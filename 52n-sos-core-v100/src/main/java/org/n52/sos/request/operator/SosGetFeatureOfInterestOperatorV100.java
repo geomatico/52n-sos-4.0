@@ -32,10 +32,10 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetFeatureOfInterestDAO;
 import org.n52.sos.encode.Encoder;
-import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
+import org.n52.sos.exception.ows.concrete.NoEncoderForResponseException;
+import org.n52.sos.exception.ows.concrete.VersionNotSupportedException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
-import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -45,13 +45,10 @@ import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.XmlOptionsHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SosGetFeatureOfInterestOperatorV100 extends
  AbstractV1RequestOperator<AbstractGetFeatureOfInterestDAO, GetFeatureOfInterestRequest> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SosGetFeatureOfInterestOperatorV100.class.getName());
     private static final String OPERATION_NAME = SosConstants.Operations.GetFeatureOfInterest.name();
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton("http://www.opengis.net/spec/SOS/1.0/conf/enhanced");
 
@@ -95,8 +92,7 @@ public class SosGetFeatureOfInterestOperatorV100 extends
             if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION) ) {
                 namespace = Sos1Constants.NS_SOS;
             } else {
-                throw new InvalidParameterValueException().at(OWSConstants.RequestParams.version)
-                        .withMessage("Received version in request is not supported!");
+                throw new VersionNotSupportedException();
             }
             
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -105,12 +101,11 @@ public class SosGetFeatureOfInterestOperatorV100 extends
             if (encoder != null) {
                 encoder.encode(response).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
                 return new ServiceResponse(baos, contentType, applyZIPcomp, true);
-                
             } else {
-                throw new NoApplicableCodeException().withMessage("No encoder for operation found!");
+                throw new NoEncoderForResponseException();
             }
         } catch (IOException ioe) {
-            throw new NoApplicableCodeException().withMessage("Error occurs while saving response to output stream!");
+            throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
     }
 }

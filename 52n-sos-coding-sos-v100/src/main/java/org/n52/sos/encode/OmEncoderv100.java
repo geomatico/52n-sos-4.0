@@ -66,6 +66,7 @@ import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
@@ -190,9 +191,8 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
         	} else {
         		return createObservation(sosObs, additionalValues);
         	}
-            
         }
-        return null;
+        throw new UnsupportedEncoderInputException(this, element);
     }
 
     private XmlObject createMeasurement(SosObservation sosObservation, Map<HelperValues, String> additionalValues)

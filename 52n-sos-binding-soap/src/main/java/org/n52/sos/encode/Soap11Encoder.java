@@ -36,6 +36,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
@@ -69,6 +70,9 @@ public class Soap11Encoder extends AbstractSoapEncoder {
     @Override
     public ServiceResponse encode(SoapResponse soapResponse,
                                   Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+        if (soapResponse == null) {
+            throw new UnsupportedEncoderInputException(this, soapResponse);
+        }
         String soapVersion = soapResponse.getSoapVersion();
         SOAPMessage soapResponseMessage;
         String action = null;

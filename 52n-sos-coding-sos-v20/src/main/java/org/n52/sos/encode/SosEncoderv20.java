@@ -70,6 +70,8 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.filter.FilterConstants;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.GMLConstants;
@@ -82,7 +84,6 @@ import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
 import org.n52.sos.ogc.ows.SwesExtension;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
@@ -184,7 +185,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         } else if (communicationObject instanceof AbstractServiceResponse) {
             return encodeResponse((AbstractServiceResponse) communicationObject);
         }
-        return null;
+        throw new UnsupportedEncoderInputException(this, communicationObject);
     }
 
     private XmlObject encodeRequests(AbstractServiceRequest request) throws OwsExceptionReport {
@@ -195,7 +196,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         } else if (request instanceof GetCapabilitiesRequest) {
             return createGetCapabilitiesRequest((GetCapabilitiesRequest) request);
         }
-        return null;
+        throw new UnsupportedEncoderInputException(this, request);
     }
 
     private XmlObject encodeResponse(AbstractServiceResponse response) throws OwsExceptionReport {
@@ -218,7 +219,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         } else if (response instanceof GetResultTemplateResponse) {
             return createGetResultTemplateResponseDocument((GetResultTemplateResponse) response);
         }
-        return null;
+        throw new UnsupportedEncoderInputException(this, response);
     }
 
     private XmlObject createCapabilitiesDocument(GetCapabilitiesResponse response) throws OwsExceptionReport {

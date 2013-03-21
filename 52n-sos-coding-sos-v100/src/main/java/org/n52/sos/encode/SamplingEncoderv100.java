@@ -39,13 +39,14 @@ import net.opengis.sampling.x10.SamplingFeatureType;
 
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -128,79 +129,85 @@ public class SamplingEncoderv100 implements Encoder<XmlObject, SosAbstractFeatur
     }
 
     private XmlObject createFeature(SosAbstractFeature absFeature) throws OwsExceptionReport {
-        SosSamplingFeature sampFeat = (SosSamplingFeature) absFeature;
-        if (absFeature.isSetGmlID()) {
-            FeaturePropertyType featureProperty = FeaturePropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-            featureProperty.setHref("#" + absFeature.getGmlId());
-            return featureProperty;
-        } else {
-            if (!sampFeat.isSetGeometry()) {
-                FeaturePropertyType featureProperty = FeaturePropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-                featureProperty.setHref(absFeature.getIdentifier().getValue());
-                if (sampFeat.isSetNames()) {
-                    featureProperty.setTitle(sampFeat.getFirstName().getValue());
-                }
+        if (absFeature instanceof SosSamplingFeature) {
+            SosSamplingFeature sampFeat = (SosSamplingFeature) absFeature;
+            if (absFeature.isSetGmlID()) {
+                FeaturePropertyType featureProperty = FeaturePropertyType.Factory.newInstance(XmlOptionsHelper
+                        .getInstance().getXmlOptions());
+                featureProperty.setHref("#" + absFeature.getGmlId());
                 return featureProperty;
-            }
-            StringBuilder builder = new StringBuilder();
-            builder.append("sf_");
-            builder.append(JavaHelper.generateID(absFeature.getIdentifier().getValue()));
-            absFeature.setGmlId(builder.toString());
-
-            SamplingFeatureDocument xbSampFeatDoc =
-            		SamplingFeatureDocument.Factory.newInstance(XmlOptionsHelper.getInstance()
-                            .getXmlOptions());
-            // ignore for now, we are in the 1.0 encoder
-            // if (sampFeat.getXmlDescription() != null) {
-            SamplingFeatureType xbSampFeature = xbSampFeatDoc.addNewSamplingFeature();
-            // TODO: CHECK for all fields
-            // set gml:id
-            xbSampFeature.setId(absFeature.getGmlId());
-
-            if (sampFeat.isSetIdentifier()
-            		&& SosHelper.checkFeatureOfInterestIdentifierForSosV2(sampFeat.getIdentifier().getValue(),
-            				Sos1Constants.SERVICEVERSION)) {
-            	xbSampFeature.addNewName().set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML, sampFeat.getIdentifier()));
-            }
-
-            // set type (is done through addNewName already?!
-            // xbSampFeature. ().setHref(sampFeat.getFeatureType());
-
-            //                if (sampFeat.isSetNames()) {
-            //                    for (CodeType sosName : sampFeat.getName()) {
-            //                        xbSampFeature.addNewName().set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML, sosName));
-            //                    }
-            //                }
-
-            // set sampledFeatures
-            // TODO: CHECK
-            if (sampFeat.getSampledFeatures() != null && !sampFeat.getSampledFeatures().isEmpty()) {
-            	for (SosAbstractFeature sampledFeature : sampFeat.getSampledFeatures()) {
-            		FeaturePropertyType sampledFeat = xbSampFeature.addNewSampledFeature();
-            		sampledFeat.set(createFeature(sampledFeature));
-            	}
             } else {
-            	FeaturePropertyType sampledFeat = xbSampFeature.addNewSampledFeature();
-            	sampledFeat.setHref(GMLConstants.NIL_UNKNOWN);
-            }
+                if (!sampFeat.isSetGeometry()) {
+                    FeaturePropertyType featureProperty = FeaturePropertyType.Factory.newInstance(XmlOptionsHelper
+                            .getInstance().getXmlOptions());
+                    featureProperty.setHref(absFeature.getIdentifier().getValue());
+                    if (sampFeat.isSetNames()) {
+                        featureProperty.setTitle(sampFeat.getFirstName().getValue());
+                    }
+                    return featureProperty;
+                }
+                StringBuilder builder = new StringBuilder();
+                builder.append("sf_");
+                builder.append(JavaHelper.generateID(absFeature.getIdentifier().getValue()));
+                absFeature.setGmlId(builder.toString());
 
-            // set position
-            LocationPropertyType xbShape = xbSampFeature.addNewLocation();
-            Encoder<XmlObject, Geometry> encoder = Configurator.getInstance().getCodingRepository()
-            		.getEncoder(CodingHelper.getEncoderKey(GMLConstants.NS_GML, sampFeat.getGeometry()));
-            if (encoder != null) {
-            	Map<HelperValues, String> additionalValues = new EnumMap<HelperValues, String>(HelperValues.class);
-            	additionalValues.put(HelperValues.GMLID, absFeature.getGmlId());
-            	XmlObject xmlObject = encoder.encode(sampFeat.getGeometry(), additionalValues);
-            	xbShape.addNewGeometry().set(xmlObject);
-            	XmlHelper.substituteElement(xbShape.getGeometry(), xmlObject);
-            	//                    encoder.substitute(xbShape.getAbstractGeometry(), xmlObject);
-            } else {
-                throw new NoApplicableCodeException()
-                        .withMessage("Error while encoding geometry for feature, needed encoder is missing!");
+                SamplingFeatureDocument xbSampFeatDoc =
+                                        SamplingFeatureDocument.Factory.newInstance(XmlOptionsHelper.getInstance()
+                        .getXmlOptions());
+                // ignore for now, we are in the 1.0 encoder
+                // if (sampFeat.getXmlDescription() != null) {
+                SamplingFeatureType xbSampFeature = xbSampFeatDoc.addNewSamplingFeature();
+                // TODO: CHECK for all fields
+                // set gml:id
+                xbSampFeature.setId(absFeature.getGmlId());
+
+                if (sampFeat.isSetIdentifier()
+                    && SosHelper.checkFeatureOfInterestIdentifierForSosV2(sampFeat.getIdentifier().getValue(),
+                                                                          Sos1Constants.SERVICEVERSION)) {
+                    xbSampFeature.addNewName().set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML, sampFeat
+                            .getIdentifier()));
+                }
+
+                // set type (is done through addNewName already?!
+                // xbSampFeature. ().setHref(sampFeat.getFeatureType());
+
+                //                if (sampFeat.isSetNames()) {
+                //                    for (CodeType sosName : sampFeat.getName()) {
+                //                        xbSampFeature.addNewName().set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML, sosName));
+                //                    }
+                //                }
+
+                // set sampledFeatures
+                // TODO: CHECK
+                if (sampFeat.getSampledFeatures() != null && !sampFeat.getSampledFeatures().isEmpty()) {
+                    for (SosAbstractFeature sampledFeature : sampFeat.getSampledFeatures()) {
+                        FeaturePropertyType sampledFeat = xbSampFeature.addNewSampledFeature();
+                        sampledFeat.set(createFeature(sampledFeature));
+                    }
+                } else {
+                    FeaturePropertyType sampledFeat = xbSampFeature.addNewSampledFeature();
+                    sampledFeat.setHref(GMLConstants.NIL_UNKNOWN);
+                }
+
+                // set position
+                LocationPropertyType xbShape = xbSampFeature.addNewLocation();
+                Encoder<XmlObject, Geometry> encoder = Configurator.getInstance().getCodingRepository()
+                        .getEncoder(CodingHelper.getEncoderKey(GMLConstants.NS_GML, sampFeat.getGeometry()));
+                if (encoder != null) {
+                    Map<HelperValues, String> additionalValues = new EnumMap<HelperValues, String>(HelperValues.class);
+                    additionalValues.put(HelperValues.GMLID, absFeature.getGmlId());
+                    XmlObject xmlObject = encoder.encode(sampFeat.getGeometry(), additionalValues);
+                    xbShape.addNewGeometry().set(xmlObject);
+                    XmlHelper.substituteElement(xbShape.getGeometry(), xmlObject);
+                    //                    encoder.substitute(xbShape.getAbstractGeometry(), xmlObject);
+                } else {
+                    throw new NoApplicableCodeException()
+                            .withMessage("Error while encoding geometry for feature, needed encoder is missing!");
+                }
+                return xbSampFeatDoc;
             }
-            return xbSampFeatDoc;
         }
+        throw new UnsupportedEncoderInputException(this, absFeature);
     }
 
     private XmlObject createFeatureCollection(List<SosAbstractFeature> features, boolean forObservation)

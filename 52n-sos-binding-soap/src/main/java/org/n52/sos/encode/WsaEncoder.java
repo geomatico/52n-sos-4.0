@@ -30,6 +30,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
@@ -88,6 +89,9 @@ public class WsaEncoder implements Encoder<Map<QName, String>, WsaHeader> {
     @Override
     public Map<QName, String> encode(WsaHeader response, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
+        if (response == null) {
+            throw new UnsupportedEncoderInputException(this, response);
+        }
         Map<QName, String> wsaHeaderValues = new HashMap<QName, String>(3);
         if (response.getReplyToAddress() != null && !response.getReplyToAddress().isEmpty()) {
             wsaHeaderValues.put(WsaConstants.QN_TO, response.getReplyToAddress());

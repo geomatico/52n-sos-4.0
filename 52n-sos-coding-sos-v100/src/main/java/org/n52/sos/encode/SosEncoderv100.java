@@ -76,6 +76,9 @@ import net.opengis.swe.x101.TimeGeometricPrimitivePropertyType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.filter.FilterConstants.ComparisonOperator;
 import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
@@ -90,8 +93,6 @@ import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
-import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -123,10 +124,6 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommunicationObject> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosEncoderv100.class);
     @SuppressWarnings("unchecked")
     private static final Set<EncoderKey> ENCODER_KEYS = CollectionHelper.union(
@@ -184,7 +181,7 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
         } else if (communicationObject instanceof AbstractServiceResponse) {
             return encodeResponse((AbstractServiceResponse) communicationObject);
         }
-        return null;
+        throw new UnsupportedEncoderInputException(this, communicationObject);
     }
 
     private XmlObject encodeRequests(AbstractServiceRequest request) throws OwsExceptionReport {
@@ -195,7 +192,7 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
 //        } else if (request instanceof GetCapabilitiesRequest) {
 //            return createGetCapabilitiesRequest((GetCapabilitiesRequest) request);
 //        }
-        return null;
+        throw new UnsupportedEncoderInputException(this, request);
     }
 
     private XmlObject encodeResponse(AbstractServiceResponse response) throws OwsExceptionReport {
@@ -221,7 +218,7 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
 //        } else if (response instanceof GetResultTemplateResponse) {
 //            return createGetResultTemplateResponseDocument((GetResultTemplateResponse) response);
 //        }
-        return null;
+        throw new UnsupportedEncoderInputException(this, response);
     }
 
     private XmlObject createCapabilitiesDocument(GetCapabilitiesResponse response) throws OwsExceptionReport {
@@ -458,7 +455,7 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
         ObservationCollectionType xb_obsCol = xb_obsColDoc.addNewObservationCollection();
         xb_obsCol.setId(SosConstants.OBS_COL_ID_PREFIX + new DateTime().getMillis());
 
-        Collection<SosObservation> observationCollection = null;
+        Collection<SosObservation> observationCollection;
 
         Encoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
         if (!(encoder instanceof ObservationEncoder)) {

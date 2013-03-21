@@ -154,11 +154,7 @@ public class SoapBinding extends Binding {
             EncoderKey key = CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse);
             Encoder<?, SoapResponse> encoder = getEncoder(key);
             if (encoder != null) {
-                ServiceResponse serviceResponse = (ServiceResponse) encoder.encode(soapResponse);
-                if (serviceResponse != null && owse.hasResponseCode()) {
-                    serviceResponse.setHttpResponseCode(owse.getResponseCode());
-                }
-                return serviceResponse;
+                return (ServiceResponse) encoder.encode(soapResponse);
             } else {
                 throw new NoEncoderForKeyException(key);
             }

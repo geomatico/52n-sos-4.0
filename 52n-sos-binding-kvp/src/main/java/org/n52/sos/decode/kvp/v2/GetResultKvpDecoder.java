@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.n52.sos.decode.DecoderException;
 import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.KvpOperationDecoderKey;
 import org.n52.sos.exception.ows.concrete.InvalidTemporalFilterParameterException;
@@ -42,7 +41,6 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetResultRequest;
-import org.n52.sos.exception.ows.concrete.DateTimeParseException;
 import org.n52.sos.util.KvpHelper;
 
 public class GetResultKvpDecoder extends AbstractKvpDecoder {
@@ -95,9 +93,7 @@ public class GetResultKvpDecoder extends AbstractKvpDecoder {
                     try {
                         request.setTemporalFilter(parseTemporalFilter(KvpHelper.checkParameterMultipleValues(
                                 parameterValues, parameterName), parameterName));
-                    } catch (DecoderException e) {
-                        throw new InvalidTemporalFilterParameterException(parameterValues).causedBy(e);
-                    } catch (DateTimeParseException e) {
+                    } catch (OwsExceptionReport e) {
                         throw new InvalidTemporalFilterParameterException(parameterValues).causedBy(e);
                     }
 

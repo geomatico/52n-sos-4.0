@@ -31,7 +31,6 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetResultDAO;
 import org.n52.sos.encode.Encoder;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.EncoderResponseUnsupportedException;
 import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
 import org.n52.sos.exception.ows.concrete.NoEncoderForResponseException;
@@ -127,7 +126,7 @@ public class SosGetResultOperatorV20 extends AbstractV2RequestOperator<AbstractG
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
-        // TODO ...
+
         exceptions.throwIfNotEmpty();
     }
     

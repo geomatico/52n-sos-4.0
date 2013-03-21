@@ -46,12 +46,13 @@ import net.opengis.swes.x20.UpdateSensorDescriptionType.Description;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.Sos2Constants.UpdateSensorDescriptionParams;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -119,24 +120,19 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
 
     @Override
     public AbstractServiceRequest decode(XmlObject xmlObject) throws OwsExceptionReport {
-        AbstractServiceRequest request = null;
         LOGGER.debug("REQUESTTYPE:" + xmlObject.getClass());
-        // validate document
         XmlHelper.validateDocument(xmlObject);
         if (xmlObject instanceof DescribeSensorDocument) {
-            DescribeSensorDocument obsDoc = (DescribeSensorDocument) xmlObject;
-            request = parseDescribeSensor(obsDoc);
+            return parseDescribeSensor((DescribeSensorDocument) xmlObject);
         } else if (xmlObject instanceof InsertSensorDocument) {
-            InsertSensorDocument xbInsSensDoc = (InsertSensorDocument) xmlObject;
-            request = parseInsertSensor(xbInsSensDoc);
+            return parseInsertSensor((InsertSensorDocument) xmlObject);
         } else if (xmlObject instanceof UpdateSensorDescriptionDocument) {
-            UpdateSensorDescriptionDocument xbUpSenDoc = (UpdateSensorDescriptionDocument) xmlObject;
-            request = parseUpdateSensorDescription(xbUpSenDoc);
+            return parseUpdateSensorDescription((UpdateSensorDescriptionDocument) xmlObject);
         } else if (xmlObject instanceof DeleteSensorDocument) {
-            DeleteSensorDocument xbDelSenDoc = (DeleteSensorDocument) xmlObject;
-            request = parseDeleteSensor(xbDelSenDoc);
+            return parseDeleteSensor((DeleteSensorDocument) xmlObject);
+        } else {
+            throw new UnsupportedDecoderInputException(this, xmlObject);
         }
-        return request;
     }
 
     /**

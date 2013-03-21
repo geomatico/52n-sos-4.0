@@ -54,8 +54,11 @@ import net.opengis.swe.x20.VectorType.Coordinate;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.NotYetSupportedException;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
+import org.n52.sos.exception.ows.concrete.XmlDecodingException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
@@ -85,9 +88,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(SweCommonEncoderv20.class);
-
     private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(
             SWEConstants.NS_SWE_20,
             SosSweCoordinate.class,
@@ -95,23 +96,22 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
             SosSweAbstractEncoding.class,
             SosSweAbstractDataComponent.class,
             SosSweDataArray.class);
-
     private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(
-        ConformanceClasses.SWE_V2_CORE,
-        ConformanceClasses.SWE_V2_UML_SIMPLE_COMPONENTS,
-        ConformanceClasses.SWE_V2_UML_RECORD_COMPONENTS,
-        ConformanceClasses.SWE_V2_UML_BLOCK_ENCODINGS,
-        ConformanceClasses.SWE_V2_UML_SIMPLE_ENCODINGS,
-        ConformanceClasses.SWE_V2_XSD_SIMPLE_COMPONENTS,
-        ConformanceClasses.SWE_V2_XSD_RECORD_COMPONENTS,
-        ConformanceClasses.SWE_V2_XSD_BLOCK_COMPONENTS,
-        ConformanceClasses.SWE_V2_XSD_SIMPLE_ENCODINGS,
-        ConformanceClasses.SWE_V2_GENERAL_ENCODING_RULES,
-        ConformanceClasses.SWE_V2_TEXT_ENCODING_RULES
-    );
+            ConformanceClasses.SWE_V2_CORE,
+            ConformanceClasses.SWE_V2_UML_SIMPLE_COMPONENTS,
+            ConformanceClasses.SWE_V2_UML_RECORD_COMPONENTS,
+            ConformanceClasses.SWE_V2_UML_BLOCK_ENCODINGS,
+            ConformanceClasses.SWE_V2_UML_SIMPLE_ENCODINGS,
+            ConformanceClasses.SWE_V2_XSD_SIMPLE_COMPONENTS,
+            ConformanceClasses.SWE_V2_XSD_RECORD_COMPONENTS,
+            ConformanceClasses.SWE_V2_XSD_BLOCK_COMPONENTS,
+            ConformanceClasses.SWE_V2_XSD_SIMPLE_ENCODINGS,
+            ConformanceClasses.SWE_V2_GENERAL_ENCODING_RULES,
+            ConformanceClasses.SWE_V2_TEXT_ENCODING_RULES);
 
     public SweCommonEncoderv20() {
-        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper
+                .join(", ", ENCODER_KEYS));
     }
 
     @Override
@@ -180,83 +180,78 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
 //            return dataArrayType;
         } else if (sosSweType instanceof SosSweDataArray) {
             DataArrayType dataArrayType =
-                    createDataArray((SosSweDataArray) sosSweType);
+                          createDataArray((SosSweDataArray) sosSweType);
             if (additionalValues.containsKey(HelperValues.FOR_OBSERVATION)) {
-                DataArrayPropertyType dataArrayProperty = DataArrayPropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                DataArrayPropertyType dataArrayProperty = DataArrayPropertyType.Factory.newInstance(XmlOptionsHelper
+                        .getInstance().getXmlOptions());
                 dataArrayProperty.setDataArray1(dataArrayType);
                 return dataArrayProperty;
             }
             return dataArrayType;
         }
-        // TODO throw exception that element could not be encoded?
-        return null;
+        throw new UnsupportedEncoderInputException(this, sosSweType);
     }
 
-    private XmlObject createAbstractDataComponent(SosSweAbstractDataComponent sosSweAbstractDataComponent, Map<HelperValues, String> additionalValues)
+    private XmlObject createAbstractDataComponent(SosSweAbstractDataComponent sosSweAbstractDataComponent,
+                                                  Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
-        try {
-            AbstractDataComponentType abstractDataComponentType = null;
-            if (sosSweAbstractDataComponent instanceof SosSweAbstractSimpleType) {
-                abstractDataComponentType = createSimpleType((SosSweAbstractSimpleType) sosSweAbstractDataComponent);
-            } else if (sosSweAbstractDataComponent instanceof SosSweDataRecord) {
-                abstractDataComponentType = createDataRecord((SosSweDataRecord) sosSweAbstractDataComponent);
-            } else if (sosSweAbstractDataComponent instanceof SosSweDataArray) {
-                abstractDataComponentType = createDataArray((SosSweDataArray) sosSweAbstractDataComponent);
-            } else if (sosSweAbstractDataComponent.getXml() != null && !sosSweAbstractDataComponent.getXml().isEmpty()) {
+        AbstractDataComponentType abstractDataComponentType = null;
+        if (sosSweAbstractDataComponent instanceof SosSweAbstractSimpleType) {
+            abstractDataComponentType = createSimpleType((SosSweAbstractSimpleType) sosSweAbstractDataComponent);
+        } else if (sosSweAbstractDataComponent instanceof SosSweDataRecord) {
+            abstractDataComponentType = createDataRecord((SosSweDataRecord) sosSweAbstractDataComponent);
+        } else if (sosSweAbstractDataComponent instanceof SosSweDataArray) {
+            abstractDataComponentType = createDataArray((SosSweDataArray) sosSweAbstractDataComponent);
+        } else if (sosSweAbstractDataComponent.getXml() != null && !sosSweAbstractDataComponent.getXml().isEmpty()) {
+            try {
                 return XmlObject.Factory.parse(sosSweAbstractDataComponent.getXml());
-            } else {
-                throw new NoApplicableCodeException()
-                        .withMessage("AbstractDataComponent can not be encoded!");
+            } catch (XmlException ex) {
+                throw new XmlDecodingException(SosSweAbstractDataComponent.class.getName(),
+                                               sosSweAbstractDataComponent.getXml(), ex);
             }
-            // add AbstractDataComponentType information
-            if (abstractDataComponentType != null) {
-                if (sosSweAbstractDataComponent.isSetDefinition()) {
-                    abstractDataComponentType.setDefinition(sosSweAbstractDataComponent.getDefinition());
-                }
-                if (sosSweAbstractDataComponent.isSetDescription()) {
-                    abstractDataComponentType.setDescription(sosSweAbstractDataComponent.getDescription());
-                }
-                if (sosSweAbstractDataComponent.isSetIdentifier()) {
-                    abstractDataComponentType.setIdentifier(sosSweAbstractDataComponent.getIdentifier());
-                }
-                if (sosSweAbstractDataComponent.isSetLabel()) {
-                    abstractDataComponentType.setLabel(sosSweAbstractDataComponent.getLabel());
-                }
-            }
-            if (abstractDataComponentType instanceof DataArrayType && additionalValues.containsKey(HelperValues.FOR_OBSERVATION)) {
-                    DataArrayPropertyType dataArrayProperty = DataArrayPropertyType.Factory.newInstance();
-                    dataArrayProperty.setDataArray1((DataArrayType)abstractDataComponentType);
-                    return dataArrayProperty;
-                }
-            return abstractDataComponentType;
-        } catch (XmlException e) {
-            throw new NoApplicableCodeException().causedBy(e)
-                    .withMessage("Error while encoding AbstractDataComponent!");
+        } else {
+            throw new NotYetSupportedException(SosSweAbstractDataComponent.class.getName(), sosSweAbstractDataComponent);
         }
+        // add AbstractDataComponentType information
+        if (abstractDataComponentType != null) {
+            if (sosSweAbstractDataComponent.isSetDefinition()) {
+                abstractDataComponentType.setDefinition(sosSweAbstractDataComponent.getDefinition());
+            }
+            if (sosSweAbstractDataComponent.isSetDescription()) {
+                abstractDataComponentType.setDescription(sosSweAbstractDataComponent.getDescription());
+            }
+            if (sosSweAbstractDataComponent.isSetIdentifier()) {
+                abstractDataComponentType.setIdentifier(sosSweAbstractDataComponent.getIdentifier());
+            }
+            if (sosSweAbstractDataComponent.isSetLabel()) {
+                abstractDataComponentType.setLabel(sosSweAbstractDataComponent.getLabel());
+            }
+        }
+        if (abstractDataComponentType instanceof DataArrayType && additionalValues
+                .containsKey(HelperValues.FOR_OBSERVATION)) {
+            DataArrayPropertyType dataArrayProperty = DataArrayPropertyType.Factory.newInstance();
+            dataArrayProperty.setDataArray1((DataArrayType) abstractDataComponentType);
+            return dataArrayProperty;
+        }
+        return abstractDataComponentType;
     }
 
-    private DataRecordType createDataRecord(SosSweDataRecord sosDataRecord) throws OwsExceptionReport    {
+    private DataRecordType createDataRecord(SosSweDataRecord sosDataRecord) throws OwsExceptionReport {
         List<SosSweField> sosFields = sosDataRecord.getFields();
         DataRecordType xbDataRecord = DataRecordType.Factory.newInstance();
         if (sosFields != null) {
             ArrayList<Field> xbFields = new ArrayList<DataRecordType.Field>(sosFields.size());
-            for (SosSweField sosSweField : sosFields)
-            {
-            	if (sosSweField != null)
-            	{
-            		Field xbField = createField(sosSweField);
-            		xbFields.add(xbField);
-            	}
-            	else
-            	{
-            		LOGGER.error("sosSweField is null is sosDataRecord");
-            	}
+            for (SosSweField sosSweField : sosFields) {
+                if (sosSweField != null) {
+                    Field xbField = createField(sosSweField);
+                    xbFields.add(xbField);
+                } else {
+                    LOGGER.error("sosSweField is null is sosDataRecord");
+                }
             }
             xbDataRecord.setFieldArray(xbFields.toArray(new Field[xbFields.size()]));
-        }
-        else
-        {
-        	LOGGER.error("sosDataRecord contained no fields");
+        } else {
+            LOGGER.error("sosDataRecord contained no fields");
         }
         return xbDataRecord;
     }
@@ -265,25 +260,25 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
         if (sosDataArray != null) {
 
             DataArrayType xbDataArray =
-                    DataArrayType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                          DataArrayType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             if (sosDataArray.isSetElementCount()) {
                 xbDataArray.addNewElementCount().setCount(createCount(sosDataArray.getElementCount()));
             }
             if (sosDataArray.isSetElementTyp()) {
-                 ElementType elementType = xbDataArray.addNewElementType();
-                 if (sosDataArray.getElementType().isSetDefinition()) {
-                     elementType.setName(sosDataArray.getElementType().getDefinition());
-                 } else {
-                     elementType.setName("Components");
-                 }
-                 
-                 elementType.addNewAbstractDataComponent()
+                ElementType elementType = xbDataArray.addNewElementType();
+                if (sosDataArray.getElementType().isSetDefinition()) {
+                    elementType.setName(sosDataArray.getElementType().getDefinition());
+                } else {
+                    elementType.setName("Components");
+                }
+
+                elementType.addNewAbstractDataComponent()
                         .set(createDataRecord((SosSweDataRecord) sosDataArray.getElementType()));
                 elementType
                         .getAbstractDataComponent()
                         .substitute(
-                                new QName(SWEConstants.NS_SWE_20, SWEConstants.EN_DATA_RECORD,
-                                        SWEConstants.NS_SWE_PREFIX), DataRecordType.type);
+                        new QName(SWEConstants.NS_SWE_20, SWEConstants.EN_DATA_RECORD,
+                                  SWEConstants.NS_SWE_PREFIX), DataRecordType.type);
             }
             if (sosDataArray.isSetEncoding()) {
                 xbDataArray.addNewEncoding().addNewAbstractEncoding();
@@ -293,8 +288,8 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
                         .getEncoding()
                         .getAbstractEncoding()
                         .substitute(
-                                new QName(SWEConstants.NS_SWE_20, SWEConstants.EN_TEXT_ENCODING,
-                                        SWEConstants.NS_SWE_PREFIX), TextEncodingType.type);
+                        new QName(SWEConstants.NS_SWE_20, SWEConstants.EN_TEXT_ENCODING,
+                                  SWEConstants.NS_SWE_PREFIX), TextEncodingType.type);
             }
             if (sosDataArray.isSetValues()) {
                 xbDataArray.addNewValues().set(createValues(sosDataArray.getValues(), sosDataArray.getEncoding()));
@@ -333,55 +328,35 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
 
     private DataRecordType.Field createField(SosSweField sweField) throws OwsExceptionReport {
         SosSweAbstractDataComponent sosElement = sweField.getElement();
-        LOGGER.trace("sweField: {}, sosElement: {}",sweField,sosElement);
+        LOGGER.trace("sweField: {}, sosElement: {}", sweField, sosElement);
         DataRecordType.Field xbField =
-                DataRecordType.Field.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                             DataRecordType.Field.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (sweField.getName() != null) {
             xbField.setName(sweField.getName());
         }
         AbstractDataComponentType xbDCD = xbField.addNewAbstractDataComponent();
-        xbDCD.set(createAbstractDataComponent(sosElement, new EnumMap<SosConstants.HelperValues, String>(HelperValues.class)));
-        if (sosElement instanceof SosSweBoolean)
-        {
+        xbDCD
+                .set(createAbstractDataComponent(sosElement, new EnumMap<SosConstants.HelperValues, String>(HelperValues.class)));
+        if (sosElement instanceof SosSweBoolean) {
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_BOOLEAN_SWE_200, BooleanType.type);
-        } 
-        else if (sosElement instanceof SosSweCategory)
-        {
+        } else if (sosElement instanceof SosSweCategory) {
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_CATEGORY_SWE_200, CategoryType.type);
-        } 
-        else if (sosElement instanceof SosSweCount)
-        {
+        } else if (sosElement instanceof SosSweCount) {
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_COUNT_SWE_200, CountType.type);
-        } 
-        else if (sosElement instanceof SosSweQuantity)
-        {
+        } else if (sosElement instanceof SosSweQuantity) {
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_QUANTITY_SWE_200, QuantityType.type);
-        } 
-        else if (sosElement instanceof SosSweText)
-        {
+        } else if (sosElement instanceof SosSweText) {
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_TEXT_ENCODING_SWE_200, TextType.type);
-        }
-        else if (sosElement instanceof SosSweTimeRange)
-        {
+        } else if (sosElement instanceof SosSweTimeRange) {
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_TIME_RANGE_SWE_200, TimeRangeType.type);
-        }
-        else if (sosElement instanceof SosSweTime) 
-        {
+        } else if (sosElement instanceof SosSweTime) {
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_TIME_SWE_200, TimeType.type);
-        }
-        else if (sosElement instanceof SosSweDataArray) {
+        } else if (sosElement instanceof SosSweDataArray) {
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_DATA_ARRAY_SWE_200, DataArrayType.type);
-        }
-        else if (sosElement instanceof SosSweDataRecord) {
+        } else if (sosElement instanceof SosSweDataRecord) {
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_DATA_RECORD_SWE_200, DataRecordType.type);
-        }
-        else
-        {
-            throw new NoApplicableCodeException()
-                    .withMessage("The type '%s' of the received %s is not supported by this encoder '%s'.",
-                                 sosElement != null ? sosElement.getClass().getName() : null,
-                                 sweField != null ? sweField.getClass().getName() : null,
-                                 getClass().getName());
+        } else {
+            throw new NotYetSupportedException(SosSweAbstractDataComponent.class.getName(), sosElement);
         }
         return xbField;
     }
@@ -409,9 +384,7 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
         } else if (sosSimpleType instanceof SosSweTime) {
             return createTime((SosSweTime) sosSimpleType);
         }
-
-        // TODO: NOT SUPPORTED EXCEPTION
-        throw new NoApplicableCodeException();
+        throw new NotYetSupportedException(SosSweAbstractSimpleType.class.getSimpleName(), sosSimpleType);
     }
 
     private BooleanType createBoolean(SosSweBoolean sosElement) {
@@ -530,7 +503,7 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
 
     private TextEncodingType createTextEncoding(SosSweTextEncoding sosTextEncoding) {
         TextEncodingType xbTextEncoding =
-                TextEncodingType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                         TextEncodingType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (sosTextEncoding.getBlockSeparator() != null) {
             xbTextEncoding.setBlockSeparator(sosTextEncoding.getBlockSeparator());
         }
@@ -545,140 +518,96 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
         }
         return xbTextEncoding;
     }
-
-    /**************************************************************************
+    /**
+     * ************************************************************************
      *
      * FIXME Clarify: Are these methods still required?
      *
      * private String createResultString(List<SosObservableProperty>
-     * phenComponents, SosObservation sosObservation, Map<ITime, Map<String,
- IValue>> valueMap) throws OwsExceptionReport {
+     * phenComponents, SosObservation sosObservation, Map<ITime, Map<String, IValue>> valueMap) throws
+     * OwsExceptionReport {
      *
      * if (!(phenComponents instanceof ArrayList)) { phenComponents = new
-     * ArrayList<SosObservableProperty>(phenComponents); } String noDataValue =
-     * sosObservation.getNoDataValue(); String tokenSeperator =
-     * sosObservation.getTokenSeparator(); String tupleSeperator =
-     * sosObservation.getTupleSeparator(); SosSweDataRecord r =
-     * sosObservation.getResultStructure();
+     * ArrayList<SosObservableProperty>(phenComponents); } String noDataValue = sosObservation.getNoDataValue(); String
+     * tokenSeperator = sosObservation.getTokenSeparator(); String tupleSeperator = sosObservation.getTupleSeparator();
+     * SosSweDataRecord r = sosObservation.getResultStructure();
      *
-     * String[] phens = new String[phenComponents.size() + 1]; int timeIndex =
-     * -1; if (r == null) { phens[timeIndex = 0] = OMConstants.PHENOMENON_TIME;
-     * for (int i = 0; i < phenComponents.size(); ++i) { phens[i+1] =
-     * phenComponents.get(i).getIdentifier(); } } else { int i = 0; for
-     * (SosSweField f : r.getFields()) { if
-     * (f.getElement().getDefinition().equals(OMConstants.PHENOMENON_TIME)) {
-     * phens[timeIndex = i] = OMConstants.PHENOMENON_TIME; } else { phens[i] =
-     * f.getElement().getDefinition(); } ++i; } } if (timeIndex < 0) { // TODO
-     * no phentimeindex found... } ITime[] times = new
-     * ArrayList<ITime>(valueMap.keySet()) .toArray(new
-     * ITime[valueMap.keySet().size()]); Arrays.sort(times); StringBuilder b =
-     * new StringBuilder();
+     * String[] phens = new String[phenComponents.size() + 1]; int timeIndex = -1; if (r == null) { phens[timeIndex = 0]
+     * = OMConstants.PHENOMENON_TIME; for (int i = 0; i < phenComponents.size(); ++i) { phens[i+1] =
+     * phenComponents.get(i).getIdentifier(); } } else { int i = 0; for (SosSweField f : r.getFields()) { if
+     * (f.getElement().getDefinition().equals(OMConstants.PHENOMENON_TIME)) { phens[timeIndex = i] =
+     * OMConstants.PHENOMENON_TIME; } else { phens[i] = f.getElement().getDefinition(); } ++i; } } if (timeIndex < 0) {
+     * // TODO no phentimeindex found... } ITime[] times = new ArrayList<ITime>(valueMap.keySet()) .toArray(new
+     * ITime[valueMap.keySet().size()]); Arrays.sort(times); StringBuilder b = new StringBuilder();
      *
-     * // dimensions will always be greater than (1,1).. // so partly roll out
-     * the loop to gain some performance b.append(getValue(0, 0, times, phens,
-     * timeIndex, noDataValue, valueMap)); for (int j = 1; j < phens.length;
-     * ++j) { b.append(tokenSeperator); b.append(getValue(0, j, times, phens,
-     * timeIndex, noDataValue, valueMap)); } for (int i = 1; i < times.length;
-     * ++i) { b.append(tupleSeperator); b.append(getValue(i, 0, times, phens,
-     * timeIndex, noDataValue, valueMap)); for (int j = 1; j < phens.length;
-     * ++j) { b.append(tokenSeperator); b.append(getValue(i, j, times, phens,
-     * timeIndex, noDataValue, valueMap)); } } b.append(tupleSeperator); return
-     * b.toString(); }
+     * // dimensions will always be greater than (1,1).. // so partly roll out the loop to gain some performance
+     * b.append(getValue(0, 0, times, phens, timeIndex, noDataValue, valueMap)); for (int j = 1; j < phens.length; ++j)
+     * { b.append(tokenSeperator); b.append(getValue(0, j, times, phens, timeIndex, noDataValue, valueMap)); } for (int
+     * i = 1; i < times.length; ++i) { b.append(tupleSeperator); b.append(getValue(i, 0, times, phens, timeIndex,
+     * noDataValue, valueMap)); for (int j = 1; j < phens.length; ++j) { b.append(tokenSeperator); b.append(getValue(i,
+     * j, times, phens, timeIndex, noDataValue, valueMap)); } } b.append(tupleSeperator); return b.toString(); }
      *
      *
-     * private String getValue(int i, int j, ITime[] times, String[] phens, int
-     * phenTimeIndex, String noDataValue, Map<ITime, Map<String, IValue>>
- valueMap) throws OwsExceptionReport { if (j == phenTimeIndex) { return
-     * DateTimeHelper.format(times[i]); } else { Map<String, IValue> value =
-     * valueMap.get(times[i]); return (value == null) ? noDataValue :
-     * getStringValue(value.get(phens[j]), noDataValue); } }
+     * private String getValue(int i, int j, ITime[] times, String[] phens, int phenTimeIndex, String noDataValue,
+     * Map<ITime, Map<String, IValue>> valueMap) throws OwsExceptionReport { if (j == phenTimeIndex) { return
+     * DateTimeHelper.format(times[i]); } else { Map<String, IValue> value = valueMap.get(times[i]); return (value ==
+     * null) ? noDataValue : getStringValue(value.get(phens[j]), noDataValue); } }
      *
      *
-     * private String getStringValue(IValue value, String noDataValue) { if
-     * (value == null) { return noDataValue; } if (value instanceof
-     * BooleanValue) { BooleanValue booleanValue = (BooleanValue) value; if
-     * (booleanValue.getValue() == null) { return noDataValue; } else { return
-     * Boolean.toString(booleanValue.getValue().booleanValue()); } } else if
-     * (value instanceof CountValue) { CountValue countValue = (CountValue)
-     * value; if (countValue.getValue() == null || (countValue.getValue() !=
-     * null && countValue.getValue() == Integer.MIN_VALUE)) { return
-     * noDataValue; } else { return
-     * Integer.toString(countValue.getValue().intValue()); } } else if (value
-     * instanceof QuantityValue) { // TODO customizable decimal seperator
-     * QuantityValue quantityValue = (QuantityValue) value; if
-     * (quantityValue.getValue() == null || (quantityValue.getValue() != null &&
-     * quantityValue.getValue().equals(Double.NaN))) { return noDataValue; }
-     * else { return Double.toString(quantityValue.getValue().doubleValue()); }
-     * } // else if (value instanceof t) { // TimeType xbTime = // (TimeType)
-     * field.addNewAbstractDataComponent().substitute( //
-     * SWEConstants.QN_TIME_SWE_200, TimeType.type); //
-     * xbTime.setDefinition(observableProperty.getIdentifier()); //
-     * xbTime.addNewUom().setHref(OMConstants.PHEN_UOM_ISO8601); // } else if
-     * (value instanceof TextValue) { TextValue textValue = (TextValue) value;
-     * // TODO should it really be tested for empty strings? isn't that a valid
-     * observation value? if (textValue.getValue() == null ||
-     * (textValue.getValue() != null && textValue.getValue().isEmpty())) {
-     * return noDataValue; } else { return textValue.getValue().toString(); } }
-     * else if (value instanceof CategoryValue) { CategoryValue categoryValue =
-     * (CategoryValue) value; if (categoryValue.getValue() == null ||
-     * (categoryValue.getValue() != null &&
-     * !categoryValue.getValue().isEmpty())) { return noDataValue; } else {
-     * return categoryValue.getValue().toString(); } } else { if
-     * (value.getValue() == null) { return noDataValue; } else { return
-     * value.getValue().toString(); } } }
+     * private String getStringValue(IValue value, String noDataValue) { if (value == null) { return noDataValue; } if
+     * (value instanceof BooleanValue) { BooleanValue booleanValue = (BooleanValue) value; if (booleanValue.getValue()
+     * == null) { return noDataValue; } else { return Boolean.toString(booleanValue.getValue().booleanValue()); } } else
+     * if (value instanceof CountValue) { CountValue countValue = (CountValue) value; if (countValue.getValue() == null
+     * || (countValue.getValue() != null && countValue.getValue() == Integer.MIN_VALUE)) { return noDataValue; } else {
+     * return Integer.toString(countValue.getValue().intValue()); } } else if (value instanceof QuantityValue) { // TODO
+     * customizable decimal seperator QuantityValue quantityValue = (QuantityValue) value; if (quantityValue.getValue()
+     * == null || (quantityValue.getValue() != null && quantityValue.getValue().equals(Double.NaN))) { return
+     * noDataValue; } else { return Double.toString(quantityValue.getValue().doubleValue()); } } // else if (value
+     * instanceof t) { // TimeType xbTime = // (TimeType) field.addNewAbstractDataComponent().substitute( //
+     * SWEConstants.QN_TIME_SWE_200, TimeType.type); // xbTime.setDefinition(observableProperty.getIdentifier()); //
+     * xbTime.addNewUom().setHref(OMConstants.PHEN_UOM_ISO8601); // } else if (value instanceof TextValue) { TextValue
+     * textValue = (TextValue) value; // TODO should it really be tested for empty strings? isn't that a valid
+     * observation value? if (textValue.getValue() == null || (textValue.getValue() != null &&
+     * textValue.getValue().isEmpty())) { return noDataValue; } else { return textValue.getValue().toString(); } } else
+     * if (value instanceof CategoryValue) { CategoryValue categoryValue = (CategoryValue) value; if
+     * (categoryValue.getValue() == null || (categoryValue.getValue() != null && !categoryValue.getValue().isEmpty())) {
+     * return noDataValue; } else { return categoryValue.getValue().toString(); } } else { if (value.getValue() == null)
+     * { return noDataValue; } else { return value.getValue().toString(); } } }
      *
-     * private void addDataComponentToField(Field field, SosObservableProperty
-     * observableProperty, Collection<Map<String, IValue>> values) { IValue
-     * value = getValueForObservableProperty(values,
-     * observableProperty.getIdentifier()); if (value != null) { if (value
-     * instanceof BooleanValue) { BooleanType xbBool = (BooleanType)
-     * field.addNewAbstractDataComponent
-     * ().substitute(SWEConstants.QN_BOOLEAN_SWE_200, BooleanType.type);
-     * xbBool.setDefinition(observableProperty.getIdentifier()); } else if
-     * (value instanceof CountValue) { CountType xbCount = (CountType)
-     * field.addNewAbstractDataComponent
+     * private void addDataComponentToField(Field field, SosObservableProperty observableProperty,
+     * Collection<Map<String, IValue>> values) { IValue value = getValueForObservableProperty(values,
+     * observableProperty.getIdentifier()); if (value != null) { if (value instanceof BooleanValue) { BooleanType xbBool
+     * = (BooleanType) field.addNewAbstractDataComponent ().substitute(SWEConstants.QN_BOOLEAN_SWE_200,
+     * BooleanType.type); xbBool.setDefinition(observableProperty.getIdentifier()); } else if (value instanceof
+     * CountValue) { CountType xbCount = (CountType) field.addNewAbstractDataComponent
      * ().substitute(SWEConstants.QN_COUNT_SWE_200, CountType.type);
-     * xbCount.setDefinition(observableProperty.getIdentifier()); } else if
-     * (value instanceof QuantityValue) { QuantityType xbQuantity =
-     * (QuantityType) field.addNewAbstractDataComponent().substitute(
+     * xbCount.setDefinition(observableProperty.getIdentifier()); } else if (value instanceof QuantityValue) {
+     * QuantityType xbQuantity = (QuantityType) field.addNewAbstractDataComponent().substitute(
      * SWEConstants.QN_QUANTITY_SWE_200, QuantityType.type);
-     * xbQuantity.setDefinition(observableProperty.getIdentifier());
-     * UnitReference xb_uom = xbQuantity.addNewUom(); // FIXME set the unit of
-     * the observed property while inserting result String uom =
-     * observableProperty.getUnit(); if (uom == null || uom.trim().isEmpty()) {
-     * uom = value.getUnit() == null ? "" : value.getUnit(); }
-     * xb_uom.setCode(uom); } // else if (value instanceof t) { // TimeType
-     * xbTime = // (TimeType) field.addNewAbstractDataComponent().substitute( //
-     * SWEConstants.QN_TIME_SWE_200, TimeType.type); //
+     * xbQuantity.setDefinition(observableProperty.getIdentifier()); UnitReference xb_uom = xbQuantity.addNewUom(); //
+     * FIXME set the unit of the observed property while inserting result String uom = observableProperty.getUnit(); if
+     * (uom == null || uom.trim().isEmpty()) { uom = value.getUnit() == null ? "" : value.getUnit(); }
+     * xb_uom.setCode(uom); } // else if (value instanceof t) { // TimeType xbTime = // (TimeType)
+     * field.addNewAbstractDataComponent().substitute( // SWEConstants.QN_TIME_SWE_200, TimeType.type); //
      * xbTime.setDefinition(observableProperty.getIdentifier()); //
-     * xbTime.addNewUom().setHref(OMConstants.PHEN_UOM_ISO8601); // } else if
-     * (value instanceof TextValue) { TextType xbText = (TextType)
-     * field.addNewAbstractDataComponent
-     * ().substitute(SWEConstants.QN_TEXT_SWE_200, TextType.type);
-     * xbText.setDefinition(observableProperty.getIdentifier()); } else if
-     * (value instanceof CategoryValue) { CategoryType xbCategory =
-     * (CategoryType) field.addNewAbstractDataComponent().substitute(
+     * xbTime.addNewUom().setHref(OMConstants.PHEN_UOM_ISO8601); // } else if (value instanceof TextValue) { TextType
+     * xbText = (TextType) field.addNewAbstractDataComponent ().substitute(SWEConstants.QN_TEXT_SWE_200, TextType.type);
+     * xbText.setDefinition(observableProperty.getIdentifier()); } else if (value instanceof CategoryValue) {
+     * CategoryType xbCategory = (CategoryType) field.addNewAbstractDataComponent().substitute(
      * SWEConstants.QN_CATEGORY_SWE_200, CategoryType.type);
-     * xbCategory.setDefinition(observableProperty.getIdentifier()); } else {
-     * TextType xbText = (TextType)
-     * field.addNewAbstractDataComponent().substitute
-     * (SWEConstants.QN_TEXT_SWE_200, TextType.type);
-     * xbText.setDefinition(observableProperty.getIdentifier()); } String[]
-     * uriParts = observableProperty.getIdentifier().split("/|:"); //
-     * field.setName(uriParts[uriParts.length - 1]); field.setName("_" + new
-     * DateTime().getMillis()); } else { //
-     * field.setName(observableProperty.getIdentifier
-     * ().replace(SosConstants.PHENOMENON_PREFIX, "")); field.setName("_" + new
-     * DateTime().getMillis()); TextType xbText = (TextType)
-     * field.addNewAbstractDataComponent
-     * ().substitute(SWEConstants.QN_TEXT_SWE_200, TextType.type);
+     * xbCategory.setDefinition(observableProperty.getIdentifier()); } else { TextType xbText = (TextType)
+     * field.addNewAbstractDataComponent().substitute (SWEConstants.QN_TEXT_SWE_200, TextType.type);
+     * xbText.setDefinition(observableProperty.getIdentifier()); } String[] uriParts =
+     * observableProperty.getIdentifier().split("/|:"); // field.setName(uriParts[uriParts.length - 1]);
+     * field.setName("_" + new DateTime().getMillis()); } else { // field.setName(observableProperty.getIdentifier
+     * ().replace(SosConstants.PHENOMENON_PREFIX, "")); field.setName("_" + new DateTime().getMillis()); TextType xbText
+     * = (TextType) field.addNewAbstractDataComponent ().substitute(SWEConstants.QN_TEXT_SWE_200, TextType.type);
      * xbText.setDefinition(observableProperty.getIdentifier()); }
      *
      * }
      *
-     * private IValue getValueForObservableProperty(Collection<Map<String,
-     * IValue>> values, String identifier) { for (Map<String, IValue> map :
-     * values) { if (map.get(identifier) != null) { return map.get(identifier);
-     * } } return null; }
+     * private IValue getValueForObservableProperty(Collection<Map<String, IValue>> values, String identifier) { for
+     * (Map<String, IValue> map : values) { if (map.get(identifier) != null) { return map.get(identifier); } } return
+     * null; }
      */
 }

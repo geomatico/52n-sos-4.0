@@ -47,11 +47,12 @@ import net.opengis.sos.x10.GetObservationDocument.GetObservation.FeatureOfIntere
 import net.opengis.sos.x10.ResponseModeType.Enum;
 
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
@@ -72,10 +73,6 @@ import org.slf4j.LoggerFactory;
 
 public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObject, XmlObject> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosDecoderv100.class);
     @SuppressWarnings("unchecked")
     private static final  Set<DecoderKey> DECODER_KEYS = CollectionHelper.union(
@@ -189,7 +186,7 @@ public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObjec
 //        }
 
         else {
-            throw new NoApplicableCodeException().withMessage("The request is not supported by this server!");
+            throw new UnsupportedDecoderInputException(this, xmlObject);
         }
         return response;
     }

@@ -38,6 +38,7 @@ import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.OwsExceptionCode;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.ows.CodedException;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -81,6 +82,9 @@ public class Soap12Encoder extends AbstractSoapEncoder {
     @Override
     public ServiceResponse encode(SoapResponse response, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
+        if (response == null) {
+            throw new UnsupportedEncoderInputException(this, response);
+        }
         String action = null;
         EnvelopeDocument envelopeDoc = EnvelopeDocument.Factory.newInstance();
         Envelope envelope = envelopeDoc.addNewEnvelope();

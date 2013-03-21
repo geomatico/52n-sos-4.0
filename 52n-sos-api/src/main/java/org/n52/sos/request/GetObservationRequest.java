@@ -25,6 +25,7 @@ package org.n52.sos.request;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -478,13 +479,31 @@ public class GetObservationRequest extends AbstractServiceRequest {
     }
 
     public List<TemporalFilter> getFirstLatestTemporalFilter() {
-        // TODO Auto-generated method stub
-        return null;
+        List<TemporalFilter> tf = new LinkedList<TemporalFilter>();
+        for (TemporalFilter temporalFilter : temporalFilters) {
+            if (temporalFilter.getTime() instanceof TimeInstant) {
+                TimeInstant ti = (TimeInstant) temporalFilter.getTime();
+                if (ti.isSetIndeterminateValue() && FirstLatest.contains(ti.getIndeterminateValue())) {
+                    tf.add(temporalFilter);
+                }
+            }
+        }
+        return tf;
     }
 
     public List<TemporalFilter> getNotFirstLatestTemporalFilter() {
-        // TODO Auto-generated method stub
-        return null;
+        List<TemporalFilter> tf = new LinkedList<TemporalFilter>();
+        for (TemporalFilter temporalFilter : temporalFilters) {
+            if (temporalFilter.getTime() instanceof TimeInstant) {
+                TimeInstant ti = (TimeInstant) temporalFilter.getTime();
+                if (!ti.isSetIndeterminateValue() || !FirstLatest.contains(ti.getIndeterminateValue())) {
+                    tf.add(temporalFilter);
+                }
+            } else {
+                tf.add(temporalFilter);
+            }
+        }
+        return tf;
     }
 
     public boolean hasTemporalFilters() {

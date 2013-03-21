@@ -32,10 +32,11 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetCapabilitiesDAO;
 import org.n52.sos.encode.Encoder;
-import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.EncoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
+import org.n52.sos.exception.ows.concrete.VersionNotSupportedException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -44,7 +45,6 @@ import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
@@ -93,16 +93,14 @@ public class SosGetCapabilitiesOperatorV20 extends AbstractV2RequestOperator<Abs
                 } else if (encodedObject instanceof ServiceResponse) {
                     return (ServiceResponse) encodedObject;
                 } else {
-                    throw new NoApplicableCodeException().withMessage("The encoder response is not supported!");
+                    throw new EncoderResponseUnsupportedException();
                 }
             } else {
-                throw new InvalidParameterValueException().at(OWSConstants.RequestParams.version)
-                        .withMessage("Received version in request is not supported!");
+                throw new VersionNotSupportedException();
             }
 
         } catch (IOException ioe) {
-            throw new NoApplicableCodeException().causedBy(ioe)
-                    .withMessage("Error occurs while saving response to output stream!");
+            throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
     }
 

@@ -37,47 +37,33 @@ import org.n52.sos.decode.XmlOperationDecoderKey;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.XmlEncoderKey;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.exception.ows.concrete.DecoderResponseUnsupportedException;
-import org.n52.sos.exception.ows.concrete.EncoderResponseUnsupportedException;
 import org.n52.sos.exception.ows.concrete.NoDecoderForKeyException;
+import org.n52.sos.exception.ows.concrete.NoEncoderForKeyException;
 import org.n52.sos.exception.ows.concrete.XmlDecodingException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.Configurator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class CodingHelper {
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(CodingHelper.class);
     
     public static Object decodeXmlElement(XmlObject x) throws OwsExceptionReport {
         return decodeXmlObject(x);
     }
 
     public static <T> XmlObject encodeObjectToXml(String namespace, T o,
-                                                  Map<SosConstants.HelperValues, String> helperValues) throws
-            OwsExceptionReport {
-        Encoder<XmlObject, T> encoder = getEncoder(namespace, o);
-        XmlObject encodedObject = encoder.encode(o, helperValues);
-        if (encodedObject == null) {
-            throw new NoApplicableCodeException()
-                    .withMessage("Encoding of type \"%s\" using namespace key \"%s\" failed", o.getClass(), namespace);
-        }
-        return encodedObject;
+                                                  Map<SosConstants.HelperValues, String> helperValues)
+            throws OwsExceptionReport {
+        return getEncoder(namespace, o).encode(o, helperValues);
     }
     
     public static <T> Encoder<XmlObject, T> getEncoder(String namespace, T o) throws OwsExceptionReport {
         EncoderKey key = getEncoderKey(namespace, o);
         Encoder<XmlObject, T> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
         if (encoder == null) {
-            throw new NoApplicableCodeException()
-                    .withMessage("No encoder found for key \"%s\".", key);
+            throw new NoEncoderForKeyException(key);
         }
         return encoder;
     }
@@ -141,11 +127,7 @@ public class CodingHelper {
         if (decoder == null) {
             throw new NoDecoderForKeyException(key);
         }
-        Object decodedObject = decoder.decode(xbObject);
-        if (decodedObject == null) {
-            throw new DecoderResponseUnsupportedException(xbObject.xmlText(), decodedObject);
-        }
-        return decodedObject;
+        return decoder.decode(xbObject);
     }
 
     public static Object decodeXmlObject(String xmlString) throws OwsExceptionReport {

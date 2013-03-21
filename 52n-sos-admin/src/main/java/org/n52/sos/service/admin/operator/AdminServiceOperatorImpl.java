@@ -28,9 +28,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.n52.sos.exception.AdministratorException;
+import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.admin.AdministratorConstants.AdministratorParams;
@@ -56,8 +56,7 @@ public class AdminServiceOperatorImpl extends AdminServiceOperator {
 
 	@Override
     public ServiceResponse doGetOperation(HttpServletRequest req) throws AdministratorException, OwsExceptionReport {
-
-        AdminRequest request = null;
+        AdminRequest request;
         if (req.getParameterMap() == null || (req.getParameterMap() != null && req.getParameterMap().isEmpty())) {
             throw new MissingParameterValueException(OWSConstants.RequestParams.request);
         }

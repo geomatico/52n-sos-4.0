@@ -59,7 +59,7 @@ public class KvpHelper {
     }
 
     public static String checkParameterSingleValue(String parameterValue, String parameterName)
-            throws OwsExceptionReport {
+            throws MissingParameterValueException, InvalidParameterValueException {
         if (checkParameterMultipleValues(parameterValue, parameterName).size() == 1) {
             return parameterValue;
         } else {
@@ -67,8 +67,13 @@ public class KvpHelper {
         }
     }
 
+    public static String checkParameterSingleValue(String parameterValue, Enum<?> parameterName)
+            throws MissingParameterValueException, InvalidParameterValueException {
+        return checkParameterSingleValue(parameterValue, parameterName.name());
+    }
+
     public static List<String> checkParameterMultipleValues(String parameterValues, String parameterName)
-            throws OwsExceptionReport {
+            throws MissingParameterValueException, InvalidParameterValueException {
         if (parameterValues.isEmpty()) {
             throw new MissingParameterValueException(parameterName);
         }
@@ -81,10 +86,21 @@ public class KvpHelper {
         return splittedParameterValues;
     }
 
-    public static void checkParameterValue(String parameterValue, String parameterName) throws OwsExceptionReport {
+    public static List<String> checkParameterMultipleValues(String parameterValues, Enum<?> parameterName) throws
+            MissingParameterValueException, InvalidParameterValueException {
+        return checkParameterMultipleValues(parameterValues, parameterName.name());
+    }
+
+    public static void checkParameterValue(String parameterValue, String parameterName) throws
+            MissingParameterValueException, InvalidParameterValueException {
         if (isNullOrEmpty(parameterValue)) {
             throw new MissingParameterValueException(parameterName);
         }
+    }
+
+    public static void checkParameterValue(String parameterValue, Enum<?> parameterName) throws
+            MissingParameterValueException, InvalidParameterValueException {
+        checkParameterValue(parameterValue, parameterName.name());
     }
 
     public static boolean isNullOrEmpty(String parameterValue) {
@@ -108,11 +124,12 @@ public class KvpHelper {
      */
     @Deprecated
     public static String getRequestParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
-        String requestParameterValue = getParameterValue(RequestParams.request.name(), parameterValueMap);
-        checkParameterValue(requestParameterValue, RequestParams.request.name());
+        String requestParameterValue = getParameterValue(RequestParams.request, parameterValueMap);
+        checkParameterValue(requestParameterValue, RequestParams.request);
         return requestParameterValue;
     }
 
+    @Deprecated
     public static String getParameterValue(String parameterName, Map<String, String> parameterMap) {
         for (String key : parameterMap.keySet()) {
             if (key.equalsIgnoreCase(parameterName)) {
@@ -120,6 +137,10 @@ public class KvpHelper {
             }
         }
         return null;
+    }
+
+    public static String getParameterValue(Enum<?> parameterName, Map<String, String> parameterMap) {
+        return getParameterValue(parameterName.name(), parameterMap);
     }
     
     private KvpHelper() {

@@ -97,16 +97,16 @@ public abstract class AbstractSoapDecoder implements Decoder<SoapRequest, XmlObj
     /**
      * Parses the SOAPBody content to a text representation
      *
-     * @param soapMessageRequest SOAP message
+     * @param message SOAP message
      *
      * @return SOAPBody content as text
      *
      *
      * @throws OwsExceptionReport * if an error occurs.
      */
-    protected XmlObject getSOAPBodyContent(SOAPMessage soapMessageRequest) throws OwsExceptionReport {
+    protected XmlObject getSOAPBodyContent(SOAPMessage message) throws OwsExceptionReport {
         try {
-            Document bodyRequestDoc = soapMessageRequest.getSOAPBody().extractContentAsDocument();
+            Document bodyRequestDoc = message.getSOAPBody().extractContentAsDocument();
             XmlOptions options = XmlOptionsHelper.getInstance().getXmlOptions();
             String xmlString = W3cHelper.nodeToXmlString(bodyRequestDoc.getDocumentElement());
             return XmlObject.Factory.parse(xmlString, options);
@@ -148,11 +148,10 @@ public abstract class AbstractSoapDecoder implements Decoder<SoapRequest, XmlObj
     }
 
     protected String checkSoapAction(String soapAction, Map<String, SoapHeader> soapHeader) {
-        if ((soapAction != null && !soapAction.isEmpty())) {
+        if (soapAction != null && !soapAction.isEmpty()) {
             return soapAction;
         } else if (soapHeader != null && soapHeader.containsKey(WsaConstants.NS_WSA)) {
-            WsaHeader wsaHeaderRequest = (WsaHeader) soapHeader.get(WsaConstants.NS_WSA);
-            return wsaHeaderRequest.getActionValue();
+            return ((WsaHeader) soapHeader.get(WsaConstants.NS_WSA)).getActionValue();
         }
         return null;
     }

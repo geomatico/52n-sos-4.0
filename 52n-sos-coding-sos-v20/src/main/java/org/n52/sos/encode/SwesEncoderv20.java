@@ -37,6 +37,7 @@ import net.opengis.swes.x20.UpdateSensorDescriptionResponseDocument;
 import net.opengis.swes.x20.UpdateSensorDescriptionResponseType;
 
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -110,7 +111,7 @@ public class SwesEncoderv20 implements Encoder<XmlObject, AbstractServiceRespons
         } else if (response instanceof DeleteSensorResponse) {
             return createDeleteSensorResponse((DeleteSensorResponse) response);
         }
-        return null;
+        throw new UnsupportedEncoderInputException(this, response);
     }
 
     private XmlObject createDescribeSensorResponse(DescribeSensorResponse response) throws OwsExceptionReport {

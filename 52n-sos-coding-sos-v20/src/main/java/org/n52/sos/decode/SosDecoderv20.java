@@ -63,8 +63,9 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.concrete.MissingResultValuesException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.MissingResultValuesException;
+import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.time.ITime;
@@ -159,76 +160,35 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
     }
 
     @Override
-    public AbstractServiceCommunicationObject decode(XmlObject xmlObject) throws OwsExceptionReport {
-        AbstractServiceCommunicationObject response = null;
-        LOGGER.debug("REQUESTTYPE:" + xmlObject.getClass());
-
+    public AbstractServiceCommunicationObject decode(XmlObject xml) throws OwsExceptionReport {
+        LOGGER.debug("REQUESTTYPE:" + xml.getClass());
         // validate document
-        XmlHelper.validateDocument(xmlObject);
-
-        // getCapabilities request
-        if (xmlObject instanceof GetCapabilitiesDocument) {
-            GetCapabilitiesDocument getCapsDoc = (GetCapabilitiesDocument) xmlObject;
-            response = parseGetCapabilities(getCapsDoc);
+        XmlHelper.validateDocument(xml);
+        if (xml instanceof GetCapabilitiesDocument) {
+            return parseGetCapabilities((GetCapabilitiesDocument) xml);
+        } else if (xml instanceof GetObservationDocument) {
+            return parseGetObservation((GetObservationDocument) xml);
+        } else if (xml instanceof GetFeatureOfInterestDocument) {
+            return parseGetFeatureOfInterest((GetFeatureOfInterestDocument) xml);
+        } else if (xml instanceof GetObservationByIdDocument) {
+            return parseGetObservationById((GetObservationByIdDocument) xml);
+        } else if (xml instanceof InsertObservationDocument) {
+            return parseInsertObservation((InsertObservationDocument) xml);
+        } else if (xml instanceof InsertResultTemplateDocument) {
+            return parseInsertResultTemplate((InsertResultTemplateDocument) xml);
+        } else if (xml instanceof InsertResultDocument) {
+            return parseInsertResult((InsertResultDocument) xml);
+        } else if (xml instanceof GetResultTemplateDocument) {
+            return parseGetResultTemplate((GetResultTemplateDocument) xml);
+        } else if (xml instanceof GetResultDocument) {
+            return parseGetResult((GetResultDocument) xml);
+        } else if (xml instanceof GetResultTemplateResponseDocument) {
+            return parseGetResultTemplateResponse((GetResultTemplateResponseDocument) xml);
+        } else if (xml instanceof GetResultResponseDocument) {
+            return parseGetResultResponse((GetResultResponseDocument) xml);
+        } else {
+            throw new UnsupportedDecoderInputException(this, xml);
         }
-
-        // getObservation request
-        else if (xmlObject instanceof GetObservationDocument) {
-            GetObservationDocument getObsDoc = (GetObservationDocument) xmlObject;
-            response = parseGetObservation(getObsDoc);
-        }
-
-        // getFeatureOfInterest request
-        else if (xmlObject instanceof GetFeatureOfInterestDocument) {
-            GetFeatureOfInterestDocument getFoiDoc = (GetFeatureOfInterestDocument) xmlObject;
-            response = parseGetFeatureOfInterest(getFoiDoc);
-        }
-
-        else if (xmlObject instanceof GetObservationByIdDocument) {
-            GetObservationByIdDocument getObsByIdDoc = (GetObservationByIdDocument) xmlObject;
-            response = parseGetObservationById(getObsByIdDoc);
-        }
-
-        else if (xmlObject instanceof InsertObservationDocument) {
-            InsertObservationDocument insertObservationDoc = (InsertObservationDocument) xmlObject;
-            response = parseInsertObservation(insertObservationDoc);
-        }
-
-        else if (xmlObject instanceof InsertResultTemplateDocument) {
-            InsertResultTemplateDocument insertResultTemplateDoc = (InsertResultTemplateDocument) xmlObject;
-            response = parseInsertResultTemplate(insertResultTemplateDoc);
-        }
-
-        else if (xmlObject instanceof InsertResultDocument) {
-            InsertResultDocument insertResultDoc = (InsertResultDocument) xmlObject;
-            response = parseInsertResult(insertResultDoc);
-        }
-
-        else if (xmlObject instanceof GetResultTemplateDocument) {
-            GetResultTemplateDocument getResultTemplateDoc = (GetResultTemplateDocument) xmlObject;
-            response = parseGetResultTemplate(getResultTemplateDoc);
-        }
-
-        else if (xmlObject instanceof GetResultDocument) {
-            GetResultDocument getResultTemplateDoc = (GetResultDocument) xmlObject;
-            response = parseGetResult(getResultTemplateDoc);
-        }
-
-        else if (xmlObject instanceof GetResultTemplateResponseDocument) {
-            GetResultTemplateResponseDocument getResultTemplateResponseDoc =
-                    (GetResultTemplateResponseDocument) xmlObject;
-            response = parseGetResultTemplateResponse(getResultTemplateResponseDoc);
-        }
-
-        else if (xmlObject instanceof GetResultResponseDocument) {
-            GetResultResponseDocument getResultResponseDoc = (GetResultResponseDocument) xmlObject;
-            response = parseGetResultResponse(getResultResponseDoc);
-        }
-
-        else {
-            throw new NoApplicableCodeException().withMessage("The request is not supported by this server!");
-        }
-        return response;
     }
 
     /**

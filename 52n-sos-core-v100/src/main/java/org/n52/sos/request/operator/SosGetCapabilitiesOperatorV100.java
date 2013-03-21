@@ -31,9 +31,9 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetCapabilitiesDAO;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetCapabilitiesRequest;
@@ -84,8 +84,7 @@ public class SosGetCapabilitiesOperatorV100 extends AbstractV1RequestOperator<Ab
             return new ServiceResponse(baos, contentType, zipCompr, true);
 
         } catch (IOException ioe) {
-            throw new NoApplicableCodeException().causedBy(ioe)
-                    .withMessage("Error occurs while saving response to output stream!");
+            throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
     }
 
@@ -116,5 +115,4 @@ public class SosGetCapabilitiesOperatorV100 extends AbstractV1RequestOperator<Ab
 
         return zipCompr;
     }
-
 }

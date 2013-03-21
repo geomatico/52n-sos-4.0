@@ -32,12 +32,12 @@ import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractDescribeSensorDAO;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
 import org.n52.sos.exception.ows.concrete.InvalidOutputFormatException;
 import org.n52.sos.exception.ows.concrete.InvalidProcedureDescriptionFormatException;
 import org.n52.sos.exception.ows.concrete.MissingProcedureDescriptionFormatException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.VersionNotSupportedException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
-import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos1Constants;
@@ -114,9 +114,7 @@ public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<Abs
                     contentType = SensorMLConstants.SENSORML_CONTENT_TYPE;
                 }
             } else {
-                throw new InvalidParameterValueException()
-                        .at(OWSConstants.RequestParams.version)
-                        .withMessage("Received version in request is not supported!");
+                throw new VersionNotSupportedException();
             }
 
             Encoder<XmlObject, DescribeSensorResponse> encoder = CodingHelper.getEncoder(namespace, response);
@@ -131,8 +129,7 @@ public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<Abs
                 }
             }
         } catch (IOException ioe) {
-            throw new NoApplicableCodeException().causedBy(ioe)
-                    .withMessage("Error occurs while saving response to output stream!");
+            throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
     }
 

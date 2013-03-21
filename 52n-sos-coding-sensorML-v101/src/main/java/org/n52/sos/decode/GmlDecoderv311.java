@@ -39,6 +39,7 @@ import net.opengis.gml.TimePositionType;
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
@@ -95,12 +96,11 @@ public class GmlDecoderv311 implements Decoder<Object, XmlObject> {
             return parseTimeInstant(((TimeInstantDocument) xmlObject).getTimeInstant());
         } else if (xmlObject instanceof TimePeriodDocument) {
             return parseTimePeriod(((TimePeriodDocument) xmlObject).getTimePeriod());
-        }
-        if (xmlObject instanceof CodeType) {
+        } else if (xmlObject instanceof CodeType) {
             return parseCodeType((CodeType) xmlObject);
+        } else {
+            throw new UnsupportedDecoderInputException(this, xmlObject);
         }
-
-        return null;
     }
 
     private Geometry getGeometry4BBOX(EnvelopeDocument xb_bbox) throws OwsExceptionReport {

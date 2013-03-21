@@ -64,8 +64,8 @@ import net.opengis.swe.x101.VectorType.Coordinate;
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.NotYetSupportedException;
+import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
 import org.n52.sos.ogc.swe.RangeValue;
@@ -90,14 +90,12 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SweCommonDecoderV101 implements Decoder<Object, Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SweCommonDecoderV101.class);
-
     private static final Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(SWEConstants.NS_SWE,
             DataArrayDocument.class,
             DataArrayType.class,
@@ -173,9 +171,7 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         } else if (element instanceof AbstractDataRecordDocument) {
             return parseAbstractDataComponentType(((AbstractDataRecordDocument) element).getAbstractDataRecord());
         } else {
-            throw new NoApplicableCodeException()
-                    .withMessage("The requested element '%s' is not supported by this server!",
-                                 element instanceof XmlObject ? XmlHelper.getLocalName(((XmlObject) element)) : element);
+            throw new UnsupportedDecoderInputException(this, element);
         }
     }
     
@@ -326,7 +322,7 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
 
     private SosSweAbstractSimpleType<RangeValue<Integer>> parseCountRange(CountRange countRange) throws
             OwsExceptionReport {
-        throw new NotYetSupportedException().forFeature("CountRange");
+        throw new NotYetSupportedException("CountRange");
     }
 
     private SosSweAbstractSimpleType<String> parseObservableProperty(ObservableProperty observableProperty) {
@@ -353,7 +349,7 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
 
     private SosSweAbstractSimpleType<RangeValue<Double>> parseQuantityRange(QuantityRange quantityRange) throws
             OwsExceptionReport {
-        throw new NotYetSupportedException().forFeature("QuantityRange");
+        throw new NotYetSupportedException("QuantityRange");
     }
 
     private SosSweAbstractSimpleType<?> parseText(Text xbText) {

@@ -21,24 +21,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.request.operator;
+package org.n52.sos.exception.ows.concrete;
 
-import org.n52.sos.ds.OperationDAO;
-import org.n52.sos.ogc.sos.Sos1Constants;
-import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.ogc.sos.Sos1Constants.DescribeSensorParams;
 
-/**
- * @param <T> The OperationDAO implementation class
- * @param <R> The request type
- *
- * @author Christian Autermann <c.autermann@52north.org>
- */
-public abstract class AbstractV1RequestOperator<T extends OperationDAO, R extends AbstractServiceRequest> 
-                                                            extends AbstractRequestOperator<T, R> {
-    
-    public AbstractV1RequestOperator(String operationName, Class<R> requestType) {
-        super(SosConstants.SOS, Sos1Constants.SERVICEVERSION, operationName, requestType);
+public class InvalidOutputFormatParameterException extends InvalidParameterValueException {
+    private static final long serialVersionUID = 21928020999418921L;
+
+    public InvalidOutputFormatParameterException(String value) {
+        super(DescribeSensorParams.outputFormat, value);
     }
-    
 }

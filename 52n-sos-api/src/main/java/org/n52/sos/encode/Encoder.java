@@ -26,25 +26,57 @@ package org.n52.sos.encode;
 import java.util.Map;
 import java.util.Set;
 
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.ConformanceClass;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 
 /**
+ * Generic interface for Encoders.
+ *
  * @param <T> the resulting type, the "Target"
  * @param <S> the input type, the "Source"
  */
 public interface Encoder<T, S> extends ConformanceClass {
     /**
-     * @return List of supported encodings of this implementation (identified by {@link EncoderKeyType})
+     * @return List of supported encodings of this implementation (identified by {@link EncoderKey})
      */
     public Set<EncoderKey> getEncoderKeyType();
 
-    public T encode(S objectToEncode) throws OwsExceptionReport;
+    /**
+     * Encodes the specified object.
+     *
+     * @param objectToEncode the object to encode
+     *
+     * @return the encoded object
+     *
+     * @throws OwsExceptionReport               if an error occurs
+     * @throws UnsupportedEncoderInputException if the supplied object (or any of it's contents) is not supported by
+     *                                          this encoder
+     */
+    public T encode(S objectToEncode) throws OwsExceptionReport, UnsupportedEncoderInputException;
 
-    public T encode(S objectToEncode, Map<HelperValues, String> additionalValues) throws OwsExceptionReport;
+    /**
+     * Encodes the specified object with the specified {@linkplain HelperValues}.
+     *
+     * @param objectToEncode the object to encode
+     * @param additionalValues the helper values
+     *
+     * @return the encoded object
+     *
+     * @throws OwsExceptionReport               if an error occurs
+     * @throws UnsupportedEncoderInputException if the supplied object (or any of it's contents) is not supported by
+     *                                          this encoder
+     */
+    public T encode(S objectToEncode, Map<HelperValues, String> additionalValues) throws OwsExceptionReport,
+                                                                                         UnsupportedEncoderInputException;
 
+    /**
+     * Get the {@linkplain SupportedTypeKey}
+     *
+     * @return the supported key types
+     */
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
 
     /**

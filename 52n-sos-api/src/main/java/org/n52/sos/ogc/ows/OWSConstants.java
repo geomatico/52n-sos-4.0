@@ -25,10 +25,10 @@ package org.n52.sos.ogc.ows;
 
 import javax.xml.namespace.QName;
 
+import org.n52.sos.exception.ows.OwsExceptionCode;
 
 /**
  * Constants for OWS.
- * 
  */
 public interface OWSConstants {
 
@@ -85,6 +85,8 @@ public interface OWSConstants {
     String EN_EXCEPTION_TEXT = "ExceptionText";
     
     QName QN_EXCEPTION = new QName(NS_OWS, EN_EXCEPTION, NS_OWS_PREFIX);
+    QName QN_EXCEPTION_TEXT = new QName(NS_OWS, EN_EXCEPTION_TEXT, NS_OWS_PREFIX);
+    QName QN_NO_APPLICABLE_CODE = new QName(NS_OWS, OwsExceptionCode.NoApplicableCode.name(), NS_OWS_PREFIX);
 
     /**
      * Enumeration for related feature role

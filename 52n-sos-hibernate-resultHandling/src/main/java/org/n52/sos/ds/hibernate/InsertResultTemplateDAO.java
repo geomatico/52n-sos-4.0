@@ -31,23 +31,16 @@ import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateUtilities;
-import org.n52.sos.exception.ows.concrete.InvalidObservationTypeException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.InvalidObservationTypeException;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.response.InsertResultTemplateResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class InsertResultTemplateDAO extends AbstractInsertResultTemplateDAO {
 
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(InsertResultTemplateDAO.class);
-    
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
     @Override
@@ -79,7 +72,6 @@ public class InsertResultTemplateDAO extends AbstractInsertResultTemplateDAO {
                 HibernateUtilities.checkObservationConstellationOfferingObservationTypeForObservation(sosObsConst, offeringID,
                         session, Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
                 if (obsConstOffObsType != null) {
-                    
                     FeatureOfInterest feature =
                             HibernateUtilities.checkOrInsertFeatureOfInterest(sosObsConst.getFeatureOfInterest(),
                                     session);
@@ -98,6 +90,11 @@ public class InsertResultTemplateDAO extends AbstractInsertResultTemplateDAO {
             }
             throw new NoApplicableCodeException().causedBy(he)
                     .withMessage("Insert result template into database failed!");
+        } catch (OwsExceptionReport owse) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw owse;
         } finally {
             sessionHolder.returnSession(session);
         }

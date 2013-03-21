@@ -34,31 +34,66 @@ import org.n52.sos.response.InsertSensorResponse;
 import org.n52.sos.util.Cleanupable;
 
 /**
- * TODO JavaDoc
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public interface ContentCacheController extends Cleanupable {
-
+    /**
+     * @return the content cache
+     */
     ContentCache getCache();
 
+    /**
+     * Update the cache after a observation was deleted.
+     *
+     * @throws OwsExceptionReport if an error occurs
+     */
     void updateAfterObservationDeletion() throws OwsExceptionReport;
 
+    /**
+     * Update the cache after a observation was inserted.
+     *
+     * @param sosRequest the InsertObservation request
+     */
     void updateAfterObservationInsertion(InsertObservationRequest sosRequest);
 
+    /**
+     * Update the cache after a result was inserted.
+     *
+     * @param templateIdentifier the identifier of the result template
+     * @param sosObservation     the observation representing the inserted values
+     */
     void updateAfterResultInsertion(String templateIdentifier, SosObservation sosObservation);
 
+    /**
+     * Update the cache after a result template was inserted.
+     *
+     * @param sosRequest  the request
+     * @param sosResponse the response
+     */
     void updateAfterResultTemplateInsertion(InsertResultTemplateRequest sosRequest,
                                             InsertResultTemplateResponse sosResponse);
 
+    /**
+     * Update the cache after a sensor was deleted.
+     *
+     * @param sosRequest the DeleteSensor request
+     */
     void updateAfterSensorDeletion(DeleteSensorRequest sosRequest);
 
+    /**
+     * Update the cache after a sensor was inserted.
+     *
+     * @param sosRequest  the request
+     * @param sosResponse the response
+     */
     void updateAfterSensorInsertion(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse);
 
     /**
-     * @return true, if updated successfully
-
+     * Update the cache from the underlying datasource.
      *
-     * @throws OwsExceptionReport     *             if the query of one of the values described upside failed
+     * @return if the update was executed
+     *
+     * @throws OwsExceptionReport if an error occurs
      */
     boolean updateCacheFromDatasource() throws OwsExceptionReport;
 }

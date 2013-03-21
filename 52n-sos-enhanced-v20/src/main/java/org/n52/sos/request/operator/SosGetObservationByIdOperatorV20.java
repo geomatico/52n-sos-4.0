@@ -31,8 +31,8 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetObservationByIdDAO;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
+import org.n52.sos.exception.ows.concrete.MissingResponseFormatParameterException;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OWSConstants;
@@ -49,12 +49,9 @@ import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SosGetObservationByIdOperatorV20 extends AbstractV2RequestOperator<AbstractGetObservationByIdDAO, GetObservationByIdRequest> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SosGetObservationByIdOperatorV20.class);
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_OBSERVATION_BY_ID_RETRIEVAL);
     private static final String OPERATION_NAME = SosConstants.Operations.GetObservationById.name();
 
@@ -90,7 +87,7 @@ public class SosGetObservationByIdOperatorV20 extends AbstractV2RequestOperator<
 
         try {
             if (responseFormat == null) {
-                throw new MissingParameterValueException("responseFormat");
+                throw new MissingResponseFormatParameterException();
             }
             // check SOS version for response encoding
             final String namespace;

@@ -35,8 +35,8 @@ import java.util.Set;
 
 import org.joda.time.DateTime;
 import org.n52.sos.decode.Decoder;
-import org.n52.sos.decode.DecoderException;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.concrete.DateTimeParseException;
 import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.filter.SpatialFilter;
@@ -48,7 +48,6 @@ import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants;
-import org.n52.sos.exception.ows.concrete.DateTimeParseException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.SosHelper;
@@ -69,7 +68,7 @@ public abstract class AbstractKvpDecoder implements Decoder<AbstractServiceReque
         return Collections.emptyMap();
     }
 
-    protected List<TemporalFilter> parseValidTime(String parameterValue, String parameterName) throws DecoderException,
+    protected List<TemporalFilter> parseValidTime(String parameterValue, String parameterName) throws OwsExceptionReport,
                                                                                                       DateTimeParseException {
         List<TemporalFilter> filterList = new ArrayList<TemporalFilter>(1);
         filterList.add(createTemporalFilterFromValue(parameterValue, null));
@@ -116,10 +115,10 @@ public abstract class AbstractKvpDecoder implements Decoder<AbstractServiceReque
     }
 
     protected List<TemporalFilter> parseTemporalFilter(List<String> parameterValues, String parameterName)
-            throws DecoderException, DateTimeParseException {
+            throws OwsExceptionReport, DateTimeParseException {
         List<TemporalFilter> filterList = new ArrayList<TemporalFilter>(1);
         if (parameterValues.size() != 2) {
-            throw new DecoderException("The parameter value is not valid!");
+            throw new InvalidParameterValueException().withMessage("The parameter value is not valid!");
         }
         filterList.add(createTemporalFilterFromValue(parameterValues.get(1), parameterValues.get(0)));
         return filterList;
@@ -138,7 +137,7 @@ public abstract class AbstractKvpDecoder implements Decoder<AbstractServiceReque
         return namespaces;
     }
     
-    private TemporalFilter createTemporalFilterFromValue(String value, String valueReference) throws DecoderException,
+    private TemporalFilter createTemporalFilterFromValue(String value, String valueReference) throws OwsExceptionReport,
                                                                                                      DateTimeParseException {
         TemporalFilter temporalFilter = new TemporalFilter();
         temporalFilter.setValueReference(valueReference);
@@ -189,7 +188,7 @@ public abstract class AbstractKvpDecoder implements Decoder<AbstractServiceReque
             temporalFilter.setTime(tp);
 
         } else {
-            throw new DecoderException(String.format("The paramter value '%s' is invalid!", value));
+            throw new InvalidParameterValueException().withMessage("The paramter value '%s' is invalid!", value);
         }
         return temporalFilter;
     }

@@ -23,28 +23,28 @@
  */
 package org.n52.sos.encode;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
 import org.apache.xmlbeans.XmlObject;
 import org.junit.Test;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 public class GmlEncoderTest {
     
-    GmlEncoderv321 encoder = new GmlEncoderv321();
+    private GmlEncoderv321 encoder = new GmlEncoderv321();
     
     @Test(expected = OwsExceptionReport.class)
     public void throwIAEForEncodeNullTest() throws OwsExceptionReport {
         encoder.encode(null);
     }
     
-    @Test
+    @Test(expected = UnsupportedEncoderInputException.class)
     public void isNullForNotSupportedObjectTest() throws OwsExceptionReport {
-        assertNull("Encoded object is NOT null", encoder.encode(5));
+        encoder.encode(5);
     }
     
     @Test(expected = OwsExceptionReport.class)

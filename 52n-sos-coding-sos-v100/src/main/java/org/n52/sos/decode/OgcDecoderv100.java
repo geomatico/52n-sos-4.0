@@ -40,6 +40,9 @@ import net.opengis.ogc.impl.BBOXTypeImpl;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.filter.FilterConstants;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
@@ -50,14 +53,11 @@ import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,10 +116,11 @@ public class OgcDecoderv100 implements Decoder<Object, XmlObject> {
         }
 		if (xmlObject instanceof BBOXTypeImpl) {
             return parseBBOXFilterType((BBOXTypeImpl) xmlObject);
+        } else {
+            throw new UnsupportedDecoderInputException(this, xmlObject);
         }
 		// TODO more spatial filters (contains, intersects, overlaps Point Linestring Polygon, not supported by this SOS yet
 		// return error message
-        return null;
 	}
 
 	@Override

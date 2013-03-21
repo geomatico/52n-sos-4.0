@@ -34,21 +34,27 @@ public interface ObservationEncoder<S, T> extends Encoder<S, T> {
     public boolean shouldObservationsWithSameXBeMerged();
     
     /**
-     * Indicates, if this {@link ObservationEncoder} is currently activated in the SOS
-
-     *
-     * @return
-     *
      * @deprecated see {@link SettingsManager#isActive(org.n52.sos.encode.ResponseFormatKeyType)} and
      * {@link SettingsManager#setActive(org.n52.sos.encode.ResponseFormatKeyType, boolean)}.
      */
     @Deprecated
     public boolean isSupported();
 
+    /**
+     * @deprecated see {@link #isSupported()}
+     */
     @Deprecated
     public void setSupported(boolean supported);
     
-    // TODO add javadoc
+    /**
+     * Get the supported response formats for this {@linkplain ObservationEncoder} and the specified service and
+     * version.
+     *
+     * @param service the service
+     * @param version the version
+     *
+     * @return the response formats
+     */
     public Set<String> getSupportedResponseFormats(String service, String version);
 
 }

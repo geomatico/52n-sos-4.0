@@ -36,6 +36,7 @@ import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.ResultTemplateInsertion;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.MissingParameterValueException;
+import org.n52.sos.exception.ows.concrete.DuplicateIdentifierException;
 import org.n52.sos.exception.ows.concrete.EncoderResponseUnsupportedException;
 import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
 import org.n52.sos.exception.ows.concrete.NoEncoderForResponseException;
@@ -202,9 +203,7 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
 
     private void checkResultTemplateIdentifier(String identifier) throws OwsExceptionReport {
         if (Configurator.getInstance().getCache().getResultTemplates().contains(identifier)) {
-            //TODO correct rerror message
-            throw new InvalidParameterValueException().at(Sos2Constants.InsertResultTemplateParams.identifier)
-                    .withMessage("The requested template identifier (%s) still contains in this service!", identifier);
+            throw new DuplicateIdentifierException("resultTemplate", identifier);
         }
 
     }

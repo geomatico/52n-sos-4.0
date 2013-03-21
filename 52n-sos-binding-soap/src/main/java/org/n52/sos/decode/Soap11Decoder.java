@@ -64,9 +64,8 @@ public class Soap11Decoder extends AbstractSoapDecoder {
      */
     @Override
     protected SoapRequest createEnvelope(XmlObject doc) throws OwsExceptionReport {
-        String soapVersion = SOAPConstants.SOAP_1_1_PROTOCOL;
-        String soapNamespace = SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE;
-        SoapRequest soapRequest = new SoapRequest(soapNamespace, soapVersion);
+        SoapRequest soapRequest = new SoapRequest(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE,
+                                                  SOAPConstants.SOAP_1_1_PROTOCOL);
         String soapAction = "";
 
         try {

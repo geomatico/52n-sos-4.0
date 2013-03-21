@@ -53,6 +53,7 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.GMLConstants;
@@ -141,9 +142,6 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
 
     @Override
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
-        if (element == null) {
-            throw new NoApplicableCodeException().withMessage("The element to encode is null!");
-        }
         if (element instanceof ITime) {
             return createTime((ITime) element, additionalValues);
         } else if (element instanceof Geometry) {
@@ -162,8 +160,9 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
             return createFeaturePropertyType((SosAbstractFeature)element, additionalValues);
         } else if (element instanceof SosEnvelope) {
             return createEnvelope((SosEnvelope)element);
+        } else {
+            throw new UnsupportedEncoderInputException(this, element);
         }
-        return null;
     }
 
     private XmlObject createFeaturePropertyType(SosAbstractFeature feature, Map<HelperValues, String> additionalValues)
@@ -258,6 +257,8 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
                 } else {
                     return createTimePeriodType((TimePeriod) time, null);
                 }
+            } else {
+                throw new UnsupportedEncoderInputException(this, time);
             }
         }
         return null;
@@ -387,8 +388,9 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
             xbPolygon.setId("polygon_" + foiId);
             createPolygonFromJtsGeometry((Polygon) geom, xbPolygon);
             return xbPolygon;
+        } else {
+            throw new UnsupportedEncoderInputException(this, geom);
         }
-        return null;
     }
 
     /**

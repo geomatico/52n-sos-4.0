@@ -23,22 +23,15 @@
  */
 package org.n52.sos.decode;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
 import org.junit.Test;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class XmlNamespaceDecoderKeyTest {
-    private class C1 {}
-    private class C2 extends C1 implements I3 {}
-    private class C3 extends C2 {}
-    private class C4 extends C3 {}
-    private class C5 {}
-    private interface I1 {}
-    private interface I2 extends I1 {}
-    private interface I3 extends I2 {}
-    private interface I4 {}
     
     @Test
     public void testHashCode() {
@@ -132,5 +125,31 @@ public class XmlNamespaceDecoderKeyTest {
         test(C1[].class, I1[].class, -1);
         
         test(C1[].class, C1.class, -1);
+    }
+    private class C1 {
+    }
+
+    private class C2 extends C1 implements I3 {
+    }
+
+    private class C3 extends C2 {
+    }
+
+    private class C4 extends C3 {
+    }
+
+    private class C5 {
+    }
+
+    private interface I1 {
+    }
+
+    private interface I2 extends I1 {
+    }
+
+    private interface I3 extends I2 {
+    }
+
+    private interface I4 {
     }
 }

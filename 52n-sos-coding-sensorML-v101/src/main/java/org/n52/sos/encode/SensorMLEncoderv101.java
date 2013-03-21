@@ -23,6 +23,8 @@
  */
 package org.n52.sos.encode;
 
+import static org.n52.sos.ogc.swe.SWEConstants.SweSimpleType.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -70,10 +72,11 @@ import net.opengis.swe.x101.VectorType;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.SosGmlMetaDataProperty;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
 import org.n52.sos.ogc.sensorML.AbstractSensorML;
 import org.n52.sos.ogc.sensorML.ProcessModel;
@@ -96,8 +99,6 @@ import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SweAggregateType;
-
-import static org.n52.sos.ogc.swe.SWEConstants.SweSimpleType.*;
 import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
@@ -185,7 +186,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             return createSensorDescriptionFromString(sensorDesc);
         }
 
-        return null;
+        throw new UnsupportedEncoderInputException(this, response);
     }
 
     /**

@@ -33,14 +33,14 @@ import org.n52.sos.decode.Decoder;
 import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.KvpOperationDecoderKey;
 import org.n52.sos.decode.OperationDecoderKey;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.InvalidAcceptVersionsParameterException;
 import org.n52.sos.exception.ows.concrete.InvalidServiceOrVersionException;
+import org.n52.sos.exception.ows.concrete.MethodNotSupportedException;
+import org.n52.sos.exception.ows.concrete.MissingRequestParameterException;
+import org.n52.sos.exception.ows.concrete.NoDecoderForKeyException;
 import org.n52.sos.exception.ows.concrete.ServiceNotSupportedException;
 import org.n52.sos.exception.ows.concrete.VersionNotSupportedException;
-import org.n52.sos.exception.ows.concrete.MissingRequestParameterException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.exception.ows.concrete.MethodNotSupportedException;
-import org.n52.sos.exception.ows.concrete.NoDecoderForKeyException;
-import org.n52.sos.exception.ows.concrete.InvalidAcceptVersionsParameterException;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
@@ -86,7 +86,7 @@ public class KvpBinding extends Binding {
             Map<String, String> parameterValueMap = KvpHelper.getKvpParameterValueMap(req);
             // check if request contains request parameter
             String operation = getRequestParameterValue(parameterValueMap);
-            KvpHelper.checkParameterValue(operation, RequestParams.request.name());
+            KvpHelper.checkParameterValue(operation, RequestParams.request);
             String service = getServiceParameterValue(parameterValueMap);
             String version = getVersionParameterValue(parameterValueMap);
 
@@ -114,8 +114,8 @@ public class KvpBinding extends Binding {
             }
             if (response == null) {
                 if (request instanceof GetCapabilitiesRequest) {
-                    throw new InvalidAcceptVersionsParameterException(((GetCapabilitiesRequest) request)
-                            .getAcceptVersions());
+                    GetCapabilitiesRequest gcr = (GetCapabilitiesRequest) request;
+                    throw new InvalidAcceptVersionsParameterException(gcr.getAcceptVersions());
                 } else {
                     throw new InvalidServiceOrVersionException(request.getService(), request.getVersion());
                 }
@@ -139,12 +139,12 @@ public class KvpBinding extends Binding {
     }
 
     private String getServiceParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
-        String service = KvpHelper.getParameterValue(RequestParams.service.name(), parameterValueMap);
+        String service = KvpHelper.getParameterValue(RequestParams.service, parameterValueMap);
         boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
         if (isGetCapabilities && service == null) {
             return SosConstants.SOS;
         } else {
-            KvpHelper.checkParameterValue(service, RequestParams.service.name());
+            KvpHelper.checkParameterValue(service, RequestParams.service);
         }
         if (!isServiceSupported(service)) {
             throw new ServiceNotSupportedException();
@@ -153,10 +153,10 @@ public class KvpBinding extends Binding {
     }
 
     private String getVersionParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
-        String version = KvpHelper.getParameterValue(RequestParams.version.name(), parameterValueMap);
+        String version = KvpHelper.getParameterValue(RequestParams.version, parameterValueMap);
         boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
         if (!isGetCapabilities) {
-            KvpHelper.checkParameterValue(version, RequestParams.version.name());
+            KvpHelper.checkParameterValue(version, RequestParams.version);
             if (!isVersionSupported(version)) {
                 throw new VersionNotSupportedException();
             }
@@ -173,8 +173,8 @@ public class KvpBinding extends Binding {
     }
 
     public String getRequestParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
-        String requestParameterValue = KvpHelper.getParameterValue(RequestParams.request.name(), parameterValueMap);
-        KvpHelper.checkParameterValue(requestParameterValue, RequestParams.request.name());
+        String requestParameterValue = KvpHelper.getParameterValue(RequestParams.request, parameterValueMap);
+        KvpHelper.checkParameterValue(requestParameterValue, RequestParams.request);
         return requestParameterValue;
     }
 

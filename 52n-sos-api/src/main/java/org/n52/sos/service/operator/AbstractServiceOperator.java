@@ -23,8 +23,8 @@
  */
 package org.n52.sos.service.operator;
 
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.OperationNotSupportedException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.operator.RequestOperator;
 import org.n52.sos.response.ServiceResponse;

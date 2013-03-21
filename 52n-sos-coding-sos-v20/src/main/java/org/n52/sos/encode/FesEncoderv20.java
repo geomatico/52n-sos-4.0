@@ -55,6 +55,8 @@ import net.opengis.fes.x20.impl.TemporalOperatorNameTypeImpl;
 import net.opengis.ows.x11.DomainType;
 
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.filter.FilterConstants;
 import org.n52.sos.ogc.filter.FilterConstants.ComparisonOperator;
 import org.n52.sos.ogc.filter.FilterConstants.ConformanceClassConstraintNames;
@@ -66,7 +68,6 @@ import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
@@ -77,7 +78,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FesEncoderv20 implements Encoder<XmlObject, Object> {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(FesEncoderv20.class);
     private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(
             FilterConstants.NS_FES_2,
@@ -86,7 +86,8 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
             SpatialFilter.class);
 
     public FesEncoderv20() {
-        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper
+                .join(", ", ENCODER_KEYS));
     }
 
     @Override
@@ -127,8 +128,9 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
             return encodeTemporalFilter((TemporalFilter) element);
         } else if (element instanceof SpatialFilter) {
             return encodeSpatialFilter((SpatialFilter) element);
+        } else {
+            throw new UnsupportedEncoderInputException(this, element);
         }
-        return null;
     }
 
     private XmlObject encodeTemporalFilter(TemporalFilter temporalFilter) throws OwsExceptionReport {
@@ -137,8 +139,7 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
         } else if (temporalFilter.getOperator().equals(TimeOperator.TM_Equals)) {
             return encodeTemporalFilterEquals(temporalFilter);
         } else {
-            throw new NoApplicableCodeException().withMessage("The temporal filter operand '%s' is not supported!",
-                                                              temporalFilter.getOperator().name());
+            throw new UnsupportedEncoderInputException(this, temporalFilter);
         }
     }
 
@@ -148,7 +149,8 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
         if (temporalFilter.getTime() instanceof TimePeriod) {
             Map<HelperValues, String> additionalValues = new EnumMap<HelperValues, String>(HelperValues.class);
             additionalValues.put(HelperValues.DOCUMENT, "");
-            during.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, temporalFilter.getTime(), additionalValues));
+            during.set(CodingHelper
+                    .encodeObjectToXml(GMLConstants.NS_GML_32, temporalFilter.getTime(), additionalValues));
         } else {
             throw new NoApplicableCodeException().withMessage("The temporal filter value is not a TimePeriod!");
         }
@@ -158,14 +160,14 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
 
     private XmlObject encodeTemporalFilterEquals(TemporalFilter temporalFilter) throws OwsExceptionReport {
         TEqualsDocument equalsDoc =
-                TEqualsDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                        TEqualsDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         BinaryTemporalOpType equals = equalsDoc.addNewTEquals();
         if (temporalFilter.getTime() instanceof TimeInstant) {
             Map<HelperValues, String> additionalValues = new EnumMap<HelperValues, String>(HelperValues.class);
             additionalValues.put(HelperValues.DOCUMENT, "");
-            equals.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, temporalFilter.getTime(), additionalValues));
+            equals.set(CodingHelper
+                    .encodeObjectToXml(GMLConstants.NS_GML_32, temporalFilter.getTime(), additionalValues));
         } else {
-            StringBuilder exceptionText = new StringBuilder();
             throw new NoApplicableCodeException().withMessage("The temporal filter value is not a TimeInstant!");
         }
         checkAndAddValueReference(equals, temporalFilter);
@@ -195,22 +197,16 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
 
     private XmlObject encodeReferenceValue(String sosValueReference) {
         ValueReferenceDocument valueReferenceDoc =
-                ValueReferenceDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                               ValueReferenceDocument.Factory
+                .newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         valueReferenceDoc.setValueReference(sosValueReference);
         return valueReferenceDoc;
     }
 
-    /**
-     * Sets the filter capabilities section to capabilities
-     *
-     * @param filterCapabilities
-     *            FES filter capabilities
-     * @param sosFilterCaps
-     *            SOS filter capabilities
-     */
-    private XmlObject encodeFilterCapabilities(org.n52.sos.ogc.filter.FilterCapabilities sosFilterCaps) {
+    private XmlObject encodeFilterCapabilities(org.n52.sos.ogc.filter.FilterCapabilities sosFilterCaps) throws
+            UnsupportedEncoderInputException {
         FilterCapabilities filterCapabilities =
-                FilterCapabilities.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                           FilterCapabilities.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         setConformance(filterCapabilities.addNewConformance());
         if (sosFilterCaps.getComparisonOperators() != null && !sosFilterCaps.getComparisonOperators().isEmpty()) {
             setScalarFilterCapabilities(filterCapabilities.addNewScalarCapabilities(), sosFilterCaps);
@@ -229,8 +225,7 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
     /**
      * Sets the FES conformance classes in the filter capabilities section.
      *
-     * @param conformance
-     *            FES conformence
+     * @param conformance FES conformence
      */
     private void setConformance(ConformanceType conformance) {
         // set Query conformance class
@@ -316,13 +311,12 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
      *
      * !!! Modify method addicted to your implementation !!!
      *
-     * @param spatialCapabilitiesType
-     *            FES SpatialCapabilities.
-     * @param sosFilterCaps
-     *            SOS spatial filter information
+     * @param spatialCapabilitiesType FES SpatialCapabilities.
+     * @param sosFilterCaps           SOS spatial filter information
      */
     private void setSpatialFilterCapabilities(SpatialCapabilitiesType spatialCapabilitiesType,
-            org.n52.sos.ogc.filter.FilterCapabilities sosFilterCaps) {
+                                              org.n52.sos.ogc.filter.FilterCapabilities sosFilterCaps) throws
+            UnsupportedEncoderInputException {
 
         // set GeometryOperands
         if (sosFilterCaps.getSpatialOperands() != null && !sosFilterCaps.getSpatialOperands().isEmpty()) {
@@ -352,13 +346,12 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
      *
      * !!! Modify method addicted to your implementation !!!
      *
-     * @param temporalCapabilitiesType
-     *            FES TemporalCapabilities.
-     * @param sosFilterCaps
-     *            SOS temporal filter information
+     * @param temporalCapabilitiesType FES TemporalCapabilities.
+     * @param sosFilterCaps            SOS temporal filter information
      */
     private void setTemporalFilterCapabilities(TemporalCapabilitiesType temporalCapabilitiesType,
-            org.n52.sos.ogc.filter.FilterCapabilities sosFilterCaps) {
+                                               org.n52.sos.ogc.filter.FilterCapabilities sosFilterCaps) throws
+            UnsupportedEncoderInputException {
 
         // set TemporalOperands
         if (sosFilterCaps.getTemporalOperands() != null && !sosFilterCaps.getTemporalOperands().isEmpty()) {
@@ -388,13 +381,12 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
      *
      * !!! Modify method addicted to your implementation !!!
      *
-     * @param scalarCapabilitiesType
-     *            FES ScalarCapabilities.
-     * @param sosFilterCaps
-     *            SOS scalar filter information
+     * @param scalarCapabilitiesType FES ScalarCapabilities.
+     * @param sosFilterCaps          SOS scalar filter information
      */
     private void setScalarFilterCapabilities(ScalarCapabilitiesType scalarCapabilitiesType,
-            org.n52.sos.ogc.filter.FilterCapabilities sosFilterCaps) {
+                                             org.n52.sos.ogc.filter.FilterCapabilities sosFilterCaps) throws
+            UnsupportedEncoderInputException {
 
         if (sosFilterCaps.getComparisonOperators() != null && !sosFilterCaps.getComparisonOperators().isEmpty()) {
             ComparisonOperatorsType scalarOps = scalarCapabilitiesType.addNewComparisonOperators();
@@ -409,124 +401,99 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
      *
      * !!! Modify method addicted to your implementation !!!
      *
-     * @param idCapabilitiesType
-     *            FES IdCapabilities.
+     * @param idCapabilitiesType FES IdCapabilities.
      */
     private void setIdFilterCapabilities(IdCapabilitiesType idCapabilitiesType) {
         idCapabilitiesType.addNewResourceIdentifier();
     }
 
-    /**
-     * Get the FES spatial operator name for SOS spatial operator
-     *
-     * @param spatialOperator
-     *            SOS spatial operator
-     * @return FES spatial operator name
-     */
-    private String getEnum4SpatialOperator(SpatialOperator spatialOperator) {
+    private String getEnum4SpatialOperator(SpatialOperator spatialOperator) throws UnsupportedEncoderInputException {
         switch (spatialOperator) {
-        case BBOX:
-            return SpatialOperatorNameTypeImpl.BBOX.toString();
-        case Beyond:
-            return SpatialOperatorNameTypeImpl.BEYOND.toString();
-        case Contains:
-            return SpatialOperatorNameTypeImpl.CONTAINS.toString();
-        case Crosses:
-            return SpatialOperatorNameTypeImpl.CROSSES.toString();
-        case Disjoint:
-            return SpatialOperatorNameTypeImpl.DISJOINT.toString();
-        case DWithin:
-            return SpatialOperatorNameTypeImpl.D_WITHIN.toString();
-        case Equals:
-            return SpatialOperatorNameTypeImpl.EQUALS.toString();
-        case Intersects:
-            return SpatialOperatorNameTypeImpl.INTERSECTS.toString();
-        case Overlaps:
-            return SpatialOperatorNameTypeImpl.OVERLAPS.toString();
-        case Touches:
-            return SpatialOperatorNameTypeImpl.TOUCHES.toString();
-        case Within:
-            return SpatialOperatorNameTypeImpl.WITHIN.toString();
-        default:
-            break;
+            case BBOX:
+                return SpatialOperatorNameTypeImpl.BBOX.toString();
+            case Beyond:
+                return SpatialOperatorNameTypeImpl.BEYOND.toString();
+            case Contains:
+                return SpatialOperatorNameTypeImpl.CONTAINS.toString();
+            case Crosses:
+                return SpatialOperatorNameTypeImpl.CROSSES.toString();
+            case Disjoint:
+                return SpatialOperatorNameTypeImpl.DISJOINT.toString();
+            case DWithin:
+                return SpatialOperatorNameTypeImpl.D_WITHIN.toString();
+            case Equals:
+                return SpatialOperatorNameTypeImpl.EQUALS.toString();
+            case Intersects:
+                return SpatialOperatorNameTypeImpl.INTERSECTS.toString();
+            case Overlaps:
+                return SpatialOperatorNameTypeImpl.OVERLAPS.toString();
+            case Touches:
+                return SpatialOperatorNameTypeImpl.TOUCHES.toString();
+            case Within:
+                return SpatialOperatorNameTypeImpl.WITHIN.toString();
+            default:
+                throw new UnsupportedEncoderInputException(this, spatialOperator);
         }
-        return null;
     }
 
-    /**
-     * Get the FES temporal operator name for SOS temporal operator
-     *
-     * @param temporalOperator
-     *            SOS temporal operator
-     * @return FES temporal operator name
-     */
-    private String getEnum4TemporalOperator(TimeOperator temporalOperator) {
+    private String getEnum4TemporalOperator(TimeOperator temporalOperator) throws UnsupportedEncoderInputException {
         switch (temporalOperator) {
-        case TM_After:
-            return TemporalOperatorNameTypeImpl.AFTER.toString();
-        case TM_Before:
-            return TemporalOperatorNameTypeImpl.BEFORE.toString();
-        case TM_Begins:
-            return TemporalOperatorNameTypeImpl.BEGINS.toString();
-        case TM_BegunBy:
-            return TemporalOperatorNameTypeImpl.BEGUN_BY.toString();
-        case TM_Contains:
-            return TemporalOperatorNameTypeImpl.T_CONTAINS.toString();
-        case TM_During:
-            return TemporalOperatorNameTypeImpl.DURING.toString();
-        case TM_EndedBy:
-            return TemporalOperatorNameTypeImpl.ENDED_BY.toString();
-        case TM_Ends:
-            return TemporalOperatorNameTypeImpl.ENDS.toString();
-        case TM_Equals:
-            return TemporalOperatorNameTypeImpl.T_EQUALS.toString();
-        case TM_Meets:
-            return TemporalOperatorNameTypeImpl.MEETS.toString();
-        case TM_MetBy:
-            return TemporalOperatorNameTypeImpl.MET_BY.toString();
-        case TM_OverlappedBy:
-            return TemporalOperatorNameTypeImpl.OVERLAPPED_BY.toString();
-        case TM_Overlaps:
-            return TemporalOperatorNameTypeImpl.T_OVERLAPS.toString();
-        default:
-            break;
+            case TM_After:
+                return TemporalOperatorNameTypeImpl.AFTER.toString();
+            case TM_Before:
+                return TemporalOperatorNameTypeImpl.BEFORE.toString();
+            case TM_Begins:
+                return TemporalOperatorNameTypeImpl.BEGINS.toString();
+            case TM_BegunBy:
+                return TemporalOperatorNameTypeImpl.BEGUN_BY.toString();
+            case TM_Contains:
+                return TemporalOperatorNameTypeImpl.T_CONTAINS.toString();
+            case TM_During:
+                return TemporalOperatorNameTypeImpl.DURING.toString();
+            case TM_EndedBy:
+                return TemporalOperatorNameTypeImpl.ENDED_BY.toString();
+            case TM_Ends:
+                return TemporalOperatorNameTypeImpl.ENDS.toString();
+            case TM_Equals:
+                return TemporalOperatorNameTypeImpl.T_EQUALS.toString();
+            case TM_Meets:
+                return TemporalOperatorNameTypeImpl.MEETS.toString();
+            case TM_MetBy:
+                return TemporalOperatorNameTypeImpl.MET_BY.toString();
+            case TM_OverlappedBy:
+                return TemporalOperatorNameTypeImpl.OVERLAPPED_BY.toString();
+            case TM_Overlaps:
+                return TemporalOperatorNameTypeImpl.T_OVERLAPS.toString();
+            default:
+                throw new UnsupportedEncoderInputException(this, temporalOperator);
         }
-        return null;
     }
 
-    /**
-     * Get the FES comparison operator name for SOS comparison operator
-     *
-     * @param comparisonOperator
-     *            SOS comparison operator
-     * @return FES comparison operator name
-     */
-    private String getEnum4ComparisonOperator(ComparisonOperator comparisonOperator) {
+    private String getEnum4ComparisonOperator(ComparisonOperator comparisonOperator) throws
+            UnsupportedEncoderInputException {
         switch (comparisonOperator) {
-        case PropertyIsBetween:
-            return ComparisonOperatorNameTypeImpl.PROPERTY_IS_BETWEEN.toString();
-        case PropertyIsEqualTo:
-            return ComparisonOperatorNameTypeImpl.PROPERTY_IS_EQUAL_TO.toString();
-        case PropertyIsGreaterThan:
-            return ComparisonOperatorNameTypeImpl.PROPERTY_IS_GREATER_THAN.toString();
-        case PropertyIsGreaterThanOrEqualTo:
-            return ComparisonOperatorNameTypeImpl.PROPERTY_IS_GREATER_THAN_OR_EQUAL_TO.toString();
-        case PropertyIsLessThan:
-            return ComparisonOperatorNameTypeImpl.PROPERTY_IS_LESS_THAN.toString();
-        case PropertyIsLessThanOrEqualTo:
-            return ComparisonOperatorNameTypeImpl.PROPERTY_IS_LESS_THAN_OR_EQUAL_TO.toString();
-        case PropertyIsLike:
-            return ComparisonOperatorNameTypeImpl.PROPERTY_IS_LIKE.toString();
-        case PropertyIsNil:
-            return ComparisonOperatorNameTypeImpl.PROPERTY_IS_NIL.toString();
-        case PropertyIsNotEqualTo:
-            return ComparisonOperatorNameTypeImpl.PROPERTY_IS_NOT_EQUAL_TO.toString();
-        case PropertyIsNull:
-            return ComparisonOperatorNameTypeImpl.PROPERTY_IS_NULL.toString();
-        default:
-            break;
+            case PropertyIsBetween:
+                return ComparisonOperatorNameTypeImpl.PROPERTY_IS_BETWEEN.toString();
+            case PropertyIsEqualTo:
+                return ComparisonOperatorNameTypeImpl.PROPERTY_IS_EQUAL_TO.toString();
+            case PropertyIsGreaterThan:
+                return ComparisonOperatorNameTypeImpl.PROPERTY_IS_GREATER_THAN.toString();
+            case PropertyIsGreaterThanOrEqualTo:
+                return ComparisonOperatorNameTypeImpl.PROPERTY_IS_GREATER_THAN_OR_EQUAL_TO.toString();
+            case PropertyIsLessThan:
+                return ComparisonOperatorNameTypeImpl.PROPERTY_IS_LESS_THAN.toString();
+            case PropertyIsLessThanOrEqualTo:
+                return ComparisonOperatorNameTypeImpl.PROPERTY_IS_LESS_THAN_OR_EQUAL_TO.toString();
+            case PropertyIsLike:
+                return ComparisonOperatorNameTypeImpl.PROPERTY_IS_LIKE.toString();
+            case PropertyIsNil:
+                return ComparisonOperatorNameTypeImpl.PROPERTY_IS_NIL.toString();
+            case PropertyIsNotEqualTo:
+                return ComparisonOperatorNameTypeImpl.PROPERTY_IS_NOT_EQUAL_TO.toString();
+            case PropertyIsNull:
+                return ComparisonOperatorNameTypeImpl.PROPERTY_IS_NULL.toString();
+            default:
+                throw new UnsupportedEncoderInputException(this, comparisonOperator);
         }
-        return null;
     }
-
 }

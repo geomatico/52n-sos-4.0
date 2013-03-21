@@ -34,7 +34,8 @@ import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetObservationDAO;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.ObservationEncoder;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.EncoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
 import org.n52.sos.exception.ows.concrete.InvalidObservedPropertyParameterException;
 import org.n52.sos.exception.ows.concrete.InvalidOfferingParameterException;
 import org.n52.sos.exception.ows.concrete.InvalidResponseFormatParameterException;
@@ -137,14 +138,13 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<Abs
                 } else if (encodedObject instanceof ServiceResponse) {
                     return (ServiceResponse) encodedObject;
                 } else {
-                    throw new NoApplicableCodeException().withMessage("The encoder response is not supported!");
+                    throw new EncoderResponseUnsupportedException();
                 }
             } else {
                 throw new InvalidResponseFormatParameterException(responseFormat);
             }
         } catch (IOException ioe) {
-            throw new NoApplicableCodeException().causedBy(ioe)
-                    .withMessage("Error occurs while saving response to output stream!");
+            throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
     }
 

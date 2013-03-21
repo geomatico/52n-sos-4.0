@@ -31,11 +31,13 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractDescribeSensorDAO;
 import org.n52.sos.encode.Encoder;
-import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.OptionNotSupportedException;
+import org.n52.sos.exception.ows.concrete.EncoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
+import org.n52.sos.exception.ows.concrete.InvalidOutputFormatException;
+import org.n52.sos.exception.ows.concrete.InvalidProcedureDescriptionFormatException;
+import org.n52.sos.exception.ows.concrete.VersionNotSupportedException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
-import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.ConformanceClasses;
@@ -52,8 +54,6 @@ import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * class handles the DescribeSensor request
@@ -62,7 +62,6 @@ import org.slf4j.LoggerFactory;
 public class SosDescribeSensorOperatorV20 extends AbstractV2RequestOperator<AbstractDescribeSensorDAO, DescribeSensorRequest> {
     private static final String OPERATION_NAME = SosConstants.Operations.DescribeSensor.name();
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_CORE_PROFILE);
-    private static final Logger LOGGER = LoggerFactory.getLogger(SosDescribeSensorOperatorV20.class);
 
     public SosDescribeSensorOperatorV20() {
         super(OPERATION_NAME, DescribeSensorRequest.class);
@@ -99,8 +98,7 @@ public class SosDescribeSensorOperatorV20 extends AbstractV2RequestOperator<Abst
                     contentType = SensorMLConstants.SENSORML_CONTENT_TYPE;
                 }
             } else {
-                throw new InvalidParameterValueException().at(OWSConstants.RequestParams.version)
-                        .withMessage("Received version in request is not supported!");
+                throw new VersionNotSupportedException();
             }
             Encoder<?, DescribeSensorResponse> encoder = Configurator.getInstance().getCodingRepository()
                     .getEncoder(CodingHelper.getEncoderKey(namespace, response));
@@ -112,23 +110,17 @@ public class SosDescribeSensorOperatorV20 extends AbstractV2RequestOperator<Abst
                 } else if (encodedObject instanceof ServiceResponse) {
                     return (ServiceResponse) encodedObject;
                 } else {
-                    throw new NoApplicableCodeException()
-                            .withMessage("The encoder response is not supported!");
+                    throw new EncoderResponseUnsupportedException();
                 }
             } else {
-                String parameterName = null;
                 if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
-                    parameterName = Sos1Constants.DescribeSensorParams.outputFormat.name();
-                } else if (sosRequest.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
-                    parameterName = Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name();
+                    throw new InvalidOutputFormatException(sosRequest.getProcedureDescriptionFormat());
+                } else {
+                    throw new InvalidProcedureDescriptionFormatException(sosRequest.getProcedureDescriptionFormat());
                 }
-                throw new InvalidParameterValueException().at(parameterName)
-                        .withMessage("The value '%s' of the outputFormat parameter is incorrect and has to be '%s' for the requested sensor!",
-                                     sosRequest.getProcedureDescriptionFormat(), SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
             }
         } catch (IOException ioe) {
-            throw new NoApplicableCodeException().causedBy(ioe)
-                    .withMessage("Error occurs while saving response to output stream!");
+            throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
     }
 

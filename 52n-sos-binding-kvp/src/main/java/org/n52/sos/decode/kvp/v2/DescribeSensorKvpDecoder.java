@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.n52.sos.decode.DecoderException;
 import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.KvpOperationDecoderKey;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
@@ -42,7 +41,6 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.DescribeSensorRequest;
-import org.n52.sos.exception.ows.concrete.DateTimeParseException;
 import org.n52.sos.util.KvpHelper;
 
 public class DescribeSensorKvpDecoder extends AbstractKvpDecoder {
@@ -94,9 +92,7 @@ public class DescribeSensorKvpDecoder extends AbstractKvpDecoder {
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.DescribeSensorParams.validTime.name())) {
                     try {
                         request.setTime(parseValidTime(parameterValues, parameterName));
-                    } catch (DecoderException e) {
-                        exceptions.add(new InvalidParameterValueException(parameterName, parameterValues).causedBy(e));
-                    } catch (DateTimeParseException e) {
+                    } catch (OwsExceptionReport e) {
                         exceptions.add(new InvalidParameterValueException(parameterName, parameterValues).causedBy(e));
                     }
                 } else {

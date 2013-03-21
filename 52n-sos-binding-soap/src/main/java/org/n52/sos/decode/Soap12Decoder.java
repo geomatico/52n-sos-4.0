@@ -65,15 +65,13 @@ public class Soap12Decoder extends AbstractSoapDecoder {
      */
     @Override
     protected SoapRequest createEnvelope(XmlObject doc) throws OwsExceptionReport {
-        String soapVersion = SOAPConstants.SOAP_1_2_PROTOCOL;
-        String soapNamespace = SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE;
-        SoapRequest soapRequest = new SoapRequest(soapNamespace, soapVersion);
+        SoapRequest soapRequest = new SoapRequest(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE,
+                                                  SOAPConstants.SOAP_1_2_PROTOCOL);
         String soapAction = "";
         try {
-            SOAPMessage soapMessageRequest;
+            SOAPMessage message;
             try {
-                soapMessageRequest =
-                        SoapHelper.getSoapMessageForProtocol(SOAPConstants.SOAP_1_2_PROTOCOL, doc.newInputStream());
+                message = SoapHelper.getSoapMessageForProtocol(SOAPConstants.SOAP_1_2_PROTOCOL, doc.newInputStream());
             } catch (IOException ioe) {
                 throw new NoApplicableCodeException().causedBy(ioe)
                         .withMessage("Error while parsing SOAPMessage from request string!");
@@ -82,11 +80,11 @@ public class Soap12Decoder extends AbstractSoapDecoder {
                         .withMessage("Error while parsing SOAPMessage from request string!");
             }
             try {
-                if (soapMessageRequest.getSOAPHeader() != null) {
-                    soapRequest.setSoapHeader(getSoapHeader(soapMessageRequest.getSOAPHeader()));
+                if (message.getSOAPHeader() != null) {
+                    soapRequest.setSoapHeader(getSoapHeader(message.getSOAPHeader()));
                 }
                 soapRequest.setAction(checkSoapAction(soapAction, soapRequest.getSoapHeader()));
-                soapRequest.setSoapBodyContent(getSOAPBodyContent(soapMessageRequest));
+                soapRequest.setSoapBodyContent(getSOAPBodyContent(message));
             } catch (SOAPException soape) {
                 throw new NoApplicableCodeException().causedBy(soape).withMessage("Error while parsing SOAPMessage!");
             }

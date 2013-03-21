@@ -60,6 +60,7 @@ import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -164,8 +165,9 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
             return parseCodeWithAuthorityTye((CodeWithAuthorityType) xmlObject);
         } else if (xmlObject instanceof CodeType) {
             return parseCodeType((CodeType)xmlObject);
+        } else {
+            throw new UnsupportedDecoderInputException(this, xmlObject);
         }
-        return null;
     }
 
     private Object parseFeaturePropertyType(FeaturePropertyType featurePropertyType) throws OwsExceptionReport {

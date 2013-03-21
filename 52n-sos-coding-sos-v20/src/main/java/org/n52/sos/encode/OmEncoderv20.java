@@ -42,6 +42,8 @@ import org.apache.xmlbeans.XmlBoolean;
 import org.apache.xmlbeans.XmlInteger;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
@@ -63,7 +65,6 @@ import org.n52.sos.ogc.om.values.IValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -187,11 +188,11 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         if (element instanceof SosObservation) {
             return createObservation((SosObservation) element, additionalValues);
-        }
-        if (element instanceof NamedValue) {
+        } else if (element instanceof NamedValue) {
             return createNamedValue((NamedValue) element);
+        } else {
+            throw new UnsupportedEncoderInputException(this, element);
         }
-        return null;
     }
 
     private XmlObject createObservation(SosObservation sosObservation, Map<HelperValues, String> additionalValues)

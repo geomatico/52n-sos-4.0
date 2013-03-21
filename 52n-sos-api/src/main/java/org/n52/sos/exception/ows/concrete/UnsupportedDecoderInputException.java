@@ -21,24 +21,32 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.request.operator;
 
-import org.n52.sos.ds.OperationDAO;
-import org.n52.sos.ogc.sos.Sos1Constants;
-import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.request.AbstractServiceRequest;
+package org.n52.sos.exception.ows.concrete;
+
+import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.decode.Decoder;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.w3c.dom.Node;
 
 /**
- * @param <T> The OperationDAO implementation class
- * @param <R> The request type
- *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class AbstractV1RequestOperator<T extends OperationDAO, R extends AbstractServiceRequest> 
-                                                            extends AbstractRequestOperator<T, R> {
-    
-    public AbstractV1RequestOperator(String operationName, Class<R> requestType) {
-        super(SosConstants.SOS, Sos1Constants.SERVICEVERSION, operationName, requestType);
+public class UnsupportedDecoderInputException extends NoApplicableCodeException {
+    private static final long serialVersionUID = 5561451567407304739L;
+
+    public UnsupportedDecoderInputException(Decoder<?, ?> decoder, Object o) {
+        if (o == null) {
+            withMessage("Decoder %s can not decode 'null'", decoder.getClass().getSimpleName());
+        } else {
+            String name;
+            if (o instanceof XmlObject) {
+                Node n = ((XmlObject) o).getDomNode();
+                name = n.getPrefix() != null ? n.getPrefix() + ":" + n.getLocalName() : n.getLocalName();
+            } else {
+                name = o.getClass().getName();
+            }
+            withMessage("%s can not be decoded by %s", name, decoder.getClass().getName());
+        }
     }
-    
 }

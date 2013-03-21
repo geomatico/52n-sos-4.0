@@ -41,6 +41,7 @@ import javax.xml.soap.SOAPMessage;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.exception.ows.OwsExceptionCode;
+import org.n52.sos.exception.ows.concrete.XmlDecodingException;
 import org.n52.sos.exception.sos.SosExceptionCode;
 import org.n52.sos.exception.swes.SwesExceptionCode;
 import org.n52.sos.ogc.ows.CodedException;
@@ -57,8 +58,6 @@ import org.n52.sos.soap.SoapResponse;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.W3CConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -67,7 +66,10 @@ import org.w3c.dom.Node;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public abstract class AbstractSoapEncoder implements Encoder<ServiceResponse, SoapResponse> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSoapEncoder.class);
+    public static final String DEFAULT_FAULT_REASON = "A server exception was encountered.";
+    public static final String MISSING_RESPONSE_DETAIL_TEXT = "Missing SOS response document!";
+    public static final String MISSING_EXCEPTION_DETAIL_TEXT =
+                               "Error while creating SOAPFault element from OWSException! OWSException is missing!";
     private final Set<EncoderKey> encoderKey;
 
     public AbstractSoapEncoder(String namespace) {
@@ -107,32 +109,35 @@ public abstract class AbstractSoapEncoder implements Encoder<ServiceResponse, So
      * Creates a SOAPBody element from SOS response
      *
      * @param soapResponseMessage SOAPBody element
-     * @param sosResponse SOS response
+     * @param sosResponse         SOS response
      *
-     * @throws SOAPException if an error occurs.
+     * @throws SOAPException        if an error occurs.
+     * @throws XmlDecodingException
      */
     protected String createSOAPBody(SOAPMessage soapResponseMessage, ServiceResponse sosResponse, String actionURI)
-            throws SOAPException {
-        try {
-            if (sosResponse != null) {
-                XmlObject xmlObject = XmlObject.Factory.parse(new String(sosResponse.getByteArray()));
+            throws SOAPException, XmlDecodingException {
+        
+        if (sosResponse != null) {
+            String xmlString = new String(sosResponse.getByteArray());
+            try {
+                XmlObject xmlObject = XmlObject.Factory.parse(xmlString);
                 addAndRemoveSchemaLocationForSOAP(xmlObject, soapResponseMessage);
                 // Document doc = parseSosResponseToDocument(xmlObject);
                 // soapResponseMessage.getSOAPBody().addDocument(doc);
                 soapResponseMessage.getSOAPBody().addDocument((Document) xmlObject.getDomNode());
                 return actionURI;
-            } else {
-                SoapFault fault = new SoapFault();
-                fault.setFaultCode(SOAPConstants.SOAP_RECEIVER_FAULT);
-                fault.setFaultSubcode(new QName(OWSConstants.NS_OWS, OwsExceptionCode.NoApplicableCode.name(),
-                                                OWSConstants.NS_OWS_PREFIX));
-                fault.setFaultReason("A server exception was encountered.");
-                fault.setLocale(Locale.ENGLISH);
-                fault.setDetailText("Missing SOS response document!");
-                createSOAPFault(soapResponseMessage.getSOAPBody().addFault(), fault);
+            } catch (XmlException xmle) {
+                throw new XmlDecodingException("SOAP Body", xmlString, xmle);
             }
-        } catch (XmlException xmle) {
-            LOGGER.error("Error while creating SOAP body !", xmle);
+        } else {
+            SoapFault fault = new SoapFault();
+            fault.setFaultCode(SOAPConstants.SOAP_RECEIVER_FAULT);
+            fault.setFaultSubcode(new QName(OWSConstants.NS_OWS, OwsExceptionCode.NoApplicableCode.name(),
+                                            OWSConstants.NS_OWS_PREFIX));
+            fault.setFaultReason(DEFAULT_FAULT_REASON);
+            fault.setLocale(Locale.ENGLISH);
+            fault.setDetailText(MISSING_RESPONSE_DETAIL_TEXT);
+            createSOAPFault(soapResponseMessage.getSOAPBody().addFault(), fault);
         }
         return null;
     }
@@ -189,8 +194,8 @@ public abstract class AbstractSoapEncoder implements Encoder<ServiceResponse, So
     /**
      * Creates a SOAPFault element from SOS internal fault
      *
-     * @param fault        SOAPFault element
-     * @param sosSOAPFault SOS internal fault
+     * @param fault     SOAPFault element
+     * @param soapFault SOS internal fault
      *
      * @throws SOAPException if an error occurs.
      */
@@ -205,8 +210,8 @@ public abstract class AbstractSoapEncoder implements Encoder<ServiceResponse, So
     /**
      * Creates a SOAPFault element from SOS exception
      *
-     * @param soapFault SOAPFault element
-     * @param sosResponse SOS exception
+     * @param soapFault          SOAPFault element
+     * @param owsExceptionReport SOS exception
      *
      * @return SOAP action URI.
      *
@@ -227,8 +232,7 @@ public abstract class AbstractSoapEncoder implements Encoder<ServiceResponse, So
                     soapFault.appendFaultSubcode(new QName(OWSConstants.NS_OWS, firstException.getCode().toString(),
                                                            OWSConstants.NS_OWS_PREFIX));
                 } else {
-                    soapFault.appendFaultSubcode(new QName(OWSConstants.NS_OWS, OwsExceptionCode.NoApplicableCode
-                            .name(), OWSConstants.NS_OWS_PREFIX));
+                    soapFault.appendFaultSubcode(OWSConstants.QN_NO_APPLICABLE_CODE);
                 }
             }
             soapFault.addFaultReasonText(SoapHelper.getSoapFaultReasonText(firstException.getCode()), Locale.ENGLISH);
@@ -237,16 +241,16 @@ public abstract class AbstractSoapEncoder implements Encoder<ServiceResponse, So
                 createSOAPFaultDetail(detail, exception);
             }
             return getExceptionActionURI(firstException.getCode());
+        } else {
+            SoapFault fault = new SoapFault();
+            fault.setFaultCode(SOAPConstants.SOAP_RECEIVER_FAULT);
+            fault.setFaultSubcode(OWSConstants.QN_NO_APPLICABLE_CODE);
+            fault.setFaultReason(DEFAULT_FAULT_REASON);
+            fault.setLocale(Locale.ENGLISH);
+            fault.setDetailText(MISSING_EXCEPTION_DETAIL_TEXT);
+            createSOAPFault(soapFault, fault);
+            return SosSoapConstants.RESP_ACTION_SOS;
         }
-        SoapFault fault = new SoapFault();
-        fault.setFaultCode(SOAPConstants.SOAP_RECEIVER_FAULT);
-        fault.setFaultSubcode(new QName(OWSConstants.NS_OWS, OwsExceptionCode.NoApplicableCode.name(),
-                                        OWSConstants.NS_OWS_PREFIX));
-        fault.setFaultReason("A server exception was encountered.");
-        fault.setLocale(Locale.ENGLISH);
-        fault.setDetailText("Error while creating SOAPFault element from OWSException! OWSException is missing!");
-        createSOAPFault(soapFault, fault);
-        return SosSoapConstants.RESP_ACTION_SOS;
     }
 
     /**
@@ -277,9 +281,7 @@ public abstract class AbstractSoapEncoder implements Encoder<ServiceResponse, So
      * @throws SOAPException if an error occurs.
      */
     private void createSOAPFaultDetail(Detail detail, CodedException exception) throws SOAPException {
-        SOAPElement exRep =
-                    detail.addChildElement(new QName(OWSConstants.NS_OWS, OWSConstants.EN_EXCEPTION,
-                                                     OWSConstants.NS_OWS_PREFIX));
+        SOAPElement exRep = detail.addChildElement(OWSConstants.QN_EXCEPTION);
         exRep.addNamespaceDeclaration(OWSConstants.NS_OWS_PREFIX, OWSConstants.NS_OWS);
         String code = exception.getCode().toString();
         String locator = exception.getLocator();
@@ -309,9 +311,7 @@ public abstract class AbstractSoapEncoder implements Encoder<ServiceResponse, So
             exRep.addAttribute(new QName(OWSConstants.EN_LOCATOR), locator);
         }
         if (exceptionText.length() != 0) {
-            SOAPElement execText =
-                        exRep.addChildElement(new QName(OWSConstants.NS_OWS, OWSConstants.EN_EXCEPTION_TEXT,
-                                                        OWSConstants.NS_OWS_PREFIX));
+            SOAPElement execText = exRep.addChildElement(OWSConstants.QN_EXCEPTION_TEXT);
             execText.setTextContent(exceptionText.toString());
         }
     }

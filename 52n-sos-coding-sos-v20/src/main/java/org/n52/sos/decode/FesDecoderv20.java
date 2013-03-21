@@ -49,6 +49,7 @@ import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
@@ -101,8 +102,9 @@ public class FesDecoderv20 implements Decoder<Object, XmlObject> {
             return parseSpatialFilterType((SpatialOpsType) xmlObject);
         } else if (xmlObject instanceof TemporalOpsType) {
             return parseTemporalFilterType((TemporalOpsType) xmlObject);
+        } else {
+            throw new UnsupportedDecoderInputException(this, xmlObject);
         }
-        return null;
     }
     
     /**

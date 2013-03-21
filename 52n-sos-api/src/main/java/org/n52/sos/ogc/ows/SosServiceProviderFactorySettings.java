@@ -28,17 +28,19 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.n52.sos.config.SettingDefinition;
-import org.n52.sos.config.SettingDefinitionProvider;
 import org.n52.sos.config.SettingDefinitionGroup;
+import org.n52.sos.config.SettingDefinitionProvider;
 import org.n52.sos.config.settings.FileSettingDefinition;
 import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.config.settings.UriSettingDefinition;
 import org.n52.sos.util.CollectionHelper;
 
 /**
- * TODO JavaDoc
+ * Setting definitions for the OWS Service Provider.
  *
  * @author Christian Autermann <c.autermann@52north.org>
+ *
+ * @since 4.0.0
  */
 public class SosServiceProviderFactorySettings implements SettingDefinitionProvider {
     

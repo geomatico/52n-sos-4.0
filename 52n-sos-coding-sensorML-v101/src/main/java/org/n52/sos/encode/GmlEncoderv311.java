@@ -29,11 +29,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.opengis.gml.AbstractRingPropertyType;
+import net.opengis.gml.AbstractRingType;
+import net.opengis.gml.CodeType;
+import net.opengis.gml.DirectPositionListType;
+import net.opengis.gml.DirectPositionType;
+import net.opengis.gml.LineStringType;
+import net.opengis.gml.LinearRingType;
+import net.opengis.gml.MeasureType;
+import net.opengis.gml.PointType;
+import net.opengis.gml.PolygonType;
+import net.opengis.gml.ReferenceType;
+import net.opengis.gml.TimeInstantDocument;
+import net.opengis.gml.TimeInstantType;
+import net.opengis.gml.TimePeriodDocument;
+import net.opengis.gml.TimePeriodType;
+import net.opengis.gml.TimePositionType;
+
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlRuntimeException;
 import org.apache.xmlbeans.impl.values.XmlValueDisconnectedException;
 import org.joda.time.DateTime;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.GMLConstants;
@@ -55,24 +74,6 @@ import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.opengis.gml.AbstractRingPropertyType;
-import net.opengis.gml.AbstractRingType;
-import net.opengis.gml.CodeType;
-import net.opengis.gml.DirectPositionListType;
-import net.opengis.gml.DirectPositionType;
-import net.opengis.gml.LineStringType;
-import net.opengis.gml.LinearRingType;
-import net.opengis.gml.MeasureType;
-import net.opengis.gml.PointType;
-import net.opengis.gml.PolygonType;
-import net.opengis.gml.ReferenceType;
-import net.opengis.gml.TimeInstantDocument;
-import net.opengis.gml.TimeInstantType;
-import net.opengis.gml.TimePeriodDocument;
-import net.opengis.gml.TimePeriodType;
-import net.opengis.gml.TimePositionType;
-
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -132,26 +133,21 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         if (element instanceof ITime) {
             return createTime((ITime) element, additionalValues);
-        }
-        if (element instanceof Geometry) {
+        } else if (element instanceof Geometry) {
             return createPosition((Geometry) element, additionalValues.get(HelperValues.GMLID));
-        }
-        if (element instanceof CategoryValue) {
+        } else if (element instanceof CategoryValue) {
             return createReferenceTypeForCategroyValue((CategoryValue) element);
-        }
-        if (element instanceof org.n52.sos.ogc.gml.ReferenceType) {
+        } else if (element instanceof org.n52.sos.ogc.gml.ReferenceType) {
             return createReferencType((org.n52.sos.ogc.gml.ReferenceType) element);
-        }
-        if (element instanceof CodeWithAuthority) {
+        } else if (element instanceof CodeWithAuthority) {
             return createCodeWithAuthorityType((CodeWithAuthority) element);
-        }
-        if (element instanceof QuantityValue) {
+        } else if (element instanceof QuantityValue) {
             return createMeasureType((QuantityValue)element);
-        }
-        if (element instanceof org.n52.sos.ogc.gml.CodeType) {
+        } else if (element instanceof org.n52.sos.ogc.gml.CodeType) {
             return createCodeType((org.n52.sos.ogc.gml.CodeType) element);
+        } else {
+            throw new UnsupportedEncoderInputException(this, element);
         }
-        return null;
     }
 
     private XmlObject createTime(ITime time, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
@@ -168,6 +164,8 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
                 } else {
                     return createTimePeriodType((TimePeriod) time, null);
                 }
+            } else {
+                throw new UnsupportedEncoderInputException(this, time);
             }
         }
         return null;
@@ -294,8 +292,9 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
             xbPolygon.setId("polygon_" + foiId);
             createPolygonFromJtsGeometry((Polygon) geom, xbPolygon);
             return xbPolygon;
+        } else {
+            throw new UnsupportedEncoderInputException(this, geom);
         }
-        return null;
     }
 
     /**

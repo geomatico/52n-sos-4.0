@@ -26,25 +26,40 @@ package org.n52.sos.decode;
 import java.util.Map;
 import java.util.Set;
 
+import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.ConformanceClass;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 
 /**
- * @param <T>
- *            the result of the decoding process, the "Target"
- * @param <S>
- *            the input which is decoded, the "Source"
+ * Generic interface for decoders.
+ *
+ * @param <T> the result of the decoding process, the "Target"
+ * @param <S> the input which is decoded, the "Source"
  */
 public interface Decoder<T, S> extends ConformanceClass {
+    /**
+     * @return List encodings this implementation (identified by {@link DecoderKeyType}) is able to decode
+     */
+    public Set<DecoderKey> getDecoderKeyTypes();
 
-	/**
-	 * @return List encodings this implementation (identified by
-	 *         {@link DecoderKeyType}) is able to decode
-	 */
-	public Set<DecoderKey> getDecoderKeyTypes();
+    /**
+     * Decode a object to another representation.
+     *
+     * @param objectToDecode the object to encode
+     *
+     * @return the encoded object
+     *
+     * @throws OwsExceptionReport               if an error occurs
+     * @throws UnsupportedDecoderInputException if the supplied type (or any of it's contents) is not supported by this
+     *                                          decoder
+     */
+    public T decode(S objectToDecode) throws OwsExceptionReport, UnsupportedDecoderInputException;
 
-    public T decode(S objectToDecode) throws OwsExceptionReport;
-
-	public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
+    /**
+     * Get the {@linkplain SupportedTypeKey}
+     *
+     * @return the supported key types
+     */
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
 }

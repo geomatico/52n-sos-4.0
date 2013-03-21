@@ -28,21 +28,20 @@ import static org.n52.sos.ogc.ows.SosServiceProviderFactorySettings.*;
 import java.io.File;
 import java.net.URI;
 
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
-import org.n52.sos.util.LazyThreadSafeFactory;
+import org.n52.sos.exception.ConfigurationException;
+import org.n52.sos.util.LazyThreadSafeProducer;
 import org.n52.sos.util.XmlHelper;
 
 /**
- * 
- * TODO generate Factory interface
- * 
  * @author Christian Autermann <c.autermann@52north.org>
+ *
+ * @since 4.0.0
  */
 @Configurable
-public class SosServiceProviderFactory extends LazyThreadSafeFactory<SosServiceProvider> {
+public class SosServiceProviderFactory extends LazyThreadSafeProducer<SosServiceProvider> {
 
     private File file;
     private String name;

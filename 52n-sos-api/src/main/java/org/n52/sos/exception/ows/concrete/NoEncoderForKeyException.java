@@ -23,8 +23,8 @@
  */
 package org.n52.sos.exception.ows.concrete;
 
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.encode.EncoderKey;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>

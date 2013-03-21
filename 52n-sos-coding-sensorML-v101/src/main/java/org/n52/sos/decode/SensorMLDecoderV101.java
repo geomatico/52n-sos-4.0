@@ -63,11 +63,11 @@ import net.opengis.sensorML.x101.ValidTimeDocument.ValidTime;
 
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
 import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sensorML.AbstractComponent;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
 import org.n52.sos.ogc.sensorML.AbstractSensorML;
@@ -90,7 +90,6 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -131,9 +130,7 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
         } else if (element instanceof ProcessModelType) {
             return parseProcessModel((ProcessModelType) element);
         } else {
-            throw new NoApplicableCodeException()
-                    .withMessage("Received XMLObject type '%s' is not supported by this '%s'.",
-                                 element != null ? element.getClass().getName() : element, this.getClass());
+            throw new UnsupportedDecoderInputException(this, element);
         }
     }
 

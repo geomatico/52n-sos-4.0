@@ -30,13 +30,14 @@ import org.n52.sos.exception.ConfigurationException;
 
 
 /**
- * Thread safe factory that creates a object only if
- * it is null or if it should be recreated explicitly.
+ * Thread safe producer that creates a object only if it is null or if it should be recreated explicitly.
+ *
  * @param <T> the type to produce
+ *
  * @since 4.0
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class LazyThreadSafeFactory<T> implements Producer<T> {
+public abstract class LazyThreadSafeProducer<T> implements Producer<T> {
 
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 	private T object;

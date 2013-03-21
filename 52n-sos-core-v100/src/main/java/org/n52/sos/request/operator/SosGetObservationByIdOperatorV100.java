@@ -35,8 +35,10 @@ import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetObservationByIdDAO;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.concrete.MissingResponseFormatParameterException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
+import org.n52.sos.exception.ows.concrete.MissingResponseFormatParameterException;
+import org.n52.sos.exception.ows.concrete.NoEncoderForResponseException;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
@@ -124,11 +126,10 @@ public class SosGetObservationByIdOperatorV100 extends
                 
             } else {
                 // complain check missing params throw exception
-                throw new NoApplicableCodeException().withMessage("No encoder for operation found!");
+                throw new NoEncoderForResponseException();
             }
         } catch (IOException ioe) {
-            throw new NoApplicableCodeException().causedBy(ioe)
-                    .withMessage("Error occurs while saving response to output stream!");
+            throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
     }
 }

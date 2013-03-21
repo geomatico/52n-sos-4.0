@@ -23,10 +23,11 @@
  */
 package org.n52.sos.decode;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
-import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosConstants;
 
 
 /**

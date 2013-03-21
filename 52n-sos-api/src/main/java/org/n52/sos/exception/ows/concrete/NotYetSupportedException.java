@@ -24,7 +24,7 @@
 package org.n52.sos.exception.ows.concrete;
 
 import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.util.StringHelper;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
@@ -32,7 +32,19 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 public class NotYetSupportedException extends NoApplicableCodeException {
     private static final long serialVersionUID = 8214490617892996058L;
 
-    public OwsExceptionReport forFeature(String feature) {
-        return withMessage("%s is not yet supported", feature);
+    public NotYetSupportedException() {
+    }
+
+    public NotYetSupportedException(String feature) {
+        withMessage("%s is not yet supported", feature);
+    }
+
+    public NotYetSupportedException(String type, Object feature) {
+        withMessage("The %s %s is not yet supported", type, feature);
+    }
+
+    public NotYetSupportedException(String type, Object feature, Object... supportedFeatures) {
+        withMessage("The %s %s is not yet supported. Currently supported: %s",
+                    type, feature, StringHelper.join(", ", supportedFeatures));
     }
 }

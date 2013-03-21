@@ -53,8 +53,9 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.apache.xmlbeans.impl.values.XmlValueDisconnectedException;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.swe.SWEConstants;
@@ -86,10 +87,6 @@ import org.slf4j.LoggerFactory;
  */
 public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SweCommonEncoderv101.class);
 
     private Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(SWEConstants.NS_SWE,
@@ -165,7 +162,7 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
         } else if (element instanceof SosSweDataArray) {
             return createDataArray((SosSweDataArray) element);
         }
-        return null;
+        throw new UnsupportedEncoderInputException(this, element);
     }
     
     private DataComponentPropertyType createField(SosSweField sweField) throws OwsExceptionReport {

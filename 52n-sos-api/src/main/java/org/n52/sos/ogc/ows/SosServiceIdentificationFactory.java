@@ -29,12 +29,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.util.LazyThreadSafeFactory;
+import org.n52.sos.util.LazyThreadSafeProducer;
 import org.n52.sos.util.Validation;
 import org.n52.sos.util.XmlHelper;
 
@@ -42,7 +42,7 @@ import org.n52.sos.util.XmlHelper;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 @Configurable
-public class SosServiceIdentificationFactory extends LazyThreadSafeFactory<SosServiceIdentification> {
+public class SosServiceIdentificationFactory extends LazyThreadSafeProducer<SosServiceIdentification> {
 
     private File file;
     private String[] keywords;

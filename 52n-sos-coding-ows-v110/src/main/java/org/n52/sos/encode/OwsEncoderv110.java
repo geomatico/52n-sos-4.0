@@ -53,6 +53,7 @@ import net.opengis.ows.x11.ServiceProviderDocument.ServiceProvider;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.OwsExceptionCode;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.ows.CodedException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.IOWSParameterValue;
@@ -130,7 +131,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
         } else if (element instanceof OwsExceptionReport) {
             return encodeOwsExceptionReport((OwsExceptionReport) element);
         }
-        return null;
+        throw new UnsupportedEncoderInputException(this, element);
     }
 
     /**
