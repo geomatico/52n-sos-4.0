@@ -35,6 +35,8 @@ import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.decode.XmlOperationDecoderKey;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.EncoderKey;
+import org.n52.sos.event.SosEventBus;
+import org.n52.sos.event.events.OwsExceptionReportEvent;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.MethodNotSupportedException;
 import org.n52.sos.exception.ows.concrete.NoEncoderForKeyException;
@@ -139,7 +141,6 @@ public class SoapBinding extends Binding {
             } else {
                 owse = new NoApplicableCodeException().causedBy(t);
             }
-            LOGGER.warn("Error processing request", owse);
             soapResponse.setException(owse.setVersion(version));
             if (soapVersion == null || !soapVersion.isEmpty()) {
                 soapResponse.setSoapVersion(SOAPConstants.SOAP_1_2_PROTOCOL);
@@ -154,7 +155,9 @@ public class SoapBinding extends Binding {
             EncoderKey key = CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse);
             Encoder<?, SoapResponse> encoder = getEncoder(key);
             if (encoder != null) {
-                return (ServiceResponse) encoder.encode(soapResponse);
+                ServiceResponse response = (ServiceResponse) encoder.encode(soapResponse);
+                SosEventBus.fire(new OwsExceptionReportEvent(owse));
+                return response;
             } else {
                 throw new NoEncoderForKeyException(key);
             }

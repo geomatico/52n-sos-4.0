@@ -100,7 +100,6 @@ public class PoxBinding extends Binding {
             } else {
                 owse = new GenericThrowableWrapperException(t);
             }
-            LOGGER.warn("Error processing request", owse);
             throw owse.setVersion(sosRequest != null ? sosRequest.getVersion() : null);
         }
         return serviceResponse;

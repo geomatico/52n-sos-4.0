@@ -127,7 +127,6 @@ public class KvpBinding extends Binding {
             } else {
                 owse = new NoApplicableCodeException().causedBy(t);
             }
-            LOGGER.warn("Error processing request", owse);
             throw owse.setVersion(request != null ? request.getVersion() : null);
         }
         return response;
