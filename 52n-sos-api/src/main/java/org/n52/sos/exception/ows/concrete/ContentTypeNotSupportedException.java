@@ -36,7 +36,7 @@ public class ContentTypeNotSupportedException extends InvalidParameterValueExcep
 
 	public ContentTypeNotSupportedException(String contentType, String... supportedContentType) {
 		super("HTTP header Content-Type",contentType);
-		withMessage("Requested content type '%s' as specified in Accept header not supported. Please something like: %s.", 
+		withMessage("Requested content type '%s' as specified in Accept header not supported. Please use something like: %s.", 
                 contentType,
                 StringHelper.join(", ", (Object[])supportedContentType));
 	}
