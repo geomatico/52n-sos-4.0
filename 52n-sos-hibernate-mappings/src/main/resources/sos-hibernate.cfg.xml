@@ -27,6 +27,7 @@
         <!-- Hibernate mapping files -->
         <mapping resource="mapping/BlobValue.hbm.xml"/>
         <mapping resource="mapping/CategoryValue.hbm.xml"/>
+        <mapping resource="mapping/Codespace.hbm.xml"/>
         <mapping resource="mapping/CompositePhenomenon.hbm.xml"/>
         <mapping resource="mapping/FeatureOfInterest.hbm.xml"/>
         <mapping resource="mapping/FeatureOfInterestType.hbm.xml"/>

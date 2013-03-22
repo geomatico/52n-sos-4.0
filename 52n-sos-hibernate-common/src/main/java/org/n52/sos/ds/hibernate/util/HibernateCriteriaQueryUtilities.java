@@ -55,6 +55,7 @@ import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.entities.BlobValue;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.CategoryValue;
+import org.n52.sos.ds.hibernate.entities.Codespace;
 import org.n52.sos.ds.hibernate.entities.CompositePhenomenon;
 import org.n52.sos.ds.hibernate.entities.CountValue;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
@@ -1303,6 +1304,12 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
 
     public static List<?> getDataAvailabilityValues(HibernateQueryObject queryObject, Session session) {
         return getObjectList(queryObject, session, Observation.class);
+    }
+
+    public static Codespace getCodespace(String codespace, Session session) {
+        Criteria criteria = session.createCriteria(Codespace.class);
+        criteria.add(eq(PARAMETER_CODESPACE, codespace));
+        return (Codespace) criteria.uniqueResult();
     }
 
 }

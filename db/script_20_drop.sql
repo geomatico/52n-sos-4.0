@@ -23,6 +23,7 @@
 --
 
 DROP TABLE IF EXISTS result_type CASCADE;
+DROP TABLE IF EXISTS codespace CASCADE;
 DROP TABLE IF EXISTS spatial_filtering_profile CASCADE;
 DROP TABLE IF EXISTS sensor_system CASCADE;
 DROP TABLE IF EXISTS offering CASCADE;
@@ -74,6 +75,7 @@ DROP TABLE IF EXISTS related_feature_role CASCADE;
 
 -- drop sequences
 DROP SEQUENCE IF EXISTS blob_value_id_seq;
+DROP SEQUENCE IF EXISTS codespace_id_seq;
 DROP SEQUENCE IF EXISTS boolean_value_id_seq;
 DROP SEQUENCE IF EXISTS category_value_id_seq;
 DROP SEQUENCE IF EXISTS composite_phenomenon_id_seq;

@@ -71,6 +71,8 @@ public interface HibernateConstants {
     String PARAMETER_PROCEDURE_DESCRIPTION_FORMAT = "procedureDescriptionFormat";
 
     String PARAMETER_UNIT = "unit";
+    
+    String PARAMETER_CODESPACE = "codespace";
 	
 	String DELETED = "deleted";
 

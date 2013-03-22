@@ -34,6 +34,7 @@ public class Observation implements java.io.Serializable {
     private FeatureOfInterest featureOfInterest;
     private ObservationConstellation observationConstellation;
     private String identifier;
+    private Codespace codespace;
     private Date phenomenonTimeStart;
     private Date phenomenonTimeEnd;
     private Date resultTime;
@@ -81,6 +82,14 @@ public class Observation implements java.io.Serializable {
         this.identifier = identifier;
     }
 
+    public Codespace getCodespace() {
+        return this.codespace;
+    }
+
+    public void setCodespace(Codespace codespace) {
+        this.codespace = codespace;
+    }
+    
     public Date getPhenomenonTimeStart() {
         return this.phenomenonTimeStart;
     }
@@ -168,5 +177,12 @@ public class Observation implements java.io.Serializable {
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
+    }
+    public boolean isSetIdentifier() {
+        return getIdentifier() != null && !getIdentifier().isEmpty();
+    }
+    
+    public boolean isSetCodespace() {
+        return getCodespace() != null && getCodespace().isSetCodespace();
     }
 }

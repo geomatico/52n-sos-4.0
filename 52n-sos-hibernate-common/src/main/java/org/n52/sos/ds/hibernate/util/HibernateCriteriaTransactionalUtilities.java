@@ -38,6 +38,7 @@ import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.entities.BlobValue;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.CategoryValue;
+import org.n52.sos.ds.hibernate.entities.Codespace;
 import org.n52.sos.ds.hibernate.entities.CountValue;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
@@ -217,6 +218,18 @@ public class HibernateCriteriaTransactionalUtilities {
         if (result == null) {
             result = new Unit();
             result.setUnit(unit);
+            session.save(result);
+            session.flush();
+            session.refresh(result);
+        }
+        return result;
+    }
+    
+    public static Codespace getOrInsertCodespace(String codespace, Session session) {
+        Codespace result = HibernateCriteriaQueryUtilities.getCodespace(codespace, session);
+        if (result == null) {
+            result = new Codespace();
+            result.setCodespace(codespace);
             session.save(result);
             session.flush();
             session.refresh(result);
@@ -552,6 +565,10 @@ public class HibernateCriteriaTransactionalUtilities {
         hObservation.setDeleted(false);
         if (sosObservation.isSetIdentifier()) {
             hObservation.setIdentifier(sosObservation.getIdentifier().getValue());
+            if (sosObservation.getIdentifier().isSetCodeSpace()) {
+                hObservation.setCodespace(HibernateCriteriaTransactionalUtilities.getOrInsertCodespace(sosObservation
+                        .getIdentifier().getCodeSpace(), session));
+            }
         }
         if (setId != null && !setId.isEmpty()) {
             hObservation.setSetId(setId);
@@ -601,7 +618,7 @@ public class HibernateCriteriaTransactionalUtilities {
 
     private static void setIdentifier(SosObservation containerObservation, SosObservation sosObservation,
             String antiSubsettingId, String idExtension) {
-        if (containerObservation.getIdentifier() != null && containerObservation.getIdentifier().isSetValue()) {
+        if (containerObservation.isSetIdentifier()) {
             String subObservationIdentifier = String.format("%s-%s", antiSubsettingId, idExtension);
             CodeWithAuthority subObsIdentifier = new CodeWithAuthority(subObservationIdentifier);
             subObsIdentifier.setCodeSpace(containerObservation.getIdentifier().getCodeSpace());

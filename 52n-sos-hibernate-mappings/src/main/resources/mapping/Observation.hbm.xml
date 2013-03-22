@@ -19,6 +19,9 @@
         <property name="identifier" type="string">
             <column name="identifier" not-null="true" />
         </property>
+        <many-to-one name="codespace" class="org.n52.sos.ds.hibernate.entities.Codespace" fetch="select">
+            <column name="codespace_id" not-null="true" />
+        </many-to-one>
         <property name="deleted" type="boolean">
             <column name="deleted" not-null="true" default="true"/>
         </property>

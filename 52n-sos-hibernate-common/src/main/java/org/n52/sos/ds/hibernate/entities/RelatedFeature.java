@@ -32,6 +32,8 @@ public class RelatedFeature implements java.io.Serializable {
     private FeatureOfInterest featureOfInterest;
     private Set<RelatedFeatureRole> relatedFeatureRoles = new HashSet<RelatedFeatureRole>(0);
 
+    private Set<Offering> offerings = new HashSet<Offering>(0);
+
     public RelatedFeature() {
     }
 
@@ -58,4 +60,13 @@ public class RelatedFeature implements java.io.Serializable {
     public void setRelatedFeatureRoles(Set<RelatedFeatureRole> relatedFeatureRoles) {
         this.relatedFeatureRoles = relatedFeatureRoles;
     }
+
+    public Set<Offering> getOfferings() {
+        return this.offerings;
+    }
+
+    public void setOfferings(Set<Offering> offerings) {
+        this.offerings = offerings;
+    }
+
 }

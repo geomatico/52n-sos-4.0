@@ -16,6 +16,9 @@
         <property name="identifier" type="string">
             <column name="identifier" />
         </property>
+        <many-to-one name="codespace" class="org.n52.sos.ds.hibernate.entities.Codespace" fetch="select">
+            <column name="codespace_id" not-null="true" />
+        </many-to-one>
         <property name="name" type="string">
             <column name="name" />
         </property>
@@ -28,6 +31,19 @@
         <property name="url" type="string">
             <column name="url" unique="true" />
         </property>
+        <!-- supports types big_decimal and string -->
+       <!--  <property name="longitude" type="big_decimal">
+           <column name="longitude" unique="true" />
+        </property>
+        <property name="latitude" type="big_decimal">
+        	<column name="latitude" unique="true" />
+        </property>
+        <property name="altitude" type="big_decimal">
+        	<column name="altitude" unique="true" />
+        </property>
+        <property name="srid" type="integer">
+        	<column name="srid" unique="true" />
+        </property> -->
         <!-- <set name="observations" table="observation" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="feature_of_interest_id" not-null="true" />

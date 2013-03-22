@@ -35,10 +35,19 @@ public class FeatureOfInterest implements java.io.Serializable {
     private long featureOfInterestId;
     private FeatureOfInterestType featureOfInterestType;
     private String identifier;
+    private Codespace codespace;
     private String name;
     private Geometry geom;
     private String descriptionXml;
     private String url;
+    
+    private Object longitude;
+    
+    private Object latitude;
+    
+    private Object altitude;
+    
+    private int srid;
     private Set<FeatureOfInterest> featureOfInterestsForChildFeatureId = new HashSet<FeatureOfInterest>(0);
     private Set<FeatureOfInterest> featureOfInterestsForParentFeatureId = new HashSet<FeatureOfInterest>(0);
 
@@ -67,6 +76,14 @@ public class FeatureOfInterest implements java.io.Serializable {
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    public Codespace getCodespace() {
+        return this.codespace;
+    }
+
+    public void setCodespace(Codespace codespace) {
+        this.codespace = codespace;
     }
 
     public String getName() {
@@ -107,6 +124,38 @@ public class FeatureOfInterest implements java.io.Serializable {
         this.url = url;
     }
 
+    public Object getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Object longitude) {
+        this.longitude = longitude;
+    }
+
+    public Object getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Object latitude) {
+        this.latitude = latitude;
+    }
+
+    public Object getAltitude() {
+        return altitude;
+    }
+
+    public void setAltitude(Object altitude) {
+        this.altitude = altitude;
+    }
+
+    public int getSrid() {
+        return srid;
+    }
+
+    public void setSrid(int srid) {
+        this.srid = srid;
+    }
+
     public Set<FeatureOfInterest> getFeatureOfInterestsForChildFeatureId() {
         return this.featureOfInterestsForChildFeatureId;
     }
@@ -121,5 +170,25 @@ public class FeatureOfInterest implements java.io.Serializable {
 
     public void setFeatureOfInterestsForParentFeatureId(Set<FeatureOfInterest> featureOfInterestsForParentFeatureId) {
         this.featureOfInterestsForParentFeatureId = featureOfInterestsForParentFeatureId;
+    }
+    
+    public boolean isSetGeometry() {
+        return getGeom() != null;
+    }
+    
+    public boolean isSetLongLat() {
+        return getLongitude() != null && getLatitude() != null;
+    }
+    
+    public boolean isSetAltitude() {
+        return getAltitude() != null;
+    }
+    
+    public boolean isSetSrid() {
+        return getSrid() > 0;
+    }
+
+    public boolean isSetCodespace() {
+        return getCodespace() != null && getCodespace().isSetCodespace();
     }
 }

@@ -26,6 +26,7 @@
 CREATE SEQUENCE blob_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE category_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE composite_phenomenon_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE codespace_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE feature_of_interest_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE feature_of_interest_type_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE geometry_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
@@ -56,6 +57,13 @@ CREATE TABLE result_type (
   result_type TEXT NOT NULL,
   UNIQUE (result_type),
   PRIMARY KEY(result_type_id)
+);
+
+CREATE TABLE codepsace (
+  codespace_id bigint NOT NULL DEFAULT nextval('codespace_id_seq'),
+  codespace TEXT NOT NULL,
+  UNIQUE (codespace),
+  PRIMARY KEY(codespace_id)
 );
 
 CREATE TABLE related_feature_role (
@@ -193,6 +201,7 @@ CREATE TABLE feature_of_interest (
   feature_of_interest_id bigint NOT NULL DEFAULT nextval('feature_of_interest_id_seq'),
   feature_of_interest_type_id bigint NOT NULL,
   identifier TEXT NULL,
+  codespace_id bigint NULL,
   name Text NULL,
   geom GEOMETRY NULL,
   description_xml TEXT NULL,
@@ -310,6 +319,7 @@ CREATE TABLE observation (
   feature_of_interest_id bigint NOT NULL,
   observation_constellation_id bigint NOT NULL,
   identifier TEXT NULL,
+  codespace_id bigint NULL,
   phenomenon_time_start TIMESTAMP NOT NULL,
   phenomenon_time_end TIMESTAMP NOT NULL,
   result_time TIMESTAMP NOT NULL,
@@ -407,6 +417,7 @@ CREATE TABLE observation_has_geometry_value (
 CREATE INDEX request_FKIndex1 ON request(offering_id);
 CREATE INDEX procedure_FKIndex1 ON procedure(procedure_description_format_id);
 CREATE INDEX feature_of_interest_FKIndex1 ON feature_of_interest(feature_of_interest_type_id);
+CREATE INDEX feature_of_interest_FKIndex2 ON feature_of_interest(codespace_id);
 CREATE INDEX sensor_system_FKIndex1 ON sensor_system(parent_sensor_id);
 CREATE INDEX sensor_system_FKIndex2 ON sensor_system(child_sensor_id);
 CREATE INDEX observable_property_FKIndex1 ON observation(unit_id);
@@ -437,6 +448,7 @@ CREATE INDEX valid_procedure_time_FKIndex1 ON valid_procedure_time(procedure_id)
 CREATE INDEX composite_phenomenon_has_observable_property_FKIndex1 ON composite_phenomenon_has_observable_property(composite_phenomenon_id);
 CREATE INDEX composite_phenomenon_has_observable_property_FKIndex2 ON composite_phenomenon_has_observable_property(observable_property_id);
 CREATE INDEX observation_FKIndex2 ON observation(feature_of_interest_id);
+CREATE INDEX observation_FKIndex3 ON observation(codespace_id);
 CREATE INDEX observation_relates_to_obs_const_off_obs_type_FKindex1 ON observation_relates_to_obs_const_off_obs_type (observation_id );
 CREATE INDEX observation_relates_to_obs_const_off_obs_type_FKindex2 ON observation_relates_to_obs_const_off_obs_type (observation_constellation_offering_observation_type_id );
 CREATE INDEX observation_has_text_value_FKIndex1 ON observation_has_text_value(observation_id);
@@ -470,6 +482,7 @@ ALTER TABLE procedure ADD FOREIGN KEY (procedure_description_format_id) REFERENC
 ALTER TABLE sensor_system ADD FOREIGN KEY (parent_sensor_id) REFERENCES procedure(procedure_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE sensor_system ADD FOREIGN KEY (child_sensor_id) REFERENCES procedure(procedure_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE feature_of_interest ADD FOREIGN KEY (feature_of_interest_type_id) REFERENCES feature_of_interest_type(feature_of_interest_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE feature_of_interest ADD FOREIGN KEY (codespace_id) REFERENCES codespace(codespace_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation ADD FOREIGN KEY (unit_id) REFERENCES unit(unit_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE offering_has_allowed_observation_type ADD FOREIGN KEY (offering_id) REFERENCES offering(offering_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE offering_has_allowed_observation_type ADD FOREIGN KEY (observation_type_id) REFERENCES observation_type(observation_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -496,6 +509,7 @@ ALTER TABLE valid_procedure_time ADD FOREIGN KEY (procedure_id) REFERENCES proce
 ALTER TABLE composite_phenomenon_has_observable_property ADD FOREIGN KEY (composite_phenomenon_id) REFERENCES composite_phenomenon(Composite_Phenomenon_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE composite_phenomenon_has_observable_property ADD FOREIGN KEY (observable_property_id) REFERENCES observable_property(Observable_Property_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation ADD FOREIGN KEY (feature_of_interest_id) REFERENCES feature_of_interest(feature_of_interest_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE observation ADD FOREIGN KEY (codespace_id) REFERENCES codespace(codespace_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_text_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_text_value ADD FOREIGN KEY (text_value_id) REFERENCES text_value(text_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE result_template ADD FOREIGN KEY (observation_constellation_offering_observation_type_id) REFERENCES observation_constellation_offering_observation_type(observation_constellation_offering_observation_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;

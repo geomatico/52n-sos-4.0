@@ -375,9 +375,13 @@ public class HibernateObservationUtilities {
             ArrayList<SosQuality> qualityList, IValue<?> value, int obsConstHash) {
         SosObservation sosObservation = new SosObservation();
         sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
-        if (hObservation.getIdentifier() != null && !hObservation.getIdentifier().isEmpty()
+        if (hObservation.isSetIdentifier()
                 && !hObservation.getIdentifier().startsWith(SosConstants.GENERATED_IDENTIFIER_PREFIX)) {
-            sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
+            CodeWithAuthority identifier = new CodeWithAuthority(hObservation.getIdentifier());
+            if (hObservation.isSetCodespace()) {
+                identifier.setCodeSpace(hObservation.getCodespace().getCodespace());
+            }
+            sosObservation.setIdentifier(identifier);
         }
         sosObservation.setNoDataValue(getActiveProfile().getResponseNoDataPlaceholder());
         sosObservation.setTokenSeparator(getTokenSeparator());
