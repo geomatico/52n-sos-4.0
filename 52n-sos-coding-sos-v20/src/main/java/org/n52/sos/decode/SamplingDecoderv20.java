@@ -114,7 +114,10 @@ public class SamplingDecoderv20 implements Decoder<SosAbstractFeature, XmlObject
 
     @Override
     public SosAbstractFeature decode(XmlObject element) throws OwsExceptionReport {
+        // validate XmlObject
+        XmlHelper.validateDocument(element);
         if (element instanceof SFSpatialSamplingFeatureDocument) {
+            XmlHelper.validateDocument(element);
             return parseSpatialSamplingFeature(((SFSpatialSamplingFeatureDocument) element)
                     .getSFSpatialSamplingFeature());
         } else if (element instanceof SFSpatialSamplingFeatureType) {
