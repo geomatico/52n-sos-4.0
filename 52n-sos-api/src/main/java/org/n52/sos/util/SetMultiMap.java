@@ -24,6 +24,7 @@
 package org.n52.sos.util;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -34,5 +35,5 @@ import java.util.Set;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public interface SetMultiMap<K, V> extends MultiMap<K, V, Set<V>>, Serializable {
+public interface SetMultiMap<K, V> extends MultiMap<K, V, Set<V>>, Map<K, Set<V>>, Serializable {
 }

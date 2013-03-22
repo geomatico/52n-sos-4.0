@@ -44,7 +44,8 @@ import org.n52.sos.event.events.SettingsChangeEvent;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.HashSetMultiMap;
+import org.n52.sos.util.SetMultiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +59,8 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractSettingsManager extends SettingsManager {
     private static final Logger log = LoggerFactory.getLogger(AbstractSettingsManager.class);
     private final SettingDefinitionProviderRepository settingDefinitionRepository;
-    private final Map<String, Set<ConfigurableObject>> configurableObjects = CollectionHelper.map();
+    private final SetMultiMap<String, ConfigurableObject> configurableObjects =
+                                                          new HashSetMultiMap<String, ConfigurableObject>();
     private final ReadWriteLock configurableObjectsLock = new ReentrantReadWriteLock();
 
     /**
@@ -100,7 +102,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
             throw new NullPointerException("newValue can not be null");
         }
         if (newValue.getKey() == null) {
-            throw new NullPointerException("key can not be null");
+            throw new NullPointerException("newValue.key can not be null");
         }
         SettingDefinition<?, ?> def = getDefinitionByKey(newValue.getKey());
 
@@ -244,11 +246,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         log.debug("Configuring {}", co);
         configurableObjectsLock.writeLock().lock();
         try {
-            Set<ConfigurableObject> cos = configurableObjects.get(co.getKey());
-            if (cos == null) {
-                configurableObjects.put(co.getKey(), cos = CollectionHelper.set());
-            }
-            cos.add(co);
+            configurableObjects.add(co.getKey(), co);
         } finally {
             configurableObjectsLock.writeLock().unlock();
         }
@@ -427,37 +425,6 @@ public abstract class AbstractSettingsManager extends SettingsManager {
             return key;
         }
 
-        @Override
-        public int hashCode() {
-            final int prime = 45;
-            int hash = 5;
-            hash = prime * hash + (getMethod() != null ? getMethod().hashCode() : 0);
-            hash = prime * hash + (getTarget() != null ? getTarget().hashCode() : 0);
-            hash = prime * hash + (getKey() != null ? getKey().hashCode() : 0);
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final ConfigurableObject other = (ConfigurableObject) obj;
-            if (getMethod() != other.getMethod() && (getMethod() == null || !getMethod().equals(other.getMethod()))) {
-                return false;
-            }
-            if (getTarget() != other.getTarget() && (getTarget() == null || !getTarget().equals(other.getTarget()))) {
-                return false;
-            }
-            if ((getKey() == null) ? (other.getKey() != null) : !getKey().equals(other.getKey())) {
-                return false;
-            }
-            return true;
-        }
-
         /**
          * Configures this object with the specified value.
          * <p/>
@@ -503,6 +470,37 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         public String toString() {
             return String.format("ConfigurableObject[key=%s, method=%s, target=%s]",
                                  getKey(), getMethod(), getTarget().get());
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 45;
+            int hash = 5;
+            hash = prime * hash + (getMethod() != null ? getMethod().hashCode() : 0);
+            hash = prime * hash + (getTarget() != null ? getTarget().hashCode() : 0);
+            hash = prime * hash + (getKey() != null ? getKey().hashCode() : 0);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final ConfigurableObject other = (ConfigurableObject) obj;
+            if (getMethod() != other.getMethod() && (getMethod() == null || !getMethod().equals(other.getMethod()))) {
+                return false;
+            }
+            if (getTarget() != other.getTarget() && (getTarget() == null || !getTarget().equals(other.getTarget()))) {
+                return false;
+            }
+            if ((getKey() == null) ? (other.getKey() != null) : !getKey().equals(other.getKey())) {
+                return false;
+            }
+            return true;
         }
     }
 }
