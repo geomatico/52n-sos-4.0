@@ -59,7 +59,7 @@ CREATE TABLE result_type (
   PRIMARY KEY(result_type_id)
 );
 
-CREATE TABLE codepsace (
+CREATE TABLE codespace (
   codespace_id bigint NOT NULL DEFAULT nextval('codespace_id_seq'),
   codespace TEXT NOT NULL,
   UNIQUE (codespace),
