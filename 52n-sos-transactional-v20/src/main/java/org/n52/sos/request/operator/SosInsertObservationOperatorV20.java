@@ -155,10 +155,10 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<A
     }
 
     private void checkObservations(List<SosObservation> observations) throws OwsExceptionReport {
-        ContentCache cache = Configurator.getInstance().getCache();
         if (observations == null || observations.isEmpty()) {
             throw new MissingObservationParameterException();
         } else {
+        	ContentCache cache = Configurator.getInstance().getCache();
             CompositeOwsException exceptions = new CompositeOwsException();
             for (SosObservation observation : observations) {
                 SosObservationConstellation obsConstallation = observation.getObservationConstellation();
