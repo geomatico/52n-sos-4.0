@@ -779,5 +779,34 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>restful</id>
+            <dependencies>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-ext-do-xml</artifactId>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-ext-do-code</artifactId>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-ext-do-code-hibernate</artifactId>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-ext-do-code-kvp</artifactId>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-binding-rest-core</artifactId>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-binding-rest-xml-binding</artifactId>
+                    </dependency>
+                </dependencies>
+        </profile>
     </profiles>
 </project>
