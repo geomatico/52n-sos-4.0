@@ -53,16 +53,9 @@ import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SosFeatureRelationship;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.InsertSensorResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class InsertSensorDAO extends AbstractInsertSensorDAO {
 
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(InsertSensorDAO.class);
-    
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
     @Override
