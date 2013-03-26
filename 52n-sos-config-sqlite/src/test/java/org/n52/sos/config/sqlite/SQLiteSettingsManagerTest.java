@@ -25,7 +25,7 @@ package org.n52.sos.config.sqlite;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
-import static org.n52.sos.config.sqlite.TestSettingDefinitionProvider.*;
+import static org.n52.sos.config.sqlite.SettingDefinitionProviderForTesting.*;
 
 import java.io.File;
 import java.io.IOException;

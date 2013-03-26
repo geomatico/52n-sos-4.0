@@ -40,7 +40,7 @@ import org.n52.sos.util.CollectionHelper;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class TestSettingDefinitionProvider implements SettingDefinitionProvider {
+public class SettingDefinitionProviderForTesting implements SettingDefinitionProvider {
 
     public static final String URI_SETTING = "uri_setting";
     public static final String DOUBLE_SETTING = "double_setting";
