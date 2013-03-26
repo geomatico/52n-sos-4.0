@@ -27,7 +27,6 @@ import org.n52.sos.web.ControllerConstants;
 
 public interface InstallConstants {
     String IS_POSTGIS_INSTALLED = "SELECT version(), postgis_version()";
-    String GET_VERSION_OF_DATABASE_INSTALLATION = "SELECT value FROM global_settings WHERE key = 'VERSION';";
 
     /* request parameters */
     String DRIVER_PARAMETER = "driver";

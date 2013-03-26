@@ -31,11 +31,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.util.SQLHelper;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.JdbcUrl;
-import org.n52.sos.web.MetaDataHandler;
 import org.n52.sos.web.install.InstallConstants.Step;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -209,33 +207,33 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
         return checkTable(getSchema(settings), "observation", st, settings);
     }
 
-    protected void checkVersion(Statement st) throws SQLException {
-        /* check version, but for now do not fail on this one... */
-        String version = null;
-        String currentVersion = null;
-        ResultSet rs = null;
-        try {
-            rs = st.executeQuery(InstallConstants.GET_VERSION_OF_DATABASE_INSTALLATION);
-            if (rs.next()) {
-                version = rs.getString(1);
-            }
-        } catch (SQLException e) {
-            log.error("Could not determine version of installed database schema.", e);
-        } finally {
-            SQLHelper.close(rs);
-        }
-
-        try {
-            currentVersion = getMetaDataHandler().get(MetaDataHandler.Metadata.VERSION);
-        } catch (ConfigurationException e) {
-            log.error("Can not load version metadata property", e);
-        }
-
-        if (currentVersion != null && !currentVersion.equals(version)) {
-            /* TODO do some conversion? */
-            log.warn("Installed database schema ({}) is not the current one ({}).", version, currentVersion);
-        }
-    }
+//    protected void checkVersion(Statement st) throws SQLException {
+//        /* check version, but for now do not fail on this one... */
+//        String version = null;
+//        String currentVersion = null;
+//        ResultSet rs = null;
+//        try {
+//            rs = st.executeQuery(InstallConstants.GET_VERSION_OF_DATABASE_INSTALLATION);
+//            if (rs.next()) {
+//                version = rs.getString(1);
+//            }
+//        } catch (SQLException e) {
+//            log.error("Could not determine version of installed database schema.", e);
+//        } finally {
+//            SQLHelper.close(rs);
+//        }
+//
+//        try {
+//            currentVersion = getMetaDataHandler().get(MetaDataHandler.Metadata.VERSION);
+//        } catch (ConfigurationException e) {
+//            log.error("Can not load version metadata property", e);
+//        }
+//
+//        if (currentVersion != null && !currentVersion.equals(version)) {
+//            /* TODO do some conversion? */
+//            log.warn("Installed database schema ({}) is not the current one ({}).", version, currentVersion);
+//        }
+//    }
 
     protected void checkPostGIS(Statement st,
                                 InstallationConfiguration settings) throws InstallationSettingsError {
@@ -269,8 +267,8 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
             }
         } else if (!alreadyExistent) {
             throw new InstallationSettingsError(settings, ErrorMessages.NO_TABLES_AND_SHOULD_NOT_CREATE);
-        } else {
-            checkVersion(st);
+//        } else {
+//            checkVersion(st);
         }
     }
 
