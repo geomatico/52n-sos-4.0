@@ -82,7 +82,9 @@ public class SensorInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
 
         // offering name
         for (SosOffering sosOffering : request.getProcedureDescription().getOfferingIdentifiers()) {
-            cache.setNameForOffering(sosOffering.getOfferingIdentifier(), sosOffering.getOfferingName());
+            if (sosOffering.isSetOfferingName()) {
+                cache.setNameForOffering(sosOffering.getOfferingIdentifier(), sosOffering.getOfferingName());
+            }
         }
 
         // allowed observation types
