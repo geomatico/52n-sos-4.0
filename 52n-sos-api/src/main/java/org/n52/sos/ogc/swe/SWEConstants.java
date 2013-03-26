@@ -91,6 +91,7 @@ public interface SWEConstants {
     String EN_TIME = "Time";
 
     String EN_TIME_RANGE = "TimeRange";
+    String EN_ENVELOPE = "Envelope";
 
     String EN_UPDATE_SENSOR_DESCRIPTION = "UpdateSensorDescription";
 
@@ -138,6 +139,7 @@ public interface SWEConstants {
     QName QN_QUANTITY_SWE_200 = new QName(NS_SWE_20, EN_QUANTITY, NS_SWE_PREFIX);
 
     QName QN_SIMPLEDATARECORD_SWE_101 = new QName(NS_SWE, EN_SIMPLEDATARECORD, NS_SWE_PREFIX);
+    QName QN_DATA_RECORD_SWE_101 = new QName(NS_SWE, EN_DATA_RECORD, NS_SWE_PREFIX);
 
     QName QN_TEXT_ENCODING_SWE_101 = new QName(NS_SWE, EN_TEXT_ENCODING, NS_SWE_PREFIX);
 
@@ -152,6 +154,7 @@ public interface SWEConstants {
     QName QN_TIME_RANGE_SWE_200 = new QName(NS_SWE_20, EN_TIME_RANGE, NS_SWE_PREFIX);
 
     QName QN_TIME_SWE_101 = new QName(NS_SWE, EN_TIME, NS_SWE_PREFIX);
+    QName QN_ENVELOPE_SWE_101 = new QName(NS_SWE, EN_ENVELOPE, NS_SWE_PREFIX);
 
     QName QN_TIME_SWE_200 = new QName(NS_SWE_20, EN_TIME, NS_SWE_PREFIX);
 

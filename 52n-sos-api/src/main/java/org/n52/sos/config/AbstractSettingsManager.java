@@ -106,6 +106,10 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         }
         SettingDefinition<?, ?> def = getDefinitionByKey(newValue.getKey());
 
+        if (def == null) {
+            throw new IllegalArgumentException("newValue.key is invalid");
+        }
+
         if (def.getType() != newValue.getType()) {
             throw new IllegalArgumentException(String.format("Invalid type for definition (%s vs. %s)",
                                                              def.getType(), newValue.getType()));

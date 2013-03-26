@@ -45,6 +45,7 @@ import net.opengis.swe.x101.DataArrayType;
 import net.opengis.swe.x101.DataComponentPropertyType;
 import net.opengis.swe.x101.DataRecordPropertyType;
 import net.opengis.swe.x101.DataRecordType;
+import net.opengis.swe.x101.EnvelopeType;
 import net.opengis.swe.x101.ObservablePropertyDocument;
 import net.opengis.swe.x101.ObservablePropertyDocument.ObservableProperty;
 import net.opengis.swe.x101.PositionType;
@@ -59,6 +60,8 @@ import net.opengis.swe.x101.TimeDocument;
 import net.opengis.swe.x101.TimeDocument.Time;
 import net.opengis.swe.x101.TimeRangeDocument;
 import net.opengis.swe.x101.TimeRangeDocument.TimeRange;
+import net.opengis.swe.x101.VectorPropertyType;
+import net.opengis.swe.x101.VectorType;
 import net.opengis.swe.x101.VectorType.Coordinate;
 
 import org.apache.xmlbeans.XmlObject;
@@ -75,8 +78,10 @@ import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
+import org.n52.sos.ogc.swe.SosSweEnvelope;
 import org.n52.sos.ogc.swe.SosSweField;
 import org.n52.sos.ogc.swe.SosSweSimpleDataRecord;
+import org.n52.sos.ogc.swe.SosSweVector;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
 import org.n52.sos.ogc.swe.simpleType.SosSweCategory;
@@ -201,13 +206,15 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         } else if (abstractDataComponent instanceof PositionType) {
             sosAbstractDataComponent = parsePosition((PositionType) abstractDataComponent);
         } else if (abstractDataComponent instanceof DataRecordPropertyType) {
-            return parseDataRecordProperty((DataRecordPropertyType) abstractDataComponent);
+            sosAbstractDataComponent = parseDataRecordProperty((DataRecordPropertyType) abstractDataComponent);
         } else if (abstractDataComponent instanceof SimpleDataRecordType) {
-            return parseSimpleDataRecord((SimpleDataRecordType) abstractDataComponent);
+            sosAbstractDataComponent = parseSimpleDataRecord((SimpleDataRecordType) abstractDataComponent);
         } else if (abstractDataComponent instanceof DataArrayType) {
             sosAbstractDataComponent = parseSweDataArrayType((DataArrayType) abstractDataComponent);
         } else if (abstractDataComponent instanceof DataRecordType) {
             sosAbstractDataComponent = parseDataRecord((DataRecordType) abstractDataComponent);
+        } else if (abstractDataComponent instanceof EnvelopeType) {
+            sosAbstractDataComponent = parseEnvelope((EnvelopeType) abstractDataComponent);
         }
         if (sosAbstractDataComponent != null) {
             if (abstractDataComponent.isSetDefinition()) {
@@ -241,6 +248,31 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
             sosDataRecord.setFields(parseDataComponentPropertyArray(dataRecord.getFieldArray()));
         }
         return sosDataRecord;
+    }
+
+    private SosSweAbstractDataComponent parseEnvelope(EnvelopeType envelopeType) throws OwsExceptionReport {
+        SosSweEnvelope envelope = new SosSweEnvelope();
+        if (envelopeType.isSetReferenceFrame()) {
+            envelope.setReferenceFrame(envelopeType.getReferenceFrame());
+        }
+        if (envelopeType.getLowerCorner() != null) {
+            envelope.setLowerCorner(parseVectorProperty(envelopeType.getLowerCorner()));
+        }
+        if (envelopeType.getUpperCorner() != null) {
+            envelope.setUpperCorner(parseVectorProperty(envelopeType.getUpperCorner()));
+        }
+        if (envelopeType.isSetTime()) {
+            envelope.setTime((SosSweTimeRange) parseTimeRange(envelopeType.getTime().getTimeRange()));
+        }
+        return envelope;
+    }
+
+    private SosSweVector parseVectorProperty(VectorPropertyType vectorPropertyType) throws OwsExceptionReport {
+        return parseVector(vectorPropertyType.getVector());
+    }
+
+    private SosSweVector parseVector(VectorType vectorType) throws OwsExceptionReport {
+        return new SosSweVector(parseCoordinates(vectorType.getCoordinateArray()));
     }
 
     private SosSweSimpleDataRecord parseSimpleDataRecord(SimpleDataRecordType simpleDataRecord) throws
@@ -281,6 +313,8 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
                 sosAbstractDataComponentType = parseAbstractDataComponentType(xbField.getTime());
             } else if (xbField.isSetTimeRange()) {
                 sosAbstractDataComponentType = parseAbstractDataComponentType(xbField.getTimeRange());
+            } else if (xbField.isSetAbstractDataRecord()) {
+                sosAbstractDataComponentType = parseAbstractDataComponentType(xbField.getAbstractDataRecord());
             }
             if (sosAbstractDataComponentType != null) {
                 sosFields.add(new SosSweField(xbField.getName(), sosAbstractDataComponentType));
@@ -294,6 +328,7 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         SosSweBoolean sosBoolean = new SosSweBoolean();
         if (xbBoolean.isSetValue()) {
             sosBoolean.setValue(xbBoolean.getValue());
+
         }
         return sosBoolean;
     }

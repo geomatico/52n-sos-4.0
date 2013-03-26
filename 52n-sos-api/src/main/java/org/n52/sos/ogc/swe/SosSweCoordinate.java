@@ -87,4 +87,8 @@ public class SosSweCoordinate<T> {
         this.value = value;
     }
 
+    @Override
+    public String toString() {
+        return String.format("SosSweCoordinate[name=%s, value=%s]", getName(), getValue());
+    }
 }

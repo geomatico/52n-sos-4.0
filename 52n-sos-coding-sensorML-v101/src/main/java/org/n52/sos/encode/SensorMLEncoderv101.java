@@ -64,9 +64,10 @@ import net.opengis.sensorML.x101.SystemDocument;
 import net.opengis.sensorML.x101.SystemType;
 import net.opengis.sensorML.x101.TermDocument.Term;
 import net.opengis.swe.x101.AnyScalarPropertyType;
+import net.opengis.swe.x101.DataComponentPropertyType;
+import net.opengis.swe.x101.DataRecordType;
 import net.opengis.swe.x101.PositionType;
 import net.opengis.swe.x101.SimpleDataRecordType;
-import net.opengis.swe.x101.TextDocument.Text;
 import net.opengis.swe.x101.VectorType;
 
 import org.apache.xmlbeans.SchemaType;
@@ -106,7 +107,6 @@ import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.SosSweField;
 import org.n52.sos.ogc.swe.SosSweSimpleDataRecord;
-import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
 import org.n52.sos.ogc.swe.simpleType.SosSweCategory;
 import org.n52.sos.ogc.swe.simpleType.SosSweCount;
@@ -483,8 +483,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                         if (capabilities.getDataRecord() instanceof SosSweSimpleDataRecord) {
                             SimpleDataRecordType xbSimpleDataRecord =
                                                  (SimpleDataRecordType) xbCapabilities.addNewAbstractDataRecord()
-                                    .substitute(
-                                    SWEConstants.QN_SIMPLEDATARECORD_SWE_101, SimpleDataRecordType.type);
+                                    .substitute(SWEConstants.QN_SIMPLEDATARECORD_SWE_101, SimpleDataRecordType.type);
                             if (capabilities.getDataRecord().isSetFields()) {
                                 for (SosSweField field : capabilities.getDataRecord().getFields()) {
                                     AnyScalarPropertyType xbField = xbSimpleDataRecord.addNewField();
@@ -507,9 +506,19 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                                 }
                             }
                         } else if (capabilities.getDataRecord() instanceof SosSweDataRecord) {
-                            throw new NoApplicableCodeException()
-                                    .withMessage("The SWE capabilities type '%s' is not supported by this SOS for SensorML!",
-                                                 SweAggregateType.DataRecord);
+                            DataRecordType xbSimpleDataRecord = (DataRecordType) xbCapabilities
+                                    .addNewAbstractDataRecord()
+                                    .substitute(SWEConstants.QN_DATA_RECORD_SWE_101, DataRecordType.type);
+
+                            if (capabilities.getDataRecord().isSetFields()) {
+                                for (SosSweField field : capabilities.getDataRecord().getFields()) {
+                                    DataComponentPropertyType dataComponentPropertyType = xbSimpleDataRecord
+                                            .addNewField();
+                                    addDataComponentTypeToField(dataComponentPropertyType, field.getElement());
+                                    dataComponentPropertyType.setName(field.getName());
+
+                                }
+                            }
                         } else {
                             throw new NoApplicableCodeException()
                                     .withMessage("The SWE capabilities type '%s' is not supported by this SOS for SensorML!",
@@ -726,43 +735,28 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
      */
     private void addSweSimpleTypeToField(AnyScalarPropertyType xbField, SosSweAbstractDataComponent sosSweData)
             throws OwsExceptionReport {
-        if (sosSweData instanceof SosSweAbstractSimpleType) {
-            SosSweAbstractSimpleType<?> sosSweSimpleType = (SosSweAbstractSimpleType) sosSweData;
-            switch (sosSweSimpleType.getSimpleType()) {
-                case Text:
-                    // FIXME: SWE Common NS
-                    Encoder<?, SosSweAbstractDataComponent> encoder = Configurator.getInstance().getCodingRepository()
-                            .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE, sosSweData.getClass()));
-                    if (encoder != null) {
-                        xbField.setText((Text) encoder.encode(sosSweData));
-                    } else {
-                        throw unsupportedSweFieldType(SweSimpleType.Text);
-                    }
-                    break;
-                default:
-                    throw unsupportedSweFieldType(sosSweSimpleType.getSimpleType());
-            }
-        } else if (sosSweData instanceof SosSweDataArray) {
-            Encoder<?, SosSweAbstractDataComponent> encoder = Configurator.getInstance().getCodingRepository()
-                    .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE, SosSweDataArray.class));
-            if (encoder != null) {
-                xbField.set((XmlObject) encoder.encode(sosSweData));
-            } else {
-                throw new NoApplicableCodeException()
-                        .withMessage("The SweDataArray is not supported by this SOS for SWE fields!");
-            }
-        } else if (sosSweData instanceof SosSweDataRecord) {
-            Encoder<?, SosSweAbstractDataComponent> encoder = Configurator.getInstance().getCodingRepository()
-                    .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE, SosSweDataRecord.class));
-            if (encoder != null) {
-                xbField.set((XmlObject) encoder.encode(sosSweData));
-            } else {
-                throw new NoApplicableCodeException()
-                        .withMessage("The SosSweDataRecord is not supported by this SOS for SWE fields!");
-            }
+        Encoder<?, SosSweAbstractDataComponent> encoder = Configurator.getInstance().getCodingRepository()
+                .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE, SosSweDataArray.class));
+        if (encoder != null) {
+            xbField.set((XmlObject) encoder.encode(sosSweData));
         } else {
             throw new NoApplicableCodeException()
-                    .withMessage("The SWE type is not supported by this SOS for SWE fields!");
+                    .withMessage("The %s is not supported by this SOS for SWE fields!",
+                                 sosSweData.getClass().getSimpleName());
+        }
+    }
+
+    /* AnyScalarPropertyType and DataComponentPropertyType do not have a common superclass .... */
+    private void addDataComponentTypeToField(DataComponentPropertyType xbField, SosSweAbstractDataComponent sosSweData)
+            throws OwsExceptionReport {
+        Encoder<?, SosSweAbstractDataComponent> encoder = Configurator.getInstance().getCodingRepository()
+                .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE, SosSweDataArray.class));
+        if (encoder != null) {
+            xbField.set((XmlObject) encoder.encode(sosSweData));
+        } else {
+            throw new NoApplicableCodeException()
+                    .withMessage("The %s is not supported by this SOS for SWE fields!",
+                                 sosSweData.getClass().getSimpleName());
         }
     }
 

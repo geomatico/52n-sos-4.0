@@ -24,6 +24,7 @@
 package org.n52.sos.encode;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,8 @@ import net.opengis.swe.x101.DataComponentPropertyType;
 import net.opengis.swe.x101.DataRecordDocument;
 import net.opengis.swe.x101.DataRecordType;
 import net.opengis.swe.x101.DataValuePropertyType;
+import net.opengis.swe.x101.EnvelopeDocument;
+import net.opengis.swe.x101.EnvelopeType;
 import net.opengis.swe.x101.ObservablePropertyDocument.ObservableProperty;
 import net.opengis.swe.x101.QuantityDocument.Quantity;
 import net.opengis.swe.x101.QuantityRangeDocument.QuantityRange;
@@ -47,6 +50,8 @@ import net.opengis.swe.x101.TextBlockDocument.TextBlock;
 import net.opengis.swe.x101.TextDocument.Text;
 import net.opengis.swe.x101.TimeDocument.Time;
 import net.opengis.swe.x101.TimeRangeDocument.TimeRange;
+import net.opengis.swe.x101.VectorPropertyType;
+import net.opengis.swe.x101.VectorType;
 import net.opengis.swe.x101.VectorType.Coordinate;
 
 import org.apache.xmlbeans.XmlException;
@@ -63,7 +68,9 @@ import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
+import org.n52.sos.ogc.swe.SosSweEnvelope;
 import org.n52.sos.ogc.swe.SosSweField;
+import org.n52.sos.ogc.swe.SosSweVector;
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
 import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
@@ -98,8 +105,9 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             SosSweQuantityRange.class,
             SosSweText.class,
             SosSweTime.class,
-            SosSweTimeRange.class,
-            SosSweCoordinate.class,
+                                                                               SosSweTimeRange.class,
+                                                                               SosSweEnvelope.class,
+                                                                               SosSweCoordinate.class,
             SosSweDataArray.class);
     
     
@@ -158,9 +166,11 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
         } else if (element instanceof SosSweTimeRange) {
             return createTimeRange((SosSweTimeRange) element);
         } else if (element instanceof SosSweCoordinate) {
-            return addValuesToCoordinate((SosSweCoordinate) element);
+            return createCoordinate((SosSweCoordinate) element);
         } else if (element instanceof SosSweDataArray) {
             return createDataArray((SosSweDataArray) element);
+        } else if (element instanceof SosSweEnvelope) {
+            return createEnvelope((SosSweEnvelope) element);
         }
         throw new UnsupportedEncoderInputException(this, element);
     }
@@ -194,6 +204,9 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
         } else if (sosElement instanceof SosSweTime) {
             xbDCD.set(createTime((SosSweTime) sosElement));
             xbField.getAbstractDataArray1().substitute(SWEConstants.QN_TIME_SWE_101, Time.type);
+        } else if (sosElement instanceof SosSweEnvelope) {
+            xbDCD.set(createEnvelope((SosSweEnvelope) sosElement));
+            xbField.getAbstractDataArray1().substitute(SWEConstants.QN_ENVELOPE_SWE_101, EnvelopeType.type);
         } else {
             throw new NoApplicableCodeException()
                     .withMessage("The element type '%s' of the received %s is not supported by this encoder '%s'.",
@@ -325,6 +338,39 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
         }
         return xbTime;
     }
+
+    private EnvelopeDocument createEnvelope(SosSweEnvelope sosSweEnvelope) {
+        EnvelopeDocument envelopeDocument = EnvelopeDocument.Factory.newInstance(XmlOptionsHelper.getInstance()
+                .getXmlOptions());
+        EnvelopeType envelopeType = envelopeDocument.addNewEnvelope();
+        addAbstractDataComponentValues(envelopeType, sosSweEnvelope);
+        if (sosSweEnvelope.isReferenceFrameSet()) {
+            envelopeType.setReferenceFrame(sosSweEnvelope.getReferenceFrame());
+        }
+        if (sosSweEnvelope.isLowerCornerSet()) {
+            envelopeType.setLowerCorner(createVectorProperty(sosSweEnvelope.getLowerCorner()));
+        }
+        if (sosSweEnvelope.isUpperCornerSet()) {
+            envelopeType.setUpperCorner(createVectorProperty(sosSweEnvelope.getUpperCorner()));
+        }
+        if (sosSweEnvelope.isTimeSet()) {
+            envelopeType.addNewTime().setTimeRange(createTimeRange(sosSweEnvelope.getTime()));
+        }
+        return envelopeDocument;
+    }
+
+    private VectorPropertyType createVectorProperty(SosSweVector sosSweVector) {
+        VectorPropertyType vectorPropertyType = VectorPropertyType.Factory
+                .newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        vectorPropertyType.setVector(createVector(sosSweVector.getCoordinates()));
+        return vectorPropertyType;
+    }
+
+    private VectorType createVector(List<SosSweCoordinate<?>> coordinates) {
+        VectorType vectorType = VectorType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        vectorType.setCoordinateArray(createCoordinates(coordinates));
+        return vectorType;
+    }
     
     private TimeRange createTimeRange(SosSweTimeRange timeRange) {
         TimeRange xbTimeRange = TimeRange.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
@@ -357,11 +403,27 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
      * @param coordinate
      *            SOS internal representation
      */
-    private Coordinate addValuesToCoordinate(SosSweCoordinate<?> coordinate) {
+    private Coordinate createCoordinate(SosSweCoordinate<?> coordinate) {
         Coordinate xbCoordinate = Coordinate.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         xbCoordinate.setName(coordinate.getName().name());
         xbCoordinate.setQuantity(createQuantity((SosSweQuantity) coordinate.getValue()));
         return xbCoordinate;
+    }
+
+    /**
+     * Adds values to SWE coordinates
+     *
+     * @param coordinates SOS internal representation
+     */
+    private Coordinate[] createCoordinates(List<SosSweCoordinate<?>> coordinates) {
+        if (coordinates != null) {
+            ArrayList<Coordinate> xbCoordinates = new ArrayList<Coordinate>(coordinates.size());
+            for (SosSweCoordinate<?> coordinate : coordinates) {
+                xbCoordinates.add(createCoordinate(coordinate));
+            }
+            return xbCoordinates.toArray(new Coordinate[xbCoordinates.size()]);
+        }
+        return null;
     }
     
  // TODO check types for SWE101
@@ -504,5 +566,4 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
         // wont cast !!! net.opengis.swe.x101.impl.BlockEncodingPropertyTypeImpl cannot be cast to net.opengis.swe.x101.AbstractEncodingType
         return xbTextEncodingType;
     }
-
 }

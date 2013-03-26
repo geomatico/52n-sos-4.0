@@ -112,4 +112,9 @@ public class SosSweField extends SosSweAbstractDataComponent{
         return super.equals(obj);
     }
 
+    @Override
+    public String toString() {
+        return String.format("SosSweField[name=%s, element=%s]", getName(), getElement());
+    }
+
 }
