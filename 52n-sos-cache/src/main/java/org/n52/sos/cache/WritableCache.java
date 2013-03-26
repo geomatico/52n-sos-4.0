@@ -28,7 +28,6 @@ import static org.n52.sos.cache.AbstractContentCache.synchronizedSet;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import org.joda.time.DateTime;
@@ -320,14 +319,13 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void setMaxPhenomenonTimeForOffering(String offering, DateTime maxTime) {
         notNullOrEmpty("offering", offering);
-        notNull("maxTime", maxTime);
         log.trace("Setting maximal EventTime for Offering {} to {}", offering, maxTime);
         getMaxPhenomenonTimeForOfferingsMap().put(offering, maxTime);
     }
 
     @Override
     public void setMinPhenomenonTimeForOffering(String offering, DateTime minTime) {
-        notNull("minTime", minTime);
+        notNullOrEmpty("offering", offering);
         log.trace("Setting minimal EventTime for Offering {} to {}", offering, minTime);
         getMinPhenomenonTimeForOfferingsMap().put(offering, minTime);
     }
