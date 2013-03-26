@@ -25,6 +25,7 @@ package org.n52.sos.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.xmlbeans.XmlOptions;
 import org.n52.sos.encode.Encoder;
@@ -42,11 +43,21 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class XmlOptionsHelper {
-    
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlOptionsHelper.class);
-    private static XmlOptionsHelper instance;
+    private static final XmlOptionsHelper instance = new XmlOptionsHelper();
+
+    /**
+     * Get instance from class with default character encoding UTF-8
+     *
+     * @return instance
+     */
+    public static XmlOptionsHelper getInstance() {
+        return instance;
+    }
+    private final ReentrantLock lock = new ReentrantLock();
     private XmlOptions xmlOptions;
-    private String characterEncoding;
+    private String characterEncoding = "UTF-8";
+    private boolean prettyPrint = true;
 
     /**
      * Initialize the XML options
@@ -54,8 +65,7 @@ public class XmlOptionsHelper {
      * @param characterEncoding
      *            Character encoding for XML documents
      */
-    private XmlOptionsHelper(String characterEncoding) {
-        this.characterEncoding = characterEncoding;
+    private XmlOptionsHelper() {
     }
 
     // TODO: To be used by other encoders to have common prefixes
@@ -84,15 +94,24 @@ public class XmlOptionsHelper {
      * @return SOS 1.0.0 XML options
      */
     public XmlOptions getXmlOptions() {
-        if (xmlOptions == null) {
-            xmlOptions = new XmlOptions();
-            Map<String, String> prefixes = getPrefixMap();
-            xmlOptions.setSaveSuggestedPrefixes(prefixes);
-            xmlOptions.setSaveImplicitNamespaces(prefixes);
-            xmlOptions.setSaveAggressiveNamespaces();
-            xmlOptions.setSavePrettyPrint();
-            xmlOptions.setSaveNamespacesFirst();
-            xmlOptions.setCharacterEncoding(characterEncoding);
+        if (this.xmlOptions == null) {
+            this.lock.lock();
+            try {
+                if (xmlOptions == null) {
+                    xmlOptions = new XmlOptions();
+                    Map<String, String> prefixes = getPrefixMap();
+                    xmlOptions.setSaveSuggestedPrefixes(prefixes);
+                    xmlOptions.setSaveImplicitNamespaces(prefixes);
+                    xmlOptions.setSaveAggressiveNamespaces();
+                    if (prettyPrint) {
+                        xmlOptions.setSavePrettyPrint();
+                    }
+                    xmlOptions.setSaveNamespacesFirst();
+                    xmlOptions.setCharacterEncoding(characterEncoding);
+                }
+            } finally {
+                this.lock.unlock();
+            }
         }
         return xmlOptions;
     }
@@ -104,25 +123,37 @@ public class XmlOptionsHelper {
         xmlOptions = null;
     }
 
-    /**
-     * Get instance from class with defined character encoding
-     * 
-     * @param characterEncoding
-     *            Defined character encoding
-     * @param reload 
-     * @return instance
-     */
-    public static synchronized XmlOptionsHelper getInstance(String characterEncoding, boolean reload) {
-        return (instance == null || reload) ? instance = new XmlOptionsHelper(characterEncoding): instance;
+    public void setPrettyPrint(boolean prettyPrint) {
+        this.lock.lock();
+        try {
+            if (this.prettyPrint != prettyPrint) {
+                setReload();
+            }
+            this.prettyPrint = prettyPrint;
+        } finally {
+            this.lock.unlock();
+        }
     }
 
-    /**
-     * Get instance from class with default character encoding UTF-8
-     * 
-     * @return instance
-     */
-    public static synchronized XmlOptionsHelper getInstance() {
-        return getInstance("UTF-8", false);
+    public void setCharacterEncoding(String characterEncoding) {
+        this.lock.lock();
+        try {
+            if (!this.characterEncoding.equals(characterEncoding)) {
+                setReload();
+            }
+            this.characterEncoding = characterEncoding;
+        } finally {
+            this.lock.unlock();
+        }
+    }
+
+    private void setReload() {
+        this.lock.lock();
+        try {
+            this.xmlOptions = null;
+        } finally {
+            this.lock.unlock();
+        }
     }
 
 }

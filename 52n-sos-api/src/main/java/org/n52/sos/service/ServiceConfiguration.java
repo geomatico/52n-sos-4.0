@@ -32,9 +32,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.Validation;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -167,7 +167,7 @@ public class ServiceConfiguration {
     public void setCharacterEncoding(String encoding) throws ConfigurationException {
         Validation.notNullOrEmpty("Character Encoding", encoding);
         this.characterEncoding = encoding;
-        XmlOptionsHelper.getInstance(this.characterEncoding, true);
+        XmlOptionsHelper.getInstance().setCharacterEncoding(characterEncoding);
     }
 
     /**

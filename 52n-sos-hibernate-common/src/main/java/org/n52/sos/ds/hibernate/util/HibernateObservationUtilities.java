@@ -40,18 +40,12 @@ import org.joda.time.DateTime;
 import org.n52.sos.cache.ContentCache;
 import org.n52.sos.ds.FeatureQueryHandler;
 import org.n52.sos.ds.hibernate.entities.BlobObservation;
-import org.n52.sos.ds.hibernate.entities.BlobValue;
 import org.n52.sos.ds.hibernate.entities.BooleanObservation;
-import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.CategoryObservation;
-import org.n52.sos.ds.hibernate.entities.CategoryValue;
 import org.n52.sos.ds.hibernate.entities.CountObservation;
-import org.n52.sos.ds.hibernate.entities.CountValue;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.GeometryObservation;
-import org.n52.sos.ds.hibernate.entities.GeometryValue;
 import org.n52.sos.ds.hibernate.entities.NumericObservation;
-import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
@@ -59,7 +53,7 @@ import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.Quality;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.entities.TextObservation;
-import org.n52.sos.ds.hibernate.entities.TextValue;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -75,13 +69,16 @@ import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.quality.SosQuality;
 import org.n52.sos.ogc.om.quality.SosQuality.QualityType;
+import org.n52.sos.ogc.om.values.BooleanValue;
+import org.n52.sos.ogc.om.values.CategoryValue;
+import org.n52.sos.ogc.om.values.CountValue;
 import org.n52.sos.ogc.om.values.IValue;
 import org.n52.sos.ogc.om.values.NilTemplateValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
+import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.om.values.UnknownValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -99,11 +96,9 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.SosHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Geometry;
 
 public class HibernateObservationUtilities {
 
@@ -292,7 +287,7 @@ public class HibernateObservationUtilities {
                             for (ResultTemplate hResultTemplate : hResultTemplates) {
                                 if (hResultTemplate.getIdentifier() != null
                                         && !hResultTemplate.getIdentifier().isEmpty()) {
-                                    org.n52.sos.ogc.sos.ResultTemplate resultTemplate = null;
+                                    org.n52.sos.ogc.sos.ResultTemplate resultTemplate;
                                     if (resultTemplates.containsKey(hResultTemplate.getIdentifier())) {
                                         resultTemplate = resultTemplates.get(hResultTemplate.getIdentifier());
                                     } else {
@@ -428,19 +423,23 @@ public class HibernateObservationUtilities {
      */
     private static IValue<?> getValueFromObservation(Observation hObservation) {
         if (hObservation instanceof NumericObservation) {
-            return new QuantityValue(getNumericValueTable(((NumericObservation) hObservation).getValue()));
+            return new QuantityValue(((NumericObservation) hObservation).getValue().getValue());
         } else if (hObservation instanceof BooleanObservation) {
-            return new org.n52.sos.ogc.om.values.BooleanValue(getBooleanValueTable(((BooleanObservation) hObservation).getValue()));
+            return new org.n52.sos.ogc.om.values.BooleanValue(Boolean.valueOf(((BooleanObservation) hObservation)
+                    .getValue().getValue()));
         } else if (hObservation instanceof CategoryObservation) {
-            return new org.n52.sos.ogc.om.values.CategoryValue(getCategoryValueTable(((CategoryObservation) hObservation).getValue()));
+            return new org.n52.sos.ogc.om.values.CategoryValue(((CategoryObservation) hObservation).getValue()
+                    .getValue());
         } else if (hObservation instanceof CountObservation) {
-            return new org.n52.sos.ogc.om.values.CountValue(getCountValueTable(((CountObservation) hObservation).getValue()));
+            return new org.n52.sos.ogc.om.values.CountValue(Integer.valueOf(((CountObservation) hObservation).getValue()
+                    .getValue()));
         } else if (hObservation instanceof TextObservation) {
-            return new org.n52.sos.ogc.om.values.TextValue(getTextValueTable(((TextObservation) hObservation).getValue()));
+            return new org.n52.sos.ogc.om.values.TextValue(((TextObservation) hObservation).getValue().getValue());
         } else if (hObservation instanceof GeometryObservation) {
-            return new org.n52.sos.ogc.om.values.GeometryValue(getGeometryValueTable(((GeometryObservation) hObservation).getValue()));
+            return new org.n52.sos.ogc.om.values.GeometryValue(((GeometryObservation) hObservation).getValue()
+                    .getValue());
         } else if (hObservation instanceof BlobObservation) {
-            return new UnknownValue(getBlobValueTable(((BlobObservation) hObservation).getValue()));
+            return new UnknownValue(((BlobObservation) hObservation).getValue().getValue());
         }
         return null;
 
@@ -470,34 +469,6 @@ public class HibernateObservationUtilities {
         // getValueFromGeometryValueTable(hObservation.getGeometryValues()));
         // }
         // return null;
-    }
-
-    private static Object getBlobValueTable(BlobValue value) {
-        return value.getValue();
-    }
-
-    private static Boolean getBooleanValueTable(BooleanValue value) {
-        return Boolean.valueOf(value.getValue());
-    }
-
-    private static String getCategoryValueTable(CategoryValue value) {
-        return value.getValue();
-    }
-
-    private static Integer getCountValueTable(CountValue value) {
-        return Integer.valueOf(value.getValue());
-    }
-
-    private static Geometry getGeometryValueTable(GeometryValue value) {
-        return value.getValue();
-    }
-
-    private static BigDecimal getNumericValueTable(NumericValue value) {
-        return value.getValue();
-    }
-
-    private static String getTextValueTable(TextValue value) {
-        return value.getValue();
     }
 
     // /**
@@ -642,14 +613,14 @@ public class HibernateObservationUtilities {
                         observedValue = new QuantityValue(new BigDecimal(token));
                         observedValue.setUnit(((SosSweQuantity) fieldForToken).getUom());
                     } else if (fieldForToken instanceof SosSweBoolean) {
-                        observedValue = new org.n52.sos.ogc.om.values.BooleanValue(Boolean.parseBoolean(token));
+                        observedValue = new BooleanValue(Boolean.parseBoolean(token));
                     } else if (fieldForToken instanceof SosSweText) {
-                        observedValue = new org.n52.sos.ogc.om.values.TextValue(token);
+                        observedValue = new TextValue(token);
                     } else if (fieldForToken instanceof SosSweCategory) {
-                        observedValue = new org.n52.sos.ogc.om.values.CategoryValue(token);
+                        observedValue = new CategoryValue(token);
                         observedValue.setUnit(((SosSweCategory) fieldForToken).getCodeSpace());
                     } else if (fieldForToken instanceof SosSweCount) {
-                        observedValue = new org.n52.sos.ogc.om.values.CountValue(Integer.parseInt(token));
+                        observedValue = new CountValue(Integer.parseInt(token));
                     } else {
                         throw new NoApplicableCodeException()
                                 .withMessage("sweField type '%s' not supported",
