@@ -320,14 +320,22 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     public void setMaxPhenomenonTimeForOffering(String offering, DateTime maxTime) {
         notNullOrEmpty("offering", offering);
         log.trace("Setting maximal EventTime for Offering {} to {}", offering, maxTime);
-        getMaxPhenomenonTimeForOfferingsMap().put(offering, maxTime);
+        if (maxTime == null) {
+            getMaxPhenomenonTimeForOfferingsMap().remove(offering);
+        } else {
+            getMaxPhenomenonTimeForOfferingsMap().put(offering, maxTime);
+        }
     }
 
     @Override
     public void setMinPhenomenonTimeForOffering(String offering, DateTime minTime) {
         notNullOrEmpty("offering", offering);
         log.trace("Setting minimal EventTime for Offering {} to {}", offering, minTime);
-        getMinPhenomenonTimeForOfferingsMap().put(offering, minTime);
+        if (minTime == null) {
+            getMinPhenomenonTimeForOfferingsMap().remove(offering);
+        } else {
+            getMinPhenomenonTimeForOfferingsMap().put(offering, minTime);
+        }
     }
 
     @Override
