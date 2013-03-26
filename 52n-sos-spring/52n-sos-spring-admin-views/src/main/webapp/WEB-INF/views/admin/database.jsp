@@ -42,7 +42,7 @@
 </jsp:include>
 
 <div class="pull-right btn-group">
-    <a href="#confirmDialog" data-toggle="modal" role="button" title="Add new Logger" class="btn btn-danger">Clear Database</a>
+    <a href="#confirmDialog" data-toggle="modal" role="button" title="Clear Database" class="btn btn-danger">Clear Database</a>
     <button id="testdata" type="button" class="btn btn-danger"></button>
 </div>
 
