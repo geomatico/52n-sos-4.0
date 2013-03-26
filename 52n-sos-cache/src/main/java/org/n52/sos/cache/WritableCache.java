@@ -1177,9 +1177,12 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void setMaxResultTimeForOffering(String offering, DateTime maxTime) {
         notNullOrEmpty("offering", offering);
-        notNull("maxTime", maxTime);
         log.trace("Setting maximal ResultTime for Offering {} to {}", offering, maxTime);
-        getMaxResultTimeForOfferingsMap().put(offering, maxTime);
+        if (maxTime == null) {
+            getMaxResultTimeForOfferingsMap().remove(offering);
+        } else {
+            getMaxResultTimeForOfferingsMap().put(offering, maxTime);
+        }
     }
 
     @Override
@@ -1191,9 +1194,12 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void setMinResultTimeForOffering(String offering, DateTime minTime) {
         notNullOrEmpty("offering", offering);
-        notNull("minTime", minTime);
         log.trace("Setting minimal ResultTime for Offering {} to {}", offering, minTime);
-        getMinResultTimeForOfferingsMap().put(offering, minTime);
+        if (minTime == null) {
+            getMinResultTimeForOfferingsMap().remove(offering);
+        } else {
+            getMinResultTimeForOfferingsMap().put(offering, minTime);
+        }
     }
 
     @Override
