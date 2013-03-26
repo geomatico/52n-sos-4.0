@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.n52.sensorweb.sos</groupId>
         <artifactId>52n-sos-spring</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+		<version>4.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>52n-sos-spring-common-views</artifactId>
     <name>52North SOS Web Common Views</name>
