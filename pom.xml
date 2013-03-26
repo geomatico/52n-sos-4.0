@@ -23,7 +23,7 @@
 		<system>hudson</system>
 		<url>http://build.dev.52north.org:8080/job/52n-sos-dev/</url>
 	</ciManagement>
-	<modules>
+    <modules>
 		<module>52n-sos-api</module>
 		<module>52n-sos-config-sqlite</module>
 		<module>52n-sos-admin</module>
@@ -869,11 +869,13 @@
 				<module>52n-sos-transactional-v20</module>
 				<module>52n-sos-webapp</module>
 				<module>52n-sos-ext-do</module>
+				<module>52n-sos-binding-rest</module>
 				<!--<module>52n-sos-test</module> -->
 			</modules>
 			<properties>
 				<config.logger.level>TRACE</config.logger.level>
 				<do.version>0.1.0-SNAPSHOT</do.version>
+				<rest-binding.version>0.1.0-SNAPSHOT</rest-binding.version>
 			</properties>
 			<dependencyManagement>
 				<dependencies>
@@ -896,6 +898,16 @@
 						<groupId>${project.groupId}</groupId>
 						<artifactId>52n-sos-ext-do-code-hibernate</artifactId>
 						<version>${do.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>${project.groupId}</groupId>
+						<artifactId>52n-sos-binding-rest-core</artifactId>
+						<version>${rest-binding.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>${project.groupId}</groupId>
+						<artifactId>52n-sos-binding-rest-xml-binding</artifactId>
+						<version>${rest-binding.version}</version>
 					</dependency>
 				</dependencies>
 			</dependencyManagement>
