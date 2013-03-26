@@ -24,14 +24,10 @@
 package org.n52.sos.ds.hibernate;
 
 import static org.n52.sos.ds.hibernate.CacheFeederSettingDefinitionProvider.CACHE_THREAD_COUNT;
-import static org.n52.sos.util.Util4Exceptions.mergeAndThrowExceptions;
-
-import java.util.LinkedList;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.n52.sos.cache.WritableContentCache;
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.CacheFeederDAO;
@@ -42,10 +38,9 @@ import org.n52.sos.ds.hibernate.cache.ObservationInsertionCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.ResultTemplateInsertionCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.SensorDeletionCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.SensorInsertionCacheUpdate;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.exception.ows.concrete.GenericThrowableWrapperException;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.util.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,9 +116,10 @@ public class SosCacheFeederDAO extends HibernateSessionHolder implements CacheFe
             action.setSession(session);
             action.setErrors(errors);
             action.execute();
+        } catch (OwsExceptionReport owse) {
+            errors.add(owse);
         } catch (HibernateException he) {
-            String exceptionText = "Error while updating CapabilitiesCache!";
-            LOGGER.error(exceptionText, he);
+            LOGGER.error("Error while updating ContentCache!", he);
         } finally {
             returnSession(session);
         }
