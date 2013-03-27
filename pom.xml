@@ -901,7 +901,7 @@
 					</dependency>
 					<dependency>
 						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-binding-rest-core</artifactId>
+						<artifactId>52n-sos-binding-rest-code</artifactId>
 						<version>${rest-binding.version}</version>
 					</dependency>
 					<dependency>
