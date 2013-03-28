@@ -34,10 +34,10 @@ import org.n52.sos.ds.OperationDAO;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.RequestEvent;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.concrete.InvalidServiceParameterException;
 import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.exception.ows.OperationNotSupportedException;
 import org.n52.sos.exception.ows.VersionNegotiationFailedException;
+import org.n52.sos.exception.ows.concrete.InvalidServiceParameterException;
 import org.n52.sos.exception.ows.concrete.InvalidValueReferenceException;
 import org.n52.sos.exception.ows.concrete.MissingProcedureParameterException;
 import org.n52.sos.exception.ows.concrete.MissingServiceParameterException;
@@ -396,7 +396,7 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
             CompositeOwsException exceptions = new CompositeOwsException();
             for (String offering : offerings) {
                 try {
-                    checkObservedProperty(offering, validOfferings, parameterName);
+                    checkOffering(offering, validOfferings, parameterName);
                 } catch (OwsExceptionReport e) {
                     exceptions.add(e);
                 }
