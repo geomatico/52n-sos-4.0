@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ogc.ows;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.n52.sos.ogc.sos.Sos1Constants;
@@ -80,9 +81,12 @@ public abstract class OwsExceptionReport extends Exception {
     @Override
     public String getMessage() {
         StringBuilder faultString = new StringBuilder();
-        for (CodedException owsException : getExceptions()) {
-            faultString.append(owsException.getMessage()).append("\n");
-            faultString.append("\n");
+        Iterator<? extends CodedException> i = getExceptions().iterator();
+        if (i.hasNext()) {
+            faultString.append(i.next().getMessage());
+        }
+        while (i.hasNext()) {
+            faultString.append('\n').append(i.next().getMessage());
         }
         return faultString.toString();
     }
