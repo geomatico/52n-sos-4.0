@@ -66,8 +66,6 @@ public class ReadableCache extends AbstractContentCache {
         return copyOf(getObservationIdentifiersSet());
     }
 
-   
-
     @Override
     public Set<String> getProcedures() {
         return copyOf(getProceduresSet());

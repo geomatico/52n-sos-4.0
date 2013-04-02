@@ -42,7 +42,6 @@ import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.GenericThrowableWrapperException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
@@ -107,7 +106,9 @@ class OfferingCacheUpdateTask extends RunnableAction {
         queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateConstants.PARAMETER_OFFERING, offering));
         List<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationType =
                 HibernateCriteriaQueryUtilities.getObservationConstellationOfferingObservationType(queryObject, session);
-        getCache().setProceduresForOffering(offeringId, getProcedureIdentifierFrom(observationConstellationOfferingObservationType));
+        final Set<String> procedureIdentifiers =
+                          getProcedureIdentifierFrom(observationConstellationOfferingObservationType);
+        getCache().setProceduresForOffering(offeringId, procedureIdentifiers);
         // Observable properties
         getCache().setObservablePropertiesForOffering(offeringId, getObservablePropertyIdentifierFrom(observationConstellationOfferingObservationType));
         // Related features

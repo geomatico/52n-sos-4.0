@@ -1042,4 +1042,84 @@ public interface WritableContentCache extends ContentCache {
      * @param roles          the roles
      */
     void setRolesForRelatedFeature(String relatedFeature, Collection<String> roles);
+
+    /**
+     * Reset the features of interest.
+     */
+    void clearFeaturesOfInterest();
+
+    /**
+     * Reset the procedures to feature of interest relation.
+     */
+    void clearProceduresForFeatureOfInterest();
+
+    /**
+     * Reset the feature hierarchy.
+     */
+    void clearFeatureHierarchy();
+
+    /**
+     * Reset the offerings.
+     */
+    void clearOfferings();
+
+    /**
+     * Reset the offering to procedures relation.
+     */
+    void clearProceduresForOfferings();
+
+    /**
+     * Reset the offering to offering name relation.
+     */
+    void clearNameForOfferings();
+
+    /**
+     * Reset the offering to observable property relation.
+     */
+    void clearObservablePropertiesForOfferings();
+
+    /**
+     * Reset the offering to related features relation.
+     */
+    void clearRelatedFeaturesForOfferings();
+
+    /**
+     * Reset the offerings to observation types relation.
+     */
+    void clearObservationTypesForOfferings();
+
+    /**
+     * Reset the offerings to allowed observation types relation.
+     */
+    void clearAllowedObservationTypeForOfferings();
+
+    /**
+     * Reset the offerings to envelope relation.
+     */
+    void clearEnvelopeForOfferings();
+
+    /**
+     * Reset the offering to feature of interest relation.
+     */
+    void clearFeaturesOfInterestForOfferings();
+
+    /**
+     * Reset the offering to minimal phenomenon time relation.
+     */
+    void clearMinPhenomenonTimeForOfferings();
+
+    /**
+     * Reset the offering to maximal phenomenon time relation.
+     */
+    void clearMaxPhenomenonTimeForOfferings();
+
+    /**
+     * Reset the offering to minimal result time relation.
+     */
+    void clearMinResultTimeForOfferings();
+
+    /**
+     * Reset the offering to maximal result time relation.
+     */
+    void clearMaxResultTimeForOfferings();
 }

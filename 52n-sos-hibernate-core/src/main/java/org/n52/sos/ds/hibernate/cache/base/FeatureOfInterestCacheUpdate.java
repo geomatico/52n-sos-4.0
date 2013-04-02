@@ -49,17 +49,20 @@ public class FeatureOfInterestCacheUpdate extends CacheUpdate {
 
     @Override
     public void execute() {
+        // we are executed after observation deletion with a old cache object
+        getCache().clearFeaturesOfInterest();
+        getCache().clearProceduresForFeatureOfInterest();
+        getCache().clearFeatureHierarchy();
         for (FeatureOfInterest featureOfInterest : getFeatureOfInterestObjects(getSession())) {
             getCache().addFeatureOfInterest(featureOfInterest.getIdentifier());
-            getCache()
-                    .setProceduresForFeatureOfInterest(featureOfInterest.getIdentifier(),
-                                                       getProceduresForFeatureOfInterest(getSession(), featureOfInterest));
-            getCache().setFeatureHierarchy(featureOfInterest.getIdentifier(),getFeatureIdentifiers(
-                    featureOfInterest.getFeatureOfInterestsForChildFeatureId()));
+            getCache().setProceduresForFeatureOfInterest(featureOfInterest.getIdentifier(),
+                                                         getProceduresForFeatureOfInterest(getSession(), featureOfInterest));
+            getCache().setFeatureHierarchy(featureOfInterest.getIdentifier(),
+                                           getFeatureIdentifiers(featureOfInterest.getFeatureOfInterestsForChildFeatureId()));
         }
         try {
-            getCache().setGlobalEnvelope(getFeatureQueryHandler().getEnvelopeForFeatureIDs(getCache()
-                    .getFeaturesOfInterest(), getSession()));
+            getCache().setGlobalEnvelope(getFeatureQueryHandler().getEnvelopeForFeatureIDs(
+                    getCache().getFeaturesOfInterest(), getSession()));
         } catch (OwsExceptionReport ex) {
             getErrors().add(ex);
         }

@@ -1219,4 +1219,101 @@ public class WritableCache extends ReadableCache implements WritableContentCache
             setMinResultTimeForOffering(offering, tp.getStart());
         }
     }
+
+    @Override
+    public void clearFeaturesOfInterest() {
+        log.trace("Clearing features of interest");
+        getFeaturesOfInterestSet().clear();
+    }
+
+    @Override
+    public void clearProceduresForFeatureOfInterest() {
+        log.trace("Clearing procedures for feature of interest");
+        getProceduresForOfferingsMap().clear();
+    }
+
+    @Override
+    public void clearFeatureHierarchy() {
+        log.trace("Clearing feature hierarchy");
+        getChildFeaturesForFeaturesOfInterestMap().clear();
+        getParentFeaturesForFeaturesOfInterestMap().clear();
+    }
+
+    @Override
+    public void clearProceduresForOfferings() {
+        log.trace("Clearing procedures for offerings");
+        getProceduresForOfferingsMap().clear();
+    }
+
+    @Override
+    public void clearNameForOfferings() {
+        log.trace("Clearing names for offerings");
+        getNameForOfferingsMap().clear();
+    }
+
+    @Override
+    public void clearObservablePropertiesForOfferings() {
+        log.trace("Clearing observable properties for offerings");
+        getObservablePropertiesForOfferingsMap().clear();
+    }
+
+    @Override
+    public void clearRelatedFeaturesForOfferings() {
+        log.trace("Clearing related features for offerings");
+        getRelatedFeaturesForOfferingsMap().clear();
+    }
+
+    @Override
+    public void clearObservationTypesForOfferings() {
+        log.trace("Clearing observation types for offerings");
+        getObservationTypesForOfferingsMap().clear();
+    }
+
+    @Override
+    public void clearAllowedObservationTypeForOfferings() {
+        log.trace("Clearing allowed observation types for offerings");
+        getAllowedObservationTypesForOfferingsMap().clear();
+    }
+
+    @Override
+    public void clearEnvelopeForOfferings() {
+        log.trace("Clearing envelope for offerings");
+        getEnvelopeForOfferingsMap().clear();
+    }
+
+    @Override
+    public void clearFeaturesOfInterestForOfferings() {
+        log.trace("Clearing features of interest for offerings");
+        getFeaturesOfInterestForOfferingMap().clear();
+    }
+
+    @Override
+    public void clearMinPhenomenonTimeForOfferings() {
+        log.trace("Clearing min phenomenon time for offerings");
+        getMinPhenomenonTimeForOfferingsMap().clear();
+    }
+
+    @Override
+    public void clearMaxPhenomenonTimeForOfferings() {
+        log.trace("Clearing max phenomenon time for offerings");
+        getMaxPhenomenonTimeForOfferingsMap().clear();
+    }
+
+    @Override
+    public void clearMinResultTimeForOfferings() {
+        log.trace("Clearing min result time for offerings");
+        getMinResultTimeForOfferingsMap().clear();
+    }
+
+    @Override
+    public void clearMaxResultTimeForOfferings() {
+        log.trace("Clearing max result time for offerings");
+        getMaxResultTimeForOfferingsMap().clear();
+    }
+
+    @Override
+    public void clearOfferings() {
+        log.trace("Clearing offerings");
+        clearProceduresForOfferings();
+    }
 }

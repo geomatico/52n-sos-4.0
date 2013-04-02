@@ -116,8 +116,6 @@ public class SosCacheFeederDAO extends HibernateSessionHolder implements CacheFe
             action.setSession(session);
             action.setErrors(errors);
             action.execute();
-        } catch (OwsExceptionReport owse) {
-            errors.add(owse);
         } catch (HibernateException he) {
             LOGGER.error("Error while updating ContentCache!", he);
         } finally {

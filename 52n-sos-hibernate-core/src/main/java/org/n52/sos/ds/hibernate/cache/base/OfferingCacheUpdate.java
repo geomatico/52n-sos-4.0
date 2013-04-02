@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.hibernate.HibernateQueryObject;
@@ -80,6 +81,21 @@ public class OfferingCacheUpdate extends CacheUpdate {
 
     @Override
     public void execute() {
+        // we are executed after observation deletion with a old cache object
+        getCache().clearOfferings();
+        getCache().clearNameForOfferings();
+        getCache().clearProceduresForOfferings();
+        getCache().clearObservablePropertiesForOfferings();
+        getCache().clearRelatedFeaturesForOfferings();
+        getCache().clearObservationTypesForOfferings();
+        getCache().clearAllowedObservationTypeForOfferings();
+        getCache().clearEnvelopeForOfferings();
+        getCache().clearFeaturesOfInterestForOfferings();
+        getCache().clearMinPhenomenonTimeForOfferings();
+        getCache().clearMaxPhenomenonTimeForOfferings();
+        getCache().clearMinResultTimeForOfferings();
+        getCache().clearMaxResultTimeForOfferings();
+
         List<Offering> offerings = getOfferingObjects(getSession());
 
         LOGGER.debug("multithreading init");
@@ -116,7 +132,7 @@ public class OfferingCacheUpdate extends CacheUpdate {
 
     protected void queueTask(Offering offering) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateConstants.PARAMETER_OFFERING, offering));
+        queryObject.addCriterion(Restrictions.eq(HibernateConstants.PARAMETER_OFFERING, offering));
         List<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationType =
                 HibernateCriteriaQueryUtilities.getObservationConstellationOfferingObservationType(queryObject, getSession());
         if (!containsDeletedProcedure(observationConstellationOfferingObservationType)) {
