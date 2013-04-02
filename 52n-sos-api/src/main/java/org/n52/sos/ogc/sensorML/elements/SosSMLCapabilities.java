@@ -51,8 +51,7 @@ public class SosSMLCapabilities {
     /**
      * constructor
      * 
-     * @param characteristicsType
-     *            Type
+     * @param name               Type
      * @param abstractDataRecord
      *            AbstractDataRecord
      */

@@ -105,9 +105,9 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             SosSweQuantityRange.class,
             SosSweText.class,
             SosSweTime.class,
-                                                                               SosSweTimeRange.class,
-                                                                               SosSweEnvelope.class,
-                                                                               SosSweCoordinate.class,
+            SosSweTimeRange.class,
+            SosSweEnvelope.class,
+            SosSweCoordinate.class,
             SosSweDataArray.class);
     
     

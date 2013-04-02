@@ -338,7 +338,8 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
         for (Classification xbClassification : classificationArray) {
             for (Classifier xbClassifier : xbClassification.getClassifierList().getClassifierArray()) {
                 sosClassifiers.add(new SosSMLClassifier(xbClassifier.getName(),
-                        xbClassifier.getTerm().getDefinition(), xbClassifier.getTerm().getValue()));
+                                                        xbClassifier.getTerm().getDefinition(),
+                                                        xbClassifier.getTerm().getValue()));
             }
         }
         return sosClassifiers;

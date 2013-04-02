@@ -86,6 +86,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
 import org.n52.sos.ogc.swe.simpleType.SosSweCategory;
 import org.n52.sos.ogc.swe.simpleType.SosSweCount;
+import org.n52.sos.ogc.swe.simpleType.SosSweObservableProperty;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuality;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
@@ -357,11 +358,12 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
 
     private SosSweAbstractSimpleType<RangeValue<Integer>> parseCountRange(CountRange countRange) throws
             OwsExceptionReport {
+        //FIXME count range
         throw new NotYetSupportedException("CountRange");
     }
 
     private SosSweAbstractSimpleType<String> parseObservableProperty(ObservableProperty observableProperty) {
-        SosSweText sosObservableProperty = new SosSweText();
+        SosSweObservableProperty sosObservableProperty = new SosSweObservableProperty();
         return sosObservableProperty;
     }
 

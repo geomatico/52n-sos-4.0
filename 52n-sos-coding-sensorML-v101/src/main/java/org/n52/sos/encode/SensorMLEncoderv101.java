@@ -23,10 +23,7 @@
  */
 package org.n52.sos.encode;
 
-import static org.n52.sos.ogc.swe.SWEConstants.SweSimpleType.*;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +31,6 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import net.opengis.gml.MetaDataPropertyType;
 import net.opengis.sensorML.x101.AbstractProcessType;
 import net.opengis.sensorML.x101.CapabilitiesDocument.Capabilities;
 import net.opengis.sensorML.x101.CharacteristicsDocument.Characteristics;
@@ -64,8 +60,6 @@ import net.opengis.sensorML.x101.SystemDocument;
 import net.opengis.sensorML.x101.SystemType;
 import net.opengis.sensorML.x101.TermDocument.Term;
 import net.opengis.swe.x101.AnyScalarPropertyType;
-import net.opengis.swe.x101.DataComponentPropertyType;
-import net.opengis.swe.x101.DataRecordType;
 import net.opengis.swe.x101.PositionType;
 import net.opengis.swe.x101.SimpleDataRecordType;
 import net.opengis.swe.x101.VectorType;
@@ -76,7 +70,6 @@ import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.gml.GMLConstants;
-import org.n52.sos.ogc.gml.SosGmlMetaDataProperty;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
 import org.n52.sos.ogc.sensorML.AbstractSensorML;
@@ -100,23 +93,14 @@ import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SweAggregateType;
-import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.SosSweField;
 import org.n52.sos.ogc.swe.SosSweSimpleDataRecord;
-import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
-import org.n52.sos.ogc.swe.simpleType.SosSweCategory;
-import org.n52.sos.ogc.swe.simpleType.SosSweCount;
-import org.n52.sos.ogc.swe.simpleType.SosSweCountRange;
-import org.n52.sos.ogc.swe.simpleType.SosSweObservableProperty;
-import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
-import org.n52.sos.ogc.swe.simpleType.SosSweQuantityRange;
+import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
-import org.n52.sos.ogc.swe.simpleType.SosSweTime;
-import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
@@ -127,13 +111,11 @@ import org.slf4j.LoggerFactory;
 
 public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SensorMLEncoderv101.class);
-    private Map<SupportedTypeKey, Set<String>> SUPPORTED_TYPES = Collections.singletonMap(
+    private static final Map<SupportedTypeKey, Set<String>> SUPPORTED_TYPES = Collections.singletonMap(
             SupportedTypeKey.ProcedureDescriptionFormat, Collections
             .singleton(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL));
-    private Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(
-            SensorMLConstants.NS_SML,
-            SosProcedureDescription.class,
-            AbstractSensorML.class);
+    private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(
+            SensorMLConstants.NS_SML, SosProcedureDescription.class, AbstractSensorML.class);
 
     public SensorMLEncoderv101() {
         LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper
@@ -202,8 +184,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
      * @throws OwsExceptionReport
      */
     private XmlObject createSensorDescription(AbstractSensorML sensorDesc) throws OwsExceptionReport {
-        if (sensorDesc.getSensorDescriptionXmlString() != null
-            && !sensorDesc.getSensorDescriptionXmlString().isEmpty()) {
+        if (sensorDesc.getSensorDescriptionXmlString() != null && !sensorDesc.getSensorDescriptionXmlString().isEmpty()) {
             return createSensorDescriptionFromString(sensorDesc);
         } else {
             return createSensorDescriptionFromObject(sensorDesc);
@@ -215,20 +196,16 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             XmlObject xmlObject = XmlObject.Factory.parse(sensorDesc.getSensorDescriptionXmlString());
             if (xmlObject instanceof SensorMLDocument) {
                 SensorMLDocument sensorML = (SensorMLDocument) xmlObject;
-                sensorML.getSensorML().getMemberArray();
                 for (Member member : sensorML.getSensorML().getMemberArray()) {
                     if (sensorDesc instanceof SensorML) {
                         for (AbstractProcess absProcess : ((SensorML) sensorDesc).getMembers()) {
                             absProcess.setFeatureOfInterest(sensorDesc.getFeatureOfInterest());
                             addAbstractProcessValues(member.getProcess(), absProcess);
-                            if (member.getProcess() instanceof SystemType
-                                && absProcess instanceof System) {
-                                addSystemValues((SystemType) member.getProcess(),
-                                                (System) absProcess);
+                            if (member.getProcess() instanceof SystemType && absProcess instanceof System) {
+                                addSystemValues((SystemType) member.getProcess(), (System) absProcess);
                             } else if (member.getProcess() instanceof ProcessModelType
                                        && absProcess instanceof ProcessModel) {
-                                addProcessModelValues((ProcessModelType) member.getProcess(),
-                                                      (ProcessModel) absProcess);
+                                addProcessModelValues((ProcessModelType) member.getProcess(), (ProcessModel) absProcess);
                             }
                         }
                     } else if (sensorDesc instanceof AbstractProcess) {
@@ -293,11 +270,8 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
     // TODO refactor/rename
     private void addAbstractProcessValues(AbstractProcessType abstractProcess, AbstractProcess sosAbstractProcess)
             throws OwsExceptionReport {
-        if (sosAbstractProcess.isSetFeatureOfInterest(sosAbstractProcess.getProcedureIdentifier())) {
-            SosSMLCapabilities featureCapabilities = createCapabilitiesFromFeatures(sosAbstractProcess
-                    .getFeatureOfInterest(sosAbstractProcess.getProcedureIdentifier()));
-            sosAbstractProcess.addCapabilities(featureCapabilities);
-        }
+
+        setCapabilitiesForFeaturesOfInterest(sosAbstractProcess, abstractProcess);
 
         // set identification
         if (sosAbstractProcess.isSetIdentifications()) {
@@ -310,11 +284,6 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         // set characteristics
         if (sosAbstractProcess.isSetCharacteristics()) {
             abstractProcess.setCharacteristicsArray(createCharacteristics(sosAbstractProcess.getCharacteristics()));
-        }
-        // set capabilities
-        if (sosAbstractProcess.isSetCapabilities()) {
-            abstractProcess.setCapabilitiesArray(createCapabilities(abstractProcess, sosAbstractProcess
-                    .getCapabilities()));
         }
         if (sosAbstractProcess.isSetDocumentation()) {
             abstractProcess.setDocumentationArray(createDocumentationArray(sosAbstractProcess.getDocumentation()));
@@ -367,13 +336,14 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         IdentifierList xbIdentifierList = xbIdentification.addNewIdentifierList();
         for (SosSMLIdentifier sosSMLIdentifier : identifications) {
             Identifier xbIdentifier = xbIdentifierList.addNewIdentifier();
-            xbIdentifier.setName(sosSMLIdentifier.getName());
+            if (sosSMLIdentifier.getName() != null) {
+                xbIdentifier.setName(sosSMLIdentifier.getName());
+            }
             Term xbTerm = xbIdentifier.addNewTerm();
             xbTerm.setDefinition(sosSMLIdentifier.getDefinition());
             xbTerm.setValue(sosSMLIdentifier.getValue());
         }
-        Identification[] identificationArray = { xbIdentification };
-        return identificationArray;
+        return new Identification[] { xbIdentification };
     }
 
     /**
@@ -388,12 +358,16 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         ClassifierList xbClassifierList = xbClassification.addNewClassifierList();
         for (SosSMLClassifier sosSMLClassifier : classifications) {
             Classifier xbClassifier = xbClassifierList.addNewClassifier();
-            xbClassifier.setName(sosSMLClassifier.getName());
+            if (sosSMLClassifier.getName() != null) {
+                xbClassifier.setName(sosSMLClassifier.getName());
+            }
             Term xbTerm = xbClassifier.addNewTerm();
             xbTerm.setValue(sosSMLClassifier.getValue());
+            if (sosSMLClassifier.getDefinition() != null) {
+                xbTerm.setDefinition(sosSMLClassifier.getDefinition());
+            }
         }
-        Classification[] classificationArray = { xbClassification };
-        return classificationArray;
+        return new Classification[] { xbClassification };
     }
 
     /**
@@ -439,102 +413,6 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             }
         }
         return characteristicsList.toArray(new Characteristics[characteristicsList.size()]);
-    }
-
-    private SosSMLCapabilities createCapabilitiesFromFeatures(Set<String> featureOfInterest) {
-        SosSMLCapabilities capabilities = new SosSMLCapabilities();
-        capabilities.setName("featureOfInterest");
-        SosSweSimpleDataRecord simpleDataRecord = new SosSweSimpleDataRecord();
-        List<SosSweField> fields = new ArrayList<SosSweField>(featureOfInterest.size());
-        for (String foiID : featureOfInterest) {
-            SosSweText text = new SosSweText();
-            text.setDefinition("FeatureOfInterest identifier");
-            text.setValue(foiID);
-            fields.add(new SosSweField("FeatureOfInterestID", text));
-        }
-        simpleDataRecord.setFields(fields);
-        capabilities.setDataRecord(simpleDataRecord);
-        return capabilities;
-    }
-
-    /**
-     * Creates the capabilities section of the SensorML description.
-     *
-     * @throws OwsExceptionReport
-     */
-    private Capabilities[] createCapabilities(AbstractProcessType abstractProcess,
-                                              List<SosSMLCapabilities> smlCapabilities)
-            throws OwsExceptionReport {
-        if (smlCapabilities == null) {
-            return new Capabilities[0];
-        } else {
-            List<Capabilities> capabilitiesList = new ArrayList<Capabilities>(smlCapabilities.size());
-            if (abstractProcess != null) {
-                if (isCapabilitiesArrayAlreadyAvailable(abstractProcess)) {
-                    capabilitiesList.addAll(Arrays.asList(abstractProcess.getCapabilitiesArray()));
-                }
-                for (SosSMLCapabilities capabilities : smlCapabilities) {
-                    if (capabilities != null && capabilities.isSetAbstractDataRecord()) { // List could contain null elements
-                        Capabilities xbCapabilities =
-                                     Capabilities.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-                        if (capabilities.getName() != null) {
-                            xbCapabilities.setName(capabilities.getName());
-                        }
-                        if (capabilities.getDataRecord() instanceof SosSweSimpleDataRecord) {
-                            SimpleDataRecordType xbSimpleDataRecord =
-                                                 (SimpleDataRecordType) xbCapabilities.addNewAbstractDataRecord()
-                                    .substitute(SWEConstants.QN_SIMPLEDATARECORD_SWE_101, SimpleDataRecordType.type);
-                            if (capabilities.getDataRecord().isSetFields()) {
-                                for (SosSweField field : capabilities.getDataRecord().getFields()) {
-                                    AnyScalarPropertyType xbField = xbSimpleDataRecord.addNewField();
-                                    xbField.setName(field.getName());
-                                    addSweSimpleTypeToField(xbField, field.getElement());
-                                }
-                            }
-                            if (capabilities.getMetaDataProperties() != null) {
-                                for (SosGmlMetaDataProperty metadata : capabilities.getMetaDataProperties()) {
-                                    MetaDataPropertyType xb_metaData = xbSimpleDataRecord.addNewMetaDataProperty();
-                                    if (metadata.getTitle() != null) {
-                                        xb_metaData.setTitle(metadata.getTitle());
-                                    }
-                                    if (metadata.getRole() != null) {
-                                        xb_metaData.setRole(metadata.getRole());
-                                    }
-                                    if (metadata.getHref() != null) {
-                                        xb_metaData.setHref(metadata.getHref());
-                                    }
-                                }
-                            }
-                        } else if (capabilities.getDataRecord() instanceof SosSweDataRecord) {
-                            DataRecordType xbSimpleDataRecord = (DataRecordType) xbCapabilities
-                                    .addNewAbstractDataRecord()
-                                    .substitute(SWEConstants.QN_DATA_RECORD_SWE_101, DataRecordType.type);
-
-                            if (capabilities.getDataRecord().isSetFields()) {
-                                for (SosSweField field : capabilities.getDataRecord().getFields()) {
-                                    DataComponentPropertyType dataComponentPropertyType = xbSimpleDataRecord
-                                            .addNewField();
-                                    addDataComponentTypeToField(dataComponentPropertyType, field.getElement());
-                                    dataComponentPropertyType.setName(field.getName());
-
-                                }
-                            }
-                        } else {
-                            throw new NoApplicableCodeException()
-                                    .withMessage("The SWE capabilities type '%s' is not supported by this SOS for SensorML!",
-                                                 SweAggregateType.DataRecord);
-                        }
-                        capabilitiesList.add(xbCapabilities);
-                    }
-                }
-            }
-
-            return capabilitiesList.toArray(new Capabilities[capabilitiesList.size()]);
-        }
-    }
-
-    private boolean isCapabilitiesArrayAlreadyAvailable(AbstractProcessType abstractProcess) {
-        return abstractProcess.getCapabilitiesArray() != null && abstractProcess.getCapabilitiesArray().length > 0;
     }
 
     private Documentation[] createDocumentationArray(List<AbstractSosSMLDocumentation> sosDocumentation) {
@@ -738,21 +616,38 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         Encoder<?, SosSweAbstractDataComponent> encoder = Configurator.getInstance().getCodingRepository()
                 .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE, SosSweDataArray.class));
         if (encoder != null) {
-            xbField.set((XmlObject) encoder.encode(sosSweData));
-        } else {
-            throw new NoApplicableCodeException()
-                    .withMessage("The %s is not supported by this SOS for SWE fields!",
-                                 sosSweData.getClass().getSimpleName());
-        }
-    }
-
-    /* AnyScalarPropertyType and DataComponentPropertyType do not have a common superclass .... */
-    private void addDataComponentTypeToField(DataComponentPropertyType xbField, SosSweAbstractDataComponent sosSweData)
-            throws OwsExceptionReport {
-        Encoder<?, SosSweAbstractDataComponent> encoder = Configurator.getInstance().getCodingRepository()
-                .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE, SosSweDataArray.class));
-        if (encoder != null) {
-            xbField.set((XmlObject) encoder.encode(sosSweData));
+            XmlObject encoded = (XmlObject) encoder.encode(sosSweData);
+            if (sosSweData instanceof SosSweAbstractSimpleType) {
+                SosSweAbstractSimpleType<?> sosSweSimpleType = (SosSweAbstractSimpleType) sosSweData;
+                switch (sosSweSimpleType.getSimpleType()) {
+                    case Boolean:
+                        xbField.addNewBoolean().set(encoded);
+                        break;
+                    case Category:
+                        xbField.addNewCategory().set(encoded);
+                        break;
+                    case Count:
+                        xbField.addNewCount().set(encoded);
+                        break;
+                    case Quantity:
+                        xbField.addNewQuantity().set(encoded);
+                        break;
+                    case Text:
+                        xbField.addNewText().set(encoded);
+                        break;
+                    case Time:
+                        xbField.addNewTime().set(encoded);
+                        break;
+                    default:
+                        throw new NoApplicableCodeException()
+                                .withMessage("The SWE simpleType '%s' is not supported by this SOS SensorML encoder!",
+                                             sosSweSimpleType.getSimpleType().name());
+                }
+            } else {
+                throw new NoApplicableCodeException()
+                        .withMessage("The SosSweAbstractDataComponent '%s' is not supported by this SOS SensorML encoder!",
+                                     sosSweData);
+            }
         } else {
             throw new NoApplicableCodeException()
                     .withMessage("The %s is not supported by this SOS for SWE fields!",
@@ -772,52 +667,41 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
     private void addIoComponentPropertyType(IoComponentPropertyType ioComponentPopertyType, SosSMLIo<?> sosSMLIO)
             throws OwsExceptionReport {
         ioComponentPopertyType.setName(sosSMLIO.getIoName());
+        XmlObject encodeObjectToXml = CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, sosSMLIO.getIoValue());
         switch (sosSMLIO.getIoValue().getSimpleType()) {
             case Boolean:
-                ioComponentPopertyType.addNewBoolean().set(
-                        CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweBoolean) sosSMLIO.getIoValue()));
+                ioComponentPopertyType.addNewBoolean().set(encodeObjectToXml);
                 break;
             case Category:
-                ioComponentPopertyType.addNewCategory().set(
-                        CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweCategory) sosSMLIO.getIoValue()));
+                ioComponentPopertyType.addNewCategory().set(encodeObjectToXml);
                 break;
             case Count:
-                ioComponentPopertyType.addNewCount().set(
-                        CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweCount) sosSMLIO.getIoValue()));
+                ioComponentPopertyType.addNewCount().set(encodeObjectToXml);
                 break;
             case CountRange:
-                ioComponentPopertyType.addNewCountRange().set(
-                        CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweCountRange) sosSMLIO.getIoValue()));
+                ioComponentPopertyType.addNewCountRange().set(encodeObjectToXml);
                 break;
             case ObservableProperty:
-                ioComponentPopertyType.addNewObservableProperty().set(
-                        CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweObservableProperty) sosSMLIO
-                        .getIoValue()));
+                ioComponentPopertyType.addNewObservableProperty().set(encodeObjectToXml);
                 break;
             case Quantity:
-                ioComponentPopertyType.addNewQuantity().set(
-                        CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweQuantity) sosSMLIO.getIoValue()));
+                ioComponentPopertyType.addNewQuantity().set(encodeObjectToXml);
                 break;
             case QuantityRange:
-                ioComponentPopertyType.addNewQuantityRange().set(
-                        CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweQuantityRange) sosSMLIO.getIoValue()));
+                ioComponentPopertyType.addNewQuantityRange().set(encodeObjectToXml);
                 break;
             case Text:
-                ioComponentPopertyType.addNewText().set(
-                        CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweText) sosSMLIO.getIoValue()));
+                ioComponentPopertyType.addNewText().set(encodeObjectToXml);
                 break;
             case Time:
-                ioComponentPopertyType.addNewTime().set(
-                        CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweTime) sosSMLIO.getIoValue()));
+                ioComponentPopertyType.addNewTime().set(encodeObjectToXml);
                 break;
             case TimeRange:
-                ioComponentPopertyType.addNewTimeRange().set(
-                        CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweTimeRange) sosSMLIO.getIoValue()));
+                ioComponentPopertyType.addNewTimeRange().set(encodeObjectToXml);
                 break;
             default:
-                throw new NoApplicableCodeException()
-                        .withMessage("The SWE simpleType '%s' is not supported by this SOS SensorML input/output!",
-                                     sosSMLIO.getIoValue().getSimpleType().name());
+
+
         }
     }
 
@@ -830,8 +714,42 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         return SensorMLConstants.ABSTRACT_PROCESS_QNAME;
     }
 
-    protected OwsExceptionReport unsupportedSweFieldType(SweSimpleType type) {
-        return new NoApplicableCodeException()
-                .withMessage("The SWE simpleType '%s' is not supported by this SOS for SWE fields!", type);
+    protected void setCapabilitiesForFeaturesOfInterest(AbstractProcess sosAbstractProcess, AbstractProcessType abstractProcess)
+            throws OwsExceptionReport {
+        if (sosAbstractProcess.isSetFeatureOfInterest(sosAbstractProcess.getProcedureIdentifier())) {
+            SosSMLCapabilities featureCapabilities = createCapabilitiesFromFeatures(sosAbstractProcess
+                    .getFeatureOfInterest(sosAbstractProcess.getProcedureIdentifier()));
+            Capabilities xbCapabilities = abstractProcess.addNewCapabilities();
+            if (featureCapabilities.getName() != null) {
+                xbCapabilities.setName(featureCapabilities.getName());
+            }
+
+            SimpleDataRecordType xbSimpleDataRecord = (SimpleDataRecordType) xbCapabilities.addNewAbstractDataRecord()
+                    .substitute(SWEConstants.QN_SIMPLEDATARECORD_SWE_101, SimpleDataRecordType.type);
+            if (featureCapabilities.getDataRecord().isSetFields()) {
+                for (SosSweField field : featureCapabilities.getDataRecord().getFields()) {
+                    AnyScalarPropertyType xbField = xbSimpleDataRecord.addNewField();
+                    xbField.setName(field.getName());
+                    addSweSimpleTypeToField(xbField, field.getElement());
+
+                }
+            }
+        }
+    }
+
+    private SosSMLCapabilities createCapabilitiesFromFeatures(Set<String> featureOfInterest) {
+        SosSMLCapabilities capabilities = new SosSMLCapabilities();
+        capabilities.setName("featureOfInterest");
+        SosSweSimpleDataRecord simpleDataRecord = new SosSweSimpleDataRecord();
+        List<SosSweField> fields = new ArrayList<SosSweField>(featureOfInterest.size());
+        for (String foiID : featureOfInterest) {
+            SosSweText text = new SosSweText();
+            text.setDefinition("FeatureOfInterest identifier");
+            text.setValue(foiID);
+            fields.add(new SosSweField("FeatureOfInterestID", text));
+        }
+        simpleDataRecord.setFields(fields);
+        capabilities.setDataRecord(simpleDataRecord);
+        return capabilities;
     }
 }
