@@ -54,24 +54,24 @@
             showError('${error}');
         }
         var jdbc_uri = "${jdbc_uri}";
-        jdbc_uri = jdbc_uri.replace("jdbc:postgresql://","");
+        jdbc_uri = jdbc_uri.replace("jdbc:","");
         $(".jdbccomponent").addClass("required").bind("keyup input", setJdbcString)
         $("#jdbc-input").val(jdbc_uri).bind("keyup input", setJdbcInputs).trigger("input");
         $("input[type=text],input[type=password],textarea").trigger("input");
         $("#save").click(function() {
             var $i = $("#jdbc-input");
-            $i.val("jdbc:postgresql://" + $i.val())
+            $i.val("jdbc:" + $i.val())
             $(this).parents("form").submit();
         });
         $(".required").bind("keyup input change", function() {
             var valid = true;
             $(".required").each(function(){ 
                 var val = $(this).val();
-                return valid = (val != null && val != undefined && val != "");
+                return valid = (val !== null && val !== undefined && val !== "");
             });
 
             var val = $(this).val();
-            if (val != null && val != undefined && val != "") {
+            if (val !== null && val !== undefined && val !== "") {
                 $(this).parents(".control-group").removeClass("error")                
             } else {
                 $(this).parents(".control-group").addClass("error")
