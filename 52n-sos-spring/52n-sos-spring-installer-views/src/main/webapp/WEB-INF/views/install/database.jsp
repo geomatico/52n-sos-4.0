@@ -108,14 +108,14 @@
         $("input[name=dialect]").val(dialect);
         $("input[name=schema]").val(schema);
                 
-        jdbc_uri = jdbc_uri.replace("jdbc:postgresql://","");
+        jdbc_uri = jdbc_uri.replace("jdbc:","");
         $("#driver").val(driver);
         $(".jdbccomponent").bind("keyup input", setJdbcString);
         $("#jdbc-input").val(jdbc_uri).bind("keyup input", setJdbcInputs).trigger("input");
 
         $("input[type=text],input[type=password],textarea").trigger("input");
         $("#next").click(function() {
-            $("input[name=jdbc_uri]").val("jdbc:postgresql://" + $("#jdbc-input").val());
+            $("input[name=jdbc_uri]").val("jdbc:" + $("#jdbc-input").val());
             $(this).parents("form").submit();
         });
         $("input[name=overwrite_tables]").click(function(){

@@ -277,7 +277,7 @@ function setSetting(id, val, settings) {
 var jdbc = {};
 
 function buildJdbcString(j) {
-    var string = j.host;
+    var string = j.scheme + "://" + j.host;
     if (j.port !== undefined) {
         string += ":" + j.port;
     }
@@ -296,8 +296,9 @@ function buildJdbcString(j) {
 }
 
 function parseJdbcString(j) {
-    var parsed = parseUri("postgresql://" + j.replace("jdbc:postgresql://",""));
+    var parsed = parseUri(j.replace("jdbc:",""));
     return {
+        scheme: parsed.protocol,
         port: parsed.port,
         user: parsed.queryKey.user,
         pass: parsed.queryKey.password,

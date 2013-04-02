@@ -49,4 +49,5 @@
             </input>
         </div>
     </div>
+    <input class="jdbccomponent" type="hidden" id="scheme-input" value="postgresql"/>
 </fieldset>

@@ -61,7 +61,7 @@
         <label class="control-label" for="jdbc-input">Connection String</label>
         <div class="controls">
             <div class="input-prepend">
-                <span id="jdbc-input-addon"class="add-on">jdbc:postgresql://</span>
+                <span id="jdbc-input-addon"class="add-on">jdbc:</span>
                 <input id="jdbc-input" type="text" />
             </div>
             <input type="hidden" name="jdbc_uri" />
