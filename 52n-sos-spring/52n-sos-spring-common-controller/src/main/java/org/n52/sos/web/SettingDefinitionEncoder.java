@@ -43,7 +43,11 @@ import org.n52.sos.config.settings.IntegerSettingDefinition;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class SettingDefinitionEncoder {
-    public JSONObject encode(Map<SettingDefinitionGroup, Set<SettingDefinition<?, ?>>> grouped) throws JSONException {
+    /*
+     * this class contains unnecessary raw types as the OpenJDK
+     * 1.6.0 comiler will fail on wrong incompatiple type errors
+     */
+    public JSONObject encode(Map<SettingDefinitionGroup, Set<SettingDefinition>> grouped) throws JSONException {
         JSONArray sections = new JSONArray();
         List<SettingDefinitionGroup> sortedGroups = new ArrayList<SettingDefinitionGroup>(grouped.keySet());
         Collections.sort(sortedGroups);
@@ -56,17 +60,17 @@ public class SettingDefinitionEncoder {
         return new JSONObject().put(JSONConstants.SECTIONS_KEY, sections);
     }
 
-    public JSONObject encode(Set<SettingDefinition<?, ?>> settings) throws JSONException {
+    public JSONObject encode(Set<SettingDefinition> settings) throws JSONException {
         JSONObject j = new JSONObject();
-        List<SettingDefinition<?, ?>> sorted = new ArrayList<SettingDefinition<?, ?>>(settings);
+        List<SettingDefinition> sorted = new ArrayList<SettingDefinition>(settings);
         Collections.sort(sorted);
-        for (SettingDefinition<?, ?> def : sorted) {
+        for (SettingDefinition def : sorted) {
             j.put(def.getKey(), encode(def));
         }
         return j;
     }
 
-    public JSONObject encode(SettingDefinition<?, ?> def) throws JSONException {
+    public JSONObject encode(SettingDefinition def) throws JSONException {
         JSONObject j = new JSONObject()
                 .put(JSONConstants.TITLE_KEY, def.getTitle())
                 .put(JSONConstants.DESCRIPTION_KEY, def.getDescription())
@@ -89,7 +93,7 @@ public class SettingDefinitionEncoder {
         return j;
     }
 
-    private String getType(SettingDefinition<?, ?> def) {
+    private String getType(SettingDefinition def) {
         switch (def.getType()) {
             case INTEGER:
                 return JSONConstants.INTEGER_TYPE;
@@ -106,7 +110,7 @@ public class SettingDefinitionEncoder {
         }
     }
 
-    private Object encodeValue(SettingDefinition<?, ?> def) {
+    private Object encodeValue(SettingDefinition def) {
         switch (def.getType()) {
             case FILE:
             case URI:
