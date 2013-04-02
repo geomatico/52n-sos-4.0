@@ -31,16 +31,18 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.jettison.json.JSONObject;
 import org.n52.sos.config.AdministratorUser;
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingValue;
 import org.n52.sos.ds.ConnectionProviderException;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.auth.UserService;
@@ -126,7 +128,7 @@ public class AdminSettingsController extends AbstractController {
 
     private Map<String, Object> toSimpleMap(Map<SettingDefinition<?, ?>, SettingValue<?>> settings) throws
             ConfigurationException {
-        Map<String, Object> simpleMap = new HashMap<String, Object>(settings.size());
+        SortedMap<String, Object> simpleMap = new TreeMap<String, Object>();
         for (Entry<SettingDefinition<?, ?>, SettingValue<?>> e : settings.entrySet()) {
             simpleMap.put(e.getKey().getKey(), encodeValue(e.getValue()));
         }
