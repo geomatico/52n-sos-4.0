@@ -124,6 +124,7 @@ public class ObservationInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate
             // update offerings
             for (String offering : request.getOfferings()) {
                 // procedure
+                cache.addOffering(offering);
                 cache.addProcedureForOffering(offering, procedure);
                 cache.addOfferingForProcedure(procedure, offering);
                 // observable property

@@ -291,7 +291,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
 
     @Override
     public void setFeaturesOfInterest(Collection<String> featuresOfInterest) {
-        log.trace("Clearing FeaturesOfInterest");
+        log.trace("Setting FeaturesOfInterest");
         getFeaturesOfInterestSet().clear();
         addFeaturesOfInterest(featuresOfInterest);
     }
@@ -304,14 +304,14 @@ public class WritableCache extends ReadableCache implements WritableContentCache
 
     @Override
     public void setObservationIdentifiers(Collection<String> observationIdentifiers) {
-        log.trace("Clearing ObservationIdentifiers");
+        log.trace("Setting ObservationIdentifiers");
         getObservationIdentifiersSet().clear();
         addObservationIdentifiers(observationIdentifiers);
     }
 
     @Override
     public void setProcedures(Collection<String> procedures) {
-        log.trace("Clearing Procedures");
+        log.trace("Setting Procedures");
         getProceduresSet().clear();
         addProcedures(procedures);
     }
@@ -1314,6 +1314,42 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void clearOfferings() {
         log.trace("Clearing offerings");
-        clearProceduresForOfferings();
+        getOfferingsSet().clear();
+    }
+
+    @Override
+    public void addOffering(String offering) {
+        notNullOrEmpty("offering", offering);
+        log.trace("Adding offering {}", offering);
+        getOfferingsSet().add(offering);
+    }
+
+    @Override
+    public void setOfferings(Collection<String> offerings) {
+        clearOfferings();
+        addOfferings(offerings);
+    }
+
+    @Override
+    public void addOfferings(Collection<String> offerings) {
+        noNullValues("offerings", offerings);
+        for (String offering : offerings) {
+            addOffering(offering);
+        }
+    }
+
+    @Override
+    public void removeOffering(String offering) {
+        notNullOrEmpty("offering", offering);
+        log.trace("Removing Offering {}", offering);
+        getOfferingsSet().remove(offering);
+    }
+
+    @Override
+    public void removeOfferings(Collection<String> offerings) {
+        noNullValues("offerings", offerings);
+        for (String offering : offerings) {
+            removeOffering(offering);
+        }
     }
 }

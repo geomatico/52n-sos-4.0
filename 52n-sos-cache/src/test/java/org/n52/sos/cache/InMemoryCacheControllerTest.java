@@ -1133,7 +1133,7 @@ public class InMemoryCacheControllerTest {
         return ((InsertSensorRequest) request).getProcedureDescription().getProcedureIdentifier();
     }
 
-    protected WritableContentCache getCache() {
+    protected ContentCache getCache() {
         return controller.getCache();
     }
 

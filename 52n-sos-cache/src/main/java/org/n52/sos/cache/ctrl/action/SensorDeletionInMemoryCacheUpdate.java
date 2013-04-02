@@ -95,6 +95,7 @@ public class SensorDeletionInMemoryCacheUpdate extends InMemoryCacheUpdate {
             }
             cache.removeOfferingForProcedure(procedure, offering);
             cache.removeProcedureForOffering(offering, procedure);
+            cache.removeOffering(offering);
         }
 
         cache.removeRolesForRelatedFeatureNotIn(cache.getRelatedFeatures());

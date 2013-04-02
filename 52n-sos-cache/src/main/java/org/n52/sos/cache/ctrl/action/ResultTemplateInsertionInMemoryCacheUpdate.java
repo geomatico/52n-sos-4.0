@@ -65,6 +65,7 @@ public class ResultTemplateInsertionInMemoryCacheUpdate extends InMemoryCacheUpd
         final String resultTemplate = response.getAcceptedTemplate();
         cache.addResultTemplate(resultTemplate);
         for (String offering : request.getObservationTemplate().getOfferings()) {
+            cache.addOffering(offering);
             cache.addResultTemplateForOffering(offering, resultTemplate);
         }
     }

@@ -25,40 +25,40 @@ package org.n52.sos.util;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
- * Implementation based on synchronized {@link HashSet}s and a synchronized {@link HashMap}.
+ * Implementation based on synchonized {@link LinkedList}s and a synchronized {@link HashMap}.
  *
  * @param <K> the key type
  * @param <V> the value type
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class SynchonizedHashSetMultiMap<K, V> extends AbstractSynchronizedMultiHashMap<K, V, Set<V>>
-        implements SetMultiMap<K, V> {
-    private static final long serialVersionUID = 741828638081663856L;
+public class SynchronizedListMulitMap<K, V> extends AbstractSynchronizedMultiMap<K, V, List<V>>
+        implements ListMultiMap<K, V> {
+    private static final long serialVersionUID = 5212730580728827254L;
 
-    public SynchonizedHashSetMultiMap(Map<? extends K, ? extends Set<V>> m) {
+    public SynchronizedListMulitMap(Map<? extends K, ? extends List<V>> m) {
         super(m);
     }
 
-    public SynchonizedHashSetMultiMap(int initialCapacity) {
+    public SynchronizedListMulitMap(int initialCapacity) {
         super(initialCapacity);
     }
 
-    public SynchonizedHashSetMultiMap(int initialCapacity, float loadFactor) {
+    public SynchronizedListMulitMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
     }
 
-    public SynchonizedHashSetMultiMap() {
+    public SynchronizedListMulitMap() {
         super();
     }
 
     @Override
-    protected Set<V> newCollection() {
-        return Collections.synchronizedSet(new HashSet<V>());
+    protected List<V> newCollection() {
+        return Collections.synchronizedList(new LinkedList<V>());
     }
 }

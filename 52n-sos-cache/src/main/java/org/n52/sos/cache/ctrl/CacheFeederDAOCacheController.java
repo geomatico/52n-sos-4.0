@@ -23,11 +23,10 @@
  */
 package org.n52.sos.cache.ctrl;
 
-import java.util.concurrent.TimeUnit;
 
+import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ds.CacheFeederDAO;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * CacheControllerImpl implements all methods to request all objects and relationships from a standard datasource.
  */
-public abstract class CacheFeederDAOCacheController extends PersistingCacheController {
+public abstract class CacheFeederDAOCacheController extends LockingPersistingCacheController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheFeederDAOCacheController.class);
     private CacheFeederDAO cacheFeederDAO;
 
@@ -47,67 +46,16 @@ public abstract class CacheFeederDAOCacheController extends PersistingCacheContr
     }
 
     @Override
-    protected boolean updateCacheFromDatasource1() throws OwsExceptionReport {
+    protected boolean updateCacheFromDatasource(WritableContentCache cache) throws OwsExceptionReport {
         LOGGER.info("Capabilities Cache Update started");
-        boolean timeNotElapsed = true;
-        try {
-            // thread safe updating of the cache map
-            timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-            // has waiting for lock got a time out?
-            if (!timeNotElapsed) {
-                LOGGER.warn("\n******\nCapabilities caches not updated "
-                            + "because of time out while waiting for update lock." + "\nWaited "
-                            + SosConstants.UPDATE_TIMEOUT + " milliseconds.\n******\n");
-                return false;
-            }
-
-            while (!isUpdateIsFree()) {
-                getUpdateFree().await();
-            }
-            setUpdateIsFree(false);
-            recreateCache();
-            getCacheDAO().updateCache(getCache());
-        } catch (InterruptedException ie) {
-            LOGGER.error("Problem while threadsafe capabilities cache update", ie);
-            return false;
-        } finally {
-            if (timeNotElapsed) {
-                getUpdateLock().unlock();
-                setUpdateIsFree(true);
-            }
-        }
+        getCacheDAO().updateCache(cache);
         return true;
     }
 
     @Override
-    protected void updateAfterObservationDeletion1() throws OwsExceptionReport {
-        boolean timeNotElapsed = true;
-        try {
-            // thread safe updating of the cache map
-            timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-            // has waiting for lock got a time out?
-            if (!timeNotElapsed) {
-                LOGGER
-                        .warn("\n******\nupdate after Observation Deletion not successful because of time out while waiting for update lock."
-                              + "\nWaited {} milliseconds.\n******\n", SosConstants.UPDATE_TIMEOUT);
-                return;
-            }
-            while (!isUpdateIsFree()) {
-                getUpdateFree().await();
-            }
-            setUpdateIsFree(false);
-            recreateCache();
-            
-            getCacheDAO().updateAfterObservationDeletion(getCache());
-        } catch (InterruptedException e) {
-            LOGGER.error("Problem while threadsafe capabilities cache update", e);
-        } finally {
-            if (timeNotElapsed) {
-                getUpdateLock().unlock();
-                setUpdateIsFree(true);
-            }
-        }
+    protected void updateAfterObservationDeletion(WritableContentCache cache) throws OwsExceptionReport {
+        getCacheDAO().updateAfterObservationDeletion(cache);
     }
+
+   
 }

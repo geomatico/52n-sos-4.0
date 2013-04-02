@@ -58,10 +58,8 @@ public class SensorInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
     public SensorInsertionInMemoryCacheUpdate(InsertSensorRequest request, InsertSensorResponse response) {
         if (request == null || response == null) {
             String msg = String.format("Missing argument: '%s': %s; '%s': %s",
-                                       InsertSensorRequest.class.getName(),
-                                       request,
-                                       InsertSensorResponse.class.getName(),
-                                       response);
+                                       InsertSensorRequest.class.getName(), request,
+                                       InsertSensorResponse.class.getName(), response);
             LOGGER.error(msg);
             throw new IllegalArgumentException(msg);
         }
@@ -77,6 +75,8 @@ public class SensorInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
 
         // procedure relations
         cache.addProcedure(procedure);
+        //FIXME shouldn't this be done for every offering of this procedure?
+        cache.addOffering(offering);
         cache.addProcedureForOffering(offering, procedure);
         cache.addOfferingForProcedure(procedure, offering);
 

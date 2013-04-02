@@ -36,7 +36,7 @@ import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.SetMultiMap;
-import org.n52.sos.util.SynchonizedHashSetMultiMap;
+import org.n52.sos.util.SynchonizedSetMultiMap;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -47,6 +47,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @since 4.0.0
  */
 public abstract class AbstractContentCache extends AbstractStaticContentCache {
+    private static final long serialVersionUID = 5229487811485834059L;
     /**
      * Convenient function to check if two objects are equal (including null values).
      *
@@ -284,29 +285,33 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
     private Map<String, DateTime> minPhenomenonTimeForOfferings = synchronizedMap();
     private Map<String, DateTime> maxResultTimeForOfferings = synchronizedMap();
     private Map<String, DateTime> minResultTimeForOfferings = synchronizedMap();
-    private SetMultiMap<String, String> allowedObservationTypeForOfferings = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> childFeaturesForFeatureOfInterest = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> childProceduresForProcedures = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> compositePhenomenonForOfferings = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> featuresOfInterestForOfferings = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> featuresOfInterestForResultTemplates = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> allowedObservationTypeForOfferings = new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> childFeaturesForFeatureOfInterest = new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> childProceduresForProcedures = new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> compositePhenomenonForOfferings = new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> featuresOfInterestForOfferings = new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> featuresOfInterestForResultTemplates =
+                                        new SynchonizedSetMultiMap<String, String>();
     private SetMultiMap<String, String> observablePropertiesForCompositePhenomenons =
-                                   new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> observablePropertiesForOfferings = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> observablePropertiesForProcedures = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> observationIdentifiersForProcedures = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> observationTypesForOfferings = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> observedPropertiesForResultTemplates = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> offeringsForObservableProperties = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> offeringsForProcedures = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> parentFeaturesForFeaturesOfInterest = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> parentProceduresForProcedures = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> proceduresForFeaturesOfInterest = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> proceduresForObservableProperties = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> proceduresForOfferings = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> relatedFeaturesForOfferings = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> resultTemplatesForOfferings = new SynchonizedHashSetMultiMap<String, String>();
-    private SetMultiMap<String, String> rolesForRelatedFeatures = new SynchonizedHashSetMultiMap<String, String>();
+                                        new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> observablePropertiesForOfferings = new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> observablePropertiesForProcedures = new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> observationIdentifiersForProcedures =
+                                        new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> observationTypesForOfferings = new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> observedPropertiesForResultTemplates =
+                                        new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> offeringsForObservableProperties = new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> offeringsForProcedures = new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> parentFeaturesForFeaturesOfInterest =
+                                        new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> parentProceduresForProcedures = new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> proceduresForFeaturesOfInterest = new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> proceduresForObservableProperties = new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> proceduresForOfferings = new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> relatedFeaturesForOfferings = new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> resultTemplatesForOfferings = new SynchonizedSetMultiMap<String, String>();
+    private SetMultiMap<String, String> rolesForRelatedFeatures = new SynchonizedSetMultiMap<String, String>();
     private Map<String, SosEnvelope> envelopeForOfferings = synchronizedMap();
     private Map<String, String> nameForOfferings = synchronizedMap();
     private Set<Integer> epsgCodes = synchronizedSet();
@@ -314,6 +319,7 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
     private Set<String> observationIdentifiers = synchronizedSet();
     private Set<String> procedures = synchronizedSet();
     private Set<String> resultTemplates = synchronizedSet();
+    private Set<String> offerings = synchronizedSet();
     private SosEnvelope globalEnvelope = new SosEnvelope(null, defaultEpsgCode);
     private TimePeriod globalPhenomenonTimeEnvelope = new TimePeriod();
     private TimePeriod globalResultTimeEnvelope = new TimePeriod();
@@ -543,6 +549,13 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
     }
 
     /**
+     * @return the procedures
+     */
+    protected Set<String> getOfferingsSet() {
+        return this.offerings;
+    }
+
+    /**
      * @return the result templates
      */
     protected Set<String> getResultTemplatesSet() {
@@ -629,6 +642,7 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
                     observationIdentifiers,
                     procedures,
                     resultTemplates,
+                    offerings,
                     globalEnvelope,
                     globalResultTimeEnvelope,
                     globalPhenomenonTimeEnvelope);
@@ -749,6 +763,9 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
             return false;
         }
         if (!eq(this.globalResultTimeEnvelope, other.globalResultTimeEnvelope)) {
+            return false;
+        }
+        if (!eq(this.offerings, other.offerings)) {
             return false;
         }
         return true;

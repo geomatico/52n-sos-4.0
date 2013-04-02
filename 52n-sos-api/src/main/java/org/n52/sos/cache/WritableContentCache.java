@@ -1122,4 +1122,39 @@ public interface WritableContentCache extends ContentCache {
      * Reset the offering to maximal result time relation.
      */
     void clearMaxResultTimeForOfferings();
+
+    /**
+     * Add the specified offering.
+     *
+     * @param offering the offering
+     */
+    void addOffering(String offering);
+
+    /**
+     * Sets the offerings.
+     *
+     * @param offerings the offerings
+     */
+    void setOfferings(Collection<String> offerings);
+
+    /**
+     * Add the specified offerings.
+     *
+     * @param offerings the offerings
+     */
+    void addOfferings(Collection<String> offerings);
+
+    /**
+     * Remove the specified offering.
+     *
+     * @param offering the offering
+     */
+    void removeOffering(String offering);
+
+    /**
+     * Remove the specified offerings.
+     *
+     * @param offerings the offerings
+     */
+    void removeOfferings(Collection<String> offerings);
 }

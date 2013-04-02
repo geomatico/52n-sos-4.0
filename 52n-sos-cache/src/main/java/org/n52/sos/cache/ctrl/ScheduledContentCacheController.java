@@ -25,14 +25,12 @@ package org.n52.sos.cache.ctrl;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.joda.time.DateTime;
 import org.n52.sos.cache.ContentCacheController;
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.util.Validation;
 import org.slf4j.Logger;
@@ -44,35 +42,32 @@ import org.slf4j.LoggerFactory;
  */
 @Configurable
 public abstract class ScheduledContentCacheController implements ContentCacheController {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledContentCacheController.class);
-    private final ReentrantLock updateLock = new ReentrantLock(true);
-    private final Condition updateFree = updateLock.newCondition();
     private boolean initialized = false;
-    private boolean updateIsFree = true;
     private long updateInterval;
-	private final Timer timer = new Timer("52n-sos-capabilities-cache-controller", true);
-	private TimerTask current = null;
+    private final Timer timer = new Timer("52n-sos-capabilities-cache-controller", true);
+    private TimerTask current = null;
 
-	/**
-	 * Starts a new timer task
-	 */
+    /**
+     * Starts a new timer task
+     */
     private void schedule() {
-		/*
-		 * Timers can not be rescheduled.
-		 * To make the interval changeable reschedule a new timer.
-		 */
-		current = new UpdateTimerTask();
-		long delay = getUpdateInterval();
-		if (!isInitialized()) {
-			delay = 1;
-			setInitialized(true);
-		}
-		if (delay > 0) {
-			LOGGER.info("Next CapabilitiesCacheUpdate in {}m: {}", delay/60000, new DateTime(System.currentTimeMillis()+delay));
-			timer.schedule(current, delay);
-		}
-	}
+        /*
+         * Timers can not be rescheduled.
+         * To make the interval changeable reschedule a new timer.
+         */
+        current = new UpdateTimerTask();
+        long delay = getUpdateInterval();
+        if (!isInitialized()) {
+            delay = 1;
+            setInitialized(true);
+        }
+        if (delay > 0) {
+            LOGGER.info("Next CapabilitiesCacheUpdate in {}m: {}", delay / 60000,
+                        new DateTime(System.currentTimeMillis() + delay));
+            timer.schedule(current, delay);
+        }
+    }
 
     @Setting(ScheduledContentCacheControllerSettings.CAPABILITIES_CACHE_UPDATE_INTERVAL)
     public void setUpdateInterval(int interval) throws ConfigurationException {
@@ -87,22 +82,23 @@ public abstract class ScheduledContentCacheController implements ContentCacheCon
         return this.updateInterval * 60000;
     }
 
-	/**
-	 * Stops the current task, if available and starts a new {@link TimerTask}.
-	 * @see #schedule()
-	 */
+    /**
+     * Stops the current task, if available and starts a new {@link TimerTask}.
+     *
+     * @see #schedule()
+     */
     private void reschedule() {
         cancelCurrent();
-		schedule();
-	}
-    
+        schedule();
+    }
+
     private void cancelCurrent() {
         if (this.current != null) {
             this.current.cancel();
             LOGGER.debug("Current {} canceled", UpdateTimerTask.class.getSimpleName());
         }
     }
-    
+
     private void cancelTimer() {
         if (this.timer != null) {
             this.timer.cancel();
@@ -111,52 +107,20 @@ public abstract class ScheduledContentCacheController implements ContentCacheCon
     }
 
     @Override
-	public void cleanup() {
-        cancelCurrent(); 
+    public void cleanup() {
+        cancelCurrent();
         cancelTimer();
-	}
+    }
 
     @Override
     protected void finalize() {
         try {
-			cleanup();
+            cleanup();
             super.finalize();
         } catch (Throwable e) {
             LOGGER.error("Could not finalize CapabilitiesCacheController! " + e.getMessage(), e);
         }
     }
-
-    /**
-	 * @return the updateIsFree
-	 */
-	protected boolean isUpdateIsFree() {
-	    return updateIsFree;
-	}
-
-
-	/**
-	 * @param updateIsFree
-	 *            the updateIsFree to set
-	 */
-	protected void setUpdateIsFree(boolean updateIsFree) {
-        this.updateIsFree = updateIsFree;
-	}
-
-
-	/**
-	 * @return the updateLock
-	 */
-	protected ReentrantLock getUpdateLock() {
-	    return updateLock;
-	}
-
-
-	/**
-	 * @return the updateFree
-	 */
-    protected Condition getUpdateFree() {
-	    return updateFree;
-	}
 
     /**
      * @return the initialized

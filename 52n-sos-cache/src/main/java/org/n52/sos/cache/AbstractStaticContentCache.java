@@ -34,6 +34,7 @@ import org.n52.sos.service.Configurator;
  * @since 4.0.0
  */
 public abstract class AbstractStaticContentCache implements ContentCache {
+    private static final long serialVersionUID = -3494345412582194615L;
     @Override
     public Set<String> getObservationTypes() {
         return Configurator.getInstance().getCodingRepository().getObservationTypes();

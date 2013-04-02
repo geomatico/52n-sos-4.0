@@ -105,6 +105,7 @@ public class ResultInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
             }
         }
         for (String offering : observation.getObservationConstellation().getOfferings()) {
+            cache.addOffering(offering);
             cache.addProcedureForOffering(offering, procedure);
             cache.addOfferingForProcedure(procedure, offering);
             cache.updateEnvelopeForOffering(offering, envelope);

@@ -83,7 +83,7 @@ public class ReadableCache extends AbstractContentCache {
 
     @Override
     public Set<String> getOfferings() {
-        return copyOf(getProceduresForOfferingsMap().keySet());
+        return copyOf(getOfferingsSet());
     }
 
     @Override

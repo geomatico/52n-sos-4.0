@@ -34,7 +34,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.n52.sos.cache.ctrl.PersistingCacheController;
+import org.n52.sos.cache.ctrl.LockingPersistingCacheController;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.DeleteSensorRequest;
@@ -70,9 +70,9 @@ public class PersistingCacheControllerTest {
     public void testSerialization() {
         tempFile.delete();
         assertThat(tempFile, is(not(existing())));
-        PersistingCacheController cc = new TestableController();
+        LockingPersistingCacheController cc = new TestableController();
         assertThat(cc.getCache().getObservationIdentifiers(), is(empty()));
-        cc.getCache().addObservationIdentifier(IDENTIFIER);
+        ((WritableContentCache) cc.getCache()).addObservationIdentifier(IDENTIFIER);
         assertThat(cc.getCache().getObservationIdentifiers(), contains(IDENTIFIER));
         cc.cleanup();
         assertThat(tempFile, is(existing()));
@@ -81,40 +81,44 @@ public class PersistingCacheControllerTest {
         assertThat(cc.getCache().getObservationIdentifiers(), contains(IDENTIFIER));
     }
 
-    private class TestableController extends PersistingCacheController {
-        @Override
-        public void updateAfterObservationInsertion1(InsertObservationRequest sosRequest) {
-        }
-
-        @Override
-        public void updateAfterResultInsertion1(String templateIdentifier, SosObservation sosObservation) {
-        }
-
-        @Override
-        public void updateAfterResultTemplateInsertion1(InsertResultTemplateRequest sosRequest,
-                                                        InsertResultTemplateResponse sosResponse) {
-        }
-
-        @Override
-        public void updateAfterSensorDeletion1(DeleteSensorRequest sosRequest) {
-        }
-
-        @Override
-        public void updateAfterSensorInsertion1(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse) {
-        }
-
-        @Override
-        protected void updateAfterObservationDeletion1() throws OwsExceptionReport {
-        }
-
-        @Override
-        protected boolean updateCacheFromDatasource1() throws OwsExceptionReport {
-            return true;
-        }
+    private class TestableController extends LockingPersistingCacheController {
 
         @Override
         protected File getCacheFile() {
             return tempFile;
+        }
+
+        @Override
+        protected void updateAfterObservationDeletion(WritableContentCache cache) throws OwsExceptionReport {
+        }
+
+        @Override
+        protected void updateAfterObservationInsertion(WritableContentCache cache, InsertObservationRequest sosRequest) {
+        }
+
+        @Override
+        protected void updateAfterResultInsertion(WritableContentCache cache, String templateIdentifier,
+                                                  SosObservation sosObservation) {
+        }
+
+        @Override
+        protected void updateAfterResultTemplateInsertion(WritableContentCache cache,
+                                                          InsertResultTemplateRequest sosRequest,
+                                                          InsertResultTemplateResponse sosResponse) {
+        }
+
+        @Override
+        protected void updateAfterSensorDeletion(WritableContentCache cache, DeleteSensorRequest sosRequest) {
+        }
+
+        @Override
+        protected void updateAfterSensorInsertion(WritableContentCache cache, InsertSensorRequest sosRequest,
+                                                  InsertSensorResponse sosResponse) {
+        }
+
+        @Override
+        protected boolean updateCacheFromDatasource(WritableContentCache cache) throws OwsExceptionReport {
+            return true;
         }
     }
 }

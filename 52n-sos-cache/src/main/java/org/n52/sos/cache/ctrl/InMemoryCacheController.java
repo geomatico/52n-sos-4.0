@@ -23,8 +23,7 @@
  */
 package org.n52.sos.cache.ctrl;
 
-import java.util.concurrent.TimeUnit;
-
+import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.cache.ctrl.action.InMemoryCacheUpdate;
 import org.n52.sos.cache.ctrl.action.ObservationInsertionInMemoryCacheUpdate;
 import org.n52.sos.cache.ctrl.action.ResultInsertionInMemoryCacheUpdate;
@@ -32,7 +31,6 @@ import org.n52.sos.cache.ctrl.action.ResultTemplateInsertionInMemoryCacheUpdate;
 import org.n52.sos.cache.ctrl.action.SensorDeletionInMemoryCacheUpdate;
 import org.n52.sos.cache.ctrl.action.SensorInsertionInMemoryCacheUpdate;
 import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.request.InsertResultTemplateRequest;
@@ -53,77 +51,51 @@ public class InMemoryCacheController extends CacheFeederDAOCacheController {
      * @see SensorInsertionInMemoryCacheUpdate
      */
     @Override
-    protected void updateAfterSensorInsertion1(InsertSensorRequest sosRequest,
-                                               InsertSensorResponse sosResponse) {
-        update(new SensorInsertionInMemoryCacheUpdate(sosRequest, sosResponse));
+    protected void updateAfterSensorInsertion(WritableContentCache cache,
+                                              InsertSensorRequest sosRequest,
+                                              InsertSensorResponse sosResponse) {
+        update(cache, new SensorInsertionInMemoryCacheUpdate(sosRequest, sosResponse));
     }
 
     /**
      * @see ObservationInsertionInMemoryCacheUpdate
      */
     @Override
-    protected void updateAfterObservationInsertion1(InsertObservationRequest sosRequest) {
-        update(new ObservationInsertionInMemoryCacheUpdate(sosRequest));
+    protected void updateAfterObservationInsertion(WritableContentCache cache, InsertObservationRequest sosRequest) {
+        update(cache, new ObservationInsertionInMemoryCacheUpdate(sosRequest));
     }
 
     /**
      * @see SensorDeletionInMemoryCacheUpdate
      */
     @Override
-    protected void updateAfterSensorDeletion1(DeleteSensorRequest sosRequest) {
-        update(new SensorDeletionInMemoryCacheUpdate(sosRequest));
+    protected void updateAfterSensorDeletion(WritableContentCache cache, DeleteSensorRequest sosRequest) {
+        update(cache, new SensorDeletionInMemoryCacheUpdate(sosRequest));
     }
 
     /**
      * @see ResultTemplateInsertionInMemoryCacheUpdate
      */
     @Override
-    protected void updateAfterResultTemplateInsertion1(InsertResultTemplateRequest sosRequest,
-                                                       InsertResultTemplateResponse sosResponse) {
-        update(new ResultTemplateInsertionInMemoryCacheUpdate(sosRequest, sosResponse));
+    protected void updateAfterResultTemplateInsertion(WritableContentCache cache,
+                                                      InsertResultTemplateRequest sosRequest,
+                                                      InsertResultTemplateResponse sosResponse) {
+        update(cache, new ResultTemplateInsertionInMemoryCacheUpdate(sosRequest, sosResponse));
     }
 
     @Override
-    protected void updateAfterResultInsertion1(String templateIdentifier, SosObservation sosObservation) {
-        update(new ResultInsertionInMemoryCacheUpdate(templateIdentifier, sosObservation));
+    protected void updateAfterResultInsertion(WritableContentCache cache,
+                                              String templateIdentifier,
+                                              SosObservation sosObservation) {
+        update(cache, new ResultInsertionInMemoryCacheUpdate(templateIdentifier, sosObservation));
     }
 
     /**
      * TODO Eike: test removal of locking mechanisms
      */
-    private void update(InMemoryCacheUpdate cacheUpdate) {
-        if (cacheUpdate == null) {
-            String errorMsg = String.format("Missing argument: InMemoryCacheUpdate: '%s'",
-                                            cacheUpdate);
-            LOGGER.warn(errorMsg);
-            throw new IllegalArgumentException(errorMsg);
-        }
-        boolean timeNotElapsed = true;
-        try {
-            // thread safe updating of the cache map
-            timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-            // has waiting for lock got a time out?
-            if (!timeNotElapsed) {
-                LOGGER.warn("\n******\n{} not successful because of time out while waiting for update lock."
-                            + "\nWaited {} milliseconds.\n******\n",
-                            cacheUpdate,
-                            SosConstants.UPDATE_TIMEOUT);
-                return;
-            }
-            while (!isUpdateIsFree()) {
-                getUpdateFree().await();
-            }
-            setUpdateIsFree(false);
-            cacheUpdate.setCache(getCache());
-            cacheUpdate.execute();
-        } catch (InterruptedException e) {
-            LOGGER.error("Problem while threadsafe capabilities cache update", e);
-        } finally {
-            if (timeNotElapsed) {
-                getUpdateLock().unlock();
-                setUpdateIsFree(true);
-            }
-        }
+    private void update(WritableContentCache cache, InMemoryCacheUpdate cacheUpdate) {
+        cacheUpdate.setCache(cache);
+        LOGGER.debug("Running {}", cacheUpdate);
+        cacheUpdate.execute();
     }
 }

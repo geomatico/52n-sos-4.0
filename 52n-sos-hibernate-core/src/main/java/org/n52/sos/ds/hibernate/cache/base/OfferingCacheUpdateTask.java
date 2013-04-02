@@ -100,6 +100,8 @@ class OfferingCacheUpdateTask extends RunnableAction {
     protected void getOfferingInformationFromDbAndAddItToCacheMaps(Session session) throws OwsExceptionReport {
         String dsOfferingId = getOffering().getIdentifier();
         String offeringId = CacheHelper.addPrefixOrGetOfferingIdentifier(dsOfferingId);
+
+        getCache().addOffering(offeringId);
         getCache().setNameForOffering(offeringId, getOffering().getName());
         // Procedures
         HibernateQueryObject queryObject = new HibernateQueryObject();
