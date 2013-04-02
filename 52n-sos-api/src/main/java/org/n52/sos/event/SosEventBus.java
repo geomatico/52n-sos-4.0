@@ -37,6 +37,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import org.n52.sos.util.ClassHelper;
 import org.n52.sos.util.GroupedAndNamedThreadFactory;
 import org.slf4j.Logger;
@@ -54,13 +55,6 @@ public class SosEventBus {
 
     private static SosEventBus instance;
     
-    private final ClassCache classCache = new ClassCache();
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private final Executor executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE, new GroupedAndNamedThreadFactory(THREAD_GROUP_NAME));
-    private final Map<Class<? extends SosEvent>, Set<SosEventListener>> listeners 
-            = new HashMap<Class<? extends SosEvent>, Set<SosEventListener>>();
-    private final Queue<HandlerExecution> queue = new ConcurrentLinkedQueue<HandlerExecution>();
-    
 	public static SosEventBus getInstance() {
 		if (instance == null) {
 			synchronized (SINGLETON_CREATION_LOCK) {
@@ -75,124 +69,138 @@ public class SosEventBus {
     public static void fire(SosEvent event) {
         getInstance().submit(event);
     }
-    
-	private SosEventBus() {
-		loadListenerImplementations();
-	}
 
-	private void loadListenerImplementations() {
-		ServiceLoader<SosEventListener> serviceLoader = ServiceLoader.load(SosEventListener.class);
-		Iterator<SosEventListener> iter = serviceLoader.iterator();
-		while (iter.hasNext()) {
-			try {
-				register(iter.next());
-			} catch(ServiceConfigurationError e) {
-				log.error("Could not load Listener implementation", e);
-			}
+    private static boolean checkEvent(SosEvent event) {
+        if (event == null) {
+            log.warn("Submitted event is null!");
+            return false;
 		}
+        return true;
 	}
 
-	private Set<SosEventListener> getListenersForEvent(SosEvent event) {
-		LinkedList<SosEventListener> result = new LinkedList<SosEventListener>();
-		this.lock.readLock().lock();
-		try {
-			for (Class<? extends SosEvent> eventType : this.classCache.getClasses(event.getClass())) {
-				Set<SosEventListener> listenersForClass = this.listeners.get(eventType);
+    private static boolean checkListener(SosEventListener listener) {
+        if (listener == null) {
+            log.warn("Tried to unregister SosEventListener null");
+            return false;
+        }
+        if (listener.getTypes() == null || listener.getTypes().isEmpty()) {
+            log.warn("Listener {} has no EventTypes", listener);
+            return false;
+        }
+        return true;
+    }
+    private final ClassCache classCache = new ClassCache();
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final Executor executor = Executors
+            .newFixedThreadPool(THREAD_POOL_SIZE, new GroupedAndNamedThreadFactory(THREAD_GROUP_NAME));
+    private final Map<Class<? extends SosEvent>, Set<SosEventListener>> listeners =
+                                                                        new HashMap<Class<? extends SosEvent>, Set<SosEventListener>>();
+    private final Queue<HandlerExecution> queue = new ConcurrentLinkedQueue<HandlerExecution>();
+
+    private SosEventBus() {
+        loadListenerImplementations();
+    }
+
+    private void loadListenerImplementations() {
+        ServiceLoader<SosEventListener> serviceLoader = ServiceLoader.load(SosEventListener.class);
+        Iterator<SosEventListener> iter = serviceLoader.iterator();
+        while (iter.hasNext()) {
+            try {
+                register(iter.next());
+            } catch (ServiceConfigurationError e) {
+                log.error("Could not load Listener implementation", e);
+            }
+        }
+    }
+
+    private Set<SosEventListener> getListenersForEvent(SosEvent event) {
+        LinkedList<SosEventListener> result = new LinkedList<SosEventListener>();
+        this.lock.readLock().lock();
+        try {
+            for (Class<? extends SosEvent> eventType : this.classCache.getClasses(event.getClass())) {
+                Set<SosEventListener> listenersForClass = this.listeners.get(eventType);
                 
-				if (listenersForClass != null) {
-                    log.debug("Adding {} Listeners for event {} (eventType={})", listenersForClass.size(), event, eventType);
+                if (listenersForClass != null) {
+                    log
+                            .trace("Adding {} Listeners for event {} (eventType={})", listenersForClass.size(), event, eventType);
                     result.addAll(listenersForClass);
                 } else {
-                    log.debug("Adding 0 Listeners for event {} (eventType={})", event, eventType);
+                    log.trace("Adding 0 Listeners for event {} (eventType={})", event, eventType);
                 }
                 
-			}
-		} finally {
-			this.lock.readLock().unlock();
-		}
-		return new HashSet<SosEventListener>(result);
-	}
+            }
+        } finally {
+            this.lock.readLock().unlock();
+        }
+        return new HashSet<SosEventListener>(result);
+    }
 
 	public void submit(SosEvent event) {
-		boolean submittedEvent = false;
-		if (!checkEvent(event)) { return; }
-		this.lock.readLock().lock();
-		try {
-			for (SosEventListener listener : getListenersForEvent(event)) {
-				submittedEvent = true;
-				log.debug("Queueing Event {} for Listener {}", event, listener);
-				this.queue.offer(new HandlerExecution(event, listener));
-			}
-		} finally {
-			this.lock.readLock().unlock();
-		}
-		HandlerExecution r;
-		while((r = this.queue.poll()) != null) {
+        boolean submittedEvent = false;
+        if (!checkEvent(event)) {
+            return;
+        }
+        this.lock.readLock().lock();
+        try {
+            for (SosEventListener listener : getListenersForEvent(event)) {
+                submittedEvent = true;
+                log.debug("Queueing Event {} for Listener {}", event, listener);
+                this.queue.offer(new HandlerExecution(event, listener));
+            }
+        } finally {
+            this.lock.readLock().unlock();
+        }
+        HandlerExecution r;
+        while ((r = this.queue.poll()) != null) {
             if (ASYNCHRONOUS_EXECUTION) {
                 this.executor.execute(r);
             } else {
                 r.run();
             }
-		}
-		if (!submittedEvent) {
-			log.info("No Listeners for SosEvent {}", event);
-		}
-	}
+        }
+        if (!submittedEvent) {
+            log.info("No Listeners for SosEvent {}", event);
+        }
+    }
 
 	public void register(SosEventListener listener) {
-		if (!checkListener(listener)) { return; }
-		this.lock.writeLock().lock();
-		try {
-			for (Class<? extends SosEvent> eventType : listener.getTypes()) {
-				log.debug("Subscibing Listener {} to EventType {}", listener, eventType);
-				Set<SosEventListener> listenersForKey = this.listeners.get(eventType);
-				if (listenersForKey == null) {
-					this.listeners.put(eventType, listenersForKey = new HashSet<SosEventListener>());
-				}
-				listenersForKey.add(listener);
-			}
-		} finally {
-			this.lock.writeLock().unlock();
-		}
-	}
+        if (!checkListener(listener)) {
+            return;
+        }
+        this.lock.writeLock().lock();
+        try {
+            for (Class<? extends SosEvent> eventType : listener.getTypes()) {
+                log.debug("Subscibing Listener {} to EventType {}", listener, eventType);
+                Set<SosEventListener> listenersForKey = this.listeners.get(eventType);
+                if (listenersForKey == null) {
+                    this.listeners.put(eventType, listenersForKey = new HashSet<SosEventListener>());
+                }
+                listenersForKey.add(listener);
+            }
+        } finally {
+            this.lock.writeLock().unlock();
+        }
+    }
 
 	public void unregister(SosEventListener listener) {
-		if (!checkListener(listener)) { return; }
-		this.lock.writeLock().lock();
-		try {
-			for (Class<? extends SosEvent> eventType : listener.getTypes()) {
-				Set<SosEventListener> listenersForKey = this.listeners.get(eventType);
-				if (listenersForKey.contains(listener)) {
-					log.debug("Unsubscibing Listener {} from EventType {}", listener, eventType);
-					listenersForKey.remove(listener);
-				} else {
-					log.warn("Listener {} was not registered for SosEvent Type {}", listener, eventType);
-				}
-			}
-		} finally {
-			this.lock.writeLock().unlock();
-		}
-	}
-
-	private static boolean checkEvent(SosEvent event) {
-		if (event == null) {
-			log.warn("Submitted event is null!");
-			return false;
-		}
-		return true;
-	}
-
-	private static boolean checkListener(SosEventListener listener) {
-		if (listener == null) {
-			log.warn("Tried to unregister SosEventListener null");
-			return false;
-		}
-		if (listener.getTypes() == null || listener.getTypes().isEmpty()) {
-			log.warn("Listener {} has no EventTypes", listener);
-			return false;
-		}
-		return true;
-	}
+        if (!checkListener(listener)) {
+            return;
+        }
+        this.lock.writeLock().lock();
+        try {
+            for (Class<? extends SosEvent> eventType : listener.getTypes()) {
+                Set<SosEventListener> listenersForKey = this.listeners.get(eventType);
+                if (listenersForKey.contains(listener)) {
+                    log.debug("Unsubscibing Listener {} from EventType {}", listener, eventType);
+                    listenersForKey.remove(listener);
+                } else {
+                    log.warn("Listener {} was not registered for SosEvent Type {}", listener, eventType);
+                }
+            }
+        } finally {
+            this.lock.writeLock().unlock();
+        }
+    }
 
 	private class ClassCache {
 		private ReadWriteLock lock = new ReentrantReadWriteLock();
