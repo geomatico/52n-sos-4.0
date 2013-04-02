@@ -183,8 +183,7 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<Abs
         }
         // TODO check foi param is ID
         try {
-            checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
-                    .getCache().getFeaturesOfInterest(),
+            checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), 
                                               SosConstants.GetObservationParams.featureOfInterest.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);

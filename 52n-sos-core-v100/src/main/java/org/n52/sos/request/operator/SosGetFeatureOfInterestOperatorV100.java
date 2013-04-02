@@ -25,7 +25,6 @@ package org.n52.sos.request.operator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -42,7 +41,6 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetFeatureOfInterestRequest;
 import org.n52.sos.response.GetFeatureOfInterestResponse;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 
@@ -81,8 +79,7 @@ public class SosGetFeatureOfInterestOperatorV100 extends
 		boolean applyZIPcomp = false;
 
         checkRequestedParameters(sosRequest);
-        Collection<String> validFois = Configurator.getInstance().getCache().getFeaturesOfInterest();
-        checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), validFois, "FeatureOfInterestId");
+        checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), "FeatureOfInterestId");
         
         try {
             String namespace;

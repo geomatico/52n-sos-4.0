@@ -52,7 +52,6 @@ import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
@@ -116,8 +115,7 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
         }
         // check offering
         try {
-            checkOfferings(request.getObservationTemplate().getOfferings(), Configurator.getInstance()
-                    .getCache().getOfferings(),
+            checkOfferings(request.getObservationTemplate().getOfferings(),
                            Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
             try {
                 checkObservationType(request);
@@ -128,14 +126,16 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
             exceptions.add(owse);
         }
         // check procedure
-            checkProcedureID(request.getObservationTemplate().getProcedure().getProcedureIdentifier(), Configurator
-                    .getInstance().getCache().getProcedures(),
+        try {
+            checkProcedureID(request.getObservationTemplate().getProcedure().getProcedureIdentifier(),
                              Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
         // check observedProperty
         try {
-            checkObservedProperty(request.getObservationTemplate().getObservableProperty()
-                    .getIdentifier(), Configurator.getInstance().getCache()
-                    .getObservableProperties(), Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
+            checkObservedProperty(request.getObservationTemplate().getObservableProperty().getIdentifier(),
+                                  Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -202,7 +202,7 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
     }
 
     private void checkResultTemplateIdentifier(String identifier) throws OwsExceptionReport {
-        if (Configurator.getInstance().getCache().getResultTemplates().contains(identifier)) {
+        if (getCache().hasResultTemplate(identifier)) {
             throw new DuplicateIdentifierException("resultTemplate", identifier);
         }
 
@@ -214,8 +214,8 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
             observationConstellation.setObservationType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
         }
         // check if observation type is supported
-        SosHelper.checkObservationType(observationConstellation.getObservationType(),
-                Sos2Constants.InsertResultTemplateParams.observationType.name());
+        checkObservationType(observationConstellation.getObservationType(),
+                             Sos2Constants.InsertResultTemplateParams.observationType.name());
         Set<String> validObservationTypesForOffering = new HashSet<String>(0);
         for (String offering : observationConstellation.getOfferings()) {
             validObservationTypesForOffering.addAll(Configurator.getInstance().getCache()

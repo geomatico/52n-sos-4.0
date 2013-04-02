@@ -58,7 +58,6 @@ import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.OMHelper;
-import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
@@ -186,11 +185,10 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<A
 
     private void checkObservationConstellationParameter(SosObservationConstellation obsConstallation) throws
             OwsExceptionReport {
-        ContentCache cache = Configurator.getInstance().getCache();
-        checkProcedureID(obsConstallation.getProcedure().getProcedureIdentifier(), cache.getProcedures(), Sos2Constants.InsertObservationParams.procedure
-                .name());
-        checkObservedProperty(obsConstallation.getObservableProperty().getIdentifier(), cache.getObservableProperties(), Sos2Constants.InsertObservationParams.observedProperty
-                .name());
+        checkProcedureID(obsConstallation.getProcedure().getProcedureIdentifier(),
+                         Sos2Constants.InsertObservationParams.procedure.name());
+        checkObservedProperty(obsConstallation.getObservableProperty().getIdentifier(),
+                              Sos2Constants.InsertObservationParams.observedProperty.name());
     }
 
 
@@ -198,8 +196,8 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<A
         SosObservationConstellation observationConstellation = sosObservation.getObservationConstellation();
         String obsTypeFromValue = OMHelper.getObservationTypeFromValue(sosObservation.getValue().getValue());
         if (observationConstellation.isSetObservationType()) {
-            SosHelper.checkObservationType(observationConstellation.getObservationType(), Sos2Constants.InsertObservationParams.observationType
-                    .name());
+            checkObservationType(observationConstellation.getObservationType(),
+                                 Sos2Constants.InsertObservationParams.observationType.name());
             if (obsTypeFromValue != null
                     && !sosObservation.getObservationConstellation().getObservationType().equals(obsTypeFromValue)) {
                 throw new NoApplicableCodeException()

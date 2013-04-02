@@ -102,27 +102,26 @@ public class SosGetResultOperatorV20 extends AbstractV2RequestOperator<AbstractG
             exceptions.add(owse);
         }
         try {
-            checkOffering(request.getOffering(), Configurator.getInstance().getCache()
-                    .getOfferings(), Sos2Constants.GetResultTemplateParams.offering.name());
+            checkOffering(request.getOffering(),
+                          Sos2Constants.GetResultTemplateParams.offering.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            checkObservedProperty(request.getObservedProperty(), Configurator.getInstance()
-                    .getCache().getObservableProperties(),
-                    Sos2Constants.GetResultTemplateParams.observedProperty.name());
+            checkObservedProperty(request.getObservedProperty(), 
+                                  Sos2Constants.GetResultTemplateParams.observedProperty.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
             checkSpatialFilter(request.getSpatialFilter(),
-                    SosConstants.GetObservationParams.featureOfInterest.name());
+                               SosConstants.GetObservationParams.featureOfInterest.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
             checkTemporalFilter(request.getTemporalFilter(),
-                    Sos2Constants.GetObservationParams.temporalFilter.name());
+                                Sos2Constants.GetObservationParams.temporalFilter.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }

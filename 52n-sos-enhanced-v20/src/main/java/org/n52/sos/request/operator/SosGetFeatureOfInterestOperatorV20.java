@@ -44,7 +44,6 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetFeatureOfInterestRequest;
 import org.n52.sos.response.GetFeatureOfInterestResponse;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
@@ -110,8 +109,7 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
             exceptions.add(owse);
         }
         try {
-            checkObservedProperties(sosRequest.getObservedProperties(), Configurator.getInstance()
-                    .getCache().getObservableProperties(),
+            checkObservedProperties(sosRequest.getObservedProperties(),
                                     Sos2Constants.GetFeatureOfInterestParams.observedProperty.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
@@ -124,11 +122,7 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
         }
         try {
             checkFeatureOfInterestAndRelatedFeatureIdentifier(sosRequest.getFeatureIdentifiers(), 
-                    getCache().getFeaturesOfInterest(), getCache().getRelatedFeatures(),
-                                              Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name());
-//            checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
-//                    .getCache().getFeaturesOfInterest(),
-//                                              Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name());
+                    Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -143,15 +137,13 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
     }
 
     private void checkFeatureOfInterestAndRelatedFeatureIdentifier(List<String> featureIdentifiers,
-                                                                   Set<String> validFeaturesOfInterest,
-                                                                   Set<String> validRelatedFeatures,
                                                                    String parameterName) throws OwsExceptionReport {
         if (featureIdentifiers != null) {
             CompositeOwsException exceptions = new CompositeOwsException();
             for (String featureOfInterest : featureIdentifiers) {
                 try {
-                    if (!isRelatedFetureIdentifier(featureOfInterest, validRelatedFeatures)) {
-                        checkFeatureOfInterestIdentifier(featureOfInterest, validFeaturesOfInterest, parameterName);
+                    if (!getCache().hasRelatedFeature(featureOfInterest)) {
+                        checkFeatureOfInterestIdentifier(featureOfInterest, parameterName);
                     }
                 } catch (OwsExceptionReport e) {
                         exceptions.add(e);

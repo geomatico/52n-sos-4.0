@@ -178,8 +178,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
             exceptions.add(owse);
         }
         try {
-            checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
-                    .getCache().getFeaturesOfInterest(),
+            checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(),
                                               SosConstants.GetObservationParams.featureOfInterest.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
@@ -278,7 +277,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
      */
     private void checkOfferingId(List<String> offeringIds) throws OwsExceptionReport {
         if (offeringIds != null) {
-            Collection<String> offerings = Configurator.getInstance().getCache().getOfferings();
+            Set<String> offerings = Configurator.getInstance().getCache().getOfferings();
             CompositeOwsException exceptions = new CompositeOwsException();
             for (String offeringId : offeringIds) {
                 if (offeringId == null || offeringId.isEmpty()) {
@@ -291,10 +290,8 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
                         exceptions.add(new InvalidOfferingParameterException(offeringId));
                     }
 
-                } else {
-                    if (!offerings.contains(offeringId)) {
-                        exceptions.add(new InvalidOfferingParameterException(offeringId));
-                    }
+                } else if (!offerings.contains(offeringId)) {
+                    exceptions.add(new InvalidOfferingParameterException(offeringId));
                 }
             }
             exceptions.throwIfNotEmpty();

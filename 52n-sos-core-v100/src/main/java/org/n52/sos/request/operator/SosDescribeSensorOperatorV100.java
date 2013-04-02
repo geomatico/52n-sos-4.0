@@ -47,7 +47,6 @@ import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.response.DescribeSensorResponse;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 
@@ -147,15 +146,15 @@ public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<Abs
             exceptions.add(owse);
         }
         try {
-            checkProcedureID(sosRequest.getProcedure(), Configurator.getInstance().getCache()
-                    .getProcedures(), SosConstants.DescribeSensorParams.procedure.name());
+            checkProcedureID(sosRequest.getProcedure(),
+                             SosConstants.DescribeSensorParams.procedure.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         // TODO necessary in SOS 1.0.0, different value? take care, here the local method is used, as it sowrks somehow differently in the sos helper(only sos 200?)
         try {
             checkProcedureDescriptionFormat(sosRequest.getProcedureDescriptionFormat(),
-                    Sos1Constants.DescribeSensorParams.outputFormat.name());
+                                            Sos1Constants.DescribeSensorParams.outputFormat.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }

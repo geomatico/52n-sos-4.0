@@ -25,7 +25,6 @@ package org.n52.sos.request.operator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -46,7 +45,6 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetObservationByIdRequest;
 import org.n52.sos.response.GetObservationByIdResponse;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -71,9 +69,8 @@ public class SosGetObservationByIdOperatorV100 extends
         
         checkServiceParameter(sosRequest.getService());
         // check valid obs ids
-        Collection<String> validObservations = Configurator.getInstance().getCache().getObservationIdentifiers();
-        checkObservationIDs(sosRequest.getObservationIdentifier(), validObservations, Sos1Constants.GetObservationByIdParams.ObservationId
-                .name());
+        checkObservationIDs(sosRequest.getObservationIdentifier(),
+                            Sos1Constants.GetObservationByIdParams.ObservationId.name());
         // check responseFormat!
 		String responseFormat = sosRequest.getResponseFormat();
         if ((responseFormat == null) || !(responseFormat.length() > 0)) {
