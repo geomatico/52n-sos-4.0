@@ -29,9 +29,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.jettison.json.JSONException;
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingDefinitionGroup;
+import org.n52.sos.exception.ConfigurationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -53,17 +53,17 @@ public class SettingDefinitonController extends AbstractController {
                     produces = ControllerConstants.MEDIA_TYPE_APPLICATION_JSON)
     public String get() throws ConfigurationException, JSONException {
         Set<SettingDefinition<?, ?>> defs = getSettingsManager().getSettingDefinitions();
-        Map<SettingDefinitionGroup, Set<SettingDefinition<?, ?>>> grouped = sortByGroup(defs);
+        Map<SettingDefinitionGroup, Set<SettingDefinition>> grouped = sortByGroup(defs);
         return getEncoder().encode(grouped).toString(4);
     }
 
-    protected Map<SettingDefinitionGroup, Set<SettingDefinition<?, ?>>> sortByGroup(Set<SettingDefinition<?, ?>> defs) {
-        Map<SettingDefinitionGroup, Set<SettingDefinition<?, ?>>> map = new HashMap<SettingDefinitionGroup, Set<SettingDefinition<?, ?>>>();
-        for (SettingDefinition<?, ?> def : defs) {
+    protected Map<SettingDefinitionGroup, Set<SettingDefinition>> sortByGroup(Set<SettingDefinition<?, ?>> defs) {
+        Map<SettingDefinitionGroup, Set<SettingDefinition>> map = new HashMap<SettingDefinitionGroup, Set<SettingDefinition>>();
+        for (SettingDefinition def : defs) {
             SettingDefinitionGroup group = def.hasGroup() ? def.getGroup() : DEFAULT_SETTINGS_GROUP;
-            Set<SettingDefinition<?, ?>> groupDefs = map.get(group);
+            Set<SettingDefinition> groupDefs = map.get(group);
             if (groupDefs == null) {
-                map.put(group, groupDefs = new HashSet<SettingDefinition<?, ?>>());
+                map.put(group, groupDefs = new HashSet<SettingDefinition>());
             }
             groupDefs.add(def);
         }
