@@ -28,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -44,12 +45,12 @@ import org.n52.sos.binding.Binding;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.concrete.InvalidProcedureDescriptionFormatException;
-import org.n52.sos.exception.ows.concrete.InvalidResponseFormatParameterException;
 import org.n52.sos.exception.ows.MissingParameterValueException;
-import org.n52.sos.exception.ows.concrete.MissingProcedureDescriptionFormatException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.GenericThrowableWrapperException;
+import org.n52.sos.exception.ows.concrete.InvalidProcedureDescriptionFormatException;
+import org.n52.sos.exception.ows.concrete.InvalidResponseFormatParameterException;
+import org.n52.sos.exception.ows.concrete.MissingProcedureDescriptionFormatException;
 import org.n52.sos.exception.sos.ResponseExceedsSizeLimitException;
 import org.n52.sos.exception.swes.InvalidRequestException;
 import org.n52.sos.ogc.filter.TemporalFilter;
@@ -68,6 +69,7 @@ import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.request.operator.AbstractRequestOperator;
 import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
@@ -83,9 +85,6 @@ import com.vividsolutions.jts.geom.Geometry;
 public class SosHelper {
    
     private static Configuration config = new Configuration();
-    /**
-     * logger
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosHelper.class);
 
     protected static Configuration getConfiguration() {
@@ -151,9 +150,6 @@ public class SosHelper {
         return url.toString();
     }
 
-    // /**
-
-    // * Creates a SosAbstractFeature from values
     public static int parseSrsName(String srsName) throws OwsExceptionReport {
         int srid = -1;
         if (srsName != null && !srsName.isEmpty() && !srsName.equalsIgnoreCase("NOT_SET")) {
@@ -280,6 +276,10 @@ public class SosHelper {
         return true;
     }
 
+    /**
+     * @deprecated not used and quite buggy (e.g. REST binding may be selected)
+     */
+    @Deprecated
     public static String getUrlPatternForHttpGetMethod(OperationDecoderKey decoderKey) throws OwsExceptionReport {
         try {
             for (Binding binding : getConfiguration().getBindings()) {
@@ -302,8 +302,13 @@ public class SosHelper {
      * 
      * @param hierarchy
      *            map to invert
+
+     *
      * @return inverted map
+     *
+     * @deprecated not used; moved to WritableContentCache (?)
      */
+    @Deprecated
     public static <K, V> Map<V, Set<K>> invertHierarchy(Map<K, Set<V>> hierarchy) {
         Map<V, Set<K>> invertedHierarchy = new HashMap<V, Set<K>>();
         for (K key : hierarchy.keySet()) {
@@ -330,6 +335,7 @@ public class SosHelper {
      *            whether to include the passed key in the result collection
      * @return collection of the full hierarchy
      */
+    // FIXME move to ReadableCache
     public static Set<String> getHierarchy(Map<String, Set<String>> hierarchy, String key, boolean fullHierarchy,
                                            boolean includeStartKey) {
         Set<String> hierarchyValues = new HashSet<String>();
@@ -364,6 +370,7 @@ keysToCheck.push(key);
      *
      * @return collection of the full hierarchy
      */
+    // FIXME move to ReadableCache
     public static Set<String> getHierarchy(Map<String, Set<String>> hierarchy, Set<String> keys, boolean fullHierarchy,
                                            boolean includeStartKeys) {
         Set<String> parents = new HashSet<String>();
@@ -572,14 +579,15 @@ public static Collection<String> getSupportedResponseFormats(String service, Str
         return Configurator.getInstance().getCodingRepository().getSupportedResponseFormats(service, version);
     }
     
-    public static Object duplicateObject(Object objectToDuplicate) throws OwsExceptionReport {
+    public static <T extends Serializable> T duplicateObject(T objectToDuplicate) throws OwsExceptionReport {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
             objectOutputStream.writeObject(objectToDuplicate);
             ByteArrayInputStream byteArrayIntputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
             ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayIntputStream);
-            Object duplicatedObject = objectInputStream.readObject();
+            @SuppressWarnings("unchecked")
+            T duplicatedObject = (T) objectInputStream.readObject();
             return duplicatedObject;
         } catch (IOException e) {
             throw new GenericThrowableWrapperException(e).withMessage("Error while duplicating object!");
@@ -617,6 +625,11 @@ public static Collection<String> getSupportedResponseFormats(String service, Str
         return names;
     }
 
+    /**
+     *
+     * @deprecated see {@link AbstractRequestOperator#checkObservationType(java.lang.String, java.lang.String)}
+     */
+    @Deprecated
     public static void checkObservationType(String observationType, String parameterName) throws OwsExceptionReport {
         Collection<String> validObservationTypes = getConfiguration().getObservationTypes();
         if (observationType.isEmpty()) {
@@ -626,7 +639,10 @@ public static Collection<String> getSupportedResponseFormats(String service, Str
         }
 
     }
-
+    /**
+     * @deprecated not used; similar methods moved to GetObservationDAO
+     */
+    @Deprecated
     public static boolean hasFirstLatestTemporalFilter(List<TemporalFilter> temporalFilters) {
         for (TemporalFilter temporalFilter : temporalFilters) {
             if (temporalFilter.getTime() != null && temporalFilter.getTime() instanceof TimeInstant) {
@@ -641,6 +657,10 @@ public static Collection<String> getSupportedResponseFormats(String service, Str
         return false;
     }
 
+    /**
+     * @deprecated moved to GetObservationDAO
+     */
+    @Deprecated
     public static List<FirstLatest> getFirstLatestTemporalFilter(List<TemporalFilter> temporalFilters) {
         List<FirstLatest> filters = new ArrayList<FirstLatest>(0);
         for (TemporalFilter temporalFilter : temporalFilters) {
@@ -656,6 +676,10 @@ public static Collection<String> getSupportedResponseFormats(String service, Str
         return filters;
     }
 
+    /**
+     * @deprecated moved to GetObservationDAO
+     */
+    @Deprecated
     public static List<TemporalFilter> getNonFirstLatestTemporalFilter(List<TemporalFilter> temporalFilters) {
         List<TemporalFilter> filters = new ArrayList<TemporalFilter>(0);
         for (TemporalFilter temporalFilter : temporalFilters) {

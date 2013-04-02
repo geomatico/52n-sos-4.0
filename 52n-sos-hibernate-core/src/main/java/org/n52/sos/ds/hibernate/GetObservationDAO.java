@@ -45,6 +45,7 @@ import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.MissingObservedPropertyParameterException;
 import org.n52.sos.ogc.filter.TemporalFilter;
+import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
@@ -52,7 +53,6 @@ import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.util.CollectionHelper;
-import org.n52.sos.util.SosHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,9 +142,9 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         List<FirstLatest> firstLatestTemporalFilter = null;
         Criterion criterionForTemporalFilters = null;
         if (request.hasTemporalFilters()) {
-            firstLatestTemporalFilter = SosHelper.getFirstLatestTemporalFilter(request.getTemporalFilters());
+            firstLatestTemporalFilter = getFirstLatestTemporalFilter(request.getTemporalFilters());
             List<TemporalFilter> nonFirstLatestTemporalFilter =
-                    SosHelper.getNonFirstLatestTemporalFilter(request.getTemporalFilters());
+                    getNonFirstLatestTemporalFilter(request.getTemporalFilters());
             if (nonFirstLatestTemporalFilter != null && !nonFirstLatestTemporalFilter.isEmpty()) {
                 criterionForTemporalFilters =
                         HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(nonFirstLatestTemporalFilter);
@@ -261,9 +261,9 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         List<FirstLatest> firstLatestTemporalFilter = null;
         Criterion criterionForTemporalFilters = null;
         if (request.hasTemporalFilters()) {
-            firstLatestTemporalFilter = SosHelper.getFirstLatestTemporalFilter(request.getTemporalFilters());
+            firstLatestTemporalFilter = getFirstLatestTemporalFilter(request.getTemporalFilters());
             List<TemporalFilter> nonFirstLatestTemporalFilter =
-                    SosHelper.getNonFirstLatestTemporalFilter(request.getTemporalFilters());
+                    getNonFirstLatestTemporalFilter(request.getTemporalFilters());
             if (nonFirstLatestTemporalFilter != null && !nonFirstLatestTemporalFilter.isEmpty()) {
                 criterionForTemporalFilters =
                         HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(nonFirstLatestTemporalFilter);
@@ -351,5 +351,38 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliasMap, prefix);
         return HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), procedures);
+    }
+
+    public List<FirstLatest> getFirstLatestTemporalFilter(List<TemporalFilter> temporalFilters) {
+        List<FirstLatest> filters = new ArrayList<FirstLatest>(0);
+        for (TemporalFilter temporalFilter : temporalFilters) {
+            if (temporalFilter.getTime() != null && temporalFilter.getTime() instanceof TimeInstant) {
+                TimeInstant ti = (TimeInstant) temporalFilter.getTime();
+                if (ti.isSetIndeterminateValue()) {
+                    if (FirstLatest.contains(ti.getIndeterminateValue())) {
+                        filters.add(FirstLatest.getEnumForString(ti.getIndeterminateValue()));
+                    }
+                }
+            }
+        }
+        return filters;
+    }
+
+    public List<TemporalFilter> getNonFirstLatestTemporalFilter(List<TemporalFilter> temporalFilters) {
+        List<TemporalFilter> filters = new ArrayList<TemporalFilter>(0);
+        for (TemporalFilter temporalFilter : temporalFilters) {
+            if (temporalFilter.getTime() != null) {
+                if (temporalFilter.getTime() instanceof TimeInstant) {
+                    TimeInstant ti = (TimeInstant) temporalFilter.getTime();
+                    if (!ti.isSetIndeterminateValue()
+                        || (ti.isSetIndeterminateValue() && !FirstLatest.contains(ti.getIndeterminateValue()))) {
+                        filters.add(temporalFilter);
+                    }
+                } else {
+                    filters.add(temporalFilter);
+                }
+            }
+        }
+        return filters;
     }
 }
