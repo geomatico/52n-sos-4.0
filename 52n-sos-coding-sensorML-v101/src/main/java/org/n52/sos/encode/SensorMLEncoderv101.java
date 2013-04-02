@@ -116,6 +116,10 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             .singleton(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL));
     private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(
             SensorMLConstants.NS_SML, SosProcedureDescription.class, AbstractSensorML.class);
+    public static final String FEATURE_OF_INTEREST_CAPABILITIES_NAME = "featureOfInterest";
+    //FIXME use a proper URI/URN for this
+    public static final String FEATURE_OF_INTEREST_CAPABILITIES_FIELD_DEFINITION = "FeatureOfInterest identifier";
+    public static final String FEATURE_OF_INTEREST_CAPABILITIES_FIELD_NAME = "FeatureOfInterestID";
 
     public SensorMLEncoderv101() {
         LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper
@@ -739,14 +743,14 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
 
     private SosSMLCapabilities createCapabilitiesFromFeatures(Set<String> featureOfInterest) {
         SosSMLCapabilities capabilities = new SosSMLCapabilities();
-        capabilities.setName("featureOfInterest");
+        capabilities.setName(FEATURE_OF_INTEREST_CAPABILITIES_NAME);
         SosSweSimpleDataRecord simpleDataRecord = new SosSweSimpleDataRecord();
         List<SosSweField> fields = new ArrayList<SosSweField>(featureOfInterest.size());
         for (String foiID : featureOfInterest) {
             SosSweText text = new SosSweText();
-            text.setDefinition("FeatureOfInterest identifier");
+            text.setDefinition(FEATURE_OF_INTEREST_CAPABILITIES_FIELD_DEFINITION);
             text.setValue(foiID);
-            fields.add(new SosSweField("FeatureOfInterestID", text));
+            fields.add(new SosSweField(FEATURE_OF_INTEREST_CAPABILITIES_FIELD_NAME, text));
         }
         simpleDataRecord.setFields(fields);
         capabilities.setDataRecord(simpleDataRecord);
