@@ -72,6 +72,7 @@ public interface ControllerConstants {
         String ADMIN_DATABASE_REMOVE_TEST_DATA = "/admin/database/testdata/remove";
         String ADMIN_DATABASE_CREATE_TEST_DATA = "/admin/database/testdata/create";
         String ADMIN_DATABASE_CLEAR = "/admin/database/clear";
+        String ADMIN_DATABASE_DELETE_DELETED_OBSERVATIONS = "/admin/database/deleteDeletedObservations";
         String ADMIN_RESET = "/admin/reset";
         String ADMIN_LOGGING = "/admin/logging";
         String ADMIN_LOGGING_FILE_DOWNLOAD = "/admin/logging/file";

@@ -42,7 +42,8 @@
 </jsp:include>
 
 <div class="pull-right btn-group">
-    <a href="#confirmDialog" data-toggle="modal" role="button" title="Clear Database" class="btn btn-danger">Clear Database</a>
+    <a href="#confirmDialogClear" data-toggle="modal" role="button" title="Clear Database" class="btn btn-danger">Clear Database</a>
+    <a href="#confirmDialogDelete" data-toggle="modal" role="button" title="Delete deleted Observations" class="btn btn-danger">Delete deleted Observations</a>
     <button id="testdata" type="button" class="btn btn-danger"></button>
 </div>
 
@@ -66,18 +67,32 @@
 <div id="result"></div>
 
 
-<div class="modal hide fade in" id="confirmDialog">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>Are you really sure?</h3>
-  </div>
-  <div class="modal-body">
-     <p><span class="label label-important">Warning!</span> This will remove all contents (except settings) from the database!</p>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-    <button type="button" id="clear" class="btn btn-danger">Do it!</button>
-  </div>
+<div class="modal hide fade in" id="confirmDialogClear">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Are you really sure?</h3>
+    </div>
+    <div class="modal-body">
+        <p><span class="label label-important">Warning!</span> This will remove all contents (except settings) from the database!</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        <button type="button" id="clear" class="btn btn-danger">Do it!</button>
+    </div>
+</div>
+
+<div class="modal hide fade in" id="confirmDialogDelete">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Are you really sure?</h3>
+    </div>
+    <div class="modal-body">
+        <p><span class="label label-important">Warning!</span> This will remove all deleted observations from the database!</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        <button type="button" id="delete" class="btn btn-danger">Do it!</button>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -117,8 +132,6 @@
             });
         }
 
-        
-        
         function setButtonLabel() {
             if (testDataInstalled) {
                 $button.text("Remove test data");
@@ -136,20 +149,41 @@
         });
         
         $("#clear").click(function() {
-            $("#confirmDialog").find("button").add($button).attr("disabled", true);
+            $("#confirmDialogClear").find("button").add($button).attr("disabled", true);
             $.ajax({
                 "url": "<c:url value="/admin/database/clear" />",
                 "type": "POST"
             }).fail(function(error) {
                 showError("Request failed: " + error.status + " " + error.statusText);
-                $("#confirmDialog").find("button").add($button).removeAttr("disabled");
-                $("#confirmDialog").modal("hide");
+                $("#confirmDialogClear").find("button").add($button).removeAttr("disabled");
+                $("#confirmDialogClear").modal("hide");
             }).done(function() {
                 showSuccess("The database was cleared");
                 testDataInstalled = false;
                 setButtonLabel();
-                $("#confirmDialog").find("button").add($button).removeAttr("disabled");
-                $("#confirmDialog").modal("hide");
+                $("#confirmDialogClear").find("button").add($button).removeAttr("disabled");
+                $("#confirmDialogClear").modal("hide");
+            });
+        });
+
+        $("#delete").click(function() {
+            $("#confirmDialogDelete").find("button").add($button).attr("disabled", true);
+            $.ajax({
+                "url": "<c:url value="/admin/database/deleteDeletedObservations" />",
+                "type": "POST"
+            }).fail(function(error) {
+                if (error.responseText) {
+                    showError(error.responseText);
+                } else {
+                    showError("Request failed: " + error.status + " " + error.statusText);
+                }
+
+                $("#confirmDialogDelete").find("button").add($button).removeAttr("disabled");
+                $("#confirmDialogDelete").modal("hide");
+            }).done(function() {
+                showSuccess("The deleted observation were deleted.");
+                $("#confirmDialogDelete").find("button").add($button).removeAttr("disabled");
+                $("#confirmDialogDelete").modal("hide");
             });
         });
         
