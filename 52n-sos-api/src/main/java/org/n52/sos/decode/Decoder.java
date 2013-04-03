@@ -60,7 +60,7 @@ public interface Decoder<T, S> extends ConformanceClass {
 
     /**
      * Get the {@linkplain SupportedTypeKey} in the case of having only generic
-     * java types, e.g. {@linkplain OMObservationType}. In this case, this 
+     * java types, e.g. {@linkplain OMObservationType}. In this case, the 
      * returned list provides a mapping from Type &rarr; SubType (e.g. 
      * {@linkplain ServiceConstants}.SupportedTypeKey.ObservationType &rarr; 
      * {@linkplain OMConstants}.OBS_TYPE_CATEGORY_OBSERVATION}).
