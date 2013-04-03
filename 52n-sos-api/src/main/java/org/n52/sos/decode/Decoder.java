@@ -27,8 +27,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
+import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.ConformanceClass;
+import org.n52.sos.service.ServiceConstants;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 
 /**
@@ -57,7 +59,11 @@ public interface Decoder<T, S> extends ConformanceClass {
     public T decode(S objectToDecode) throws OwsExceptionReport, UnsupportedDecoderInputException;
 
     /**
-     * Get the {@linkplain SupportedTypeKey}
+     * Get the {@linkplain SupportedTypeKey} in the case of having only generic
+     * java types, e.g. {@linkplain OMObservationType}. In this case, this 
+     * returned list provides a mapping from Type &rarr; SubType (e.g. 
+     * {@linkplain ServiceConstants}.SupportedTypeKey.ObservationType &rarr; 
+     * {@linkplain OMConstants}.OBS_TYPE_CATEGORY_OBSERVATION}).
      *
      * @return the supported key types
      */
