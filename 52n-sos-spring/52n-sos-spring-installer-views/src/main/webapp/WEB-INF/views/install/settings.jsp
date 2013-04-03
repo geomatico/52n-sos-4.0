@@ -43,15 +43,18 @@
 
 <script type="text/javascript">
     function overwriteDefaultSettings(settings) {
-        <c:if test="${not empty settings}">
-            <c:forEach items="${settings}" var="entry">
-                <c:if test="${not empty entry.value}">
-                    setSetting("${entry.key}","${fn:replace(entry.value, "\"","\\\"")}", settings);
-                </c:if>
-            </c:forEach>
-        </c:if>
+    <c:if test="${not empty settings}">
+        <c:set var="search" value='"' />
+        <c:set var="replace" value='\\"' />
+        <c:forEach items="${settings}" var="entry">
+            <c:if test="${not empty entry.value}">
+                setSetting("${entry.key}","${fn:replace(entry.value, search, replace)}", settings);
+            </c:if>
+        </c:forEach>
+    </c:if>
     }
 </script>
+
 
 <form action="<c:url value="/install/settings" />" method="POST" class="form-horizontal">
 	<div id="settings"></div>
