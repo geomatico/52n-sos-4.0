@@ -110,7 +110,7 @@ function generateSettings(settings, container, tabbed) {
     }
 
     function generateSetting(setting) {
-        var $setting = $("<div>").addClass("control-group");
+        var $setting = $("<div>").addClass("control-group").attr("id", setting.id.toLowerCase().replace(/\W/g, "_"));
         switch (setting.type) {
         //TODO add validation of parameters
         case "integer":
@@ -327,5 +327,18 @@ function warnIfNotHttps() {
                 "<b>Warning!</b> The password will be transferred in clear text. "
                 + "Use this site only in safe environments (i.e. <b>NOT</b> on "
                 + "public Wi-Fi or internet caf&eacute;s)!");
+    }
+}
+
+function parsehash() {
+    var h = document.location.hash;
+    if (h) {
+        var $t = $(h);
+        if ($t.hasClass("tab-pane")) {
+            $("a[href=" + h + "]").tab("show");
+        } else if ($t.hasClass("control-group")) {
+            $("a[href=#" + $t.parents(".tab-pane").attr("id") + "]").tab("show");
+            $("html body").animate({scrollTop: $t.offset().top - 10}, 200);
+        }
     }
 }

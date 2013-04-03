@@ -36,7 +36,7 @@
 <script type="text/javascript">
     if (document.referrer) {
         if (document.referrer.matches(/install\/database/)) {
-            showSuccess("Database configuration successfully tested.")
+            showSuccess("Database configuration successfully tested.");
         }
     }
 </script>
@@ -76,7 +76,7 @@
             var valid = true;
             $(".required").each(function(){ 
                 var val = $(this).val();
-                return valid = (val != null && val != undefined && val != "");
+                return valid = (val !== null && val !== undefined && val !== "");
             });
             if (valid) {
                 $("button[type=submit]").removeAttr("disabled");
@@ -86,8 +86,9 @@
         });
 
         $(".required:first").trigger("change");
+        parsehash();
 	});
-	</script>
+    </script>
 
 	<hr/>
 	<div>

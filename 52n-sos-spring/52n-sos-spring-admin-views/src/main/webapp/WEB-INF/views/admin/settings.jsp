@@ -123,7 +123,7 @@
                 var valid = true;
                 $(".required").each(function(){ 
                     var val = $(this).val();
-                    return valid = (val != null && val != undefined && val != "");
+                    return valid = (val !== null && val !== undefined && val !== "");
                 });
                 if (valid) {
                     $button.removeAttr("disabled");
@@ -151,12 +151,12 @@
                 .text("Defaults").click(function() {
                 function getSettings(section) {
                     for (var i = 0; i < settings.sections.length; ++i) {
-                        if (settings.sections[i].title == section) {
+                        if (settings.sections[i].title === section) {
                             return settings.sections[i].settings;
                         }
                     }
                 }
-                var activeId = $(".tab-pane.active").attr("id")
+                var activeId = $(".tab-pane.active").attr("id");
                 var section = $(".nav.nav-tabs li a[href=#" + activeId + "]").text();
                 var s = getSettings(section);
                 for (var key in s) {
@@ -178,7 +178,9 @@
                 } else {
                     $defaultButton.attr("disabled", true);
                 }
-            })
+            });
+
+            parsehash();
         });
     });
 </script>
