@@ -58,6 +58,7 @@ public abstract class LockingPersistingCacheController extends ScheduledContentC
     private static final Logger LOGGER = LoggerFactory.getLogger(LockingPersistingCacheController.class);
     private static final String CACHE_FILE = "cache.tmp";
     private final ReadWriteLock updateLock = new ReentrantReadWriteLock(true);
+    private String cacheFile;
     private WritableContentCache cache;
 
     public LockingPersistingCacheController() {
@@ -93,7 +94,10 @@ public abstract class LockingPersistingCacheController extends ScheduledContentC
     }
 
     protected File getCacheFile() {
-        return new File(Configurator.getInstance().getBasePath(), CACHE_FILE);
+        if (this.cacheFile == null) {
+            this.cacheFile = new File(Configurator.getInstance().getBasePath(), CACHE_FILE).getAbsolutePath();
+        }
+        return new File(this.cacheFile);
     }
 
     @Override
