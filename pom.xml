@@ -848,10 +848,48 @@
 				<module>52n-sos-coding-sos-v100</module>
 				<module>52n-sos-coding-wml-v20</module>
 				<module>52n-sos-gda</module>
+				<module>52n-sos-binding-rest</module>
+                <module>52n-sos-ext-do</module>
 			</modules>
-			<properties>
+            <properties>
 				<config.logger.level>TRACE</config.logger.level>
-			</properties>
+                <do.version>0.1.0-SNAPSHOT</do.version>
+                <rest-binding.version>0.1.0-SNAPSHOT</rest-binding.version>
+            </properties>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-ext-do-xml</artifactId>
+                        <version>${do.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-ext-do-code</artifactId>
+                        <version>${do.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-ext-do-code-hibernate</artifactId>
+                        <version>${do.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-ext-do-code-kvp</artifactId>
+                        <version>${do.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-binding-rest-code</artifactId>
+                        <version>${rest-binding.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-binding-rest-xml-binding</artifactId>
+                        <version>${rest-binding.version}</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
 		</profile>
 		<profile>
 			<id>autermann</id>
