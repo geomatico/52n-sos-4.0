@@ -32,6 +32,7 @@ import org.n52.sos.service.ConformanceClass;
 
 /**
  * Interface for SOS request operator implementations
+ * TODO add javadoc for each method
  */
 public interface RequestOperator extends ConformanceClass {
     public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
