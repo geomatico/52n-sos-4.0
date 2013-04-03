@@ -23,7 +23,8 @@
     visit the Free Software Foundation web page, http://www.fsf.org.
 
 --%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <jsp:include page="../common/header.jsp">
     <jsp:param name="activeMenu" value="admin" />
 </jsp:include>
@@ -53,7 +54,7 @@
         <c:if test="${not empty settings}">
             <c:forEach items="${settings}" var="entry">
                 <c:if test="${not empty entry.value}">
-                    setSetting("${entry.key}","${entry.value}", settings);
+                    setSetting("${entry.key}","${fn:replace(entry.value, "\"","\\\"")}", settings);
                 </c:if>
             </c:forEach>
         </c:if>
