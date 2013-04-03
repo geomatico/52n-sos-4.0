@@ -353,7 +353,13 @@ public class SosObservation implements Serializable {
             SosMultiObservationValues<?> multiValue = (SosMultiObservationValues) sosObservation.getValue();
             tvpValue.addValues(((TVPValue) multiValue.getValue()).getValue());
         }
-        
+        if (isSetResultTime() && sosObservation.isSetResultTime()) {
+            if (getResultTime().getValue().isBefore(sosObservation.getResultTime().getValue())) {
+                resultTime = sosObservation.getResultTime();
+            }
+        } else if (!isSetResultTime() && sosObservation.isSetResultTime()){
+                resultTime = sosObservation.getResultTime();
+        }
     }
     
     private TVPValue convertSingleValueToMultiValue(SosSingleObservationValue<?> singleValue) {
@@ -389,5 +395,9 @@ public class SosObservation implements Serializable {
 
     public boolean isSetTokenSeparator() {
         return tokenSeparator != null && !tokenSeparator.isEmpty();
+    }
+    
+    public boolean isSetResultTime() {
+        return resultTime != null && resultTime.isSetValue();
     }
 }
