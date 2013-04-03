@@ -32,6 +32,8 @@ import java.util.Set;
 import org.n52.sos.ogc.om.SosOffering;
 
 public abstract class SosProcedureDescription {
+    
+    private String identifier;
 
     private String sensorDescriptionXmlString;
 
@@ -43,8 +45,18 @@ public abstract class SosProcedureDescription {
 
     private Map<String, Set<SosProcedureDescription>> childProcedureForProcedure =
             new HashMap<String, Set<SosProcedureDescription>>(0);
+    
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
 
-    public abstract String getProcedureIdentifier();
+    public String getIdentifier() {
+        return identifier;
+    }
+    
+    public boolean isSetIdentifier() {
+        return identifier != null && !identifier.isEmpty();
+    }
 
     public abstract List<SosOffering> getOfferingIdentifiers();
 
@@ -209,7 +221,7 @@ public abstract class SosProcedureDescription {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash =  31 * hash + ((getProcedureIdentifier() != null) ? getProcedureIdentifier().hashCode() : 0);
+        hash =  31 * hash + ((getIdentifier() != null) ? getIdentifier().hashCode() : 0);
         return hash;
     }
 

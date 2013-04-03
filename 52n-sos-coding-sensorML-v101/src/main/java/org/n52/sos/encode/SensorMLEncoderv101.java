@@ -720,9 +720,9 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
 
     protected void setCapabilitiesForFeaturesOfInterest(AbstractProcess sosAbstractProcess, AbstractProcessType abstractProcess)
             throws OwsExceptionReport {
-        if (sosAbstractProcess.isSetFeatureOfInterest(sosAbstractProcess.getProcedureIdentifier())) {
+        if (sosAbstractProcess.isSetFeatureOfInterest(sosAbstractProcess.getIdentifier())) {
             SosSMLCapabilities featureCapabilities = createCapabilitiesFromFeatures(sosAbstractProcess
-                    .getFeatureOfInterest(sosAbstractProcess.getProcedureIdentifier()));
+                    .getFeatureOfInterest(sosAbstractProcess.getIdentifier()));
             Capabilities xbCapabilities = abstractProcess.addNewCapabilities();
             if (featureCapabilities.getName() != null) {
                 xbCapabilities.setName(featureCapabilities.getName());

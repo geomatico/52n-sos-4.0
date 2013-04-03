@@ -88,6 +88,7 @@ public class HibernateProcedureUtilities {
                     try {
                         sosProcedureDescription =
                                 (SosProcedureDescription) CodingHelper.decodeXmlElement(procedureDescription);
+                        sosProcedureDescription.setIdentifier(procedureIdentifier);
                     } catch (OwsExceptionReport owse) {
                         sosProcedureDescription =
                                 new SosProcedureDescriptionUnknowType(procedureIdentifier, outputFormat,
@@ -98,6 +99,7 @@ public class HibernateProcedureUtilities {
                     try {
                         sosProcedureDescription =
                                 (SosProcedureDescription) CodingHelper.decodeXmlElement(procedureDescription);
+                        sosProcedureDescription.setIdentifier(procedureIdentifier);
                     } catch (OwsExceptionReport owse) {
                         sosProcedureDescription =
                                 new SosProcedureDescriptionUnknowType(procedureIdentifier, outputFormat,

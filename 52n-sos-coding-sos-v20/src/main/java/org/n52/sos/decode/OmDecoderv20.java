@@ -23,10 +23,8 @@
  */
 package org.n52.sos.decode;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,7 +58,6 @@ import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.CodedException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorML;
-import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
@@ -324,10 +321,7 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
 
     private SosProcedureDescription createProcedure(String procedureIdentifier) {
         SensorML procedure = new SensorML();
-        SosSMLIdentifier identifier = new SosSMLIdentifier("uniqueID", "urn:ogc:def:identifier:OGC:uniqueID", procedureIdentifier);
-        List<SosSMLIdentifier> identifiers = new ArrayList<SosSMLIdentifier>(1);
-        identifiers.add(identifier);
-        procedure.setIdentifications(identifiers);
+        procedure.setIdentifier(procedureIdentifier);
         return procedure;
     }
 

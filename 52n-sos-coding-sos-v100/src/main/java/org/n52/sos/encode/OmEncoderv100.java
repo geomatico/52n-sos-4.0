@@ -232,7 +232,7 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
         // xbObs.addNewResultTime().setHref("#" + phenomenonTime.getId());
         // set procedure
         xbObs.addNewProcedure().setHref(
-                sosObservation.getObservationConstellation().getProcedure().getProcedureIdentifier());
+                sosObservation.getObservationConstellation().getProcedure().getIdentifier());
         // set observedProperty (phenomenon)
         List<SosObservableProperty> phenComponents = null;
         if (sosObservation.getObservationConstellation().getObservableProperty() instanceof SosObservableProperty) {
@@ -295,7 +295,7 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
         // xbObs.addNewResultTime().setHref("#" + phenomenonTime.getId());
         // set procedure
         xbObs.addNewProcedure().setHref(
-                sosObservation.getObservationConstellation().getProcedure().getProcedureIdentifier());
+                sosObservation.getObservationConstellation().getProcedure().getIdentifier());
         // set observedProperty (phenomenon)
         List<SosObservableProperty> phenComponents = null;
         if (sosObservation.getObservationConstellation().getObservableProperty() instanceof SosObservableProperty) {

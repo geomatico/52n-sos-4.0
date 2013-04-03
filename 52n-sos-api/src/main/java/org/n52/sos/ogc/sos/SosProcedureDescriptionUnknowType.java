@@ -30,19 +30,13 @@ import org.n52.sos.ogc.om.SosOffering;
 
 public class SosProcedureDescriptionUnknowType extends SosProcedureDescription {
     
-    private String identifier;
 	private List<SosOffering> offerings = new ArrayList<SosOffering>(0);
     
     
     public SosProcedureDescriptionUnknowType(String identifier, String procedureDescriptionFormat, String xmlDescription) {
-        this.identifier = identifier;
+        setIdentifier(identifier);
         this.setDescriptionFormat(procedureDescriptionFormat);
         this.setSensorDescriptionXmlString(xmlDescription);
-    }
-
-    @Override
-    public String getProcedureIdentifier() {
-        return identifier;
     }
 
     @Override

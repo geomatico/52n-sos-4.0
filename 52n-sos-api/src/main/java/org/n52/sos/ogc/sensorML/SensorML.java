@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.sensorML;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.n52.sos.ogc.om.SosOffering;
@@ -35,7 +35,7 @@ public class SensorML extends AbstractSensorML {
 
     private String version;
 
-    private List<AbstractProcess> members;
+    private List<AbstractProcess> members = new LinkedList<AbstractProcess>();
 
     /**
      * default constructor
@@ -56,65 +56,53 @@ public class SensorML extends AbstractSensorML {
     }
 
     public void setMembers(List<AbstractProcess> members) {
-        this.members = members;
+        for (AbstractProcess member : members) {
+            addMember(member);
+        }
     }
 
     public void addMember(AbstractProcess member) {
-        if (members == null) {
-            members = new ArrayList<AbstractProcess>();
+        if (isEmpty() && !isSetIdentifier() && member.isSetIdentifier()) {
+           setIdentifier(member.getIdentifier()); 
         }
         members.add(member);
     }
     
     /**
-     * @return <tt>true</tt>, if this instance contains only members and everything else is not set
+     * @return <tt>true</tt>, if everything from the super class is not set
      */
-    // TODO please review this javadoc
+    private boolean isEmpty() {
+        return !isSetKeywords() && !isSetIdentifications() && !isSetClassifications() && !isSetCapabilities()
+                && !isSetCharacteristics() && !isSetValidTime() && !isSetContact() && !isSetDocumentation()
+                && !isSetHistory();
+    }
+
+    /**
+     * @return <tt>true</tt>, if this instance contains only members and
+     *         everything else is not set
+     */
     public boolean isWrapper() {
-        return !isSetKeywords()
-                && !isSetIdentifications()
-                && !isSetClassifications()
-                && !isSetCapabilities()
-                && !isSetCharacteristics()
-                && !isSetValidTime() && !isSetContact()
-                && !isSetDocumentation()
-                && !isSetHistory()
-                && isSetMembers();
+        return isEmpty() && isSetMembers();
     }
 
     public boolean isSetMembers() {
         return members != null && !members.isEmpty();
     }
-    
-    @Override
-    public String getProcedureIdentifier()
-    {
-    	if (isWrapper() && getMembers() != null && !getMembers().isEmpty())
-        {
-        	return this.getMembers().get(0).getProcedureIdentifier();
-        }
-    	return super.getProcedureIdentifier();
-    }
-    
+
     @Override
     public List<SosOffering> getOfferingIdentifiers() {
         List<SosOffering> sosOfferings = super.getOfferingIdentifiers();
-        if (isWrapper() && getMembers() != null && !getMembers().isEmpty())
-        {
-        	for (AbstractProcess member : getMembers())
-        	{
-        		final List<SosOffering> offeringIdentifiers = member.getOfferingIdentifiers();
-				if (offeringIdentifiers != null && !offeringIdentifiers.isEmpty())
-        		{
-        			for (SosOffering sosOffering : offeringIdentifiers) 
-        			{
-						if (!sosOfferings.contains(sosOffering))
-						{
-							sosOfferings.add(sosOffering);
-						}
-					}
-        		}
-        	}
+        if (isWrapper() && getMembers() != null && !getMembers().isEmpty()) {
+            for (AbstractProcess member : getMembers()) {
+                final List<SosOffering> offeringIdentifiers = member.getOfferingIdentifiers();
+                if (offeringIdentifiers != null && !offeringIdentifiers.isEmpty()) {
+                    for (SosOffering sosOffering : offeringIdentifiers) {
+                        if (!sosOfferings.contains(sosOffering)) {
+                            sosOfferings.add(sosOffering);
+                        }
+                    }
+                }
+            }
         }
         return sosOfferings;
     }

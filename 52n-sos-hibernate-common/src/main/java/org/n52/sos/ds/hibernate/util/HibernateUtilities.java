@@ -83,7 +83,7 @@ public class HibernateUtilities {
         String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, obsConstAlias);
         queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias),
-                sosObservationConstellation.getProcedure().getProcedureIdentifier()));
+                sosObservationConstellation.getProcedure().getIdentifier()));
         queryObject.setAliases(aliases);
         List<ObservationConstellationOfferingObservationType> obsConstsOffObsTypes = HibernateCriteriaQueryUtilities
                 .getObservationConstellationOfferingObservationType(queryObject, session);

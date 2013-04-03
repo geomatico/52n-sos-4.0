@@ -1130,7 +1130,7 @@ public class InMemoryCacheControllerTest {
     }
 
     private String getSensorIdFromInsertSensorRequest() {
-        return ((InsertSensorRequest) request).getProcedureDescription().getProcedureIdentifier();
+        return ((InsertSensorRequest) request).getProcedureDescription().getIdentifier();
     }
 
     protected ContentCache getCache() {

@@ -80,7 +80,6 @@ import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.om.values.UnknownValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorML;
-import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
@@ -272,7 +271,7 @@ public class HibernateObservationUtilities {
                     HashSet<String> offerings = new HashSet<String>(getCache()
                             .getOfferingsForObservableProperty(obsConst.getObservableProperty().getIdentifier()));
                     offerings.retainAll(getCache().getOfferingsForProcedure(obsConst.getProcedure()
-                            .getProcedureIdentifier()));
+                            .getIdentifier()));
                     obsConst.setOfferings(offerings);
                 }
                 int obsConstHash = obsConst.hashCode();
@@ -323,11 +322,13 @@ public class HibernateObservationUtilities {
         if (observationConstellation != null && featureOfInterestIdentifiers != null) {
             String procID = observationConstellation.getProcedure().getIdentifier();
             SensorML procedure = new SensorML();
-            SosSMLIdentifier identifier =
-                    new SosSMLIdentifier("uniqueID", "urn:ogc:def:identifier:OGC:uniqueID", procID);
-            List<SosSMLIdentifier> identifiers = new ArrayList<SosSMLIdentifier>(1);
-            identifiers.add(identifier);
-            procedure.setIdentifications(identifiers);
+            procedure.setIdentifier(procID);
+            // TODO remove unused code
+//            SosSMLIdentifier identifier =
+//                    new SosSMLIdentifier("uniqueID", "urn:ogc:def:identifier:OGC:uniqueID", procID);
+//            List<SosSMLIdentifier> identifiers = new ArrayList<SosSMLIdentifier>(1);
+//            identifiers.add(identifier);
+//            procedure.setIdentifications(identifiers);
 
             // phenomenon
             String phenID = observationConstellation.getObservableProperty().getIdentifier();
@@ -344,9 +345,9 @@ public class HibernateObservationUtilities {
                 /* get the offerings to find the templates */
                 if (obsConst.getOfferings() == null) {
                     Set<String> offerings = new HashSet<String>(getCache().getOfferingsForProcedure(
-                            obsConst.getProcedure().getProcedureIdentifier()));
+                            obsConst.getProcedure().getIdentifier()));
                     offerings.retainAll(new HashSet<String>(getCache().getOfferingsForProcedure(
-                            obsConst.getProcedure().getProcedureIdentifier())));
+                            obsConst.getProcedure().getIdentifier())));
                     obsConst.setOfferings(offerings);
                 }
                 SosObservation sosObservation = new SosObservation();

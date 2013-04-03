@@ -185,7 +185,7 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<A
 
     private void checkObservationConstellationParameter(SosObservationConstellation obsConstallation) throws
             OwsExceptionReport {
-        checkProcedureID(obsConstallation.getProcedure().getProcedureIdentifier(),
+        checkProcedureID(obsConstallation.getProcedure().getIdentifier(),
                          Sos2Constants.InsertObservationParams.procedure.name());
         checkObservedProperty(obsConstallation.getObservableProperty().getIdentifier(),
                               Sos2Constants.InsertObservationParams.observedProperty.name());

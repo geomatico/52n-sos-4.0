@@ -57,7 +57,18 @@ public class AbstractSensorML extends SosProcedureDescription {
     private List<AbstractSosSMLDocumentation> documentations = new ArrayList<AbstractSosSMLDocumentation>(0);
 
     private String history;
-    
+
+    public String getProcedureIdentifierFromIdentifications() {
+        if (isSetIdentifications()) {
+            for (SosSMLIdentifier identification : identifications) {
+                if (isIdentificationHoldingAnProcedureIdentifier(identification)) {
+                    return identification.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
     public List<String> getKeywords() {
         return keywords;
     }
@@ -72,6 +83,10 @@ public class AbstractSensorML extends SosProcedureDescription {
 
     public void setIdentifications(List<SosSMLIdentifier> identifications) {
         this.identifications = identifications;
+        String identifier = getProcedureIdentifierFromIdentifications();
+        if (!isSetIdentifier() && identifier != null && !identifier.isEmpty()) {
+            setIdentifier(identifier);
+        }
     }
 
     public List<SosSMLClassifier> getClassifications() {
@@ -101,7 +116,7 @@ public class AbstractSensorML extends SosProcedureDescription {
             this.characteristics = characteristics;
         }
     }
-    
+
     public void addCharacteristic(SosSMLCharacteristics characteristic) {
         this.characteristics.add(characteristic);
     }
@@ -137,7 +152,7 @@ public class AbstractSensorML extends SosProcedureDescription {
     public void setDocumentation(List<AbstractSosSMLDocumentation> documentations) {
         this.documentations.addAll(documentations);
     }
-    
+
     public void addDocumentation(AbstractSosSMLDocumentation documentation) {
         this.documentations.add(documentation);
     }
@@ -153,88 +168,67 @@ public class AbstractSensorML extends SosProcedureDescription {
     public void addIdentifier(SosSMLIdentifier identifier) {
         this.identifications.add(identifier);
     }
-    
-    @Override
-    public String getProcedureIdentifier() {
-        if (isSetIdentifications()) 
-        {
-            for (SosSMLIdentifier identification : identifications)
-            {
-                if (isIdentificationHoldingAnProcedureIdentifier(identification)) 
-                {
-                    return identification.getValue();
-                }
-            }
-        }
-        return null;
-    }
 
     @Override
     public List<SosOffering> getOfferingIdentifiers() {
         List<SosOffering> sosOfferings = new ArrayList<SosOffering>(0);
-        if (isSetIdentifications()) 
-        {
-            for (SosSMLIdentifier identification : identifications)
-            {
-                if (isIdentificationHoldingAnOfferingId(identification)) 
-                {
+        if (isSetIdentifications()) {
+            for (SosSMLIdentifier identification : identifications) {
+                if (isIdentificationHoldingAnOfferingId(identification)) {
                     sosOfferings.add(new SosOffering(identification.getValue(), identification.getName()));
                 }
             }
         }
         return sosOfferings;
     }
-    
-    private boolean isIdentificationHoldingAnProcedureIdentifier(SosSMLIdentifier identification)
-	{
-		return (identification.getName() != null && identification.getName().equals(URN_UNIQUE_IDENTIFIER_END))
-		        || (identification.getDefinition() != null
-		                && (identification.getDefinition().equals(URN_UNIQUE_IDENTIFIER)
-		                || identification.getDefinition().equals(URN_IDENTIFIER_IDENTIFICATION) 
-		                || (identification.getDefinition().startsWith(URN_UNIQUE_IDENTIFIER_START) 
-		                		&& identification.getDefinition().contains(URN_UNIQUE_IDENTIFIER_END))
-		                ));
-	}
 
-	private boolean isIdentificationHoldingAnOfferingId(SosSMLIdentifier identification)
-	{
-		return identification.getDefinition() != null
-		        && (identification.getDefinition().equals(URN_OFFERING_ID)
-		                || identification.getDefinition().contains(ELEMENT_NAME_OFFERING));
-	}
+    private boolean isIdentificationHoldingAnProcedureIdentifier(SosSMLIdentifier identification) {
+        return (identification.getName() != null && identification.getName().equals(URN_UNIQUE_IDENTIFIER_END))
+                || (identification.getDefinition() != null && (identification.getDefinition().equals(
+                        URN_UNIQUE_IDENTIFIER)
+                        || identification.getDefinition().equals(URN_IDENTIFIER_IDENTIFICATION) || (identification
+                        .getDefinition().startsWith(URN_UNIQUE_IDENTIFIER_START) && identification.getDefinition()
+                        .contains(URN_UNIQUE_IDENTIFIER_END))));
+    }
+
+    private boolean isIdentificationHoldingAnOfferingId(SosSMLIdentifier identification) {
+        return identification.getDefinition() != null
+                && (identification.getDefinition().equals(URN_OFFERING_ID) || identification.getDefinition().contains(
+                        ELEMENT_NAME_OFFERING));
+    }
 
     public boolean isSetKeywords() {
         return keywords != null && !keywords.isEmpty();
     }
-    
+
     public boolean isSetIdentifications() {
         return identifications != null && !identifications.isEmpty();
     }
-    
+
     public boolean isSetClassifications() {
         return classifications != null && !classifications.isEmpty();
     }
-    
+
     public boolean isSetCharacteristics() {
         return characteristics != null && !characteristics.isEmpty();
     }
-    
+
     public boolean isSetCapabilities() {
         return capabilities != null && !capabilities.isEmpty();
     }
-    
+
     public boolean isSetDocumentation() {
         return documentations != null && !documentations.isEmpty();
     }
-    
+
     public boolean isSetValidTime() {
         return validTime != null;
     }
-    
+
     public boolean isSetContact() {
         return contact != null && !contact.isEmpty();
     }
-    
+
     public boolean isSetHistory() {
         return history != null && !history.isEmpty();
     }

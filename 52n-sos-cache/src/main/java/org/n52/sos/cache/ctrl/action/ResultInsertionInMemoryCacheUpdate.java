@@ -68,7 +68,7 @@ public class ResultInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
         // TODO remove not required updates and adjust test accordingly
         final WritableContentCache cache = getCache();
         final String observationType = observation.getObservationConstellation().getObservationType();
-        final String procedure = observation.getObservationConstellation().getProcedure().getProcedureIdentifier();
+        final String procedure = observation.getObservationConstellation().getProcedure().getIdentifier();
         final String observableProperty = observation.getObservationConstellation().getObservableProperty().getIdentifier();
         final ITime phenomenonTime = observation.getPhenomenonTime();
         final ITime resultTime = observation.getResultTime();

@@ -127,7 +127,7 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
         }
         // check procedure
         try {
-            checkProcedureID(request.getObservationTemplate().getProcedure().getProcedureIdentifier(),
+            checkProcedureID(request.getObservationTemplate().getProcedure().getIdentifier(),
                              Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);

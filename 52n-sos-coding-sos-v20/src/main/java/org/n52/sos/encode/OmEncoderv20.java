@@ -325,10 +325,10 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
             if (encodeProcedure != null) {
                 procedure.set(encodeProcedure);
             } else {
-                procedure.setHref(procedureDescription.getProcedureIdentifier());
+                procedure.setHref(procedureDescription.getIdentifier());
             }
         } else {
-            procedure.setHref(procedureDescription.getProcedureIdentifier());
+            procedure.setHref(procedureDescription.getIdentifier());
         }
     }
 

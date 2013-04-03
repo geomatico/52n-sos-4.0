@@ -23,7 +23,6 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,7 +61,6 @@ import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorML;
-import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.sos.SosResultEncoding;
@@ -180,10 +178,12 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
     
     private SosProcedureDescription createProcedure(Procedure hProcedure) {
         SensorML procedure = new SensorML();
-        SosSMLIdentifier identifier = new SosSMLIdentifier("uniqueID", "urn:ogc:def:identifier:OGC:uniqueID", hProcedure.getIdentifier());
-        List<SosSMLIdentifier> identifiers = new ArrayList<SosSMLIdentifier>(1);
-        identifiers.add(identifier);
-        procedure.setIdentifications(identifiers);
+        procedure.setIdentifier(hProcedure.getIdentifier());
+     // TODO remove unused code
+//        SosSMLIdentifier identifier = new SosSMLIdentifier("uniqueID", "urn:ogc:def:identifier:OGC:uniqueID", hProcedure.getIdentifier());
+//        List<SosSMLIdentifier> identifiers = new ArrayList<SosSMLIdentifier>(1);
+//        identifiers.add(identifier);
+//        procedure.setIdentifications(identifiers);
         return procedure;
     }
 
