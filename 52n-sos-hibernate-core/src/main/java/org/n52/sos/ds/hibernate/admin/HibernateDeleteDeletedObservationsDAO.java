@@ -50,9 +50,8 @@ public class HibernateDeleteDeletedObservationsDAO implements DeleteDeletedObser
             session = sessionHolder.getSession();
             transaction = session.beginTransaction();
             @SuppressWarnings("unchecked")
-            List<Observation> list = (List<Observation>) session
-                    .createCriteria(Observation.class)
-                    .add(Restrictions.eq(HibernateConstants.DELETED, true));
+            List<Observation> list = (List<Observation>) session.createCriteria(Observation.class)
+                    .add(Restrictions.eq(HibernateConstants.DELETED, true)).list();
             for (Observation o : list) {
                 session.delete(o);
             }
