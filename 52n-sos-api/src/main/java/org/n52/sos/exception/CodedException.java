@@ -21,10 +21,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ogc.ows;
+package org.n52.sos.exception;
 
 import java.util.Collections;
 import java.util.List;
+
+import org.n52.sos.ogc.ows.ExceptionCode;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>

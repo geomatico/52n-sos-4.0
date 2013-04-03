@@ -29,6 +29,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.n52.sos.exception.CodedException;
+
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */

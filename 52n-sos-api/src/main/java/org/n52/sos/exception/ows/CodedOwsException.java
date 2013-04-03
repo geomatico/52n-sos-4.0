@@ -23,7 +23,7 @@
  */
 package org.n52.sos.exception.ows;
 
-import org.n52.sos.ogc.ows.CodedException;
+import org.n52.sos.exception.CodedException;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>

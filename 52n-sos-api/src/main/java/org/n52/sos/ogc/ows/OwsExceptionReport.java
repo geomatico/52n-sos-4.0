@@ -26,6 +26,7 @@ package org.n52.sos.ogc.ows;
 import java.util.Iterator;
 import java.util.List;
 
+import org.n52.sos.exception.CodedException;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.Configurator;
