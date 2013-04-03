@@ -1229,7 +1229,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void clearProceduresForFeatureOfInterest() {
         log.trace("Clearing procedures for feature of interest");
-        getProceduresForOfferingsMap().clear();
+        getProceduresForFeaturesOfInterestMap().clear();
     }
 
     @Override
