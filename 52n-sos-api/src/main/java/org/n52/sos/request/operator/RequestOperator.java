@@ -37,6 +37,7 @@ import org.n52.sos.service.ConformanceClass;
 public interface RequestOperator extends ConformanceClass {
     public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
 
+    @Deprecated
     public boolean hasImplementedDAO();
 
     public RequestOperatorKeyType getRequestOperatorKeyType();
