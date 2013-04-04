@@ -42,10 +42,11 @@ public class ScheduledContentCacheControllerSettings implements SettingDefinitio
             .setGroup(ServiceSettings.GROUP)
             .setOrder(6)
             .setKey(CAPABILITIES_CACHE_UPDATE_INTERVAL)
-            .setDefaultValue(5)
+            .setDefaultValue(120)
             .setMinimum(0)
-            .setTitle("Capabilities cache update interval")
-            .setDescription("The update interval of the capabilities cache in minutes.");
+            .setTitle("Content cache update interval")
+            .setDescription("The update interval of the content cache in minutes. Set this to lower value if "
+                            + "your database is externally modified frequently.");
 
     @Override
     public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
