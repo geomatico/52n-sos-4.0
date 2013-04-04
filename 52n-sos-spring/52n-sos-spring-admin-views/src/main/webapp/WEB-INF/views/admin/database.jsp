@@ -41,10 +41,12 @@
     <jsp:param name="leadParagraph" value="Here you can query the database directly." />
 </jsp:include>
 
-<div class="pull-right btn-group">
-    <a href="#confirmDialogClear" data-toggle="modal" role="button" title="Clear Database" class="btn btn-danger">Clear Database</a>
-    <a href="#confirmDialogDelete" data-toggle="modal" role="button" title="Delete deleted Observations" class="btn btn-danger">Delete deleted Observations</a>
-    <button id="testdata" type="button" class="btn btn-danger"></button>
+<div class="pull-right">
+    <ul class="inline">
+        <li><a href="#confirmDialogClear" data-toggle="modal" role="button" title="Clear Database" class="btn btn-danger">Clear Database</a></li>
+        <li><a href="#confirmDialogDelete" data-toggle="modal" role="button" title="Delete deleted Observations" class="btn btn-danger">Delete deleted Observations</a></li>
+        <li><button id="testdata" type="button" class="btn btn-danger"></button></li>
+    </ul>
 </div>
 
 <form id="form" action="" method="POST">
