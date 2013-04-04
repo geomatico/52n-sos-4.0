@@ -43,7 +43,7 @@
 	<tbody>
 		<tr>
 			<td><a href='http://twitter.github.com/bootstrap/'>Bootstrap</a></td>
-			<td>2.1.1</td>
+			<td>2.3.1</td>
 			<td><a href='http://www.apache.org/licenses/LICENSE-2.0.html'>Apache</a></td>
 		</tr>
 		<tr>

@@ -39,11 +39,11 @@
 		<link href="<c:url value="/static/images/favicon.ico" />" rel="shortcut icon" type="image/x-icon" />        
 		<link rel="stylesheet" href="<c:url value="/static/css/52n.css" />" type="text/css" />
 		<link rel="stylesheet" href="<c:url value="/static/css/52n.cssmenu.css" />" type="text/css"/>
-		<link rel="stylesheet" href="<c:url value="/static/lib/bootstrap-2.1.1.min.css" />" type="text/css" />
+		<link rel="stylesheet" href="<c:url value="/static/lib/bootstrap-2.3.1.min.css" />" type="text/css" />
 		<link rel="stylesheet" href="<c:url value="/static/css/application.css" />" type="text/css" />
 		<script type="text/javascript" src="<c:url value="/static/js/arrays.js" />"></script>
 		<script type="text/javascript" src="<c:url value="/static/lib/jquery-1.8.2.min.js" />"></script>
-		<script type="text/javascript" src="<c:url value="/static/lib/bootstrap-2.1.1.min.js" />"></script>
+		<script type="text/javascript" src="<c:url value="/static/lib/bootstrap-2.3.1.min.js" />"></script>
 		<script type="text/javascript" src="<c:url value="/static/js/application.js" />"></script>
 		<title>52&deg;North Sensor Observation Service</title>
 		
