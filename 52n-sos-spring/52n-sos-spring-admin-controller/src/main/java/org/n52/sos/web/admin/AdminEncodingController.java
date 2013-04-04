@@ -29,9 +29,9 @@ import java.util.Set;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.encode.ResponseFormatKeyType;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.web.ControllerConstants;
@@ -59,7 +59,7 @@ public class AdminEncodingController extends AbstractAdminController {
 
     @ResponseBody
     @ExceptionHandler(ConnectionProviderException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String onConnectionProviderException(ConnectionProviderException e) {
         return e.getMessage();
     }

@@ -56,7 +56,7 @@ public class AdminOperationController extends AbstractAdminController {
 
     @ResponseBody
     @ExceptionHandler(ConnectionProviderException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String onConnectionProviderException(ConnectionProviderException e) {
         return e.getMessage();
     }
