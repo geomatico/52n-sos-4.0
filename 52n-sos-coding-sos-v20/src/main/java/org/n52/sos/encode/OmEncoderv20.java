@@ -95,7 +95,7 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(OmEncoderv20.class);
 
     private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(OMConstants.NS_OM_2,
-            SosObservation.class);
+            SosObservation.class, NamedValue.class);
 
     // TODO: change to correct conformance class
     private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(ConformanceClasses.OM_V2_MEASUREMENT,
