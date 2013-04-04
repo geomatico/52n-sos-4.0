@@ -177,8 +177,8 @@ CREATE TABLE request (
   request_id bigint NOT NULL DEFAULT nextval('request_id_seq'),
   offering_id bigint NOT NULL,
   request TEXT NOT NULL,
-  begin_lease TIMESTAMP NULL,
-  end_lease TIMESTAMP NOT NULL,
+  begin_lease TIMESTAMP WITH TIMEZONE NULL,
+  end_lease TIMESTAMP WITH TIMEZONE NOT NULL,
   PRIMARY KEY(request_id)
 );
 
@@ -300,8 +300,8 @@ CREATE TABLE observation_constellation_offering_observation_type (
 CREATE TABLE valid_procedure_time (
   valid_procedure_time_id bigint NOT NULL DEFAULT nextval('valid_procedure_time_id_seq'),
   procedure_id bigint NOT NULL,
-  start_time TIMESTAMP NOT NULL,
-  end_time TIMESTAMP NULL,
+  start_time TIMESTAMP WITH TIMEZONE NOT NULL,
+  end_time TIMESTAMP WITH TIMEZONE NULL,
   description_url TEXT NULL,
   description_xml TEXT NULL,
   UNIQUE (procedure_id,start_time),
@@ -320,11 +320,11 @@ CREATE TABLE observation (
   observation_constellation_id bigint NOT NULL,
   identifier TEXT NULL,
   codespace_id bigint NULL,
-  phenomenon_time_start TIMESTAMP NOT NULL,
-  phenomenon_time_end TIMESTAMP NOT NULL,
-  result_time TIMESTAMP NOT NULL,
-  valid_time_start TIMESTAMP NULL,
-  valid_time_end TIMESTAMP NULL,
+  phenomenon_time_start TIMESTAMP WITH TIMEZONE NOT NULL,
+  phenomenon_time_end TIMESTAMP WITH TIMEZONE NOT NULL,
+  result_time TIMESTAMP WITH TIMEZONE NOT NULL,
+  valid_time_start TIMESTAMP WITH TIMEZONE NULL,
+  valid_time_end TIMESTAMP WITH TIMEZONE NULL,
   unit_id bigint NULL,
   set_id TEXT NULL,
   deleted BOOL NOT NULL DEFAULT false,
