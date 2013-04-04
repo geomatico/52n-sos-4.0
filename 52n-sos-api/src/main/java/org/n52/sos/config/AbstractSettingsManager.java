@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.n52.sos.binding.BindingKey;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.ConnectionProviderException;
@@ -292,7 +293,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
 
     @Override
     public void setActive(RequestOperatorKeyType rokt, boolean active) throws ConnectionProviderException {
-        log.debug("Setting activation of {} to {}", rokt, active);
+        log.debug("Setting status of {} to {}", rokt, active);
         setOperationStatus(rokt, active);
         if (Configurator.getInstance() != null) {
             Configurator.getInstance().getRequestOperatorRepository().setActive(rokt, active);
@@ -301,7 +302,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
 
     @Override
     public void setActive(ResponseFormatKeyType rfkt, boolean active) throws ConnectionProviderException {
-        log.debug("Setting activation of {} to {}", rfkt, active);
+        log.debug("Setting status of {} to {}", rfkt, active);
         setResponseFormatStatus(rfkt, active);
         if (Configurator.getInstance() != null) {
             Configurator.getInstance().getCodingRepository().setActive(rfkt, active);
@@ -310,10 +311,19 @@ public abstract class AbstractSettingsManager extends SettingsManager {
 
     @Override
     public void setActive(String pdf, boolean active) throws ConnectionProviderException {
-        log.debug("Setting activation of {} to {}", pdf, active);
+        log.debug("Setting status of {} to {}", pdf, active);
         setProcedureDescriptionFormatStatus(pdf, active);
         if (Configurator.getInstance() != null) {
             Configurator.getInstance().getCodingRepository().setActive(pdf, active);
+        }
+    }
+
+    @Override
+    public void setActive(BindingKey bk, boolean active) throws ConnectionProviderException {
+        log.debug("Setting status of {} to {}", bk, active);
+        setBindingStatus(bk, active);
+        if (Configurator.getInstance() != null) {
+            Configurator.getInstance().getBindingRepository().setActive(bk, active);
         }
     }
 
@@ -389,6 +399,17 @@ public abstract class AbstractSettingsManager extends SettingsManager {
      */
     protected abstract void setProcedureDescriptionFormatStatus(String pdf, boolean active) throws
             ConnectionProviderException;
+
+    /**
+     * Sets the status of a binding.
+     *
+     * @param bk     the binding
+     * @param active the status
+     *
+     * @throws ConnectionProviderException
+     * @see #setActive(org.n52.sos.binding.BindingKey, boolean)
+     */
+    protected abstract void setBindingStatus(BindingKey bk, boolean active) throws ConnectionProviderException;
 
     private class ConfigurableObject {
         private final Method method;

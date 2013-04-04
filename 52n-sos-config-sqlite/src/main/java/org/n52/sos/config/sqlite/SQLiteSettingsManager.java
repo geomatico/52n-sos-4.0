@@ -35,31 +35,32 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.n52.sos.binding.BindingKey;
 import org.n52.sos.config.AbstractSettingValueFactory;
 import org.n52.sos.config.AbstractSettingsManager;
 import org.n52.sos.config.AdministratorUser;
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingValue;
 import org.n52.sos.config.SettingValueFactory;
 import org.n52.sos.config.sqlite.entities.AbstractSettingValue;
 import org.n52.sos.config.sqlite.entities.Activatable;
 import org.n52.sos.config.sqlite.entities.AdminUser;
+import org.n52.sos.config.sqlite.entities.Binding;
 import org.n52.sos.config.sqlite.entities.BooleanSettingValue;
 import org.n52.sos.config.sqlite.entities.FileSettingValue;
 import org.n52.sos.config.sqlite.entities.IntegerSettingValue;
 import org.n52.sos.config.sqlite.entities.NumericSettingValue;
+import org.n52.sos.config.sqlite.entities.ObservationEncoding;
+import org.n52.sos.config.sqlite.entities.ObservationEncodingKey;
 import org.n52.sos.config.sqlite.entities.Operation;
 import org.n52.sos.config.sqlite.entities.OperationKey;
 import org.n52.sos.config.sqlite.entities.ProcedureEncoding;
-import org.n52.sos.config.sqlite.entities.ObservationEncodingKey;
-import org.n52.sos.config.sqlite.entities.ObservationEncoding;
 import org.n52.sos.config.sqlite.entities.StringSettingValue;
 import org.n52.sos.config.sqlite.entities.UriSettingValue;
 import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.encode.ResponseFormatKeyType;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
-import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -235,6 +236,12 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
+    protected void setBindingStatus(BindingKey bk, boolean active) throws ConnectionProviderException {
+        setActive(Binding.class, new Binding(bk.getServletPath()), active);
+    }
+
+
+    @Override
     public boolean isActive(ResponseFormatKeyType rfkt) throws ConnectionProviderException {
         return isActive(ObservationEncoding.class, new ObservationEncodingKey(rfkt));
     }
@@ -242,6 +249,11 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     @Override
     public boolean isActive(String pdf) throws ConnectionProviderException {
         return isActive(ProcedureEncoding.class, pdf);
+    }
+
+    @Override
+    public boolean isActive(BindingKey bk) throws ConnectionProviderException {
+        return isActive(Binding.class, bk.getServletPath());
     }
 
     private static class SqliteSettingFactory extends AbstractSettingValueFactory {

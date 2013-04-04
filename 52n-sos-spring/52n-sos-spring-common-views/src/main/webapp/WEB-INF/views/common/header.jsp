@@ -82,7 +82,7 @@
                                             </a>
                                             <sec:authorize access="hasRole('ROLE_ADMIN')">
                                                 <script type="text/javascript">
-                                                    $("#admin-menuitem").addClass("havechild")
+                                                    $("#admin-menuitem").addClass("havechild");
                                                 </script>
                                                 <ul>
                                                     <li>
@@ -103,6 +103,11 @@
                                                             <li>
                                                                 <a href="<c:url value="/admin/encodings" />">
                                                                     <span class="menu-title">Encodings</span>
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="<c:url value="/admin/bindings" />">
+                                                                    <span class="menu-title">Bindings</span>
                                                                 </a>
                                                             </li>
                                                             <li>

@@ -39,6 +39,7 @@ public interface ControllerConstants {
         String ADMIN_SETTINGS = "admin/settings";
         String ADMIN_OPERATIONS = "admin/operations";
         String ADMIN_ENCODINGS = "admin/encodings";
+        String ADMIN_BINDINGS = "admin/bindings";
         String INSTALL_INDEX = "install/index";
         String INSTALL_DATABASE = "install/database";
         String INSTALL_SETTINGS = "install/settings";
@@ -66,6 +67,8 @@ public interface ControllerConstants {
         String ADMIN_OPERATIONS_JSON_ENDPOINT = "/admin/operations/json";
         String ADMIN_ENCODINGS = "/admin/encodings";
         String ADMIN_ENCODINGS_JSON_ENDPOINT = "/admin/encodings/json";
+        String ADMIN_BINDINGS = "/admin/bindings";
+        String ADMIN_BINDINGS_JSON_ENDPOINT = "/admin/bindings/json";
         String ADMIN_DATABASE_EXECUTE = "/admin/database";
         String ADMIN_DATABASE_SETTINGS = "/admin/database/settings";
         String ADMIN_RELOAD_CAPABILITIES_CACHE = "/admin/cache/reload";

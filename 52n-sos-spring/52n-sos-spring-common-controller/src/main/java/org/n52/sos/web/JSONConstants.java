@@ -27,6 +27,8 @@ package org.n52.sos.web;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public interface JSONConstants {
+    String BINDING_KEY = "binding";
+    String BINDINGS_KEY = "bindings";
     String RESPONSE_FORMAT_KEY = "responseFormat";
     String PROCEDURE_DESCRIPTION_FORMAT_KEY = "procedureDescriptionFormat";
     String OBSERVATION_ENCODINGS_KEY = "observationEncodings";

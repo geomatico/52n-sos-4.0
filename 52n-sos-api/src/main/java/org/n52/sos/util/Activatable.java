@@ -69,6 +69,19 @@ public class Activatable<T> {
         return unfiltered;
     }
 
+    public static <K, V> Map<K, V> unfiltered(Map<K, Activatable<V>> map) {
+        if (map == null) {
+            return CollectionHelper.map();
+        }
+        Map<K, V> filtered = new HashMap<K, V>(map.size());
+        for (K k : map.keySet()) {
+            if (map.get(k) != null) {
+                filtered.put(k, map.get(k).getInternal());
+            }
+        }
+        return filtered;
+    }
+
     public static <E> Set<Activatable<E>> from(Set<E> set) {
         Set<Activatable<E>> a = new HashSet<Activatable<E>>(set.size());
         for (E t : set) {

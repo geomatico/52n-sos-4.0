@@ -23,13 +23,15 @@
  */
 package org.n52.sos.binding;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.n52.sos.config.SettingsManager;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
+import org.n52.sos.util.Activatable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BindingRepository extends AbstractConfiguringServiceLoaderRepository<Binding> {
 	private static final Logger log = LoggerFactory.getLogger(BindingRepository.class);
-    private final Map<String, Binding> bindings = new HashMap<String, Binding>(0);
+    private final Map<String, Activatable<Binding>> bindings = new HashMap<String, Activatable<Binding>>(0);
 
     /**
      * reads the requestListeners from the configFile and returns a
@@ -54,24 +56,41 @@ public class BindingRepository extends AbstractConfiguringServiceLoaderRepositor
 
 	@Override
 	protected void processConfiguredImplementations(Set<Binding> bindings) throws ConfigurationException {
-		this.bindings.clear();
-        for (Binding iBindingOperator : bindings) {
-			this.bindings.put(iBindingOperator.getUrlPattern(), iBindingOperator);
+        this.bindings.clear();
+        SettingsManager sm = SettingsManager.getInstance();
+        try {
+            for (Binding binding : bindings) {
+                this.bindings.put(binding.getUrlPattern(), Activatable.from(binding, sm
+                        .isActive(new BindingKey(binding.getUrlPattern()))));
+            }
+        } catch (ConnectionProviderException ex) {
+            throw new ConfigurationException("Could not check status of Binding", ex);
         }
         if (this.bindings.isEmpty()) {
             StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("No Binding implementation could be loaded!");
-            exceptionText.append(" If the SOS is not used as webapp, this has no effect!");
-            exceptionText.append(" Else add a Binding implementation!");
+            exceptionText.append("No Binding implementation could be loaded! ");
+            exceptionText.append("If the SOS is not used as webapp, this has no effect! ");
+            exceptionText.append("Else add a Binding implementation!");
             log.warn(exceptionText.toString());
         }
     }
 
 	public Binding getBinding(String urlPattern) {
-        return this.bindings.get(urlPattern);
+        Activatable<Binding> binding = this.bindings.get(urlPattern);
+        return binding == null ? null : binding.get();
     }
 
     public Map<String, Binding> getBindings() {
-        return Collections.unmodifiableMap(bindings);
+        return Activatable.filter(this.bindings);
+    }
+
+    public Map<String, Binding> getAllBindings() {
+        return Activatable.unfiltered(this.bindings);
+    }
+
+    public void setActive(BindingKey bk, boolean active) {
+        if (this.bindings.containsKey(bk.getServletPath())) {
+            this.bindings.get(bk.getServletPath()).setActive(active);
+        }
     }
 }

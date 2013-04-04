@@ -30,6 +30,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.n52.sos.binding.BindingKey;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.ConnectionProviderException;
@@ -276,20 +277,18 @@ public abstract class SettingsManager {
      *
      * @throws ConnectionProviderException
      */
-    public abstract boolean isActive(ResponseFormatKeyType rfkt) throws
-            ConnectionProviderException;
+    public abstract boolean isActive(ResponseFormatKeyType rfkt) throws ConnectionProviderException;
 
     /**
      * Checks if the procedure description format is active.
      *
-     * @param pdf the pdf
+     * @param pdf the procedure description format
      *
      * @return if the format is active
      *
      * @throws ConnectionProviderException
      */
-    public abstract boolean isActive(String pdf) throws
-            ConnectionProviderException;
+    public abstract boolean isActive(String pdf) throws ConnectionProviderException;
 
     /**
      * Sets the status of an operation.
@@ -299,8 +298,7 @@ public abstract class SettingsManager {
      * <p/>
      * @throws ConnectionProviderException
      */
-    public abstract void setActive(RequestOperatorKeyType rokt, boolean active) throws
-            ConnectionProviderException;
+    public abstract void setActive(RequestOperatorKeyType rokt, boolean active) throws ConnectionProviderException;
 
     /**
      * Sets the status of a response format for the specified service and version.
@@ -321,4 +319,25 @@ public abstract class SettingsManager {
      * @throws ConnectionProviderException
      */
     public abstract void setActive(String pdf, boolean active) throws ConnectionProviderException;
+
+    /**
+     * Sets the status of a binding.
+     *
+     * @param bk     the binding
+     * @param active the status
+     *
+     * @throws ConnectionProviderException
+     */
+    public abstract void setActive(BindingKey bk, boolean active) throws ConnectionProviderException;
+
+    /**
+     * Checks if the binding is active.
+     *
+     * @param bk the binding
+     *
+     * @return if the binding is active
+     *
+     * @throws ConnectionProviderException
+     */
+    public abstract boolean isActive(BindingKey bk) throws ConnectionProviderException;
 }
