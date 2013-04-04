@@ -24,9 +24,8 @@
 
 package org.n52.sos.ds.hibernate.admin;
 
-import java.util.List;
-
 import org.hibernate.HibernateException;
+import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
@@ -49,11 +48,10 @@ public class HibernateDeleteDeletedObservationsDAO implements DeleteDeletedObser
         try {
             session = sessionHolder.getSession();
             transaction = session.beginTransaction();
-            @SuppressWarnings("unchecked")
-            List<Observation> list = (List<Observation>) session.createCriteria(Observation.class)
-                    .add(Restrictions.eq(HibernateConstants.DELETED, true)).list();
-            for (Observation o : list) {
-                session.delete(o);
+            ScrollableResults sr = session.createCriteria(Observation.class)
+                    .add(Restrictions.eq(HibernateConstants.DELETED, true)).scroll();
+            while (sr.next()) {
+                session.delete((Observation) sr.get(0));
             }
             session.flush();
             transaction.commit();
