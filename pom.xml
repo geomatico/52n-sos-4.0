@@ -23,7 +23,7 @@
 		<system>hudson</system>
 		<url>http://build.dev.52north.org:8080/job/52n-sos-dev/</url>
 	</ciManagement>
-    <modules>
+	<modules>
 		<module>52n-sos-api</module>
 		<module>52n-sos-config-sqlite</module>
 		<module>52n-sos-admin</module>
@@ -53,17 +53,18 @@
 	</licenses>
 	<properties>
 		<!-- sos name -->
-		<conf.sos.name>52n-sos-webapp-${project.version}</conf.sos.name>
+		<conf.sos.name>52n-sos-webapp-${sos.version}</conf.sos.name>
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<!-- Source encoding during build process ** !!! DO NOT CHANGE !!! ** -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<n52.common.xml.version>1.1.2</n52.common.xml.version>
+		
 		<!-- Logger configuration -->
 		<config.logger.fileappender.filepath>${catalina.base}/logs</config.logger.fileappender.filepath>
 		<config.logger.fileappender.filename>${conf.sos.name}</config.logger.fileappender.filename>
 		<config.logger.level>INFO</config.logger.level>
 		<config.logger.history.max>30</config.logger.history.max>
 		<config.logger.maxFileSize>10MB</config.logger.maxFileSize>
+
 		<postgresql.version>9.1-901.jdbc4</postgresql.version>
 		<postgis.version>2.0.1</postgis.version>
 		<logback.version>1.0.0</logback.version>
@@ -71,192 +72,202 @@
 		<hibernate.version>4.1.4.Final</hibernate.version>
 		<hibernate.spatial.version>4.0-M1</hibernate.spatial.version>
 		<sqlite.version>3.7.2</sqlite.version>
+
+		<!-- 52N dependency versions -->
+		<n52.common.xml.version>1.1.2</n52.common.xml.version>
+		<!--
+			managed dependencies with ${project.version} will be
+			wrong in submodules with different versions
+		-->
+		<sos.version>4.0.0-SNAPSHOT</sos.version>
+		<do.version>0.1.0-SNAPSHOT</do.version>
+		<rest-binding.version>0.1.0-SNAPSHOT</rest-binding.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-api</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-config-sqlite</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-admin</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-cache</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-coding-ows-v110</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-coding-sensorML-v101</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-coding-sos-v100</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-coding-sos-v20</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-core-v100</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-core-v20</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-core-gc-dao</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-hibernate-api</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-hibernate-common</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-hibernate-mappings</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-hibernate-dialect</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-hibernate-core</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-hibernate-feature</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-binding-kvp</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-binding-soap</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-binding-pox</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-enhanced-v20</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-hibernate-enhanced</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-transactional-v20</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-hibernate-transactional</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-resultHandling-v20</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-hibernate-resultHandling</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-profile</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-spring-common-controller</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-spring-common-views</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 				<type>war</type>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-spring-admin-controller</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-spring-admin-views</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 				<type>war</type>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-spring-installer-controller</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-spring-installer-views</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 				<type>war</type>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-spring-client-controller</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-spring-client-views</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 				<type>war</type>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-webapp</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 				<type>war</type>
 			</dependency>
 			<dependency>
@@ -291,7 +302,7 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-api</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 				<scope>test</scope>
 				<classifier>tests</classifier>
 			</dependency>
@@ -427,6 +438,16 @@
 			</dependency>
 			<dependency>
 				<groupId>org.n52.sensorweb</groupId>
+				<artifactId>52n-ogc-schema</artifactId>
+				<version>${n52.common.xml.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.n52.sensorweb</groupId>
+				<artifactId>52n-xml-swes-v20</artifactId>
+				<version>${n52.common.xml.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.n52.sensorweb</groupId>
 				<artifactId>52n-xml-sensorML-v101</artifactId>
 				<version>${n52.common.xml.version}</version>
 			</dependency>
@@ -480,22 +501,22 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-coding-wml-v20</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-gda</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-gda-operation</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-gda-hibernate</artifactId>
-				<version>${project.version}</version>
+				<version>${sos.version}</version>
 			</dependency>
 			<!-- required for common test classes -->
 			<dependency>
@@ -513,6 +534,36 @@
 						<artifactId>commons-logging</artifactId>
 					</exclusion>
 				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>52n-sos-ext-do-xml</artifactId>
+				<version>${do.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>52n-sos-ext-do-code</artifactId>
+				<version>${do.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>52n-sos-ext-do-code-hibernate</artifactId>
+				<version>${do.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>52n-sos-ext-do-code-kvp</artifactId>
+				<version>${do.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>52n-sos-binding-rest-code</artifactId>
+				<version>${rest-binding.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>52n-sos-binding-rest-xml-binding</artifactId>
+				<version>${rest-binding.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -590,10 +641,6 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<!-- check for correct source file headers during test phase: http://code.google.com/p/maven-license-plugin/wiki/HowTo -->
-				<!-- add profiles to command: e.g -PenhancedV20,transactionalV20,... -->
-				<!-- run "mvn license:check -Dyear=2012" to check -->
-				<!-- run "mvn license:format -Dyear=2012" to add to the files -->
 				<groupId>com.mycila.maven-license-plugin</groupId>
 				<artifactId>maven-license-plugin</artifactId>
 				<inherited>false</inherited>
@@ -625,11 +672,8 @@
 				</configuration>
 				<executions>
 					<execution>
-						<phase>test</phase>
-						<!-- test will fail if license headers are not correct, run license:format 
-							to add the headers. -->
+						<phase>prepare-sources</phase>
 						<goals>
-							<!-- <goal>check</goal> -->
 							<goal>format</goal>
 						</goals>
 					</execution>
@@ -638,7 +682,6 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>xmlbeans-maven-plugin</artifactId>
-				<version>2.3.3</version>
 				<executions>
 					<execution>
 						<id>main</id>
@@ -660,9 +703,19 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>xmlbeans-maven-plugin</artifactId>
+					<version>2.3.3</version>
+				</plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>2.5.1</version>
+					<configuration>
+						<compilerVersion>1.6</compilerVersion>
+						<source>1.6</source>
+						<target>1.6</target>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
@@ -849,47 +902,11 @@
 				<module>52n-sos-coding-wml-v20</module>
 				<module>52n-sos-gda</module>
 				<module>52n-sos-binding-rest</module>
-                <module>52n-sos-ext-do</module>
+				<module>52n-sos-ext-do</module>
 			</modules>
-            <properties>
+			<properties>
 				<config.logger.level>TRACE</config.logger.level>
-                <do.version>0.1.0-SNAPSHOT</do.version>
-                <rest-binding.version>0.1.0-SNAPSHOT</rest-binding.version>
-            </properties>
-            <dependencyManagement>
-                <dependencies>
-                    <dependency>
-                        <groupId>${project.groupId}</groupId>
-                        <artifactId>52n-sos-ext-do-xml</artifactId>
-                        <version>${do.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>${project.groupId}</groupId>
-                        <artifactId>52n-sos-ext-do-code</artifactId>
-                        <version>${do.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>${project.groupId}</groupId>
-                        <artifactId>52n-sos-ext-do-code-hibernate</artifactId>
-                        <version>${do.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>${project.groupId}</groupId>
-                        <artifactId>52n-sos-ext-do-code-kvp</artifactId>
-                        <version>${do.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>${project.groupId}</groupId>
-                        <artifactId>52n-sos-binding-rest-code</artifactId>
-                        <version>${rest-binding.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>${project.groupId}</groupId>
-                        <artifactId>52n-sos-binding-rest-xml-binding</artifactId>
-                        <version>${rest-binding.version}</version>
-                    </dependency>
-                </dependencies>
-            </dependencyManagement>
+			</properties>
 		</profile>
 		<profile>
 			<id>autermann</id>
@@ -924,43 +941,7 @@
 			</modules>
 			<properties>
 				<config.logger.level>TRACE</config.logger.level>
-				<do.version>0.1.0-SNAPSHOT</do.version>
-				<rest-binding.version>0.1.0-SNAPSHOT</rest-binding.version>
 			</properties>
-			<dependencyManagement>
-				<dependencies>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-ext-do-xml</artifactId>
-						<version>${do.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-ext-do-code</artifactId>
-						<version>${do.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-ext-do-code-kvp</artifactId>
-						<version>${do.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-ext-do-code-hibernate</artifactId>
-						<version>${do.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-binding-rest-code</artifactId>
-						<version>${rest-binding.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-binding-rest-xml-binding</artifactId>
-						<version>${rest-binding.version}</version>
-					</dependency>
-				</dependencies>
-			</dependencyManagement>
 		</profile>
 		<profile>
 			<id>sosV100</id>
@@ -1027,44 +1008,6 @@
 				<module>52n-sos-binding-rest</module>
 				<module>52n-sos-ext-do</module>
 			</modules>
-			<properties>
-				<do.version>0.1.0-SNAPSHOT</do.version>
-				<rest-binding.version>0.1.0-SNAPSHOT</rest-binding.version>
-			</properties>
-			<dependencyManagement>
-				<dependencies>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-ext-do-xml</artifactId>
-						<version>${do.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-ext-do-code</artifactId>
-						<version>${do.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-ext-do-code-hibernate</artifactId>
-						<version>${do.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-ext-do-code-kvp</artifactId>
-						<version>${do.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-binding-rest-code</artifactId>
-						<version>${rest-binding.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-binding-rest-xml-binding</artifactId>
-						<version>${rest-binding.version}</version>
-					</dependency>
-				</dependencies>
-			</dependencyManagement>
 		</profile>
 		<profile>
 			<id>release</id>
@@ -1117,36 +1060,9 @@
 		<profile>
 			<id>do</id>
 			<!-- Requires svn:externals definition for 52n-sos-ext-do -->
-			<properties>
-				<do.version>0.1.0-SNAPSHOT</do.version>
-			</properties>
 			<modules>
 				<module>52n-sos-ext-do</module>
 			</modules>
-			<dependencyManagement>
-				<dependencies>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-ext-do-xml</artifactId>
-						<version>${do.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-ext-do-code</artifactId>
-						<version>${do.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-ext-do-code-hibernate</artifactId>
-						<version>${do.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>52n-sos-ext-do-code-kvp</artifactId>
-						<version>${do.version}</version>
-					</dependency>
-				</dependencies>
-			</dependencyManagement>
 		</profile>
 	</profiles>
 </project>
