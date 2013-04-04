@@ -89,18 +89,12 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
 
     @Override
     public SwesExtension getExtension() throws OwsExceptionReport {
-    	if (hasImplementedDAO()) {
-    		return getDao().getExtension();
-    	}
-    	return null;
+        return getDao().getExtension();
     }
 
     @Override
     public OWSOperation getOperationMetadata(String service, String version) throws OwsExceptionReport {
-    	if (hasImplementedDAO()) {
-    		return getDao().getOperationsMetadata(service, version);
-    	}
-    	return null;
+        return getDao().getOperationsMetadata(service, version);
     }
 
     protected String getOperationName() {
@@ -108,8 +102,9 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
     }
 
     @Override
+    @Deprecated
     public boolean hasImplementedDAO() {
-        return getDao() != null;
+        return true;
     }
 
     @Override
