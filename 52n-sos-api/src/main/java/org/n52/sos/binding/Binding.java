@@ -77,7 +77,7 @@ public abstract class Binding implements ConformanceClass {
      *
      * @throws OwsExceptionReport
      */
-    public ServiceResponse doDeleteperation(HttpServletRequest request) throws OwsExceptionReport {
+    public ServiceResponse doDeleteOperation(HttpServletRequest request) throws OwsExceptionReport {
         return createNotImplementedContentLessServiceResponse();
     }
 

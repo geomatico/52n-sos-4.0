@@ -79,7 +79,7 @@ public class SosService extends ConfiguratedHttpServlet {
         boolean clientSupportsGzip = checkForClientGZipSupport(req);
         ServiceResponse sosResp;
         try {
-            sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doDeleteperation(req);
+            sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doDeleteOperation(req);
         } catch (OwsExceptionReport owse) {
             sosResp = handleOwsException(owse);
         }
