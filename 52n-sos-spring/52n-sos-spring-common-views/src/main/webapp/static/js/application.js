@@ -88,7 +88,7 @@ function showMessage(text, type, autoclose) {
     }
 }
 
-function showError(error) {
+function showError(error, autoclose) {
 	if (autoclose === undefined) {
 		autoclose = false; 
 	}
