@@ -88,9 +88,9 @@ function showMessage(text, type, autoclose) {
     }
 }
 
-function showError(error, autoclose) {
+function showError(error) {
 	if (autoclose === undefined) {
-		autoclose = true; 
+		autoclose = false; 
 	}
     showMessage("<strong>Error!</strong> " + error, "error", autoclose);
 }
