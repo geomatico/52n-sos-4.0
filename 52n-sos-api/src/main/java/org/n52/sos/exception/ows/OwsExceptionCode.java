@@ -34,7 +34,6 @@ public enum OwsExceptionCode implements ExceptionCode {
     InvalidUpdateSequence(OWSConstants.SOAP_REASON_INVALID_UPDATE_SEQUENCES),
     MissingParameterValue(OWSConstants.SOAP_REASON_MISSING_PARAMETER_VALUE),
     NoApplicableCode(OWSConstants.SOAP_REASON_NO_APPLICABLE_CODE),
-    NoDataAvailable(OWSConstants.SOAP_REASON_NO_DATA_AVAILABLE),
     OperationNotSupported(OWSConstants.SOAP_REASON_OPTION_NOT_SUPPORTED),
     OptionNotSupported(OWSConstants.SOAP_REASON_OPERATION_NOT_SUPPORTED),
     VersionNegotiationFailed(OWSConstants.SOAP_REASON_VERSION_NEGOTIATION_FAILED);
