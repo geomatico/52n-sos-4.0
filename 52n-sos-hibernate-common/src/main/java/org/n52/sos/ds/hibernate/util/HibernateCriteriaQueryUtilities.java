@@ -78,13 +78,13 @@ import org.n52.sos.ds.hibernate.entities.SpatialRefSys;
 import org.n52.sos.ds.hibernate.entities.SweType;
 import org.n52.sos.ds.hibernate.entities.TextValue;
 import org.n52.sos.ds.hibernate.entities.Unit;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.util.DateTimeHelper;
 import org.slf4j.Logger;
@@ -864,8 +864,8 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         String procedureAlias = addProcedureAliasToMap(aliases, obsConstsAlias);
         String foiAlias = addFeatureOfInterestAliasToMap(aliases, null);
         queryObject.setAliases(aliases);
-        queryObject.addCriterion(getEqualRestriction(getIdentifierParameter(foiAlias),
-                featureOfInterest.getIdentifier()));
+        queryObject.addCriterion(eq(getIdentifierParameter(foiAlias), featureOfInterest.getIdentifier()));
+        queryObject.addCriterion(eq(HibernateConstants.DELETED, false));
         queryObject.addProjection(getDistinctProjection(getIdentifierParameter(procedureAlias)));
         return (List<String>) getObjectList(queryObject, session, Observation.class);
     }
@@ -874,6 +874,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     public static List<String> getObservationIdentifiers(Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         queryObject.addCriterion(ne(getIdentifierParameter(null), "null"));
+        queryObject.addCriterion(eq(HibernateConstants.DELETED, false));
         queryObject.addProjection(getDistinctProjectionForIdentifier());
         return (List<String>) getObjectList(queryObject, session, Observation.class);
     }
