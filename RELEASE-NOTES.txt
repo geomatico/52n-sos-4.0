@@ -25,6 +25,7 @@ Changes since last release
 --- Fixed bugs ---
   
    * Insert an observation again without an error.
+   * [Bug 847] Useless error message when sending POX to SOAP endpoint
 
 
  
