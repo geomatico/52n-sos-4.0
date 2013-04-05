@@ -84,7 +84,14 @@ public class SoapBinding extends Binding {
             Decoder<?,XmlObject> decoder = getDecoder(CodingHelper.getDecoderKey(doc));
             // decode SOAP message
             Object abstractRequest = decoder.decode(doc);
-            if (abstractRequest instanceof SoapRequest) {
+            if (!(abstractRequest instanceof SoapRequest)) 
+            {
+            	throw new NoApplicableCodeException().withMessage("Request type '%s' not supported. Expected '%s'.", 
+            			abstractRequest!=null?abstractRequest.getClass().getName():abstractRequest,
+            					SoapRequest.class.getName());
+            } 
+            else 
+            {
                 SoapRequest soapRequest = (SoapRequest) abstractRequest;
                 if (soapRequest.getSoapAction() == null && soapAction != null) {
                     soapRequest.setAction(soapAction);
@@ -119,9 +126,7 @@ public class SoapBinding extends Binding {
                         throw new NoApplicableCodeException()
                                 .withMessage("The returned object is not an AbstractServiceRequest implementation");
                     }
-                } else {
-                    soapResponse.setSoapFault(soapRequest.getSoapFault());
-                }
+                } 
                 // Encode SOAP response
                 EncoderKey key = CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse);
                 Encoder<?, SoapResponse> encoder = getEncoder(key);
@@ -130,9 +135,6 @@ public class SoapBinding extends Binding {
                 } else {
                     throw new NoEncoderForKeyException(key);
                 }
-            } else {
-                // FIXME: valid exception
-                throw new NoApplicableCodeException();
             }
         } catch (Throwable t) {
             OwsExceptionReport owse;
