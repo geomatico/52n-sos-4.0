@@ -41,7 +41,6 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ConformanceClass;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
@@ -65,7 +64,7 @@ public abstract class Binding implements ConformanceClass {
      * @return SOS response
      */
     protected ServiceResponse createNotImplementedContentLessServiceResponse() {
-        return new ServiceResponse(null, HttpServletResponse.SC_NOT_IMPLEMENTED);
+        return new ServiceResponse(null, HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
     /**
