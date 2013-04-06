@@ -70,7 +70,7 @@ import org.w3c.dom.Node;
 
 public class Soap12Encoder extends AbstractSoapEncoder {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(Soap12Encoder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Soap12Encoder.class);
 
     public Soap12Encoder() {
         super(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE);

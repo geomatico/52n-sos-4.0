@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * @author Carsten Hollmann
  */
 public class Soap12Decoder extends AbstractSoapDecoder {
-    private static Logger LOGGER = LoggerFactory.getLogger(Soap12Decoder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Soap12Decoder.class);
 
     public Soap12Decoder() {
         super(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE);

@@ -59,7 +59,7 @@ import org.w3c.dom.Document;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public abstract class AbstractSoapDecoder implements Decoder<SoapRequest, XmlObject> {
-    private static Logger LOGGER = LoggerFactory.getLogger(Soap12Decoder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSoapDecoder.class);
     private final Set<DecoderKey> decoderKeys;
 
     public AbstractSoapDecoder(String namespace) {

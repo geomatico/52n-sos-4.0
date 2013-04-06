@@ -33,8 +33,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -43,8 +43,7 @@ import org.w3c.dom.NodeList;
 
 public class W3cHelper {
 
-    /** the logger, used to log exceptions and additonaly information */
-    private static Logger LOGGER = LoggerFactory.getLogger(W3cHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(W3cHelper.class);
 
     /**
      * Parses w3c.Node to String

@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 
 public class WsaDecoder implements Decoder<WsaHeader, List<SOAPHeaderElement>> {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(WsaDecoder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WsaDecoder.class);
 
     private static final Set<DecoderKey> DECODER_KEYS = Collections.<DecoderKey>singleton(
             new NamespaceDecoderKey(WsaConstants.NS_WSA, SOAPHeaderElement.class));

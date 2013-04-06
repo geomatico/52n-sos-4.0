@@ -44,14 +44,10 @@ import org.slf4j.LoggerFactory;
 
 public class WsaEncoder implements Encoder<Map<QName, String>, WsaHeader> {
 
-    /** the logger, used to log exceptions and additonaly information */
-    private static Logger LOGGER = LoggerFactory.getLogger(WsaEncoder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WsaEncoder.class);
 
     private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(WsaConstants.NS_WSA, WsaHeader.class);
     
-    /**
-     * constructor
-     */
     public WsaEncoder() {
         LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }

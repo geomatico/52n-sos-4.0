@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Soap11Encoder extends AbstractSoapEncoder {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(Soap11Encoder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Soap11Encoder.class);
 
     public Soap11Encoder() {
         super(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE);
