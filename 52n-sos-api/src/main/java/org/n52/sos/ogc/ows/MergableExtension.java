@@ -25,5 +25,5 @@ package org.n52.sos.ogc.ows;
 
 public interface MergableExtension<T extends MergableExtension<T>> extends CapabilitiesExtension {
     
-    public void merge(T t);
+    void merge(T t);
 }

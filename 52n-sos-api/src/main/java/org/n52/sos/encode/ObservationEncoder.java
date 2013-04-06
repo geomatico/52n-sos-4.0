@@ -29,22 +29,22 @@ import org.n52.sos.config.SettingsManager;
 
 public interface ObservationEncoder<S, T> extends Encoder<S, T> {
     
-    public boolean isObservationAndMeasurmentV20Type();
+    boolean isObservationAndMeasurmentV20Type();
     
-    public boolean shouldObservationsWithSameXBeMerged();
+    boolean shouldObservationsWithSameXBeMerged();
     
     /**
      * @deprecated see {@link SettingsManager#isActive(org.n52.sos.encode.ResponseFormatKeyType)} and
      * {@link SettingsManager#setActive(org.n52.sos.encode.ResponseFormatKeyType, boolean)}.
      */
     @Deprecated
-    public boolean isSupported();
+    boolean isSupported();
 
     /**
      * @deprecated see {@link #isSupported()}
      */
     @Deprecated
-    public void setSupported(boolean supported);
+    void setSupported(boolean supported);
     
     /**
      * Get the supported response formats for this {@linkplain ObservationEncoder} and the specified service and
@@ -55,6 +55,6 @@ public interface ObservationEncoder<S, T> extends Encoder<S, T> {
      *
      * @return the response formats
      */
-    public Set<String> getSupportedResponseFormats(String service, String version);
+    Set<String> getSupportedResponseFormats(String service, String version);
 
 }

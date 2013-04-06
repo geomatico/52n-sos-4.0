@@ -34,6 +34,6 @@ import org.n52.sos.response.InsertResultResponse;
 @Deprecated
 public interface IInsertResultDAO extends OperationDAO {
     
-    public InsertResultResponse insertResult(InsertResultRequest request) throws OwsExceptionReport;
+    InsertResultResponse insertResult(InsertResultRequest request) throws OwsExceptionReport;
 
 }

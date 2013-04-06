@@ -46,6 +46,6 @@ public interface IGetCapabilitiesDAO extends OperationDAO {
      *
      * @throws OwsExceptionReport     *             If an error occurs.
      */
-    public GetCapabilitiesResponse getCapabilities(GetCapabilitiesRequest request) throws OwsExceptionReport;
+    GetCapabilitiesResponse getCapabilities(GetCapabilitiesRequest request) throws OwsExceptionReport;
 
 }

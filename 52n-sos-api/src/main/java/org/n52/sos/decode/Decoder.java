@@ -43,7 +43,7 @@ public interface Decoder<T, S> extends ConformanceClass {
     /**
      * @return List encodings this implementation (identified by {@link DecoderKeyType}) is able to decode
      */
-    public Set<DecoderKey> getDecoderKeyTypes();
+    Set<DecoderKey> getDecoderKeyTypes();
 
     /**
      * Decode a object to another representation.
@@ -56,7 +56,7 @@ public interface Decoder<T, S> extends ConformanceClass {
      * @throws UnsupportedDecoderInputException if the supplied type (or any of it's contents) is not supported by this
      *                                          decoder
      */
-    public T decode(S objectToDecode) throws OwsExceptionReport, UnsupportedDecoderInputException;
+    T decode(S objectToDecode) throws OwsExceptionReport, UnsupportedDecoderInputException;
 
     /**
      * Get the {@linkplain SupportedTypeKey} in the case of having only generic
@@ -67,5 +67,5 @@ public interface Decoder<T, S> extends ConformanceClass {
      *
      * @return the supported key types
      */
-    public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
+    Map<SupportedTypeKey, Set<String>> getSupportedTypes();
 }

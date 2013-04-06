@@ -36,12 +36,12 @@ public interface Ordered<T extends Ordered<T>> extends Comparable<Ordered<?>> {
     /**
      * @return the order of this clas represented as a <code>float</code>
      */
-    public float getOrder();
+    float getOrder();
 
     /**
      * @param order the order
      * <p/>
      * @return <code>this</code>
      */
-    public T setOrder(float order);
+    T setOrder(float order);
 }

@@ -36,6 +36,6 @@ public interface IDescribeObservationTypeDAO extends OperationDAO {
     /**
      * @return Returns the DescirbeObservationType response
      */
-    public ServiceResponse getObservationTypeDescription();
+    ServiceResponse getObservationTypeDescription();
 
 }

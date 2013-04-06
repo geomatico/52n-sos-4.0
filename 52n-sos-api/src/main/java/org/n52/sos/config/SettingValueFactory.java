@@ -49,7 +49,7 @@ public interface SettingValueFactory {
      * <p/>
      * @return the implementation specific {@code SettingValue}
      */
-    public SettingValue<Boolean> newBooleanSettingValue(BooleanSettingDefinition setting, String stringValue);
+    SettingValue<Boolean> newBooleanSettingValue(BooleanSettingDefinition setting, String stringValue);
 
     /**
      * Constructs a new {@code Integer} setting value from the supplied definition and string value.
@@ -59,7 +59,7 @@ public interface SettingValueFactory {
      * <p/>
      * @return the implementation specific {@code SettingValue}
      */
-    public SettingValue<Integer> newIntegerSettingValue(IntegerSettingDefinition setting, String stringValue);
+    SettingValue<Integer> newIntegerSettingValue(IntegerSettingDefinition setting, String stringValue);
 
     /**
      * Constructs a new {@code String} setting value from the supplied definition and string value.
@@ -69,7 +69,7 @@ public interface SettingValueFactory {
      * <p/>
      * @return the implementation specific {@code SettingValue}
      */
-    public SettingValue<String> newStringSettingValue(StringSettingDefinition setting, String stringValue);
+    SettingValue<String> newStringSettingValue(StringSettingDefinition setting, String stringValue);
 
     /**
      * Constructs a new {@code File} setting value from the supplied definition and string value.
@@ -79,7 +79,7 @@ public interface SettingValueFactory {
      * <p/>
      * @return the implementation specific {@code SettingValue}
      */
-    public SettingValue<File> newFileSettingValue(FileSettingDefinition setting, String stringValue);
+    SettingValue<File> newFileSettingValue(FileSettingDefinition setting, String stringValue);
 
     /**
      * Constructs a new {@code URI} setting value from the supplied definition and string value.
@@ -89,7 +89,7 @@ public interface SettingValueFactory {
      * <p/>
      * @return the implementation specific {@code SettingValue}
      */
-    public SettingValue<URI> newUriSettingValue(UriSettingDefinition setting, String stringValue);
+    SettingValue<URI> newUriSettingValue(UriSettingDefinition setting, String stringValue);
 
     /**
      * Constructs a new {@code Double} setting value from the supplied definition and string value.
@@ -99,7 +99,7 @@ public interface SettingValueFactory {
      * <p/>
      * @return the implementation specific {@code SettingValue}
      */
-    public SettingValue<Double> newNumericSettingValue(NumericSettingDefinition setting, String stringValue);
+    SettingValue<Double> newNumericSettingValue(NumericSettingDefinition setting, String stringValue);
 
     /**
      * Constructs a new generic setting value from the supplied definition and string value.
@@ -109,5 +109,5 @@ public interface SettingValueFactory {
      * <p/>
      * @return the implementation specific {@code SettingValue}
      */
-    public SettingValue<?> newSettingValue(SettingDefinition<?, ?> setting, String stringValue);
+    SettingValue<?> newSettingValue(SettingDefinition<?, ?> setting, String stringValue);
 }

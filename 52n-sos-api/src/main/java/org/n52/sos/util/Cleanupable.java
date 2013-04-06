@@ -27,5 +27,5 @@ package org.n52.sos.util;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public interface Cleanupable {
-    public void cleanup();
+    void cleanup();
 }

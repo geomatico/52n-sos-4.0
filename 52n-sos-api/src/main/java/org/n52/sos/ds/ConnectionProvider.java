@@ -32,9 +32,8 @@ import org.n52.sos.util.Cleanupable;
  * Interface for a connection provider that handles the connection to the
  * underlying data source (e.g. database, web service). Implementation can
  * contain a ConnectionPool.
- * 
  */
-public interface ConnectionProvider extends Cleanupable{
+public interface ConnectionProvider extends Cleanupable {
 
     /**
      * Get a data source connection
@@ -42,7 +41,7 @@ public interface ConnectionProvider extends Cleanupable{
      * @return Connection to the data source
      * @throws ConnectionProviderException  
      */
-    public Object getConnection() throws ConnectionProviderException;
+    Object getConnection() throws ConnectionProviderException;
 
     /**
      * Return the connection to the provider
@@ -50,7 +49,7 @@ public interface ConnectionProvider extends Cleanupable{
      * @param connection
      *            Connection
      */
-    public void returnConnection(Object connection);
+    void returnConnection(Object connection);
 
 	/**
 	 * Initializes the connection provider.
@@ -59,6 +58,6 @@ public interface ConnectionProvider extends Cleanupable{
 	 * 
 	 * @throws ConfigurationException if the initialization failed 
 	 */
-	public void initialize(Properties properties) throws ConfigurationException;
+	void initialize(Properties properties) throws ConfigurationException;
 
 }

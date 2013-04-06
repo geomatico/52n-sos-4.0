@@ -43,5 +43,5 @@ public interface SettingDefinitionProvider {
     /**
      * @return the declared setting definitons of this provider
      */
-    public Set<SettingDefinition<?, ?>> getSettingDefinitions();
+    Set<SettingDefinition<?, ?>> getSettingDefinitions();
 }

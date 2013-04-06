@@ -36,29 +36,29 @@ public interface SettingValue<T> {
     /**
      * @return the key of this setting
      */
-    public String getKey();
+    String getKey();
 
     /**
      * @return the value
      */
-    public T getValue();
+    T getValue();
 
     /**
      * @param key the key of this setting
      * <p/>
      * @return <code>this</code>
      */
-    public SettingValue<T> setKey(String key);
+    SettingValue<T> setKey(String key);
 
     /**
      * @param value the value of this setting
      * <p/>
      * @return <code>this</code>
      */
-    public SettingValue<T> setValue(T value);
+    SettingValue<T> setValue(T value);
 
     /**
      * @return the {@code SettingType} of this value
      */
-    public SettingType getType();
+    SettingType getType();
 }

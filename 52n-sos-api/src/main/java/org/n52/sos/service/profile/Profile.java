@@ -28,41 +28,41 @@ import java.util.Set;
 
 public interface Profile {
 
-    public String getIdentifier();
+    String getIdentifier();
 
     boolean isActiveProfile();
 
-    public String getObservationResponseFormat();
+    String getObservationResponseFormat();
 
-    public boolean isEncodeFeatureOfInterestInObservations();
+    boolean isEncodeFeatureOfInterestInObservations();
 
-    public String getEncodingNamespaceForFeatureOfInterest();
+    String getEncodingNamespaceForFeatureOfInterest();
 
-    public boolean isShowMetadataOfEmptyObservations();
+    boolean isShowMetadataOfEmptyObservations();
 
-    public boolean isAllowSubsettingForSOS20OM20();
+    boolean isAllowSubsettingForSOS20OM20();
 
-    public boolean isMergeValues();
+    boolean isMergeValues();
 
-    public boolean isSetEncodeFeatureOfInterestNamespace();
+    boolean isSetEncodeFeatureOfInterestNamespace();
 
-    public boolean isEncodeProcedureInObservation(String namespace);
+    boolean isEncodeProcedureInObservation(String namespace);
 
-    public boolean isReturnLatestValueIfTemporalFilterIsMissingInGetObservation();
+    boolean isReturnLatestValueIfTemporalFilterIsMissingInGetObservation();
 
-    public Map<String, String> getDefaultObservationTypesForEncoding();
+    Map<String, String> getDefaultObservationTypesForEncoding();
     
-    public boolean isListFeatureOfInterestsInOfferings();
+    boolean isListFeatureOfInterestsInOfferings();
 
-    public boolean isEncodeChildProcedureDescriptions();
+    boolean isEncodeChildProcedureDescriptions();
 
-    public boolean isShowFullOperationsMetadata();
+    boolean isShowFullOperationsMetadata();
 
-    public boolean isShowFullOperationsMetadataForObservations();
+    boolean isShowFullOperationsMetadataForObservations();
     
-    public String getResponseNoDataPlaceholder();
+    String getResponseNoDataPlaceholder();
 
-    public Set<String> getNoDataPlaceholder();
+    Set<String> getNoDataPlaceholder();
     
-    public boolean isSetNoDataPlaceholder();
+    boolean isSetNoDataPlaceholder();
 }

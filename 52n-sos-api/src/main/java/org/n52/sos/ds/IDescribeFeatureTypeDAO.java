@@ -42,5 +42,5 @@ public interface IDescribeFeatureTypeDAO extends OperationDAO {
      *
      * @throws OwsExceptionReport     *             If an error occurs
      */
-    public XmlObject getFeatureOfInterestDescription(AbstractServiceRequest request) throws OwsExceptionReport;
+    XmlObject getFeatureOfInterestDescription(AbstractServiceRequest request) throws OwsExceptionReport;
 }

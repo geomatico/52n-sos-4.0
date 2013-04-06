@@ -28,15 +28,18 @@ import java.io.Serializable;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.om.values.IValue;
 
+/*
+ * FIXME rename (remove the leading I)
+ */
 public interface IObservationValue<T extends IValue<?>> extends Serializable {
     
     /** phenomenon or sampling time of the observation */
-    public ITime getPhenomenonTime();
+    ITime getPhenomenonTime();
     
-    public void setPhenomenonTime(ITime phenomenonTime);
+    void setPhenomenonTime(ITime phenomenonTime);
 
-    public T getValue();
+    T getValue();
 
-    public void setValue(T value);
+    void setValue(T value);
 
 }

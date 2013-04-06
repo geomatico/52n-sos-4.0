@@ -28,8 +28,7 @@ import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.ServiceResponse;
 
 /**
- * interface for the request listeners
- * 
+ * Interface for the request listeners.
  */
 public interface ServiceOperator {
 
@@ -46,8 +45,8 @@ public interface ServiceOperator {
      *
      * @throws OwsExceptionReport
      */
-    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
+    ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
 
-    public ServiceOperatorKeyType getServiceOperatorKeyType();
+    ServiceOperatorKeyType getServiceOperatorKeyType();
 
 }

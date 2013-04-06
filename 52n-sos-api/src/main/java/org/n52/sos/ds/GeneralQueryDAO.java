@@ -108,5 +108,5 @@ public interface GeneralQueryDAO {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public QueryResult query(String query) throws SQLException, FileNotFoundException, IOException;
+    QueryResult query(String query) throws SQLException, FileNotFoundException, IOException;
 }

@@ -33,6 +33,6 @@ import org.n52.sos.response.GetResultTemplateResponse;
 @Deprecated
 public interface IGetResultTemplateDAO extends OperationDAO {
     
-    public GetResultTemplateResponse getResultTemplate(GetResultTemplateRequest request) throws OwsExceptionReport;
+    GetResultTemplateResponse getResultTemplate(GetResultTemplateRequest request) throws OwsExceptionReport;
 
 }

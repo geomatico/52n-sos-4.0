@@ -46,7 +46,6 @@ public interface IGetFeatureOfInterestDAO extends OperationDAO {
      *
      * @throws OwsExceptionReport     *             If an error occurs.
      */
-    public GetFeatureOfInterestResponse getFeatureOfInterest(GetFeatureOfInterestRequest request)
-            throws OwsExceptionReport;
+    GetFeatureOfInterestResponse getFeatureOfInterest(GetFeatureOfInterestRequest request) throws OwsExceptionReport;
 
 }

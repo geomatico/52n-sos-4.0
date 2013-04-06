@@ -43,5 +43,5 @@ public interface IRegisterSensorDAO extends OperationDAO {
      *
      * @throws OwsExceptionReport     *             If an error occurs.
      */
-    public String insertSensor(AbstractServiceRequest request) throws OwsExceptionReport;
+    String insertSensor(AbstractServiceRequest request) throws OwsExceptionReport;
 }

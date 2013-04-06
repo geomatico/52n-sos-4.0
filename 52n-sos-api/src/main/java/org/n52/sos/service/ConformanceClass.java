@@ -27,6 +27,6 @@ import java.util.Set;
 
 public interface ConformanceClass {
     
-    public Set<String> getConformanceClasses();
+    Set<String> getConformanceClasses();
 
 }

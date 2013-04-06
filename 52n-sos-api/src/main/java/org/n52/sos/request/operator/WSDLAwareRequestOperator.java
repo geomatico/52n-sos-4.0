@@ -32,7 +32,7 @@ import org.n52.sos.wsdl.WSDLOperation;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public interface WSDLAwareRequestOperator extends RequestOperator {
-    public WSDLOperation getSosOperationDefinition();
-    public Map<String, String> getAdditionalSchemaImports();
-    public Map<String, String> getAdditionalPrefixes();
+    WSDLOperation getSosOperationDefinition();
+    Map<String, String> getAdditionalSchemaImports();
+    Map<String, String> getAdditionalPrefixes();
 }

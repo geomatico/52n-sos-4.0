@@ -48,6 +48,6 @@ public interface IGetResultDAO extends OperationDAO {
      *
      * @throws OwsExceptionReport     *             If an error occurs.
      */
-    public GetResultResponse getResult(GetResultRequest request) throws OwsExceptionReport;
+    GetResultResponse getResult(GetResultRequest request) throws OwsExceptionReport;
 
 }

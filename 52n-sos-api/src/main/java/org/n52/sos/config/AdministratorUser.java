@@ -36,14 +36,14 @@ public interface AdministratorUser {
      * <p/>
      * @return the value of password
      */
-    public String getPassword();
+    String getPassword();
 
     /**
      * Get the value of username
      * <p/>
      * @return the value of username
      */
-    public String getUsername();
+    String getUsername();
 
     /**
      * Set the value of password
@@ -52,7 +52,7 @@ public interface AdministratorUser {
      * <p/>
      * @return this
      */
-    public AdministratorUser setPassword(String password);
+    AdministratorUser setPassword(String password);
 
     /**
      * Set the value of username
@@ -61,5 +61,5 @@ public interface AdministratorUser {
      * <p/>
      * @return this
      */
-    public AdministratorUser setUsername(String username);
+    AdministratorUser setUsername(String username);
 }

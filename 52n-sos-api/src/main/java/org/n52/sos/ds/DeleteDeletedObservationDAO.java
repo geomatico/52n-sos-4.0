@@ -31,6 +31,6 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
  */
 public interface DeleteDeletedObservationDAO {
 
-    public void deleteDeletedObservations() throws OwsExceptionReport;
+    void deleteDeletedObservations() throws OwsExceptionReport;
 
 }

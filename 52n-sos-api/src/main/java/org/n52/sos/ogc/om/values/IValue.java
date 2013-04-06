@@ -25,18 +25,18 @@ package org.n52.sos.ogc.om.values;
 
 import java.io.Serializable;
 
-public interface IValue<T> extends Serializable{
+public interface IValue<T> extends Serializable {
     
-    public void setValue(T value);
+    void setValue(T value);
     
-    public T getValue();
+    T getValue();
     
-    public void setUnit(String unit);
+    void setUnit(String unit);
     
-    public String getUnit();
+    String getUnit();
     
-    public boolean isSetValue();
+    boolean isSetValue();
     
-    public boolean isSetUnit();
+    boolean isSetUnit();
 
 }

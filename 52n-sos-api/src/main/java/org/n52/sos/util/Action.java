@@ -31,5 +31,5 @@ package org.n52.sos.util;
  * @see <a href="http://www.sfgate.com/politics/article/THE-CALIFORNIA-TRANSITION-Incoming-governor-s-2581330.php">[...]Incoming governor's mantra: 'Action'[...]</a>
  */
 public interface Action {
-    public void execute();
+    void execute();
 }

@@ -44,6 +44,6 @@ public interface IDescribeSensorDAO extends OperationDAO {
      *
      * @throws OwsExceptionReport     *             If an error occurs
      */
-    public DescribeSensorResponse getSensorDescription(DescribeSensorRequest request) throws OwsExceptionReport;
+    DescribeSensorResponse getSensorDescription(DescribeSensorRequest request) throws OwsExceptionReport;
 
 }

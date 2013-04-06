@@ -48,6 +48,6 @@ public interface IGetObservationDAO extends OperationDAO {
      * 
      * @throws OwsExceptionReport     *             if query of the database or creating the O&M document failed
      */
-    public GetObservationResponse getObservation(GetObservationRequest request) throws OwsExceptionReport;
+    GetObservationResponse getObservation(GetObservationRequest request) throws OwsExceptionReport;
 
 }

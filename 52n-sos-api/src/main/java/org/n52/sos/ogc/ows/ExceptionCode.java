@@ -27,6 +27,5 @@ package org.n52.sos.ogc.ows;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public interface ExceptionCode {
-
-    public String getSoapFaultReason();
+    String getSoapFaultReason();
 }

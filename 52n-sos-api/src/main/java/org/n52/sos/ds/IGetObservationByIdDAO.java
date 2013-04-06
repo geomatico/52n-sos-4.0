@@ -48,5 +48,5 @@ public interface IGetObservationByIdDAO extends OperationDAO {
      *
      * @throws OwsExceptionReport     *             if getting observation(s) from data source failed
      */
-    public GetObservationByIdResponse getObservationById(GetObservationByIdRequest request) throws OwsExceptionReport;
+    GetObservationByIdResponse getObservationById(GetObservationByIdRequest request) throws OwsExceptionReport;
 }

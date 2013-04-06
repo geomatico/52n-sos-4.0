@@ -30,8 +30,8 @@ import org.n52.sos.service.admin.request.AdminRequest;
 
 public interface AdminRequestOperator {
     
-    public ServiceResponse receiveRequest(AdminRequest request) throws AdministratorException, OwsExceptionReport;
+    ServiceResponse receiveRequest(AdminRequest request) throws AdministratorException, OwsExceptionReport;
 
-    public String getKey();
+    String getKey();
     
 }

@@ -29,44 +29,44 @@ package org.n52.sos.web.install;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public interface ErrorMessages {
-    static final String POST_GIS_IS_NOT_INSTALLED_IN_THE_DATABASE = "PostGIS is not installed in the database.";
-    static final String COULD_NOT_INSERT_TEST_DATA = "Could not insert test data: %s";
-    static final String NO_DRIVER_SPECIFIED = "no driver specified";
-    static final String NO_SCHEMA_SPECIFIED = "No schema specified";
-    static final String NO_JDBC_URL_SPECIFIED = "No JDBC URL specified.";
-    static final String COULD_NOT_WRITE_DATASOURCE_CONFIG = "Could not write datasource config: %s";
-    static final String PASSWORD_IS_INVALID = "Password is invalid.";
-    static final String COULD_NOT_READ_SPATIAL_REF_SYS_TABLE = "Could not read 'spatial_ref_sys' table of PostGIS. "
+    String POST_GIS_IS_NOT_INSTALLED_IN_THE_DATABASE = "PostGIS is not installed in the database.";
+    String COULD_NOT_INSERT_TEST_DATA = "Could not insert test data: %s";
+    String NO_DRIVER_SPECIFIED = "no driver specified";
+    String NO_SCHEMA_SPECIFIED = "No schema specified";
+    String NO_JDBC_URL_SPECIFIED = "No JDBC URL specified.";
+    String COULD_NOT_WRITE_DATASOURCE_CONFIG = "Could not write datasource config: %s";
+    String PASSWORD_IS_INVALID = "Password is invalid.";
+    String COULD_NOT_READ_SPATIAL_REF_SYS_TABLE = "Could not read 'spatial_ref_sys' table of PostGIS. "
                                                                + "Please revise your database configuration.";
-    static final String COULD_NOT_LOAD_DIALECT = "Could not load dialect: %s";
-    static final String COULD_NOT_LOAD_CONNECTION_POOL = "Could not load connection pool: %s";
-    static final String COULD_NOT_VALIDATE_PARAMETER = "Could not validate '%s' parameter: %s";
-    static final String COULD_NOT_INSTANTIATE_CONFIGURATOR = "Could not instantiate Configurator: %s";
-    static final String INVALID_JDBC_URL_WITH_ERROR_MESSAGE = "Invalid JDBC URL: %s";
-    static final String CAN_NOT_CREATE_STATEMENT = "Cannot create Statement: %s";
-    static final String COULD_NOT_CONNECT_TO_THE_DATABASE = "Could not connect to the database: %s";
-    static final String COULD_NOT_SAVE_ADMIN_CREDENTIALS = "Could not save admin credentials into the database: %s";
-    static final String INVALID_JDBC_URL = "Invalid JDBC URL.";
-    static final String USERNAME_IS_INVALID = "Username is invalid.";
-    static final String COULD_NOT_LOAD_DRIVER = "Could not load Driver: %s";
-    static final String NO_DIALECT_SPECIFIED = "no dialect specified";
-    static final String TABLES_ALREADY_CREATED_BUT_SHOULD_NOT_OVERWRITE =
+    String COULD_NOT_LOAD_DIALECT = "Could not load dialect: %s";
+    String COULD_NOT_LOAD_CONNECTION_POOL = "Could not load connection pool: %s";
+    String COULD_NOT_VALIDATE_PARAMETER = "Could not validate '%s' parameter: %s";
+    String COULD_NOT_INSTANTIATE_CONFIGURATOR = "Could not instantiate Configurator: %s";
+    String INVALID_JDBC_URL_WITH_ERROR_MESSAGE = "Invalid JDBC URL: %s";
+    String CAN_NOT_CREATE_STATEMENT = "Cannot create Statement: %s";
+    String COULD_NOT_CONNECT_TO_THE_DATABASE = "Could not connect to the database: %s";
+    String COULD_NOT_SAVE_ADMIN_CREDENTIALS = "Could not save admin credentials into the database: %s";
+    String INVALID_JDBC_URL = "Invalid JDBC URL.";
+    String USERNAME_IS_INVALID = "Username is invalid.";
+    String COULD_NOT_LOAD_DRIVER = "Could not load Driver: %s";
+    String NO_DIALECT_SPECIFIED = "no dialect specified";
+    String TABLES_ALREADY_CREATED_BUT_SHOULD_NOT_OVERWRITE =
                         "Tables already created, but should not overwrite. "
                         + "Please take a look at the 'Actions' section.";
-    static final String COULD_NOT_INSERT_SETTINGS = "Could not insert settings into the database: %s";
-    static final String NO_CONNECTION_POOL_SPECIFIED = "no connection pool specified";
-    static final String COULD_NOT_CREATE_SOS_TABLES = "Could not create SOS tables: %s";
-    static final String COULD_NOT_DROP_SOS_TABLES = "Could not drop SOS tables: %s";
-    static final String COULD_NOT_FIND_FILE = "Could not find file '%s'!";
-    static final String COULD_NOT_CONNECT_TO_DATABASE_SERVER = "Could not connect to DB server: %s";
-    static final String COULD_NOT_CREATE_TABLES = "Could not create tables: %s";
-    static final String NO_TABLES_AND_SHOULD_NOT_CREATE = "No tables are present in the database "
+    String COULD_NOT_INSERT_SETTINGS = "Could not insert settings into the database: %s";
+    String NO_CONNECTION_POOL_SPECIFIED = "no connection pool specified";
+    String COULD_NOT_CREATE_SOS_TABLES = "Could not create SOS tables: %s";
+    String COULD_NOT_DROP_SOS_TABLES = "Could not drop SOS tables: %s";
+    String COULD_NOT_FIND_FILE = "Could not find file '%s'!";
+    String COULD_NOT_CONNECT_TO_DATABASE_SERVER = "Could not connect to DB server: %s";
+    String COULD_NOT_CREATE_TABLES = "Could not create tables: %s";
+    String NO_TABLES_AND_SHOULD_NOT_CREATE = "No tables are present in the database "
                                                           + "and no tables should be created.";
-    static final String COULD_NOT_INSTANTIATE_SETTINGS_MANAGER = "Could not instantiate Settings Manager: %s";
-    static final String NO_DEFINITON_FOUND = "No definiton found for setting with key '%s'";
-    static final String COULD_NOT_DELETE_PREVIOUS_SETTINGS = "Could not delete previous settings: %s";
-    static final String COULD_NOT_SET_CATALOG = "Could not set catalog search path";
-    static final String COULD_NOT_CHECK_IF_TABLE_EXISTS = "Could not check if table '%s' exists: %s";
-    static final String COULD_NOT_CHECK_IF_SCHEMA_EXISTS = "Could not check if schema '%s' exists: %s";
-    static final String SCHEMA_DOES_NOT_EXIST = "Schema %s does not exist";
+    String COULD_NOT_INSTANTIATE_SETTINGS_MANAGER = "Could not instantiate Settings Manager: %s";
+    String NO_DEFINITON_FOUND = "No definiton found for setting with key '%s'";
+    String COULD_NOT_DELETE_PREVIOUS_SETTINGS = "Could not delete previous settings: %s";
+    String COULD_NOT_SET_CATALOG = "Could not set catalog search path";
+    String COULD_NOT_CHECK_IF_TABLE_EXISTS = "Could not check if table '%s' exists: %s";
+    String COULD_NOT_CHECK_IF_SCHEMA_EXISTS = "Could not check if schema '%s' exists: %s";
+    String SCHEMA_DOES_NOT_EXIST = "Schema %s does not exist";
 }

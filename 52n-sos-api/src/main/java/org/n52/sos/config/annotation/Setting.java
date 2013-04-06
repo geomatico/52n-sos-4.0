@@ -69,5 +69,5 @@ public @interface Setting {
      * <p/>
      * @return the key
      */
-    public String value();
+    String value();
 }

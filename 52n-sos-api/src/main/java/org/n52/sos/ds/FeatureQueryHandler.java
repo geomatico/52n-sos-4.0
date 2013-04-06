@@ -55,7 +55,7 @@ public interface FeatureQueryHandler {
      *
      * @throws OwsExceptionReport
      */
-    public SosAbstractFeature getFeatureByID(String featureID, Object connection, String version, int responseSrid)
+    SosAbstractFeature getFeatureByID(String featureID, Object connection, String version, int responseSrid)
             throws OwsExceptionReport;
 
     /**
@@ -90,7 +90,7 @@ public interface FeatureQueryHandler {
      *
      * @throws OwsExceptionReport
      */
-    public Map<String, SosAbstractFeature> getFeatures(Collection<String> foiIDs, List<SpatialFilter> list,
+    Map<String, SosAbstractFeature> getFeatures(Collection<String> foiIDs, List<SpatialFilter> list,
                                                        Object connection, String version, int responseSrid) throws
             OwsExceptionReport;
 
@@ -106,10 +106,10 @@ public interface FeatureQueryHandler {
      *
      * @throws OwsExceptionReport
      */
-    public SosEnvelope getEnvelopeForFeatureIDs(Collection<String> featureIDs, Object connection) throws
+    SosEnvelope getEnvelopeForFeatureIDs(Collection<String> featureIDs, Object connection) throws
             OwsExceptionReport;
     
-    public String insertFeature(SosSamplingFeature samplingFeature, Object connection) throws OwsExceptionReport;
+    String insertFeature(SosSamplingFeature samplingFeature, Object connection) throws OwsExceptionReport;
 
-    public int getDefaultEPSG();
+    int getDefaultEPSG();
 }

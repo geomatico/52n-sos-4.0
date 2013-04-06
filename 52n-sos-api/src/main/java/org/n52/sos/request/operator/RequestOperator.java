@@ -35,14 +35,14 @@ import org.n52.sos.service.ConformanceClass;
  * TODO add javadoc for each method
  */
 public interface RequestOperator extends ConformanceClass {
-    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
+    ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
 
     @Deprecated
-    public boolean hasImplementedDAO();
+    boolean hasImplementedDAO();
 
-    public RequestOperatorKeyType getRequestOperatorKeyType();
+    RequestOperatorKeyType getRequestOperatorKeyType();
 
-    public OWSOperation getOperationMetadata(String service, String version) throws OwsExceptionReport;
+    OWSOperation getOperationMetadata(String service, String version) throws OwsExceptionReport;
 
-    public SwesExtension getExtension() throws OwsExceptionReport;
+    SwesExtension getExtension() throws OwsExceptionReport;
 }

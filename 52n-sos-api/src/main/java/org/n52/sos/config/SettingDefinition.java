@@ -55,52 +55,52 @@ public interface SettingDefinition<S extends SettingDefinition<S, T>, T> extends
     /**
      * @return the unique key of this definition
      */
-    public String getKey();
+    String getKey();
 
     /**
      * @return the title of this definition
      */
-    public String getTitle();
+    String getTitle();
 
     /**
      * @return the description of this definition
      */
-    public String getDescription();
+    String getDescription();
 
     /**
      * @return wether this setting is optional or required.
      */
-    public boolean isOptional();
+    boolean isOptional();
 
     /**
      * @return the default value (or null if there is none)
      */
-    public T getDefaultValue();
+    T getDefaultValue();
 
     /**
      * @return the group of this definition
      */
-    public SettingDefinitionGroup getGroup();
+    SettingDefinitionGroup getGroup();
 
     /**
      * @return if this definition has a non empty title
      */
-    public boolean hasTitle();
+    boolean hasTitle();
 
     /**
      * @return if this definition has a non empty description
      */
-    public boolean hasDescription();
+    boolean hasDescription();
 
     /**
      * @return if this definition has a default value
      */
-    public boolean hasDefaultValue();
+    boolean hasDefaultValue();
 
     /**
      * @return if this definition has a group
      */
-    public boolean hasGroup();
+    boolean hasGroup();
 
     /**
      * Sets the unique identifier of this setting definition, which can be referenced by configurable classes.
@@ -109,7 +109,7 @@ public interface SettingDefinition<S extends SettingDefinition<S, T>, T> extends
      *
      * @return this (for method chaining)
      */
-    public S setKey(String key);
+    S setKey(String key);
 
     /**
      * Sets the title of this setting definition, which will be presented to the user.
@@ -118,7 +118,7 @@ public interface SettingDefinition<S extends SettingDefinition<S, T>, T> extends
      *
      * @return this (for method chaining)
      */
-    public S setTitle(String title);
+    S setTitle(String title);
 
     /**
      * Sets the description of this setting definition, which should further describe the purpose of this setting. Can
@@ -128,7 +128,7 @@ public interface SettingDefinition<S extends SettingDefinition<S, T>, T> extends
      *
      * @return this (for method chaining)
      */
-    public S setDescription(String description);
+    S setDescription(String description);
 
     /**
      * Sets whether this setting is optional or can be null. By default all settings are required.
@@ -137,7 +137,7 @@ public interface SettingDefinition<S extends SettingDefinition<S, T>, T> extends
      *
      * @return this (for method chaining)
      */
-    public S setOptional(boolean optional);
+    S setOptional(boolean optional);
 
     /**
      * Sets the default value of this setting. All required settings should have a default setting to allow a smoother
@@ -147,7 +147,7 @@ public interface SettingDefinition<S extends SettingDefinition<S, T>, T> extends
      *
      * @return this (for method chaining)
      */
-    public S setDefaultValue(T defaultValue);
+    S setDefaultValue(T defaultValue);
 
     /**
      * Sets the group of this definition. If no group is set, the setting will be moved to a default group.
@@ -156,10 +156,10 @@ public interface SettingDefinition<S extends SettingDefinition<S, T>, T> extends
      *
      * @return this (for method chaining)
      */
-    public S setGroup(SettingDefinitionGroup group);
+    S setGroup(SettingDefinitionGroup group);
 
     /**
      * @return the type of the value of this definition
      */
-    public SettingType getType();
+    SettingType getType();
 }

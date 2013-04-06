@@ -45,6 +45,6 @@ public interface IGetFeatureOfInterestTimeDAO extends OperationDAO {
      *
      * @throws OwsExceptionReport     *             If an error occurs.
      */
-    public TimePeriod getFeatureOfInterestTime(AbstractServiceRequest request) throws OwsExceptionReport;
+    TimePeriod getFeatureOfInterestTime(AbstractServiceRequest request) throws OwsExceptionReport;
 
 }

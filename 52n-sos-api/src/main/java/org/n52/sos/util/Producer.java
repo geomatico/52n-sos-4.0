@@ -32,5 +32,5 @@ package org.n52.sos.util;
  */
 public interface Producer<T> {
 
-    public T get();
+    T get();
 }

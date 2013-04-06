@@ -34,6 +34,6 @@ import org.n52.sos.response.UpdateSensorResponse;
 @Deprecated
 public interface IUpdateSensorDescriptionDAO extends OperationDAO {
     
-    public UpdateSensorResponse updateSensorDescription(UpdateSensorRequest request) throws OwsExceptionReport;
+    UpdateSensorResponse updateSensorDescription(UpdateSensorRequest request) throws OwsExceptionReport;
 
 }

@@ -42,7 +42,7 @@ public interface Encoder<T, S> extends ConformanceClass {
     /**
      * @return List of supported encodings of this implementation (identified by {@link EncoderKey})
      */
-    public Set<EncoderKey> getEncoderKeyType();
+    Set<EncoderKey> getEncoderKeyType();
 
     /**
      * Encodes the specified object.
@@ -55,7 +55,7 @@ public interface Encoder<T, S> extends ConformanceClass {
      * @throws UnsupportedEncoderInputException if the supplied object (or any of it's contents) is not supported by
      *                                          this encoder
      */
-    public T encode(S objectToEncode) throws OwsExceptionReport, UnsupportedEncoderInputException;
+    T encode(S objectToEncode) throws OwsExceptionReport, UnsupportedEncoderInputException;
 
     /**
      * Encodes the specified object with the specified {@linkplain HelperValues}.
@@ -69,7 +69,7 @@ public interface Encoder<T, S> extends ConformanceClass {
      * @throws UnsupportedEncoderInputException if the supplied object (or any of it's contents) is not supported by
      *                                          this encoder
      */
-    public T encode(S objectToEncode, Map<HelperValues, String> additionalValues) throws OwsExceptionReport,
+    T encode(S objectToEncode, Map<HelperValues, String> additionalValues) throws OwsExceptionReport,
                                                                                          UnsupportedEncoderInputException;
 
     /**
@@ -77,17 +77,17 @@ public interface Encoder<T, S> extends ConformanceClass {
      *
      * @return the supported key types
      */
-    public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
+    Map<SupportedTypeKey, Set<String>> getSupportedTypes();
 
     /**
      * Add the namespace prefix of this {@linkplain Encoder} instance to the given {@linkplain Map}.
      *
      * @param nameSpacePrefixMap
      */
-    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap);
+    void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap);
 
     /**
      * @return the content type of the encoded response.
      */
-    public String getContentType();
+    String getContentType();
 }

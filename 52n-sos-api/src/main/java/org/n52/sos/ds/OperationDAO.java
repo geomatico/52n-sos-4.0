@@ -28,8 +28,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SwesExtension;
 
 /**
- * Interface for all SOS operation DAOs
- * 
+ * Interface for all SOS operation DAOs.
  */
 public interface OperationDAO {
 
@@ -38,7 +37,7 @@ public interface OperationDAO {
      * 
      * @return The supported SOS operation name
      */
-    public String getOperationName();
+    String getOperationName();
 
     /**
      * Get the OperationsMetadata of the supported SOS operation for the
@@ -49,18 +48,15 @@ public interface OperationDAO {
      * @param version
      *            SOS version
      * @return OperationsMetadata for the operation
-
      *
-     * @throws OwsExceptionReport     *             If an error occurs.
+     * @throws OwsExceptionReport If an error occurs.
      */
-    public OWSOperation getOperationsMetadata(String service, String version)
-            throws OwsExceptionReport;
+    OWSOperation getOperationsMetadata(String service, String version) throws OwsExceptionReport;
     
     /**
      * @return the operation specific extension information (&larr; should be available from cache or from code)
-
      *
      * @throws OwsExceptionReport
      */
-    public SwesExtension getExtension() throws OwsExceptionReport;
+    SwesExtension getExtension() throws OwsExceptionReport;
 }
