@@ -36,7 +36,7 @@ import org.n52.sos.ogc.sos.SosProcedureDescription;
  * @author c_hollmann
  * 
  */
-public class SosObservationConstellation implements Serializable {
+public class SosObservationConstellation implements Serializable, Cloneable {
     private static final long serialVersionUID = 8758412729768944974L;
 
     /** Identifier of the procedure by which the observation is made */
@@ -268,6 +268,7 @@ public class SosObservationConstellation implements Serializable {
         return offerings != null && !offerings.isEmpty();
     }
     
+    @Override
     public SosObservationConstellation clone() {
         SosObservationConstellation clone = new SosObservationConstellation();
         clone.setFeatureOfInterest(this.getFeatureOfInterest());
