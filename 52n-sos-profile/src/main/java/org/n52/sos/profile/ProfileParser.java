@@ -33,6 +33,9 @@ import org.x52North.sensorweb.sos.profile.NoDataPlaceholderDocument.NoDataPlaceh
 import org.x52North.sensorweb.sos.profile.SosProfileDocument;
 import org.x52North.sensorweb.sos.profile.SosProfileType;
 
+/*
+ * FIXME why is this class a helper class?
+ */
 public class ProfileParser {
 
     public static Profile parseSosProfile(SosProfileDocument sosProfileDoc) {
@@ -93,4 +96,6 @@ public class ProfileParser {
         }
     }
 
+    private ProfileParser() {
+    }
 }

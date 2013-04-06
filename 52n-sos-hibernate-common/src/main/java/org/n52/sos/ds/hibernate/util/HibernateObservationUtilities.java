@@ -95,13 +95,10 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.SosHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class HibernateObservationUtilities {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateObservationUtilities.class);
     private static Configuration configuration;
 
     protected static Configuration getConfiguration() {
@@ -717,5 +714,8 @@ public class HibernateObservationUtilities {
         protected boolean isSupportsQuality() {
             return Configurator.getInstance().isSupportsQuality();
         }
+    }
+
+    private HibernateObservationUtilities() {
     }
 }

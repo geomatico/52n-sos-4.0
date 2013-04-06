@@ -86,5 +86,7 @@ public class CacheHelper {
         } 
         return observableProperty;
     }
-    
+
+    private CacheHelper() {
+    }
 }

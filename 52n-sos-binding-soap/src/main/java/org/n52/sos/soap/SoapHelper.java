@@ -34,10 +34,10 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 
-import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.ExceptionCode;
+import org.n52.sos.ogc.ows.OWSConstants;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.Operations;
 import org.n52.sos.ogc.sos.SosSoapConstants;
 import org.slf4j.Logger;
@@ -45,12 +45,10 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.NodeList;
 
 /**
- * Utility class for SOAP requests
- * 
+ * Utility class for SOAP requests.
  */
 public class SoapHelper {
 
-    /** the logger, used to log exceptions and additonaly information */
     private static final Logger LOGGER = LoggerFactory.getLogger(SoapHelper.class);
 
     /**
@@ -159,4 +157,6 @@ public class SoapHelper {
         return null;
     }
 
+    private SoapHelper() {
+    }
 }

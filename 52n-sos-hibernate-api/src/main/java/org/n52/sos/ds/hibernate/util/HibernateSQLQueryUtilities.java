@@ -64,4 +64,6 @@ public class HibernateSQLQueryUtilities {
         return query.toString();
     }
 
+    private HibernateSQLQueryUtilities() {
+    }
 }

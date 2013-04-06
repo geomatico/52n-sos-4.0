@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 
 public class JavaHelper {
 
-    /** logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaHelper.class);
 
     /**
@@ -99,5 +98,8 @@ public class JavaHelper {
      */
     public static List<String> createStringListWithValue(String value) {
         return CollectionHelper.asList(value);
+    }
+
+    private JavaHelper() {
     }
 }

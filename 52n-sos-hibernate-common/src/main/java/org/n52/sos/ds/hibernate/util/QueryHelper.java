@@ -28,9 +28,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Session;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.service.Configurator;
 
 public class QueryHelper {
@@ -67,4 +67,6 @@ public class QueryHelper {
         return foiIDs;
     }
 
+    private QueryHelper() {
+    }
 }

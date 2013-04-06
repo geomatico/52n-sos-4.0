@@ -148,4 +148,7 @@ public class DefaultHibernateCriteriaQueryUtilities {
             aliases.put(parameter, alias);
         }
     }
+
+    private DefaultHibernateCriteriaQueryUtilities() {
+    }
 }
