@@ -159,7 +159,7 @@ abstract class AbstractSettingDefinition<S extends AbstractSettingDefinition<S, 
 
     @Override
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof AbstractSettingDefinition) {
+        if (obj instanceof AbstractSettingDefinition) {
             AbstractSettingDefinition<?, ?> o = (AbstractSettingDefinition<?, ?>) obj;
             return getKey() == null ? o.getKey() == null : getKey().equals(o.getKey()) && getTitle() == null ? o
                     .getTitle() == null : getTitle().equals(o.getTitle()) && getDescription() == null ? o

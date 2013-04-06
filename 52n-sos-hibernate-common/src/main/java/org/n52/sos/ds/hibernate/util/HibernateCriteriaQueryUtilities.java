@@ -176,7 +176,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
             criteria.setProjection(projections);
 
             Object temporalBoundingBox = criteria.uniqueResult();
-            if (temporalBoundingBox != null && temporalBoundingBox instanceof Object[]) {
+            if (temporalBoundingBox instanceof Object[]) {
                 Object[] record = (Object[]) temporalBoundingBox;
                 TimePeriod bBox =
                         createTimePeriod((Timestamp) record[0], (Timestamp) record[1], (Timestamp) record[2]);

@@ -331,7 +331,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
             CompositeOwsException exceptions = new CompositeOwsException();
             for (Observation observation : insertObservationType.getObservationArray()) {
                 Object decodedObject = CodingHelper.decodeXmlElement(observation.getOMObservation());
-                if (decodedObject != null && decodedObject instanceof SosObservation) {
+                if (decodedObject instanceof SosObservation) {
                     SosObservation sosObservation = (SosObservation) decodedObject;
                     checkAndAddPhenomenonTime(sosObservation.getPhenomenonTime(), phenomenonTimes);
                     checkAndAddResultTime(sosObservation.getResultTime(), resultTimes);
@@ -449,7 +449,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
             net.opengis.sos.x20.GetObservationType.SpatialFilter spatialFilter) throws OwsExceptionReport {
         if (spatialFilter != null && spatialFilter.getSpatialOps() != null) {
             Object filter = CodingHelper.decodeXmlElement(spatialFilter.getSpatialOps());
-            if (filter != null && filter instanceof SpatialFilter) {
+            if (filter instanceof SpatialFilter) {
                 return (SpatialFilter) filter;
             }
         }
@@ -473,7 +473,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
         List<SpatialFilter> sosSpatialFilters = new ArrayList<SpatialFilter>(spatialFilters.length);
         for (net.opengis.sos.x20.GetFeatureOfInterestType.SpatialFilter spatialFilter : spatialFilters) {
             Object filter = CodingHelper.decodeXmlElement(spatialFilter.getSpatialOps());
-            if (filter != null && filter instanceof SpatialFilter) {
+            if (filter instanceof SpatialFilter) {
                 sosSpatialFilters.add((SpatialFilter) filter);
             }
         }
@@ -484,7 +484,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
             throws OwsExceptionReport {
         if (spatialFilter != null && spatialFilter.getSpatialOps() != null) {
             Object filter = CodingHelper.decodeXmlElement(spatialFilter.getSpatialOps());
-            if (filter != null && filter instanceof SpatialFilter) {
+            if (filter instanceof SpatialFilter) {
                 return (SpatialFilter) filter;
             }
         }
@@ -508,7 +508,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
         List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>(temporalFilters.length);
         for (net.opengis.sos.x20.GetObservationType.TemporalFilter temporalFilter : temporalFilters) {
             Object filter = CodingHelper.decodeXmlElement(temporalFilter.getTemporalOps());
-            if (filter != null && filter instanceof TemporalFilter) {
+            if (filter instanceof TemporalFilter) {
                 sosTemporalFilters.add((TemporalFilter) filter);
             }
         }
@@ -520,7 +520,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
         List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>(temporalFilters.length);
         for (net.opengis.sos.x20.GetResultType.TemporalFilter temporalFilter : temporalFilters) {
             Object filter = CodingHelper.decodeXmlElement(temporalFilter.getTemporalOps());
-            if (filter != null && filter instanceof TemporalFilter) {
+            if (filter instanceof TemporalFilter) {
                 sosTemporalFilters.add((TemporalFilter) filter);
             }
         }
@@ -539,7 +539,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
 
     private SosResultStructure parseResultStructure(XmlObject resultStructure) throws OwsExceptionReport {
         Object decodedObject = CodingHelper.decodeXmlElement(resultStructure);
-        if (decodedObject != null && decodedObject instanceof SosSweAbstractDataComponent) {
+        if (decodedObject instanceof SosSweAbstractDataComponent) {
             SosSweAbstractDataComponent sosSweData = (SosSweAbstractDataComponent) decodedObject;
             SosResultStructure sosResultStructure = new SosResultStructure();
             sosResultStructure.setResultStructure(sosSweData);
@@ -553,7 +553,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
 
     private SosResultEncoding parseResultEncoding(XmlObject resultEncoding) throws OwsExceptionReport {
         Object decodedObject = CodingHelper.decodeXmlElement(resultEncoding);
-        if (decodedObject != null && decodedObject instanceof SosSweAbstractEncoding) {
+        if (decodedObject instanceof SosSweAbstractEncoding) {
             SosSweAbstractEncoding sosSweEncoding = (SosSweAbstractEncoding) decodedObject;
             SosResultEncoding encoding = new SosResultEncoding();
             encoding.setEncoding(sosSweEncoding);

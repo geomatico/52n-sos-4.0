@@ -204,7 +204,7 @@ public class SweHelper {
 
     private static List<String> createBlock(SosSweAbstractDataComponent elementType, ITime phenomenonTime,
             String phenID, IValue<?> value) {
-        if (elementType != null && elementType instanceof SosSweDataRecord) {
+        if (elementType instanceof SosSweDataRecord) {
             SosSweDataRecord elementTypeRecord = (SosSweDataRecord) elementType;
             List<String> block = new ArrayList<String>(elementTypeRecord.getFields().size());
             for (SosSweField sweField : elementTypeRecord.getFields()) {

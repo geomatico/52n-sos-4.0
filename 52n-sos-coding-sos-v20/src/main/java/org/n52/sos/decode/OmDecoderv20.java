@@ -35,9 +35,9 @@ import org.apache.xmlbeans.XmlBoolean;
 import org.apache.xmlbeans.XmlInteger;
 import org.apache.xmlbeans.XmlString;
 import org.n52.sos.exception.CodedException;
-import org.n52.sos.exception.ows.OwsExceptionCode;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.MissingParameterValueException;
+import org.n52.sos.exception.ows.OwsExceptionCode;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -152,7 +152,7 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
     private CodeWithAuthority getIdentifier(OMObservationType omObservation) throws OwsExceptionReport {
         if (omObservation.getIdentifier() != null) {
             Object decodedObject = CodingHelper.decodeXmlObject(omObservation.getIdentifier());
-            if (decodedObject != null && decodedObject instanceof CodeWithAuthority) {
+            if (decodedObject instanceof CodeWithAuthority) {
                 return (CodeWithAuthority) decodedObject;
             }
         }
@@ -203,7 +203,7 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
             return timeInstant;
         } else {
             Object decodedObject = CodingHelper.decodeXmlObject(phenomenonTime.getAbstractTimeObject());
-            if (decodedObject != null && decodedObject instanceof ITime) {
+            if (decodedObject instanceof ITime) {
                 return (ITime) decodedObject;
             }
         }
@@ -232,7 +232,7 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
             return timeInstant;
         } else {
             Object decodedObject = CodingHelper.decodeXmlObject(omObservation.getResultTime().getTimeInstant());
-            if (decodedObject != null && decodedObject instanceof TimeInstant) {
+            if (decodedObject instanceof TimeInstant) {
                 return (TimeInstant) decodedObject;
             }
             throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
@@ -243,7 +243,7 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
     private TimePeriod getValidTime(OMObservationType omObservation) throws OwsExceptionReport {
         if (omObservation.isSetValidTime()) {
             Object decodedObject = CodingHelper.decodeXmlObject(omObservation.getValidTime().getTimePeriod());
-            if (decodedObject != null && decodedObject instanceof TimePeriod) {
+            if (decodedObject instanceof TimePeriod) {
                 return (TimePeriod) decodedObject;
             }
             throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
@@ -287,15 +287,15 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
         // result elements with other encoding like SWE_ARRAY_OBSERVATION
         else {
             Object decodedObject = CodingHelper.decodeXmlObject(omObservation.getResult());
-            if (decodedObject != null && decodedObject instanceof IObservationValue) {
+            if (decodedObject instanceof IObservationValue) {
                 return (IObservationValue) decodedObject;
-            } else if (decodedObject != null && decodedObject instanceof SosSweDataArray) {
+            } else if (decodedObject instanceof SosSweDataArray) {
                     SosMultiObservationValues<SosSweDataArray> result = new SosMultiObservationValues<SosSweDataArray>();
                     SweDataArrayValue value = new SweDataArrayValue();
                     value.setValue((SosSweDataArray) decodedObject);
                     result.setValue(value);
                     return result;
-            } else if (decodedObject != null && decodedObject instanceof SosSweDataArray) {
+            } else if (decodedObject instanceof SosSweDataArray) {
                 SosMultiObservationValues<SosSweDataArray> result = new SosMultiObservationValues<SosSweDataArray>();
                 SweDataArrayValue value = new SweDataArrayValue();
                 value.setValue((SosSweDataArray) decodedObject);

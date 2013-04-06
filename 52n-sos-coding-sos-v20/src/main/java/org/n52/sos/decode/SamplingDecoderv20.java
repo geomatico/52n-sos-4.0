@@ -37,6 +37,8 @@ import net.opengis.samplingSpatial.x20.ShapeType;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
@@ -44,8 +46,6 @@ import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
@@ -158,7 +158,7 @@ public class SamplingDecoderv20 implements Decoder<SosAbstractFeature, XmlObject
         List<CodeType> names = new ArrayList<CodeType>(length);
         for (int i = 0; i < length; i++) {
             Object decodedElement = CodingHelper.decodeXmlObject(spatialSamplingFeature.getNameArray(i));
-            if (decodedElement != null && decodedElement instanceof CodeType) {
+            if (decodedElement instanceof CodeType) {
                 names.add((CodeType)decodedElement);
             }
         }
@@ -203,7 +203,7 @@ public class SamplingDecoderv20 implements Decoder<SosAbstractFeature, XmlObject
                 }
                 if (abstractFeature != null) {
                     Object decodedObject = CodingHelper.decodeXmlObject(abstractFeature);
-                    if (decodedObject != null && decodedObject instanceof SosAbstractFeature) {
+                    if (decodedObject instanceof SosAbstractFeature) {
                         sampledFeatures.add((SosAbstractFeature) decodedObject);
                     }
                 }
@@ -216,7 +216,7 @@ public class SamplingDecoderv20 implements Decoder<SosAbstractFeature, XmlObject
 
     private Geometry getGeometry(ShapeType shape) throws OwsExceptionReport {
         Object decodedObject = CodingHelper.decodeXmlElement(shape.getAbstractGeometry());
-        if (decodedObject != null && decodedObject instanceof Geometry) {
+        if (decodedObject instanceof Geometry) {
             return (Geometry) decodedObject;
         }
         throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)

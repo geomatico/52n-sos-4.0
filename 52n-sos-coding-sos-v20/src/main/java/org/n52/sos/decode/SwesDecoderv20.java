@@ -195,7 +195,7 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
                         .withMessage("The requested procedureDescritpionFormat is not supported!");
             }
             Object decodedObject = decoder.decode(xmlObject);
-            if (decodedObject != null && decodedObject instanceof SosProcedureDescription) {
+            if (decodedObject instanceof SosProcedureDescription) {
                 request.setProcedureDescription((SosProcedureDescription) decodedObject);
             }
         } catch (XmlException xmle) {
@@ -246,7 +246,7 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
                 }
                 
                 Object decodedObject = decoder.decode(xmlObject);
-                if (decodedObject != null && decodedObject instanceof SosProcedureDescription) {
+                if (decodedObject instanceof SosProcedureDescription) {
                     request.addProcedureDescriptionString((SosProcedureDescription) decodedObject);
                 }
             } catch (XmlException xmle) {

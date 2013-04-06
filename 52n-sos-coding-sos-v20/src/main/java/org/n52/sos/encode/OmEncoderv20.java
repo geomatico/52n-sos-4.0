@@ -475,7 +475,7 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
             additionalValues.put(HelperValues.FOR_OBSERVATION, null);
             // TODO create SosSweDataArray
             Object encodedObj = CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE_20, dataArray, additionalValues);
-            if (encodedObj != null && encodedObj instanceof XmlObject) {
+            if (encodedObj instanceof XmlObject) {
                 xbResult.set((XmlObject) encodedObj);
             } else {
                 throw new NoApplicableCodeException()
@@ -496,7 +496,7 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
                 new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
         additionalValues.put(HelperValues.FOR_OBSERVATION, null);
         Object encodedObj = CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE_20, dataArray, additionalValues);
-        if (encodedObj != null && encodedObj instanceof XmlObject) {
+        if (encodedObj instanceof XmlObject) {
             xbResult.set((XmlObject) encodedObj);
         } else {
             throw new NoApplicableCodeException()

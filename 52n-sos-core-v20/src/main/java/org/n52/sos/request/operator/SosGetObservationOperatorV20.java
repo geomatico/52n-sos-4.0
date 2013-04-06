@@ -300,7 +300,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
 
     private boolean checkForObservationAndMeasurementV20Type(String responseFormat) throws OwsExceptionReport {
         Encoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(responseFormat, new SosObservation());
-        if (encoder != null && encoder instanceof ObservationEncoder) {
+        if (encoder instanceof ObservationEncoder) {
             return ((ObservationEncoder) encoder).isObservationAndMeasurmentV20Type();
         }
         return false;

@@ -650,7 +650,7 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof AbstractContentCache)) {
+        if (!(obj instanceof AbstractContentCache)) {
             return false;
         }
         final AbstractContentCache other = (AbstractContentCache) obj;

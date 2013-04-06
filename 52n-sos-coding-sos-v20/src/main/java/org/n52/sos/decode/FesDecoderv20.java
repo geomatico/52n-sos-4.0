@@ -37,6 +37,9 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlObject.Factory;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
 import org.n52.sos.ogc.filter.FilterConstants;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator2;
@@ -47,9 +50,6 @@ import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
@@ -133,7 +133,7 @@ public class FesDecoderv20 implements Decoder<Object, XmlObject> {
                 XmlCursor geometryCursor = xbSpatialOpsType.newCursor();
                 if (geometryCursor.toChild(GMLConstants.QN_ENVELOPE_32)) {
                     Object sosGeometry = CodingHelper.decodeXmlObject(Factory.parse(geometryCursor.getDomNode()));
-                    if (sosGeometry != null && sosGeometry instanceof Geometry) {
+                    if (sosGeometry instanceof Geometry) {
                         spatialFilter.setGeometry((Geometry) sosGeometry);
                     } else {
                         //TODO throw exception
@@ -177,7 +177,7 @@ public class FesDecoderv20 implements Decoder<Object, XmlObject> {
                 for (int i = 0; i < nodes.getLength(); i++) {
                     if (nodes.item(i).getNamespaceURI() != null && !nodes.item(i).getLocalName().equals(FilterConstants.EN_VALUE_REFERENCE)) {
                         Object timeObject = CodingHelper.decodeXmlObject(Factory.parse(nodes.item(i)));
-                        if (timeObject != null && timeObject instanceof ITime) {
+                        if (timeObject instanceof ITime) {
                             TimeOperator operator;
                             ITime time = (ITime) timeObject;
                             String localName = XmlHelper.getLocalName(xbTemporalOpsType);

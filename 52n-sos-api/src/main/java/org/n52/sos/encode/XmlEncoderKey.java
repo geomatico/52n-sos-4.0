@@ -69,7 +69,7 @@ public class XmlEncoderKey extends EncoderKey {
     
     @Override
     public int getSimilarity(EncoderKey key) {
-        if (key != null && key instanceof XmlEncoderKey) {
+        if (key instanceof XmlEncoderKey) {
             XmlEncoderKey xmlKey = (XmlEncoderKey) key;
             if (eq(getNamespace(), xmlKey.getNamespace())) {
                 return ClassHelper.getSimiliarity(getType() != null ?        getType() : Object.class, 

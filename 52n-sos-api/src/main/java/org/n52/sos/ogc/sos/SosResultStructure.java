@@ -27,9 +27,7 @@ package org.n52.sos.ogc.sos;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject.Factory;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.DecoderResponseUnsupportedException;
-import org.n52.sos.exception.ows.concrete.EncoderResponseUnsupportedException;
 import org.n52.sos.exception.ows.concrete.XmlDecodingException;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.util.CodingHelper;
@@ -80,7 +78,7 @@ public class SosResultStructure {
     private SosSweAbstractDataComponent parseResultStructure() throws OwsExceptionReport {
         try {
             Object decodedObject = CodingHelper.decodeXmlObject(Factory.parse(xml));
-            if (decodedObject != null && decodedObject instanceof SosSweAbstractDataComponent) {
+            if (decodedObject instanceof SosSweAbstractDataComponent) {
                 SosSweAbstractDataComponent sosSweData = (SosSweAbstractDataComponent) decodedObject;
                 return sosSweData;
             } else {
@@ -93,7 +91,7 @@ public class SosResultStructure {
 
     @Override
     public boolean equals(Object o) {
-        if (o != null && o instanceof SosResultStructure) {
+        if (o instanceof SosResultStructure) {
             SosResultStructure other = (SosResultStructure) o;
             try {
                 if (getResultStructure() == other.getResultStructure()) {

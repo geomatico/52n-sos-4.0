@@ -71,7 +71,7 @@ public abstract class AbstractSettingValue<T> implements SettingValue<T>, Serial
 
     @Override
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof SettingValue) {
+        if (obj instanceof SettingValue) {
             final SettingValue<?> other = (SettingValue<?>) obj;
             return (getKey() == null ? other.getKey() == null : getKey().equals(other.getKey()))
                    && (getValue() == null ? other.getValue() == null : getValue().equals(other.getValue()));

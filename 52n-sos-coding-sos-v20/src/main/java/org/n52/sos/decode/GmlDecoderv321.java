@@ -201,7 +201,7 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
             }
             if (abstractFeature != null) {
                 Object decodedObject = CodingHelper.decodeXmlObject(abstractFeature);
-                if (decodedObject != null && decodedObject instanceof SosSamplingFeature) {
+                if (decodedObject instanceof SosSamplingFeature) {
                     feature = (SosSamplingFeature) decodedObject;
                 } else {
                     throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)

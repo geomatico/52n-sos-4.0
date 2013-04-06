@@ -119,7 +119,7 @@ public class SosEnvelope implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof SosEnvelope) {
+        if (obj instanceof SosEnvelope) {
             final SosEnvelope other = (SosEnvelope) obj;
             return getSrid() == other.getSrid()
                    && getEnvelope() == null

@@ -219,7 +219,7 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
             int length = xbAbstractProcess.getNameArray().length;
             for (int i = 0; i < length; i++) {
                 Object decodedElement = CodingHelper.decodeXmlElement(xbAbstractProcess.getNameArray(i));
-                if (decodedElement != null && decodedElement instanceof CodeType) {
+                if (decodedElement instanceof CodeType) {
                     abstractProcess.addName((CodeType)decodedElement);
                 }
             }
@@ -361,7 +361,7 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
         SosSMLCharacteristics sosCharacteristics = new SosSMLCharacteristics();
         for (Characteristics xbCharacteristics : characteristicsArray) {
             Object decodedObject = CodingHelper.decodeXmlElement(xbCharacteristics.getAbstractDataRecord());
-            if (decodedObject != null && decodedObject instanceof AbstractDataRecord) {
+            if (decodedObject instanceof AbstractDataRecord) {
                 sosCharacteristics.setDataRecord((AbstractDataRecord)decodedObject);
             } else {
                 throw new InvalidParameterValueException().at(XmlHelper.getLocalName(xbCharacteristics))
@@ -389,7 +389,7 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
         SosSMLCapabilities sosCapabilities = new SosSMLCapabilities();
         for (Capabilities xbCpabilities : capabilitiesArray) {
             Object decodedObject = CodingHelper.decodeXmlElement(xbCpabilities.getAbstractDataRecord());
-            if (decodedObject != null && decodedObject instanceof AbstractDataRecord) {
+            if (decodedObject instanceof AbstractDataRecord) {
                 sosCapabilities.setDataRecord((AbstractDataRecord)decodedObject);
             } else {
                 throw new InvalidParameterValueException().at(XmlHelper.getLocalName(xbCpabilities))
@@ -546,7 +546,7 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
         }
 
         Object decodedObject = CodingHelper.decodeXmlElement(toDecode);
-        if (decodedObject != null && decodedObject instanceof SosSweAbstractSimpleType) {
+        if (decodedObject instanceof SosSweAbstractSimpleType) {
             sosIo.setIoValue((SosSweAbstractSimpleType) decodedObject);
         }
         return sosIo;

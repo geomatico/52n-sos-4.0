@@ -57,10 +57,10 @@ public class JsonEncoderKey extends EncoderKey {
 
     @Override
     public int getSimilarity(EncoderKey key) {
-        if (key != null && key instanceof XmlEncoderKey) {
-            XmlEncoderKey xmlKey = (XmlEncoderKey) key;
+        if (key instanceof JsonEncoderKey) {
+            JsonEncoderKey jsonKey = (JsonEncoderKey) key;
                 return ClassHelper.getSimiliarity(getType() != null ?        getType() : Object.class, 
-                                           xmlKey.getType() != null ? xmlKey.getType() : Object.class);
+                                           jsonKey.getType() != null ? jsonKey.getType() : Object.class);
         } else {
             return -1;
         }
