@@ -30,8 +30,8 @@ import java.util.Set;
 import javax.wsdl.WSDLException;
 
 import org.n52.sos.binding.Binding;
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.decode.OperationDecoderKey;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.operator.RequestOperator;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
@@ -111,9 +111,9 @@ public class WSDLFactory implements Producer<String> {
                 builder.setKvpEndpoint(URI.create(serviceUrl + KVP_BINDING_ENDPOINT + "?"));
                 Binding b = bindings.get(KVP_BINDING_ENDPOINT);
                 for (RequestOperatorKeyType o : requestOperators) {
-                    if (o instanceof WSDLAwareRequestOperator) {
-                        RequestOperator op = repo.getRequestOperator(o);
-                        WSDLAwareRequestOperator wop = (WSDLAwareRequestOperator) o;
+                    RequestOperator op = repo.getRequestOperator(o);
+                    if (op instanceof WSDLAwareRequestOperator) {
+                        WSDLAwareRequestOperator wop = (WSDLAwareRequestOperator) op;
                         if (wop.getSosOperationDefinition() != null) {
                             if (isHttpGetSupported(b, wop)) {
                                 builder.addKvpOperation(wop.getSosOperationDefinition());
