@@ -96,19 +96,19 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SweCommonEncoderv101.class);
 
-    private Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(SWEConstants.NS_SWE,
-            SosSweBoolean.class,
-            SosSweCategory.class,
-            SosSweCount.class,
-            SosSweObservableProperty.class,
-            SosSweQuantity.class,
-            SosSweQuantityRange.class,
-            SosSweText.class,
-            SosSweTime.class,
-            SosSweTimeRange.class,
-            SosSweEnvelope.class,
-            SosSweCoordinate.class,
-            SosSweDataArray.class);
+    private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(SWEConstants.NS_SWE,
+                                                                                            SosSweBoolean.class,
+                                                                                            SosSweCategory.class,
+                                                                                            SosSweCount.class,
+                                                                                            SosSweObservableProperty.class,
+                                                                                            SosSweQuantity.class,
+                                                                                            SosSweQuantityRange.class,
+                                                                                            SosSweText.class,
+                                                                                            SosSweTime.class,
+                                                                                            SosSweTimeRange.class,
+                                                                                            SosSweEnvelope.class,
+                                                                                            SosSweCoordinate.class,
+                                                                                            SosSweDataArray.class);
     
     
     public SweCommonEncoderv101() {

@@ -80,7 +80,7 @@ public class SamplingEncoderv20 implements Encoder<XmlObject, SosAbstractFeature
     private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(
             ConformanceClasses.OM_V2_SPATIAL_SAMPLING, ConformanceClasses.OM_V2_SAMPLING_POINT,
             ConformanceClasses.OM_V2_SAMPLING_CURVE, ConformanceClasses.OM_V2_SAMPLING_SURFACE);
-    private Map<SupportedTypeKey, Set<String>> SUPPORTED_TYPES = Collections.singletonMap(
+    private static final Map<SupportedTypeKey, Set<String>> SUPPORTED_TYPES = Collections.singletonMap(
             SupportedTypeKey.FeatureType, CollectionHelper.set(OGCConstants.UNKNOWN,
                     SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_POINT,
                     SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_CURVE,

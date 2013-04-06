@@ -57,16 +57,18 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GmlDecoderv311 implements Decoder<Object, XmlObject> {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(GmlDecoderv311.class);
-
-    private Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(GMLConstants.NS_GML,
-            EnvelopeDocument.class, TimeInstantType.class, TimePeriodType.class, TimeInstantDocument.class,
-            TimePeriodDocument.class, CodeType.class);
+    private static final Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(GMLConstants.NS_GML,
+                                                                                            EnvelopeDocument.class,
+                                                                                            TimeInstantType.class,
+                                                                                            TimePeriodType.class,
+                                                                                            TimeInstantDocument.class,
+                                                                                            TimePeriodDocument.class,
+                                                                                            CodeType.class);
 
     public GmlDecoderv311() {
         LOGGER.debug("Decoder for the following keys initialized successfully: {}!",
-                StringHelper.join(", ", DECODER_KEYS));
+                     StringHelper.join(", ", DECODER_KEYS));
     }
 
     @Override

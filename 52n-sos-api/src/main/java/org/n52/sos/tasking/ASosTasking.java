@@ -27,7 +27,7 @@ import java.util.TimerTask;
 
 public abstract class ASosTasking extends TimerTask {
     
-    private final int DEFAULT_EXECUTION_INTERVALL = 15;
+    private static final int DEFAULT_EXECUTION_INTERVALL = 15;
     
     private long executionIntervall = DEFAULT_EXECUTION_INTERVALL;
     

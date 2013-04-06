@@ -38,8 +38,8 @@ import org.n52.sos.service.ServiceSettings;
 public class CoreProfileOperatorSettings implements SettingDefinitionProvider {
     public static final String BLOCK_GET_OBSERVATION_REQUESTS_WITHOUT_RESTRICTION =
                                "service.blockGetObservationRequestsWithoutRestriction";
-    private BooleanSettingDefinition BLOCK_GET_OBSERVATION_REQUESTS_WITHOUT_RESTRICTION_DEFINITION =
-                                     new BooleanSettingDefinition()
+    private static final BooleanSettingDefinition BLOCK_GET_OBSERVATION_REQUESTS_WITHOUT_RESTRICTION_DEFINITION =
+                                                  new BooleanSettingDefinition()
             .setGroup(ServiceSettings.GROUP)
             .setDefaultValue(Boolean.FALSE)
             .setDescription("Should GetObservation requests without any restriction be blocked")

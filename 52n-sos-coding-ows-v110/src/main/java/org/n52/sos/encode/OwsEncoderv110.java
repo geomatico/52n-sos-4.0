@@ -83,11 +83,11 @@ import org.slf4j.LoggerFactory;
 @Configurable
 public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(OwsEncoderv110.class);
-    private Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(OWSConstants.NS_OWS,
-                                                                               SosServiceIdentification.class,
-                                                                               SosServiceProvider.class,
-                                                                               OWSOperationsMetadata.class,
-                                                                               OwsExceptionReport.class);
+    private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(OWSConstants.NS_OWS,
+                                                                                            SosServiceIdentification.class,
+                                                                                            SosServiceProvider.class,
+                                                                                            OWSOperationsMetadata.class,
+                                                                                            OwsExceptionReport.class);
     private boolean includeStackTraceInExceptionReport = false;
 
     public OwsEncoderv110() {

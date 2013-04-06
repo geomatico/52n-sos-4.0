@@ -62,13 +62,9 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class FesDecoderv20 implements Decoder<Object, XmlObject> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(FesDecoderv20.class);
 
-    private Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(
+    private static final Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(
             FilterConstants.NS_FES_2, SpatialOpsType.class, TemporalOpsType.class);
 
     public FesDecoderv20() {

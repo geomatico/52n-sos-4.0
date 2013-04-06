@@ -43,12 +43,9 @@ public class WsaDecoder implements Decoder<WsaHeader, List<SOAPHeaderElement>> {
 
     private static Logger LOGGER = LoggerFactory.getLogger(WsaDecoder.class);
 
-    private Set<DecoderKey> DECODER_KEYS = Collections.<DecoderKey>singleton(
+    private static final Set<DecoderKey> DECODER_KEYS = Collections.<DecoderKey>singleton(
             new NamespaceDecoderKey(WsaConstants.NS_WSA, SOAPHeaderElement.class));
 
-    /**
-     * constructor
-     */
     public WsaDecoder() {
         LOGGER.debug("Decoder for the following keys initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));
     }

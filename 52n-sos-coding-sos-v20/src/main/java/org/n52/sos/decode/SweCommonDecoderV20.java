@@ -94,7 +94,7 @@ import org.slf4j.LoggerFactory;
 public class SweCommonDecoderV20 implements Decoder<Object, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweCommonDecoderV20.class);
 
-    private Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(
+    private static final Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(
             SWEConstants.NS_SWE_20,
             DataArrayPropertyType.class,
             DataArrayDocument.class,

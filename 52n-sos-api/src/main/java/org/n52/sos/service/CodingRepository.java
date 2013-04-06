@@ -503,7 +503,7 @@ public class CodingRepository {
         }
     }
 
-    private static abstract class SimilarityComparator<T> implements Comparator<T> {
+    private abstract static class SimilarityComparator<T> implements Comparator<T> {
         @Override
         public int compare(T o1, T o2) {
             int s1 = getSimilarity(o1);

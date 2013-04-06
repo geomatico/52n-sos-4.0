@@ -111,8 +111,8 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SosDecoderv20.class);
     @SuppressWarnings("unchecked")
-    private Set<DecoderKey> DECODER_KEYS = CollectionHelper.union(
-        CodingHelper.decoderKeysForElements(Sos2Constants.NS_SOS_20,
+    private static final Set<DecoderKey> DECODER_KEYS = CollectionHelper.union(
+            CodingHelper.decoderKeysForElements(Sos2Constants.NS_SOS_20,
             GetCapabilitiesDocument.class,
             GetObservationDocument.class,
             GetFeatureOfInterestDocument.class,
