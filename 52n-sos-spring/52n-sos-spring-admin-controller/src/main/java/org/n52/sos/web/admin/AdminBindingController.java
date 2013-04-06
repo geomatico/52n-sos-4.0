@@ -31,7 +31,6 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.n52.sos.binding.Binding;
 import org.n52.sos.binding.BindingKey;
-import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.ControllerConstants;
@@ -83,7 +82,6 @@ public class AdminBindingController extends AbstractAdminController {
 
     protected JSONArray getBindings() throws ConnectionProviderException, JSONException {
         Map<String, Binding> bindings = Configurator.getInstance().getBindingRepository().getAllBindings();
-        SettingsManager sm = getSettingsManager();
         JSONArray a = new JSONArray();
         for (Binding binding : bindings.values()) {
             String path = binding.getUrlPattern();
