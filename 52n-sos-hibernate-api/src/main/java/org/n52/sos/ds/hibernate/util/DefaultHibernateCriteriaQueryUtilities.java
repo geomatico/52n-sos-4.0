@@ -149,6 +149,6 @@ public class DefaultHibernateCriteriaQueryUtilities {
         }
     }
 
-    private DefaultHibernateCriteriaQueryUtilities() {
+    protected DefaultHibernateCriteriaQueryUtilities() {
     }
 }

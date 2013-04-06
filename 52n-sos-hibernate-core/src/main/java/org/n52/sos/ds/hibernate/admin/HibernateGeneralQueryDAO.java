@@ -29,6 +29,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -166,7 +167,7 @@ public class HibernateGeneralQueryDAO implements GeneralQueryDAO {
             return new Row().setValues(values);
         }
 
-        protected ArrayList<String> getColumnNames(int columnCount, ResultSetMetaData meta) throws SQLException {
+        protected List<String> getColumnNames(int columnCount, ResultSetMetaData meta) throws SQLException {
             ArrayList<String> names = new ArrayList<String>(columnCount);
             for (int i = 1; i <= columnCount; ++i) {
                 names.add(meta.getColumnLabel(i));

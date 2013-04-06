@@ -78,7 +78,7 @@ public class ResultHandlingHelper {
         StringBuilder builder = new StringBuilder();
         String tokenSeparator = getTokenSeparator(sosResultEncoding.getEncoding());
         String blockSeparator = getBlockSeparator(sosResultEncoding.getEncoding());
-        TreeMap<Integer, String> valueOrder = getValueOrderMap(sosResultStructure.getResultStructure());
+        Map<Integer, String> valueOrder = getValueOrderMap(sosResultStructure.getResultStructure());
         for (Observation observation : observations) {
             for (Integer intger : valueOrder.keySet()) {
                 String definition = valueOrder.get(intger);
@@ -123,7 +123,7 @@ public class ResultHandlingHelper {
         return builder.toString();
     }
 
-    private static TreeMap<Integer, String> getValueOrderMap(
+    private static Map<Integer, String> getValueOrderMap(
             SosSweAbstractDataComponent sweDataElement) {
         Map<Integer, String> valueOrder = new HashMap<Integer, String>(0);
         if (sweDataElement instanceof SosSweDataArray && ((SosSweDataArray) sweDataElement).getElementType() instanceof SosSweDataRecord) {

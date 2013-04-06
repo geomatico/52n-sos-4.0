@@ -365,7 +365,7 @@ public class HibernateObservationUtilities {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static SosObservation createNewObservation(
             Map<Integer, SosObservationConstellation> observationConstellations, Observation hObservation,
-            ArrayList<SosQuality> qualityList, IValue<?> value, int obsConstHash) {
+            List<SosQuality> qualityList, IValue<?> value, int obsConstHash) {
         SosObservation sosObservation = new SosObservation();
         sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
         if (hObservation.isSetIdentifier()

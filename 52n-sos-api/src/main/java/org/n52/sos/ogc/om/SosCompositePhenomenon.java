@@ -23,7 +23,6 @@
  */
 package org.n52.sos.ogc.om;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -67,7 +66,7 @@ public class SosCompositePhenomenon extends AbstractSosPhenomenon {
      * @param phenomenonComponents
      *            The phenomenonComponents to set.
      */
-    public void setPhenomenonComponents(ArrayList<SosObservableProperty> phenomenonComponents) {
+    public void setPhenomenonComponents(List<SosObservableProperty> phenomenonComponents) {
         this.phenomenonComponents = phenomenonComponents;
     }
 }

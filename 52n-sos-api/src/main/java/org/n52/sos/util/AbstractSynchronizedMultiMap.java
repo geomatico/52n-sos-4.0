@@ -52,24 +52,20 @@ public abstract class AbstractSynchronizedMultiMap<K, V, C extends Collection<V>
     private final Lock write = lock.writeLock();
     private Map<K, C> delegate;
 
-    private AbstractSynchronizedMultiMap(HashMap<K, C> map) {
-        this.delegate = map;
-    }
-
     public AbstractSynchronizedMultiMap(Map<? extends K, ? extends C> m) {
-        this(new HashMap<K, C>(m));
+        this.delegate = new HashMap<K, C>(m);
     }
 
     public AbstractSynchronizedMultiMap(int initialCapacity) {
-        this(new HashMap<K, C>(initialCapacity));
+        this.delegate = new HashMap<K, C>(initialCapacity);
     }
 
     public AbstractSynchronizedMultiMap(int initialCapacity, float loadFactor) {
-        this(new HashMap<K, C>(initialCapacity, loadFactor));
+        this.delegate = new HashMap<K, C>(initialCapacity, loadFactor);
     }
 
     public AbstractSynchronizedMultiMap() {
-        this(new HashMap<K, C>());
+        this.delegate = new HashMap<K, C>();
     }
 
     @Override
