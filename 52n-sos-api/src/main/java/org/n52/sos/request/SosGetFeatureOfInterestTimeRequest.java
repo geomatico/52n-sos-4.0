@@ -39,7 +39,7 @@ public class SosGetFeatureOfInterestTimeRequest extends AbstractServiceRequest {
     /**
      * FOI identifier
      */
-    protected String featureIdentifier;
+    private String featureIdentifier;
 
     /**
      * Get FOI identifier

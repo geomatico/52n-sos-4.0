@@ -37,7 +37,7 @@ public enum OwsExceptionCode implements ExceptionCode {
     OperationNotSupported(OWSConstants.SOAP_REASON_OPTION_NOT_SUPPORTED),
     OptionNotSupported(OWSConstants.SOAP_REASON_OPERATION_NOT_SUPPORTED),
     VersionNegotiationFailed(OWSConstants.SOAP_REASON_VERSION_NEGOTIATION_FAILED);
-    final String soapFaulReason;
+    private final String soapFaulReason;
 
     private OwsExceptionCode(String soapFaultReason) {
         this.soapFaulReason = soapFaultReason;

@@ -37,7 +37,7 @@ import org.n52.sos.service.operator.ServiceOperatorKeyType;
  */
 public abstract class AbstractServiceRequest extends AbstractServiceCommunicationObject {
     protected ServiceOperatorKeyType[] serviceOperatorKeyTypes;
-    protected SwesExtensions extensions;
+    private SwesExtensions extensions;
 
     /**
      * @return the operationName

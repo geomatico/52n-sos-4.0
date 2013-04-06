@@ -52,7 +52,7 @@ public class DescribeSensorRequest extends AbstractServiceRequest {
     /**
      * Temporal filters
      */
-    protected List<TemporalFilter> times;
+    private List<TemporalFilter> times;
 
     /**
      * Get output format
@@ -66,8 +66,7 @@ public class DescribeSensorRequest extends AbstractServiceRequest {
     /**
      * Set output format
      * 
-     * @param outputFormat
-     *            output format
+     * @param procedureDescriptionFormat output format
      */
     public void setProcedureDescriptionFormat(String procedureDescriptionFormat) {
         this.procedureDescriptionFormat = procedureDescriptionFormat;

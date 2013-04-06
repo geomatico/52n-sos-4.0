@@ -174,11 +174,6 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
         return extensionArray;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
-     */
     @Override
     public String getOperationName() {
         return operationName;

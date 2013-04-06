@@ -50,9 +50,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.AbstractLoggingConfigurator;
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.util.FileIOHelper;
 import org.slf4j.Logger;
 import org.w3c.dom.Attr;
@@ -226,7 +226,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
             Document doc = read();
             List<Element> appender = getChildren(doc.getDocumentElement(), EN_APPENDER);
             for (Element a : appender) {
-                if (getAttribute(a, AN_NAME).getValue().equals(Appender.FILE.name)) {
+                if (getAttribute(a, AN_NAME).getValue().equals(Appender.FILE.getName())) {
                     Element rollingPolicy = getSingleChildren(a, EN_ROLLING_POLICY);
                     Element maxHistory = getSingleChildren(rollingPolicy, EN_MAX_HISTORY);
                     int before = -1;
@@ -287,19 +287,19 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
             Element refNode = null;
             List<Element> refs = getChildren(root, EN_APPENDER_REF);
             for (Element ref : refs) {
-                if (getAttribute(ref, AN_REF).getValue().equals(a.name)) {
+                if (getAttribute(ref, AN_REF).getValue().equals(a.getName())) {
                     refNode = ref;
                     break;
                 }
             }
             if (enable && refNode == null) {
-                log.debug("Enabling {} logging appender", a.name);
+                log.debug("Enabling {} logging appender", a.getName());
                 refNode = doc.createElement(EN_APPENDER_REF);
-                refNode.setAttribute(AN_REF, a.name);
+                refNode.setAttribute(AN_REF, a.getName());
                 root.appendChild(refNode);
                 write();
             } else if (!enable && refNode != null) {
-                log.debug("Disabling {} logging appender", a.name);
+                log.debug("Disabling {} logging appender", a.getName());
                 root.removeChild(refNode);
                 write();
             }
@@ -529,7 +529,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                 Document doc = read();
                 List<Element> appender = getChildren(doc.getDocumentElement(), EN_APPENDER);
                 for (Element a : appender) {
-                    if (getAttribute(a, AN_NAME).getValue().equals(Appender.FILE.name)) {
+                    if (getAttribute(a, AN_NAME).getValue().equals(Appender.FILE.getName())) {
                         try {
                             max = Integer.parseInt(getSingleChildren(
                                     getSingleChildren(a, EN_ROLLING_POLICY), EN_MAX_HISTORY)
@@ -556,7 +556,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                 Document doc = read();
                 List<Element> appender = getChildren(doc.getDocumentElement(), EN_APPENDER);
                 for (Element a : appender) {
-                    if (getAttribute(a, AN_NAME).getValue().equals(Appender.FILE.name)) {
+                    if (getAttribute(a, AN_NAME).getValue().equals(Appender.FILE.getName())) {
                         maxFileSize = getSingleChildren(getSingleChildren(getSingleChildren(a, 
                             EN_ROLLING_POLICY), 
                                 EN_TIME_BASED_FILE_NAME_AND_TRIGGERING_POLICY), 
@@ -582,7 +582,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
             Document doc = read();
             List<Element> appender = getChildren(doc.getDocumentElement(), EN_APPENDER);
             for (Element a : appender) {
-                if (getAttribute(a, AN_NAME).getValue().equals(Appender.FILE.name)) {
+                if (getAttribute(a, AN_NAME).getValue().equals(Appender.FILE.getName())) {
                     Element maxFileSize = getSingleChildren(getSingleChildren(getSingleChildren(a, 
                             EN_ROLLING_POLICY), 
                                 EN_TIME_BASED_FILE_NAME_AND_TRIGGERING_POLICY), 
@@ -623,7 +623,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
         try {
             Element doc = read().getDocumentElement();
             for (Element a : getChildren(doc, EN_APPENDER)) {
-                if (getAttribute(a, AN_NAME).getValue().equals(Appender.FILE.name)) {
+                if (getAttribute(a, AN_NAME).getValue().equals(Appender.FILE.getName())) {
                     file = getSingleChildren(a, EN_FILE).getTextContent();
                 }
             }

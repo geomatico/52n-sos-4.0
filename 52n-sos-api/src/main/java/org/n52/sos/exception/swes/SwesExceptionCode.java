@@ -32,7 +32,7 @@ import org.n52.sos.ogc.swe.SWEConstants;
 public enum SwesExceptionCode implements ExceptionCode {
     InvalidRequest(SWEConstants.SOAP_REASON_INVALID_REQUEST),
     RequestExtensionNotSupported(SWEConstants.SOAP_REASON_REQUEST_EXTENSION_NOT_SUPPORTED);
-    final String soapFaultReason;
+    private final String soapFaultReason;
 
     private SwesExceptionCode(String soapFaultReason) {
         this.soapFaultReason = soapFaultReason;

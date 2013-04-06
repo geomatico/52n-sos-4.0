@@ -97,7 +97,7 @@ public abstract class AbstractLoggingConfigurator {
     public enum Appender {
         FILE("FILE"),
         CONSOLE("STDOUT");
-        public final String name;
+        private final String name;
 
         private Appender(String name) {
             this.name = name;
@@ -109,7 +109,7 @@ public abstract class AbstractLoggingConfigurator {
 
         public static Appender byName(String name) {
             for (Appender a : values()) {
-                if (a.name.equals(name)) {
+                if (a.getName().equals(name)) {
                     return a;
                 }
             }
