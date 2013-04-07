@@ -87,7 +87,7 @@ public class AdminUser implements Serializable, AdministratorUser {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof AdminUser) {
+        if (obj instanceof AdminUser) {
             final AdminUser other = (AdminUser) obj;
             return (getId() == null ? other.getId() == null : getId().equals(other.getId()))
                    && (getUsername() == null ? other.getUsername() == null : getUsername().equals(other.getUsername()));
