@@ -27,6 +27,6 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 public interface DataSourceInitializer {
 
-    public void initializeDataSource() throws OwsExceptionReport;
+    void initializeDataSource() throws OwsExceptionReport;
 
 }

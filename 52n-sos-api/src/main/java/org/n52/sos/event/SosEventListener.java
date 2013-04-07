@@ -29,6 +29,6 @@ import java.util.Set;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public interface SosEventListener {
-	public Set<Class<? extends SosEvent>> getTypes();
-	public void handle(SosEvent event);
+	Set<Class<? extends SosEvent>> getTypes();
+	void handle(SosEvent event);
 }

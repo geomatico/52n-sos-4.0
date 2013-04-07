@@ -34,7 +34,7 @@ import java.util.List;
 import org.n52.sos.ds.GeneralQueryDAO.QueryResult;
 
 public interface GeneralQueryDAO {
-    public static class QueryResult {
+    class QueryResult {
         private boolean error;
         private String message;
         private List<String> columnNames = new ArrayList<String>(0);
@@ -79,7 +79,7 @@ public interface GeneralQueryDAO {
         }
     }
 
-    public static class Row {
+    class Row {
         private List<String> values = new LinkedList<String>();
 
         public List<String> getValues() {
