@@ -49,7 +49,7 @@ public class HibernateDeleteDeletedObservationsDAO implements DeleteDeletedObser
             session = sessionHolder.getSession();
             transaction = session.beginTransaction();
             ScrollableResults sr = session.createCriteria(Observation.class)
-                    .add(Restrictions.eq(HibernateConstants.DELETED, true)).scroll();
+                    .add(Restrictions.eq(HibernateConstants.PARAMETER_DELETED, true)).scroll();
             while (sr.next()) {
                 session.delete((Observation) sr.get(0));
             }

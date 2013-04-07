@@ -124,7 +124,7 @@ public class GetResultDAO extends AbstractGetResultDAO {
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(obsPropAlias), request.getObservedProperty()));
         // deleted
         // XXX DeleteObservation Extension
-        queryObject.addCriterion(Restrictions.eq(HibernateConstants.DELETED, false));
+        queryObject.addCriterion(Restrictions.eq(HibernateConstants.PARAMETER_DELETED, false));
         // feature identifier
         if (featureIdentifier != null && featureIdentifier.isEmpty()) {
             return null;

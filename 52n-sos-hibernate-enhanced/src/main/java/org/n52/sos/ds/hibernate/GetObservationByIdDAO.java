@@ -87,7 +87,7 @@ public class GetObservationByIdDAO extends AbstractGetObservationByIdDAO {
     @SuppressWarnings({ "unchecked", "unused" })
     private List<Observation> queryObservationWithHibernate(GetObservationByIdRequest request, Session session) {
         return session.createCriteria(Observation.class)
-                .add(Restrictions.eq(DELETED, false))
+                .add(Restrictions.eq(PARAMETER_DELETED, false))
                 .add(Restrictions.or(
                     Restrictions.in(PARAMETER_IDENTIFIER, request.getObservationIdentifier()),
                     Restrictions.in(PARAMETER_SET_ID, request.getObservationIdentifier())))

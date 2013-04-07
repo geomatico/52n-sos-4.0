@@ -73,8 +73,13 @@ public interface HibernateConstants {
     String PARAMETER_UNIT = "unit";
     
     String PARAMETER_CODESPACE = "codespace";
-	
-	String DELETED = "deleted";
+
+    String PARAMETER_DELETED = "deleted";
+    /**
+     * @deprecated use {@link #PARAMETER_DELETED}
+     */
+    @Deprecated
+    String DELETED = PARAMETER_DELETED;
 
     String PARAMETER_RELATED_FEATURE_ROLE = "relatedFeatureRole";
 
