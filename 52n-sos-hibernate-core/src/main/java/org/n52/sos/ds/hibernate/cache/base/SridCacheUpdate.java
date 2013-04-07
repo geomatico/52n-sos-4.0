@@ -23,8 +23,6 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import java.util.HashSet;
-import java.util.Set;
 
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.service.Configurator;
@@ -43,8 +41,6 @@ public class SridCacheUpdate extends CacheUpdate {
 //            srids.add(spatialRefSys.getSrid());
 //        }
 //        getCache().setSrids(srids);
-        Set<Integer> srids = new HashSet<Integer>(1);
-        srids.add(new Integer(Configurator.getInstance().getFeatureQueryHandler().getDefaultEPSG()));
-        getCache().addEpsgCodes(srids);
+        getCache().addEpsgCode(Integer.valueOf(Configurator.getInstance().getFeatureQueryHandler().getDefaultEPSG()));
     }
 }
