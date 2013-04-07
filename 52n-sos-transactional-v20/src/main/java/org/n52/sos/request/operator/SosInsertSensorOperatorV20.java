@@ -157,7 +157,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
             exceptions.add(owse);
         }
         try {
-            checkObservablePropterty(request.getObservableProperty());
+            checkObservableProperty(request.getObservableProperty());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -193,7 +193,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
         exceptions.throwIfNotEmpty();
     }
 
-    private void checkObservablePropterty(List<String> observableProperty) throws OwsExceptionReport {
+    private void checkObservableProperty(List<String> observableProperty) throws OwsExceptionReport {
         if (observableProperty == null || observableProperty.isEmpty()) {
             throw new MissingObservedPropertyParameterException();
         } else {
