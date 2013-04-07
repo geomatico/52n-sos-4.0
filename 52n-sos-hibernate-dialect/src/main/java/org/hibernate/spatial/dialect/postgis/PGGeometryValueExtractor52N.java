@@ -98,8 +98,9 @@ public class PGGeometryValueExtractor52N extends AbstractJTSGeometryValueExtract
             PGobject pgo = (PGobject) object;
             // try to extract the box object (if available)
             String boxStr = extractBoxString(pgo);
-            if (boxStr == null)
+            if (boxStr == null) {
                 throw new IllegalArgumentException("Can't convert object: " + pgo.getType() + " : " + pgo.getValue());
+            }
             String[] pointsStr = boxStr.split(",");
             Point ll = toPoint(pointsStr[0]);
             Point ur = toPoint(pointsStr[1]);

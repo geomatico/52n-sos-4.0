@@ -72,23 +72,30 @@ public class CodeWithAuthority {
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof CodeWithAuthority))
-			return false;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof CodeWithAuthority)) {
+            return false;
+        }
 		CodeWithAuthority other = (CodeWithAuthority) obj;
 		if (codeSpace == null) {
-			if (other.codeSpace != null)
-				return false;
-		} else if (!codeSpace.equals(other.codeSpace))
-			return false;
+            if (other.codeSpace != null) {
+                return false;
+            }
+        } else if (!codeSpace.equals(other.codeSpace)) {
+            return false;
+        }
 		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
-			return false;
+            if (other.value != null) {
+                return false;
+            }
+        } else if (!value.equals(other.value)) {
+            return false;
+        }
 		return true;
 	}
 

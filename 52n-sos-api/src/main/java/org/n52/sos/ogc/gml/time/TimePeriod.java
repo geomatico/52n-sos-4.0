@@ -228,7 +228,7 @@ public class TimePeriod extends ITime {
     /**
      * Extend TimePeriod to contain Collection<ISosTime>
      * 
-     * @param sosTime
+     * @param times
      */
     public void extendToContain(Collection<ITime> times) {
         for (ITime time : times) {
@@ -239,7 +239,7 @@ public class TimePeriod extends ITime {
     /**
      * Extend TimePeriod to contain ISosTime
      * 
-     * @param sosTime
+     * @param time
      */
     public void extendToContain(ITime time) {
         if (time instanceof TimeInstant) {
@@ -391,43 +391,58 @@ public class TimePeriod extends ITime {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (!(obj instanceof TimePeriod))
+        }
+        if (!(obj instanceof TimePeriod)) {
             return false;
+        }
         TimePeriod other = (TimePeriod) obj;
         if (duration == null) {
-            if (other.duration != null)
+            if (other.duration != null) {
                 return false;
-        } else if (!duration.equals(other.duration))
+            }
+        } else if (!duration.equals(other.duration)) {
             return false;
+        }
         if (end == null) {
-            if (other.end != null)
+            if (other.end != null) {
                 return false;
-        } else if (!end.equals(other.end))
+            }
+        } else if (!end.equals(other.end)) {
             return false;
+        }
         if (endIndet == null) {
-            if (other.endIndet != null)
+            if (other.endIndet != null) {
                 return false;
-        } else if (!endIndet.equals(other.endIndet))
+            }
+        } else if (!endIndet.equals(other.endIndet)) {
             return false;
+        }
         if (interval == null) {
-            if (other.interval != null)
+            if (other.interval != null) {
                 return false;
-        } else if (!interval.equals(other.interval))
+            }
+        } else if (!interval.equals(other.interval)) {
             return false;
+        }
         if (start == null) {
-            if (other.start != null)
+            if (other.start != null) {
                 return false;
-        } else if (!start.equals(other.start))
+            }
+        } else if (!start.equals(other.start)) {
             return false;
+        }
         if (startIndet == null) {
-            if (other.startIndet != null)
+            if (other.startIndet != null) {
                 return false;
-        } else if (!startIndet.equals(other.startIndet))
+            }
+        } else if (!startIndet.equals(other.startIndet)) {
             return false;
+        }
         return true;
     }
 }
