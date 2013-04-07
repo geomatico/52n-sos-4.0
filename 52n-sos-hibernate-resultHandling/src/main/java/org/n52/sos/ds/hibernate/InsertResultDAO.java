@@ -48,6 +48,7 @@ import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.DateTimeParseException;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
@@ -77,7 +78,6 @@ import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.request.InsertResultRequest;
 import org.n52.sos.response.InsertResultResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.exception.ows.concrete.DateTimeParseException;
 import org.n52.sos.util.DateTimeHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -308,9 +308,7 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
                 return blockValues;
             } else {
                 String[] blockValuesWithoutCount = new String[blockValues.length - 1];
-                for (int i = 1; i < blockValues.length; i++) {
-                    blockValuesWithoutCount[i - 1] = blockValues[i];
-                }
+                System.arraycopy(blockValues, 1, blockValuesWithoutCount, 0, blockValuesWithoutCount.length);
                 return blockValuesWithoutCount;
             }
         }
@@ -320,5 +318,4 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
     private String[] separateValues(String values, String separator) {
         return values.split(separator);
     }
-
 }
