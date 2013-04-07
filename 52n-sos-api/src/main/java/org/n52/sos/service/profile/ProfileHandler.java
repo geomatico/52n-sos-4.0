@@ -18,7 +18,8 @@
  *
  * You should have received a copy of the GNU General Public License along with
  * this program (see gnu-gpl v2.txt). If not, write to the Free Software
- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 0T2111-1307, USA or * visit the Free Software Foundation web page, http://www.fsf.org.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
+ * visit the Free Software Foundation web page, http://www.fsf.org.
  */
 package org.n52.sos.service.profile;
 
