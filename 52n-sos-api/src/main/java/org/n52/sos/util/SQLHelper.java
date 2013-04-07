@@ -81,7 +81,7 @@ public class SQLHelper {
         if (closeable != null) {
             try {
                 closeable.close();
-            } catch (Throwable t) {
+            } catch (IOException t) {
                 log.error(String.format("Error closing %s!", closeable.getClass()), t);
             }
         }
@@ -91,7 +91,7 @@ public class SQLHelper {
         if (closable != null) {
             try {
                 closable.close();
-            } catch (Throwable ex) {
+            } catch (SQLException ex) {
                 log.error("Error closing ResultSet!", ex);
             }
         }
@@ -101,7 +101,7 @@ public class SQLHelper {
         if (closable != null) {
             try {
                 closable.close();
-            } catch (Throwable ex) {
+            } catch (SQLException ex) {
                 log.error("Error closing Statement!", ex);
             }
         }
@@ -111,7 +111,7 @@ public class SQLHelper {
         if (closable != null) {
             try {
                 closable.close();
-            } catch (Throwable ex) {
+            } catch (SQLException ex) {
                 log.error("Error closing Connection!", ex);
             }
         }

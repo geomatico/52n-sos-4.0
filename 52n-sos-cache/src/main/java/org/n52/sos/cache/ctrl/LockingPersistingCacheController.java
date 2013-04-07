@@ -26,6 +26,7 @@ package org.n52.sos.cache.ctrl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.concurrent.TimeUnit;
@@ -114,16 +115,14 @@ public abstract class LockingPersistingCacheController extends ScheduledContentC
             try {
                 in = new ObjectInputStream(new FileInputStream(f));
                 this.cache = (WritableContentCache) in.readObject();
-            } catch (Throwable t) {
+            } catch (IOException t) {
+                LOGGER.error(String.format("Error reading cache file '%s'", f.getAbsolutePath()), t);
+            } catch (ClassNotFoundException t) {
                 LOGGER.error(String.format("Error reading cache file '%s'", f.getAbsolutePath()), t);
             } finally {
                 IOUtils.closeQuietly(in);
             }
-            try {
-                f.delete();
-            } catch (Throwable t) {
-                LOGGER.error(String.format("Error deleting cache file '%s'", f.getAbsolutePath()), t);
-            }
+            f.delete();
         } else {
             LOGGER.debug("No cache temp file found at '{}'", f.getAbsolutePath());
         }
@@ -147,7 +146,7 @@ public abstract class LockingPersistingCacheController extends ScheduledContentC
                     } else {
                         LOGGER.error("Can not create writable file {}", f.getAbsolutePath());
                     }
-                } catch (Throwable t) {
+                } catch (IOException t) {
                     LOGGER.error(String.format("Error serializing cache to '%s'", f.getAbsolutePath()), t);
                 } finally {
                     IOUtils.closeQuietly(out);

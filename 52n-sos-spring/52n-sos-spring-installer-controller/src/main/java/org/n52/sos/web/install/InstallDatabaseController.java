@@ -92,7 +92,7 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
         settings.setDatabaseSetting(InstallConstants.DRIVER_PARAMETER, driver);
         try {
             Class.forName(driver);
-        } catch (Throwable ex) {
+        } catch (ClassNotFoundException ex) {
             throw new InstallationSettingsError(settings, String.format(ErrorMessages.COULD_NOT_LOAD_DRIVER, ex
                     .getMessage()), ex);
         }
@@ -107,7 +107,7 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
         settings.setDatabaseSetting(InstallConstants.CONNECTION_POOL_PARAMETER, connectionPool);
         try {
             Class.forName(connectionPool);
-        } catch (Throwable ex) {
+        } catch (ClassNotFoundException ex) {
             throw new InstallationSettingsError(settings, String.format(ErrorMessages.COULD_NOT_LOAD_CONNECTION_POOL, ex
                     .getMessage()), ex);
         }
@@ -122,7 +122,7 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
         settings.setDatabaseSetting(InstallConstants.DIALECT_PARAMETER, dialect);
         try {
             Class.forName(dialect);
-        } catch (Throwable ex) {
+        } catch (ClassNotFoundException ex) {
             throw new InstallationSettingsError(settings, String.format(ErrorMessages.COULD_NOT_LOAD_DIALECT, ex
                     .getMessage()), ex);
         }
