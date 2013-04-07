@@ -37,23 +37,23 @@ import java.util.Map;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class SynchronizedListMulitMap<K, V> extends AbstractSynchronizedMultiMap<K, V, List<V>>
+public class SynchronizedListMultiMap<K, V> extends AbstractSynchronizedMultiMap<K, V, List<V>>
         implements ListMultiMap<K, V> {
     private static final long serialVersionUID = 5212730580728827254L;
 
-    public SynchronizedListMulitMap(Map<? extends K, ? extends List<V>> m) {
+    public SynchronizedListMultiMap(Map<? extends K, ? extends List<V>> m) {
         super(m);
     }
 
-    public SynchronizedListMulitMap(int initialCapacity) {
+    public SynchronizedListMultiMap(int initialCapacity) {
         super(initialCapacity);
     }
 
-    public SynchronizedListMulitMap(int initialCapacity, float loadFactor) {
+    public SynchronizedListMultiMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
     }
 
-    public SynchronizedListMulitMap() {
+    public SynchronizedListMultiMap() {
         super();
     }
 

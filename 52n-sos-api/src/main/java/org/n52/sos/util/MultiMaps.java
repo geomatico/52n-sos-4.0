@@ -21,46 +21,32 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-
 package org.n52.sos.util;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Abstract implementation that delegates to a {@link HashMap}.
- *
- * @param <K> the key type
- * @param <V> the value type
- * @param <C> the collection type
- *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class AbstractMultiHashMap<K, V, C extends Collection<V>> extends AbstractDelegatingMultiMap<K, V, C>
-        implements MultiMap<K, V, C>, Map<K, C>, Serializable {
-    private static final long serialVersionUID = 5980618435134246476L;
-    private final Map<K, C> delegate;
-
-    public AbstractMultiHashMap(Map<? extends K, ? extends C> m) {
-        delegate = new HashMap<K, C>(m);
+public class MultiMaps {
+    public static <K, V> SetMultiMap<K, V> newSetMultiMap() {
+        return new HashSetMultiMap<K, V>();
     }
 
-    public AbstractMultiHashMap(int initialCapacity) {
-        delegate = new HashMap<K, C>(initialCapacity);
+    public static <K extends Enum<K>, V> SetMultiMap<K, V> newSetMultiMap(Class<K> keyType) {
+        return new EnumSetMultiMap<K, V>(keyType);
     }
 
-    public AbstractMultiHashMap(int initialCapacity, float loadFactor) {
-        delegate = new HashMap<K, C>(initialCapacity, loadFactor);
+    public static <K, V> SetMultiMap<K, V> newSynchronizedSetMultiMap() {
+        return new SynchronizedSetMultiMap<K, V>();
     }
 
-    public AbstractMultiHashMap() {
-        this.delegate = new HashMap<K, C>();
+    public static <K, V> ListMultiMap<K, V> newListMultiMap() {
+        return new LinkedListMultiMap<K, V>();
     }
 
-    @Override
-    protected Map<K, C> getDelegate() {
-        return delegate;
+    public static <K, V> ListMultiMap<K, V> newSynchronizedListMultiMap() {
+        return new SynchronizedListMultiMap<K, V>();
+    }
+
+    private MultiMaps() {
     }
 }

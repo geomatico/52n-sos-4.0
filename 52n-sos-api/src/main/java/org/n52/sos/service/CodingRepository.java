@@ -25,11 +25,11 @@ package org.n52.sos.service;
 
 import static org.n52.sos.util.CollectionHelper.map;
 import static org.n52.sos.util.CollectionHelper.set;
+import static org.n52.sos.util.MultiMaps.newSetMultiMap;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +50,7 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.Activatable;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.SetMultiMap;
 import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,14 +66,14 @@ public class CodingRepository {
     private final ServiceLoader<Encoder> serviceLoaderEncoder;
     private final Set<Decoder<?, ?>> decoders;
     private final Set<Encoder<?, ?>> encoders;
-    private final Map<DecoderKey, Set<Decoder<?, ?>>> decoderByKey = map();
-    private final Map<EncoderKey, Set<Encoder<?, ?>>> encoderByKey = map();
-    private Map<SupportedTypeKey, Set<Activatable<String>>> typeMap = Collections.emptyMap();
+    private final SetMultiMap<DecoderKey, Decoder<?, ?>> decoderByKey = newSetMultiMap();
+    private final SetMultiMap<EncoderKey, Encoder<?, ?>> encoderByKey = newSetMultiMap();
+    private SetMultiMap<SupportedTypeKey, Activatable<String>> typeMap = newSetMultiMap(SupportedTypeKey.class);
     private final Set<ObservationEncoder<?, ?>> observationEncoders = set();
     private final Map<String, Map<String, Set<String>>> responseFormats = map();
     private final Map<ResponseFormatKeyType, Boolean> responseFormatStatus = map();
 
-    public CodingRepository() throws ConfigurationException {
+    public CodingRepository() {
         this.serviceLoaderDecoder = ServiceLoader.load(Decoder.class);
         this.serviceLoaderEncoder = ServiceLoader.load(Encoder.class);
         this.decoders = CollectionHelper.asSet(loadDecoders());
@@ -120,7 +121,7 @@ public class CodingRepository {
         }
     }
 
-    public void updateDecoders() throws ConfigurationException {
+    public void updateDecoders() {
         log.debug("Reloading Decoder implementations");
         this.decoders.clear();
         this.decoders.addAll(loadDecoders());
@@ -129,7 +130,7 @@ public class CodingRepository {
         log.debug("Reloaded Decoder implementations");
     }
 
-    public void updateEncoders() throws ConfigurationException {
+    public void updateEncoders() {
         log.debug("Reloading Encoder implementations");
         this.encoders.clear();
         this.encoders.addAll(loadEncoders());
@@ -139,7 +140,7 @@ public class CodingRepository {
         log.debug("Reloaded Encoder implementations");
     }
 
-    private void generateResponseFormatMaps() throws ConfigurationException {
+    private void generateResponseFormatMaps() {
         this.responseFormatStatus.clear();
         this.responseFormats.clear();
         final Set<ServiceOperatorKeyType> serviceOperatorKeyTypes = Configurator.getInstance()
@@ -159,7 +160,7 @@ public class CodingRepository {
         }
     }
 
-    protected void addResponseFormat(ResponseFormatKeyType rfkt) throws ConfigurationException {
+    protected void addResponseFormat(ResponseFormatKeyType rfkt) {
         try {
             this.responseFormatStatus.put(rfkt, SettingsManager.getInstance().isActive(rfkt));
         } catch (ConnectionProviderException ex) {
@@ -176,7 +177,7 @@ public class CodingRepository {
         byVersion.add(rfkt.getResponseFormat());
     }
 
-    private List<Decoder<?, ?>> loadDecoders() throws ConfigurationException {
+    private List<Decoder<?, ?>> loadDecoders() {
         List<Decoder<?, ?>> loadedDecoders = new LinkedList<Decoder<?, ?>>();
         try {
             SettingsManager sm = SettingsManager.getInstance();
@@ -197,7 +198,7 @@ public class CodingRepository {
         return loadedDecoders;
     }
 
-    private List<Encoder<?, ?>> loadEncoders() throws ConfigurationException {
+    private List<Encoder<?, ?>> loadEncoders() {
         List<Encoder<?, ?>> loadedEncoders = new LinkedList<Encoder<?, ?>>();
         try {
             SettingsManager sm = SettingsManager.getInstance();
@@ -266,17 +267,12 @@ public class CodingRepository {
             list.add(encoder.getSupportedTypes());
         }
 
-        Map<SupportedTypeKey, Set<Activatable<String>>> resultMap =
-                                                        new EnumMap<SupportedTypeKey, Set<Activatable<String>>>(SupportedTypeKey.class);
+        SetMultiMap<SupportedTypeKey, Activatable<String>> resultMap = newSetMultiMap(SupportedTypeKey.class);
         for (Map<SupportedTypeKey, Set<String>> map : list) {
             if (map != null && !map.isEmpty()) {
                 for (SupportedTypeKey type : map.keySet()) {
                     if (map.get(type) != null && !map.get(type).isEmpty()) {
-                        Set<Activatable<String>> values = resultMap.get(type);
-                        if (values == null) {
-                            resultMap.put(type, values = set());
-                        }
-                        values.addAll(Activatable.from(map.get(type)));
+                        resultMap.addAll(type, Activatable.from(map.get(type)));
                     }
                 }
             }
@@ -290,11 +286,7 @@ public class CodingRepository {
         this.encoderByKey.clear();
         for (Encoder<?, ?> encoder : getEncoders()) {
             for (EncoderKey key : encoder.getEncoderKeyType()) {
-                Set<Encoder<?, ?>> encodersForKey = encoderByKey.get(key);
-                if (encodersForKey == null) {
-                    encoderByKey.put(key, encodersForKey = set());
-                }
-                encodersForKey.add(encoder);
+                encoderByKey.add(key, encoder);
             }
             if (encoder instanceof ObservationEncoder) {
                 observationEncoders.add((ObservationEncoder<?, ?>) encoder);
@@ -365,11 +357,10 @@ public class CodingRepository {
     private Set<Decoder<?, ?>> findDecodersForSingleKey(DecoderKey key) {
         Set<Decoder<?, ?>> matches = decoderByKey.get(key);
         if (matches == null) {
-            decoderByKey.put(key, matches = set());
             for (Decoder<?, ?> decoder : getDecoders()) {
                 for (DecoderKey dk : decoder.getDecoderKeyTypes()) {
                     if (dk.getSimilarity(key) > 0) {
-                        matches.add(decoder);
+                        decoderByKey.add(key, decoder);
                     }
                 }
             }
@@ -381,10 +372,9 @@ public class CodingRepository {
         Set<Encoder<?, ?>> matches = encoderByKey.get(ck);
         if (matches == null) {
             // first request; search for matching encoders and save result for later quries
-            encoderByKey.put(ck, matches = set());
             for (Encoder<?, ?> encoder : encoders) {
                 if (ck.matches(encoder.getEncoderKeyType())) {
-                    matches.add(encoder);
+                    encoderByKey.add(ck, encoder);
                 }
             }
             log.debug("Found {} Encoders for CompositeKey: {}", matches.size(),
@@ -397,10 +387,9 @@ public class CodingRepository {
         Set<Decoder<?, ?>> matches = decoderByKey.get(ck);
         if (matches == null) {
             // first request; search for matching decoders and save result for later queries
-            decoderByKey.put(ck, matches = set());
             for (Decoder<?, ?> decoder : decoders) {
                 if (ck.matches(decoder.getDecoderKeyTypes())) {
-                    matches.add(decoder);
+                    decoderByKey.add(ck, decoder);
                 }
             }
             log.debug("Found {} Decoders for CompositeKey: {}", matches.size(),

@@ -21,46 +21,44 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-
 package org.n52.sos.util;
 
-import java.io.Serializable;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * Abstract implementation that delegates to a {@link HashMap}.
+ * Implementation based on synchronized {@link HashSet}s and a synchronized {@link HashMap}.
  *
  * @param <K> the key type
  * @param <V> the value type
- * @param <C> the collection type
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class AbstractMultiHashMap<K, V, C extends Collection<V>> extends AbstractDelegatingMultiMap<K, V, C>
-        implements MultiMap<K, V, C>, Map<K, C>, Serializable {
-    private static final long serialVersionUID = 5980618435134246476L;
-    private final Map<K, C> delegate;
+public class SynchronizedSetMultiMap<K, V> extends AbstractSynchronizedMultiMap<K, V, Set<V>>
+        implements SetMultiMap<K, V> {
+    private static final long serialVersionUID = 741828638081663856L;
 
-    public AbstractMultiHashMap(Map<? extends K, ? extends C> m) {
-        delegate = new HashMap<K, C>(m);
+    public SynchronizedSetMultiMap(Map<? extends K, ? extends Set<V>> m) {
+        super(m);
     }
 
-    public AbstractMultiHashMap(int initialCapacity) {
-        delegate = new HashMap<K, C>(initialCapacity);
+    public SynchronizedSetMultiMap(int initialCapacity) {
+        super(initialCapacity);
     }
 
-    public AbstractMultiHashMap(int initialCapacity, float loadFactor) {
-        delegate = new HashMap<K, C>(initialCapacity, loadFactor);
+    public SynchronizedSetMultiMap(int initialCapacity, float loadFactor) {
+        super(initialCapacity, loadFactor);
     }
 
-    public AbstractMultiHashMap() {
-        this.delegate = new HashMap<K, C>();
+    public SynchronizedSetMultiMap() {
+        super();
     }
 
     @Override
-    protected Map<K, C> getDelegate() {
-        return delegate;
+    protected Set<V> newCollection() {
+        return Collections.synchronizedSet(new HashSet<V>());
     }
 }

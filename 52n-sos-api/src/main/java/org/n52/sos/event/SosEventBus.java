@@ -23,11 +23,9 @@
  */
 package org.n52.sos.event;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
@@ -40,6 +38,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.n52.sos.util.ClassHelper;
 import org.n52.sos.util.GroupedAndNamedThreadFactory;
+import org.n52.sos.util.MultiMaps;
+import org.n52.sos.util.SetMultiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,19 +51,9 @@ public class SosEventBus {
     private static final boolean ASYNCHRONOUS_EXECUTION = false;
     private static final int THREAD_POOL_SIZE = 3;
     private static final String THREAD_GROUP_NAME = "SosEventBus-Worker";
-    private static final Object SINGLETON_CREATION_LOCK = new Object();
 
-    private static SosEventBus instance;
-    
-	public static SosEventBus getInstance() {
-		if (instance == null) {
-			synchronized (SINGLETON_CREATION_LOCK) {
-				if (instance == null) {
-					instance = new SosEventBus();
-				}
-			}
-		}
-		return instance;
+    public static SosEventBus getInstance() {
+        return InstanceHolder.INSTANCE;
 	}
     
     public static void fire(SosEvent event) {
@@ -93,8 +83,7 @@ public class SosEventBus {
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Executor executor = Executors
             .newFixedThreadPool(THREAD_POOL_SIZE, new GroupedAndNamedThreadFactory(THREAD_GROUP_NAME));
-    private final Map<Class<? extends SosEvent>, Set<SosEventListener>> listeners =
-                                                                        new HashMap<Class<? extends SosEvent>, Set<SosEventListener>>();
+    private final SetMultiMap<Class<? extends SosEvent>, SosEventListener> listeners = MultiMaps.newSetMultiMap();
     private final Queue<HandlerExecution> queue = new ConcurrentLinkedQueue<HandlerExecution>();
 
     private SosEventBus() {
@@ -121,8 +110,8 @@ public class SosEventBus {
                 Set<SosEventListener> listenersForClass = this.listeners.get(eventType);
                 
                 if (listenersForClass != null) {
-                    log
-                            .trace("Adding {} Listeners for event {} (eventType={})", listenersForClass.size(), event, eventType);
+                    log.trace("Adding {} Listeners for event {} (eventType={})",
+                              listenersForClass.size(), event, eventType);
                     result.addAll(listenersForClass);
                 } else {
                     log.trace("Adding 0 Listeners for event {} (eventType={})", event, eventType);
@@ -171,11 +160,7 @@ public class SosEventBus {
         try {
             for (Class<? extends SosEvent> eventType : listener.getTypes()) {
                 log.debug("Subscibing Listener {} to EventType {}", listener, eventType);
-                Set<SosEventListener> listenersForKey = this.listeners.get(eventType);
-                if (listenersForKey == null) {
-                    this.listeners.put(eventType, listenersForKey = new HashSet<SosEventListener>());
-                }
-                listenersForKey.add(listener);
+                this.listeners.add(eventType, listener);
             }
         } finally {
             this.lock.writeLock().unlock();
@@ -202,10 +187,15 @@ public class SosEventBus {
         }
     }
 
+    private static class InstanceHolder {
+        private static final SosEventBus INSTANCE = new SosEventBus();
+        private InstanceHolder() {
+        }
+    }
+
 	private class ClassCache {
 		private ReadWriteLock lock = new ReentrantReadWriteLock();
-		private Map<Class<? extends SosEvent>, Set<Class<? extends SosEvent>>> cache
-				= new HashMap<Class<? extends SosEvent>, Set<Class<? extends SosEvent>>>();
+        private SetMultiMap<Class<? extends SosEvent>, Class<? extends SosEvent>> cache = MultiMaps.newSetMultiMap();
 
 		public Set<Class<? extends SosEvent>> getClasses(Class<? extends SosEvent> eventClass)  {
 			lock.readLock().lock();
@@ -217,7 +207,7 @@ public class SosEventBus {
 			}
 			lock.writeLock().lock();
 			try {
-				Set<Class<? extends SosEvent>> r = cache.get(eventClass);
+                Set<Class<? extends SosEvent>> r = cache.get(eventClass);
 				if (r != null) { return r; }
 				cache.put(eventClass, r = flatten(eventClass));
 				return r;

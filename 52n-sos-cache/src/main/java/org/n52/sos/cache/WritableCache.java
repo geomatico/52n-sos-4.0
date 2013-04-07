@@ -23,8 +23,8 @@
  */
 package org.n52.sos.cache;
 
+import static org.n52.sos.cache.AbstractContentCache.newSynchronizedSet;
 import static org.n52.sos.cache.AbstractContentCache.notNullOrEmpty;
-import static org.n52.sos.cache.AbstractContentCache.synchronizedSet;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -206,42 +206,42 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void setObservablePropertiesForCompositePhenomenon(String compositePhenomenon,
                                                               Collection<String> observableProperties) {
-        final Set<String> newValue = synchronizedSet(observableProperties);
+        final Set<String> newValue = newSynchronizedSet(observableProperties);
         log.trace("Setting ObservableProperties for CompositePhenomenon {} to {}", compositePhenomenon, newValue);
         getObservablePropertiesForCompositePhenomenonsMap().put(compositePhenomenon, newValue);
     }
 
     @Override
     public void setObservablePropertiesForOffering(String offering, Collection<String> observableProperties) {
-        final Set<String> newValue = synchronizedSet(observableProperties);
+        final Set<String> newValue = newSynchronizedSet(observableProperties);
         log.trace("Setting ObservableProperties for Offering {} to {}", offering, observableProperties);
         getObservablePropertiesForOfferingsMap().put(offering, newValue);
     }
 
     @Override
     public void setObservablePropertiesForProcedure(String procedure, Collection<String> observableProperties) {
-        final Set<String> newValue = synchronizedSet(observableProperties);
+        final Set<String> newValue = newSynchronizedSet(observableProperties);
         log.trace("Setting ObservableProperties for Procedure {} to {}", procedure, newValue);
         getObservablePropertiesForProceduresMap().put(procedure, newValue);
     }
 
     @Override
     public void setObservationTypesForOffering(String offering, Collection<String> observationTypes) {
-        final Set<String> newValue = synchronizedSet(observationTypes);
+        final Set<String> newValue = newSynchronizedSet(observationTypes);
         log.trace("Setting ObservationTypes for Offering {} to {}", offering, newValue);
         getObservationTypesForOfferingsMap().put(offering, newValue);
     }
 
     @Override
     public void setOfferingsForObservableProperty(String observableProperty, Collection<String> offerings) {
-        final Set<String> newValue = synchronizedSet(offerings);
+        final Set<String> newValue = newSynchronizedSet(offerings);
         log.trace("Setting Offerings for ObservableProperty {} to {}", observableProperty, newValue);
         getOfferingsForObservablePropertiesMap().put(observableProperty, newValue);
     }
 
     @Override
     public void setOfferingsForProcedure(String procedure, Collection<String> offerings) {
-        final Set<String> newValue = synchronizedSet(offerings);
+        final Set<String> newValue = newSynchronizedSet(offerings);
         log.trace("Setting Offerings for Procedure {} to {}", procedure, newValue);
         getOfferingsForProceduresMap().put(procedure, newValue);
     }
@@ -249,42 +249,42 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void setProceduresForFeatureOfInterest(String featureOfInterest,
                                                   Collection<String> proceduresForFeatureOfInterest) {
-        final Set<String> newValue = synchronizedSet(proceduresForFeatureOfInterest);
+        final Set<String> newValue = newSynchronizedSet(proceduresForFeatureOfInterest);
         log.trace("Setting Procedures for FeatureOfInterest {} to {}", featureOfInterest, newValue);
         getProceduresForFeaturesOfInterestMap().put(featureOfInterest, newValue);
     }
 
     @Override
     public void setProceduresForObservableProperty(String observableProperty, Collection<String> procedures) {
-        final Set<String> newValue = synchronizedSet(procedures);
+        final Set<String> newValue = newSynchronizedSet(procedures);
         log.trace("Setting Procedures for ObservablePropert {} to {}", observableProperty, procedures);
         getProceduresForObservablePropertiesMap().put(observableProperty, newValue);
     }
 
     @Override
     public void setProceduresForOffering(String offering, Collection<String> procedures) {
-        final Set<String> newValue = synchronizedSet(procedures);
+        final Set<String> newValue = newSynchronizedSet(procedures);
         log.trace("Setting Procedures for Offering {} to {}", offering, newValue);
         getProceduresForOfferingsMap().put(offering, newValue);
     }
 
     @Override
     public void setRelatedFeaturesForOffering(String offering, Collection<String> relatedFeatures) {
-        final Set<String> newValue = synchronizedSet(relatedFeatures);
+        final Set<String> newValue = newSynchronizedSet(relatedFeatures);
         log.trace("Setting Related Features for Offering {} to {}", offering, newValue);
         getRelatedFeaturesForOfferingsMap().put(offering, newValue);
     }
 
     @Override
     public void setResultTemplatesForOffering(String offering, Collection<String> resultTemplates) {
-        final Set<String> newValue = synchronizedSet(resultTemplates);
+        final Set<String> newValue = newSynchronizedSet(resultTemplates);
         log.trace("Setting ResultTemplates for Offering {} to {}", offering, newValue);
         getResultTemplatesForOfferingsMap().put(offering, newValue);
     }
 
     @Override
     public void setRolesForRelatedFeature(String relatedFeature, Collection<String> roles) {
-        final Set<String> newValue = synchronizedSet(roles);
+        final Set<String> newValue = newSynchronizedSet(roles);
         log.trace("Setting Roles for RelatedFeature {} to {}", relatedFeature, newValue);
         getRolesForRelatedFeaturesMap().put(relatedFeature, newValue);
     }
@@ -853,7 +853,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void setAllowedObservationTypeForOffering(String offering, Collection<String> allowedObservationType) {
         notNullOrEmpty("offering", offering);
-        final Set<String> newValue = synchronizedSet(allowedObservationType);
+        final Set<String> newValue = newSynchronizedSet(allowedObservationType);
         log.trace("Setting allowedObservationTypes for offering {} to {}", offering, newValue);
         getAllowedObservationTypesForOfferingsMap().put(offering, newValue);
     }
@@ -861,7 +861,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void setCompositePhenomenonsForOffering(String offering, Collection<String> compositePhenomenons) {
         notNullOrEmpty("offering", offering);
-        final Set<String> newValue = synchronizedSet(compositePhenomenons);
+        final Set<String> newValue = newSynchronizedSet(compositePhenomenons);
         log.trace("Setting compositePhenomenons for offering {} to {}", offering, newValue);
         getCompositePhenomenonsForOfferingsMap().put(offering, newValue);
     }
@@ -869,7 +869,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void setFeaturesOfInterestForOffering(String offering, Collection<String> featureOfInterest) {
         notNullOrEmpty("offering", offering);
-        final Set<String> newValue = synchronizedSet(featureOfInterest);
+        final Set<String> newValue = newSynchronizedSet(featureOfInterest);
         log.trace("Setting featureOfInterest for offering {} to {}", offering, newValue);
         getFeaturesOfInterestForOfferingMap().put(offering, newValue);
     }
@@ -900,7 +900,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void setObservablePropertiesForResultTemplate(String resultTemplate, Collection<String> observableProperties) {
         notNullOrEmpty("resultTemplate", resultTemplate);
-        final Set<String> newValue = synchronizedSet(observableProperties);
+        final Set<String> newValue = newSynchronizedSet(observableProperties);
         log.trace("Setting observableProperties for resultTemplate {} to {}", resultTemplate, newValue);
         getObservablePropertiesForResultTemplatesMap().put(resultTemplate, newValue);
     }
@@ -908,7 +908,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void setObservationIdentifiersForProcedure(String procedure, Collection<String> observationIdentifiers) {
         notNullOrEmpty("procedure", procedure);
-        final Set<String> newValue = synchronizedSet(observationIdentifiers);
+        final Set<String> newValue = newSynchronizedSet(observationIdentifiers);
         log.trace("Setting observationIdentifiers for procedure {} to {}", procedure, newValue);
         getObservationIdentifiersForProceduresMap().put(procedure, newValue);
     }
@@ -943,7 +943,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
      * @param childs    the childs map
      */
     protected <T> void updateHierarchy(T parent, Collection<T> newChilds, SetMultiMap<T, T> parents, SetMultiMap<T, T> childs) {
-        Set<T> newChildSet = synchronizedSet(newChilds);
+        Set<T> newChildSet = newSynchronizedSet(newChilds);
         Set<T> currentParents = parents.put(parent, newChildSet);
         if (currentParents != null) {
             for (T currentParent : currentParents) {

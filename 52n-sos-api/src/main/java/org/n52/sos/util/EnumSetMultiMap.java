@@ -21,44 +21,47 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
+
 package org.n52.sos.util;
 
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Implementation based on synchronized {@link HashSet}s and a synchronized {@link HashMap}.
+ * {@linkplain SetMultiMap} implementation backed with a {@link EnumMap}.
  *
  * @param <K> the key type
  * @param <V> the value type
  *
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0
  */
-public class SynchonizedSetMultiMap<K, V> extends AbstractSynchronizedMultiMap<K, V, Set<V>>
-        implements SetMultiMap<K, V> {
-    private static final long serialVersionUID = 741828638081663856L;
+public class EnumSetMultiMap<K extends Enum<K>, V> extends AbstractDelegatingMultiMap<K, V, Set<V>> implements
+        SetMultiMap<K, V> {
+    private static final long serialVersionUID = 1343214593123842785L;
+    private final Map<K, Set<V>> delegate;
 
-    public SynchonizedSetMultiMap(Map<? extends K, ? extends Set<V>> m) {
-        super(m);
+    public EnumSetMultiMap(Class<K> keyType) {
+        this.delegate = new EnumMap<K, Set<V>>(keyType);
     }
 
-    public SynchonizedSetMultiMap(int initialCapacity) {
-        super(initialCapacity);
+    public EnumSetMultiMap(EnumMap<K, ? extends Set<V>> m) {
+        this.delegate = new EnumMap<K, Set<V>>(m);
     }
 
-    public SynchonizedSetMultiMap(int initialCapacity, float loadFactor) {
-        super(initialCapacity, loadFactor);
+    public EnumSetMultiMap(Map<K, ? extends Set<V>> m) {
+        this.delegate = new EnumMap<K, Set<V>>(m);
     }
 
-    public SynchonizedSetMultiMap() {
-        super();
+    @Override
+    protected Map<K, Set<V>> getDelegate() {
+        return this.delegate;
     }
 
     @Override
     protected Set<V> newCollection() {
-        return Collections.synchronizedSet(new HashSet<V>());
+        return new HashSet<V>();
     }
 }

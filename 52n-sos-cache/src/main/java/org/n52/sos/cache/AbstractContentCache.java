@@ -23,6 +23,8 @@
  */
 package org.n52.sos.cache;
 
+import static org.n52.sos.util.MultiMaps.newSynchronizedSetMultiMap;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,7 +38,6 @@ import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.SetMultiMap;
-import org.n52.sos.util.SynchonizedSetMultiMap;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -89,7 +90,7 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
      *
      * @return the synchronized map
      */
-    protected static <K, V> Map<K, V> synchronizedMap(Map<K, V> map) {
+    protected static <K, V> Map<K, V> newSynchronizedMap(Map<K, V> map) {
         if (map == null) {
             return CollectionHelper.synchronizedMap(0);
         } else {
@@ -105,7 +106,7 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
      *
      * @return the synchronized set
      */
-    protected static <T> Set<T> synchronizedSet(Iterable<T> elements) {
+    protected static <T> Set<T> newSynchronizedSet(Iterable<T> elements) {
         if (elements == null) {
             return CollectionHelper.synchronizedSet(0);
         } else {
@@ -129,8 +130,8 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
      *
      * @return the synchronized map
      */
-    protected static <K, V> Map<K, V> synchronizedMap() {
-        return synchronizedMap(null);
+    protected static <K, V> Map<K, V> newSynchronizedMap() {
+        return newSynchronizedMap(null);
     }
 
     /**
@@ -140,8 +141,8 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
      *
      * @return a synchronized set
      */
-    protected static <T> Set<T> synchronizedSet() {
-        return synchronizedSet(null);
+    protected static <T> Set<T> newSynchronizedSet() {
+        return newSynchronizedSet(null);
     }
 
     /**
@@ -281,45 +282,40 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
     }
 
     private int defaultEpsgCode = 4326;
-    private Map<String, DateTime> maxPhenomenonTimeForOfferings = synchronizedMap();
-    private Map<String, DateTime> minPhenomenonTimeForOfferings = synchronizedMap();
-    private Map<String, DateTime> maxResultTimeForOfferings = synchronizedMap();
-    private Map<String, DateTime> minResultTimeForOfferings = synchronizedMap();
-    private SetMultiMap<String, String> allowedObservationTypeForOfferings = new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> childFeaturesForFeatureOfInterest = new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> childProceduresForProcedures = new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> compositePhenomenonForOfferings = new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> featuresOfInterestForOfferings = new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> featuresOfInterestForResultTemplates =
-                                        new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> observablePropertiesForCompositePhenomenons =
-                                        new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> observablePropertiesForOfferings = new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> observablePropertiesForProcedures = new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> observationIdentifiersForProcedures =
-                                        new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> observationTypesForOfferings = new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> observedPropertiesForResultTemplates =
-                                        new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> offeringsForObservableProperties = new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> offeringsForProcedures = new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> parentFeaturesForFeaturesOfInterest =
-                                        new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> parentProceduresForProcedures = new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> proceduresForFeaturesOfInterest = new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> proceduresForObservableProperties = new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> proceduresForOfferings = new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> relatedFeaturesForOfferings = new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> resultTemplatesForOfferings = new SynchonizedSetMultiMap<String, String>();
-    private SetMultiMap<String, String> rolesForRelatedFeatures = new SynchonizedSetMultiMap<String, String>();
-    private Map<String, SosEnvelope> envelopeForOfferings = synchronizedMap();
-    private Map<String, String> nameForOfferings = synchronizedMap();
-    private Set<Integer> epsgCodes = synchronizedSet();
-    private Set<String> featuresOfInterest = synchronizedSet();
-    private Set<String> observationIdentifiers = synchronizedSet();
-    private Set<String> procedures = synchronizedSet();
-    private Set<String> resultTemplates = synchronizedSet();
-    private Set<String> offerings = synchronizedSet();
+    private Map<String, DateTime> maxPhenomenonTimeForOfferings = newSynchronizedMap();
+    private Map<String, DateTime> minPhenomenonTimeForOfferings = newSynchronizedMap();
+    private Map<String, DateTime> maxResultTimeForOfferings = newSynchronizedMap();
+    private Map<String, DateTime> minResultTimeForOfferings = newSynchronizedMap();
+    private SetMultiMap<String, String> allowedObservationTypeForOfferings = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> childFeaturesForFeatureOfInterest = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> childProceduresForProcedures = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> compositePhenomenonForOfferings = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> featuresOfInterestForOfferings = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> featuresOfInterestForResultTemplates = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> observablePropertiesForCompositePhenomenons = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> observablePropertiesForOfferings = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> observablePropertiesForProcedures = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> observationIdentifiersForProcedures = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> observationTypesForOfferings = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> observedPropertiesForResultTemplates = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> offeringsForObservableProperties = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> offeringsForProcedures = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> parentFeaturesForFeaturesOfInterest = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> parentProceduresForProcedures = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> proceduresForFeaturesOfInterest = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> proceduresForObservableProperties = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> proceduresForOfferings = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> relatedFeaturesForOfferings = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> resultTemplatesForOfferings = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> rolesForRelatedFeatures = newSynchronizedSetMultiMap();
+    private Map<String, SosEnvelope> envelopeForOfferings = newSynchronizedMap();
+    private Map<String, String> nameForOfferings = newSynchronizedMap();
+    private Set<Integer> epsgCodes = newSynchronizedSet();
+    private Set<String> featuresOfInterest = newSynchronizedSet();
+    private Set<String> observationIdentifiers = newSynchronizedSet();
+    private Set<String> procedures = newSynchronizedSet();
+    private Set<String> resultTemplates = newSynchronizedSet();
+    private Set<String> offerings = newSynchronizedSet();
     private SosEnvelope globalEnvelope = new SosEnvelope(null, defaultEpsgCode);
     private TimePeriod globalPhenomenonTimeEnvelope = new TimePeriod();
     private TimePeriod globalResultTimeEnvelope = new TimePeriod();
