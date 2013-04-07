@@ -113,12 +113,17 @@ public abstract class ScheduledContentCacheController implements ContentCacheCon
     }
 
     @Override
-    protected void finalize() {
+    protected void finalize() throws Throwable {
+        Throwable t = null;
         try {
             cleanup();
-            super.finalize();
         } catch (Throwable e) {
             LOGGER.error("Could not finalize CapabilitiesCacheController! " + e.getMessage(), e);
+            t = e;
+        }
+        super.finalize();
+        if (t != null) {
+            throw t;
         }
     }
 
