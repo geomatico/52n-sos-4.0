@@ -39,7 +39,6 @@ import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.spatial.criterion.SpatialProjections;
 import org.hibernate.spatial.criterion.SpatialRestrictions;
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.FeatureQueryHandler;
@@ -47,14 +46,15 @@ import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
+import org.n52.sos.exception.ConfigurationException;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.NotYetSupportedException;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.exception.ows.concrete.NotYetSupportedException;
 import org.n52.sos.ogc.sos.Range;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -211,7 +211,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
                     Envelope envelope = new Envelope();
                     List<FeatureOfInterest> featuresOfInterest =
                             HibernateCriteriaQueryUtilities.getFeatureOfInterestObject(featureIDs, session);
-                    for (FeatureOfInterest feature : (List<FeatureOfInterest>) featuresOfInterest) {
+                    for (FeatureOfInterest feature : featuresOfInterest) {
                         try {
                             Geometry geom = getGeomtery(feature);
                             if (geom != null) {
