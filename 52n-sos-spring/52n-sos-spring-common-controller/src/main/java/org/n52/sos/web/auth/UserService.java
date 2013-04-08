@@ -27,13 +27,10 @@ import java.io.Serializable;
 import java.security.Principal;
 import java.util.Collections;
 
-import javax.servlet.ServletContext;
-
 import org.n52.sos.config.AdministratorUser;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.exception.ConfigurationException;
-import org.n52.sos.web.ControllerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +39,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class UserService implements AuthenticationProvider, Serializable {
@@ -50,17 +46,16 @@ public class UserService implements AuthenticationProvider, Serializable {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
     
     @Autowired
-    private ServletContext context;
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
     public UsernamePasswordAuthenticationToken authenticate(Authentication authentication) throws
             AuthenticationException {
         UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) authentication;
-        AdministratorUser user = authenticate((String) auth.getPrincipal(), (String) auth.getCredentials());
-        return new UsernamePasswordAuthenticationToken(new AdministratorUserPrinciple(user), null, Collections
-                .singleton(new AdministratorAuthority()));
+        AdministratorUser user = authenticate((String) auth.getPrincipal(),
+                                              (String) auth.getCredentials());
+        return new UsernamePasswordAuthenticationToken(new AdministratorUserPrinciple(user), null,
+                                                       Collections.singleton(new AdministratorAuthority()));
     }
 
     public AdministratorUser authenticate(String username, String password) throws AuthenticationException {
@@ -136,14 +131,6 @@ public class UserService implements AuthenticationProvider, Serializable {
         }
     }
 
-    public ServletContext getContext() {
-        return context;
-    }
-
-    public void setContext(ServletContext context) {
-        this.context = context;
-    }
-
     public PasswordEncoder getPasswordEncoder() {
         return passwordEncoder;
     }
@@ -154,30 +141,5 @@ public class UserService implements AuthenticationProvider, Serializable {
 
     protected SettingsManager getSettingsManager() throws ConfigurationException {
         return SettingsManager.getInstance();
-    }
-
-    private static class AdministratorAuthority implements GrantedAuthority {
-
-        private static final long serialVersionUID = 5103351149817795492L;
-
-        @Override
-        public String getAuthority() {
-            return ControllerConstants.ROLE_ADMIN;
-        }
-    }
-    
-    private class AdministratorUserPrinciple implements Principal, Serializable {
-        private static final long serialVersionUID = 8178359938656526381L;
-
-        private String username;
-        
-        AdministratorUserPrinciple(AdministratorUser user) {
-            this.username = user.getUsername();
-        }
-        
-        @Override
-        public String getName() {
-            return this.username;
-        }
     }
 }
