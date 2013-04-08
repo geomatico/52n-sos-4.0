@@ -340,23 +340,20 @@ public class CodingRepository {
     }
 
     private Set<Encoder<?, ?>> findEncodersForSingleKey(EncoderKey key) {
-        Set<Encoder<?, ?>> matches = encoderByKey.get(key);
-        if (matches == null) {
-            encoderByKey.put(key, matches = set());
+        if (!encoderByKey.containsKey(key)) {
             for (Encoder<?, ?> encoder : getEncoders()) {
                 for (EncoderKey ek : encoder.getEncoderKeyType()) {
                     if (ek.getSimilarity(key) > 0) {
-                        matches.add(encoder);
+                        encoderByKey.add(key, encoder);
                     }
                 }
             }
         }
-        return matches;
+        return encoderByKey.get(key);
     }
 
     private Set<Decoder<?, ?>> findDecodersForSingleKey(DecoderKey key) {
-        Set<Decoder<?, ?>> matches = decoderByKey.get(key);
-        if (matches == null) {
+        if (!decoderByKey.containsKey(key)) {
             for (Decoder<?, ?> decoder : getDecoders()) {
                 for (DecoderKey dk : decoder.getDecoderKeyTypes()) {
                     if (dk.getSimilarity(key) > 0) {
@@ -365,37 +362,35 @@ public class CodingRepository {
                 }
             }
         }
-        return matches;
+        return decoderByKey.get(key);
     }
 
     private Set<Encoder<?, ?>> findEncodersForCompositeKey(CompositeEncoderKey ck) {
-        Set<Encoder<?, ?>> matches = encoderByKey.get(ck);
-        if (matches == null) {
+        if (!encoderByKey.containsKey(ck)) {
             // first request; search for matching encoders and save result for later quries
             for (Encoder<?, ?> encoder : encoders) {
                 if (ck.matches(encoder.getEncoderKeyType())) {
                     encoderByKey.add(ck, encoder);
                 }
             }
-            log.debug("Found {} Encoders for CompositeKey: {}", matches.size(),
-                      StringHelper.join(", ", matches));
+            log.debug("Found {} Encoders for CompositeKey: {}", encoderByKey.get(ck).size(),
+                      StringHelper.join(", ", encoderByKey.get(ck)));
         }
-        return matches;
+        return encoderByKey.get(ck);
     }
 
     private Set<Decoder<?, ?>> findDecodersForCompositeKey(CompositeDecoderKey ck) {
-        Set<Decoder<?, ?>> matches = decoderByKey.get(ck);
-        if (matches == null) {
+        if (!decoderByKey.containsKey(ck)) {
             // first request; search for matching decoders and save result for later queries
             for (Decoder<?, ?> decoder : decoders) {
                 if (ck.matches(decoder.getDecoderKeyTypes())) {
                     decoderByKey.add(ck, decoder);
                 }
             }
-            log.debug("Found {} Decoders for CompositeKey: {}", matches.size(),
-                      StringHelper.join(", ", matches));
+            log.debug("Found {} Decoders for CompositeKey: {}", decoderByKey.get(ck).size(),
+                      StringHelper.join(", ", decoderByKey.get(ck)));
         }
-        return matches;
+        return decoderByKey.get(ck);
     }
 
     public Set<String> getSupportedResponseFormats(String service, String version) {
