@@ -329,8 +329,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
         return exceptionDoc;
     }
 
-    private ExceptionReportDocument encodeOwsExceptionReport(OwsExceptionReport owsExceptionReport)
-            throws OwsExceptionReport {
+    private ExceptionReportDocument encodeOwsExceptionReport(OwsExceptionReport owsExceptionReport) {
         ExceptionReportDocument erd = ExceptionReportDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         ExceptionReport er = erd.addNewExceptionReport();
         // er.setLanguage("en");
