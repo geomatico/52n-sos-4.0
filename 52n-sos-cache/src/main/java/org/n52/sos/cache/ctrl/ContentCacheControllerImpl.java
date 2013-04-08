@@ -31,7 +31,6 @@ import org.n52.sos.cache.ctrl.action.ResultInsertionUpdate;
 import org.n52.sos.cache.ctrl.action.ResultTemplateInsertionUpdate;
 import org.n52.sos.cache.ctrl.action.SensorDeletionUpdate;
 import org.n52.sos.cache.ctrl.action.SensorInsertionUpdate;
-import org.n52.sos.ds.CacheFeederDAO;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.DeleteSensorRequest;
@@ -40,7 +39,6 @@ import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.response.InsertSensorResponse;
-import org.n52.sos.service.Configurator;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
@@ -49,23 +47,15 @@ import org.n52.sos.service.Configurator;
  * @since 4.0
  */
 public class ContentCacheControllerImpl extends AbstractContentCacheController {
-    private CacheFeederDAO cacheFeederDAO;
-
-    protected CacheFeederDAO getCacheDAO() {
-        if (this.cacheFeederDAO == null) {
-            this.cacheFeederDAO = Configurator.getInstance().getCacheFeederDAO();
-        }
-        return this.cacheFeederDAO;
-    }
 
     @Override
     public void updateCacheFromDatasource() throws OwsExceptionReport {
-        update(new CompleteCacheUpdate(getCacheDAO()));
+        update(new CompleteCacheUpdate());
     }
 
     @Override
     public void updateAfterObservationDeletion(SosObservation o) throws OwsExceptionReport {
-        update(new ObservationDeletionUpdate(getCacheDAO(), o));
+        update(new ObservationDeletionUpdate(o));
     }
 
     @Override

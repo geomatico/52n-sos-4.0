@@ -24,7 +24,6 @@
 
 package org.n52.sos.cache.ctrl.action;
 
-import org.n52.sos.ds.CacheFeederDAO;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
@@ -34,8 +33,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 public class ObservationDeletionUpdate extends DatasourceCacheUpdate {
     private final SosObservation o;
 
-    public ObservationDeletionUpdate(CacheFeederDAO dao, SosObservation o) {
-        super(dao);
+    public ObservationDeletionUpdate(SosObservation o) {
         this.o = o;
     }
 

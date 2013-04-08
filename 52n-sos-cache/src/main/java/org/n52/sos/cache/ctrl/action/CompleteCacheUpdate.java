@@ -26,17 +26,12 @@ package org.n52.sos.cache.ctrl.action;
 
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.cache.ctrl.CacheFactory;
-import org.n52.sos.ds.CacheFeederDAO;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class CompleteCacheUpdate extends DatasourceCacheUpdate {
-    public CompleteCacheUpdate(CacheFeederDAO dao) {
-        super(dao);
-    }
-
     @Override
     public void execute() {
         try {

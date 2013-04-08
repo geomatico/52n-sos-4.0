@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.n52.sos.cache.ctrl.ContentCacheControllerImpl;
-import org.n52.sos.ds.CacheFeederDAO;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
@@ -61,11 +60,6 @@ public class TestableInMemoryCacheController extends ContentCacheControllerImpl 
     @Override
     protected File getCacheFile() {
         return getTempFile();
-    }
-
-    @Override
-    protected CacheFeederDAO getCacheDAO() {
-        return null;
     }
 
     @Override
