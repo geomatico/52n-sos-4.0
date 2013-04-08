@@ -45,12 +45,12 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @since 4.0
  */
-public class ResultInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ResultInsertionInMemoryCacheUpdate.class);
+public class ResultInsertionUpdate extends InMemoryCacheUpdate {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResultInsertionUpdate.class);
     private final SosObservation observation;
     private final String templateIdentifier;
 
-    public ResultInsertionInMemoryCacheUpdate(String templateIdentifier, SosObservation observation) {
+    public ResultInsertionUpdate(String templateIdentifier, SosObservation observation) {
         if (observation == null || templateIdentifier == null || templateIdentifier.isEmpty()) {
             String msg = String.format("Missing argument: '%s': %s; template identifier: '%s'",
                                        SosObservation.class.getName(),

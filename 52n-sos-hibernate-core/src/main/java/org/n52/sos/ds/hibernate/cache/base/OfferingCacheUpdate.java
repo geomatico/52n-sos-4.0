@@ -81,21 +81,6 @@ public class OfferingCacheUpdate extends CacheUpdate {
 
     @Override
     public void execute() {
-        // we are executed after observation deletion with a old cache object
-        getCache().clearOfferings();
-        getCache().clearNameForOfferings();
-        getCache().clearProceduresForOfferings();
-        getCache().clearObservablePropertiesForOfferings();
-        getCache().clearRelatedFeaturesForOfferings();
-        getCache().clearObservationTypesForOfferings();
-        getCache().clearAllowedObservationTypeForOfferings();
-        getCache().clearEnvelopeForOfferings();
-        getCache().clearFeaturesOfInterestForOfferings();
-        getCache().clearMinPhenomenonTimeForOfferings();
-        getCache().clearMaxPhenomenonTimeForOfferings();
-        getCache().clearMinResultTimeForOfferings();
-        getCache().clearMaxResultTimeForOfferings();
-
         List<Offering> offerings = getOfferingObjects(getSession());
 
         LOGGER.debug("multithreading init");

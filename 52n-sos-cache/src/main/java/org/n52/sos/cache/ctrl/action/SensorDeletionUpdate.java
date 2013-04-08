@@ -40,11 +40,11 @@ import org.slf4j.LoggerFactory;
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @since 4.0
  */
-public class SensorDeletionInMemoryCacheUpdate extends InMemoryCacheUpdate {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SensorDeletionInMemoryCacheUpdate.class);
+public class SensorDeletionUpdate extends InMemoryCacheUpdate {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SensorDeletionUpdate.class);
     private final DeleteSensorRequest request;
 
-    public SensorDeletionInMemoryCacheUpdate(DeleteSensorRequest response) {
+    public SensorDeletionUpdate(DeleteSensorRequest response) {
         if (response == null) {
             String msg = String.format("Missing argument: '%s': %s",
                                        DeleteSensorRequest.class.getName(),

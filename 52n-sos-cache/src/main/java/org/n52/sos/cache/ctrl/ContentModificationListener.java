@@ -72,7 +72,8 @@ public class ContentModificationListener implements SosEventListener {
                         ((ObservationInsertion) event).getRequest());
             } else if (event instanceof ObservationDeletion) {
                 // this update will always be performed based on database information
-                getContentCacheController().updateAfterObservationDeletion();
+                getContentCacheController().updateAfterObservationDeletion(
+                        ((ObservationDeletion) event).getDeletedObservation());
             } else if (event instanceof ResultTemplateInsertion) {
                 getContentCacheController().updateAfterResultTemplateInsertion(
                         ((ResultTemplateInsertion) event).getRequest(),

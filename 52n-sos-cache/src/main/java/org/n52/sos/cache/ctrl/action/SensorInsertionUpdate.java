@@ -50,12 +50,12 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  *
  */
-public class SensorInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SensorInsertionInMemoryCacheUpdate.class);
+public class SensorInsertionUpdate extends InMemoryCacheUpdate {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SensorInsertionUpdate.class);
     private final InsertSensorResponse response;
     private final InsertSensorRequest request;
 
-    public SensorInsertionInMemoryCacheUpdate(InsertSensorRequest request, InsertSensorResponse response) {
+    public SensorInsertionUpdate(InsertSensorRequest request, InsertSensorResponse response) {
         if (request == null || response == null) {
             String msg = String.format("Missing argument: '%s': %s; '%s': %s",
                                        InsertSensorRequest.class.getName(), request,

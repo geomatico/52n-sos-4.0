@@ -5,7 +5,7 @@
         </encoder>
     </appender>
     <logger name="org.hibernate" level="WARN" />
-    <logger name="org.n52" level="DEBUG" />
+    <logger name="org.n52" level="TRACE" />
     <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>

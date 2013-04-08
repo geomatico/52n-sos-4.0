@@ -50,10 +50,6 @@ public class FeatureOfInterestCacheUpdate extends CacheUpdate {
     @Override
     public void execute() {
         // FIXME shouldn't the identifiers be translated using CacheHelper.addPrefixAndGetFeatureIdentifier()?
-        // we are executed after observation deletion with a old cache object
-        getCache().clearFeaturesOfInterest();
-        getCache().clearProceduresForFeatureOfInterest();
-        getCache().clearFeatureHierarchy();
         for (FeatureOfInterest featureOfInterest : getFeatureOfInterestObjects(getSession())) {
             getCache().addFeatureOfInterest(featureOfInterest.getIdentifier());
             getCache().setProceduresForFeatureOfInterest(featureOfInterest.getIdentifier(),

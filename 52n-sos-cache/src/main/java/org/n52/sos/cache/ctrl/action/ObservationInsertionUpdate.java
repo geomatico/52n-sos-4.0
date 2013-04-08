@@ -60,11 +60,11 @@ import com.vividsolutions.jts.geom.Envelope;
  * @since 4.0
  *
  */
-public class ObservationInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ObservationInsertionInMemoryCacheUpdate.class);
+public class ObservationInsertionUpdate extends InMemoryCacheUpdate {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ObservationInsertionUpdate.class);
     private final InsertObservationRequest request;
 
-    public ObservationInsertionInMemoryCacheUpdate(InsertObservationRequest request) {
+    public ObservationInsertionUpdate(InsertObservationRequest request) {
         if (request == null) {
             String msg = String.format("Missing argument: '%s': %s",
                                        InsertObservationRequest.class.getName(),

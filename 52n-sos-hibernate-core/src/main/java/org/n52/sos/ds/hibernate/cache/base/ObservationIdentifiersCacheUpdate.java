@@ -25,8 +25,6 @@ package org.n52.sos.ds.hibernate.cache.base;
 
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getObservationIdentifiers;
 
-import java.util.HashSet;
-
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 
 /**
@@ -37,6 +35,6 @@ public class ObservationIdentifiersCacheUpdate extends CacheUpdate {
 
     @Override
     public void execute() {
-        getCache().setObservationIdentifiers(new HashSet<String>(getObservationIdentifiers(getSession())));
+        getCache().addObservationIdentifiers(getObservationIdentifiers(getSession()));
     }
 }

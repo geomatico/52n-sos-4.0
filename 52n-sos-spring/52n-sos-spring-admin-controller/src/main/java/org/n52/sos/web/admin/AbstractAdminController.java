@@ -83,7 +83,7 @@ public abstract class AbstractAdminController extends AbstractController {
         }
     }
 
-    protected boolean updateCache() throws OwsExceptionReport {
-        return Configurator.getInstance().getCacheController().updateCacheFromDatasource();
+    protected void updateCache() throws OwsExceptionReport {
+        Configurator.getInstance().getCacheController().updateCacheFromDatasource();
     }
 }

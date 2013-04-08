@@ -21,18 +21,30 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.exception.ows.concrete;
 
-import org.n52.sos.decode.DecoderKey;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
+package org.n52.sos.cache.ctrl.action;
+
+import org.n52.sos.ds.CacheFeederDAO;
+import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class NoDecoderForKeyException extends NoApplicableCodeException {
-    private static final long serialVersionUID = 2130152587752891589L;
+public class ObservationDeletionUpdate extends DatasourceCacheUpdate {
+    private final SosObservation deletedObservation;
 
-    public NoDecoderForKeyException(DecoderKey k) {
-        withMessage("No decoder implementation is available for KvpBinding (%s)!", k);
+    public ObservationDeletionUpdate(CacheFeederDAO dao, SosObservation deletedObservation) {
+        super(dao);
+        this.deletedObservation = deletedObservation;
+    }
+
+    @Override
+    public void execute() {
+        try {
+            getDao().updateAfterObservationDeletion(getCache(), deletedObservation);
+        } catch (OwsExceptionReport e) {
+            fail(e);
+        }
     }
 }

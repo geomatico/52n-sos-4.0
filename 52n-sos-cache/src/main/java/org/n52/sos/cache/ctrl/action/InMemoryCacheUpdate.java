@@ -27,11 +27,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.n52.sos.cache.WritableContentCache;
+import org.n52.sos.cache.ctrl.CacheUpdate;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.SosFeatureCollection;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
-import org.n52.sos.util.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,23 +43,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * @since 4.0
  *
  */
-public abstract class InMemoryCacheUpdate implements Action {
+public abstract class InMemoryCacheUpdate extends CacheUpdate {
     private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryCacheUpdate.class);
-    private WritableContentCache cache;
-
-    /**
-     * @return the writable cache of this action
-     */
-    public WritableContentCache getCache() {
-        return cache;
-    }
-
-    /**
-     * @param cache the writable cache for this action
-     */
-    public void setCache(WritableContentCache cache) {
-        this.cache = cache;
-    }
 
     /**
      * Get a list of all SosSamplingFeatures contained in the abstract feature.
@@ -113,6 +97,6 @@ public abstract class InMemoryCacheUpdate implements Action {
 
     @Override
     public String toString() {
-        return String.format("%s [cache=%s]", getClass().getName(), cache);
+        return String.format("%s [cache=%s]", getClass().getName(), getCache());
     }
 }

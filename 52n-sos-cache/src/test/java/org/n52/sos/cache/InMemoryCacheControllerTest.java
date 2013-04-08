@@ -45,8 +45,6 @@ import static org.n52.sos.util.builder.SweDataArrayBuilder.aSweDataArray;
 import static org.n52.sos.util.builder.SweDataArrayValueBuilder.aSweDataArrayValue;
 import static org.n52.sos.util.builder.SweTimeBuilder.aSweTime;
 
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Set;
@@ -54,10 +52,8 @@ import java.util.Set;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.n52.sos.cache.ctrl.InMemoryCacheController;
-import org.n52.sos.ds.CacheFeederDAO;
+import org.n52.sos.cache.ctrl.ContentCacheControllerImpl;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
@@ -84,7 +80,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * Test after DeleteObservation => not possible with InMemory because of bounding box issues, for example.
  */
-public class InMemoryCacheControllerTest {
+public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
     /* FIXTURES */
     private static final String RELATED_FEATURE_ROLE_2 = "test-role-2";
     private static final String RELATED_FEATURE_ROLE = "test-role-1";
@@ -101,31 +97,14 @@ public class InMemoryCacheControllerTest {
     private static final String PROCEDURE_2 = "test-procedure-2";
     private static final String RESULT_TEMPLATE_IDENTIFIER = "test-result-template";
     private static final String OFFERING = PROCEDURE + OFFERING_IDENTIFIER_EXTENSION;
-    private static File tempFile;
-
-    @BeforeClass
-    public static void setUp() {
-        try {
-            tempFile = File.createTempFile("TestableInMemoryCacheController", "");
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
     private AbstractServiceRequest request;
-    private InMemoryCacheController controller;
+    private ContentCacheControllerImpl controller;
     private AbstractServiceResponse response;
     private SosObservation observation;
 
     @Before
-    public void initControllerAndStopTimer() {
+    public void initController() {
         controller = new TestableInMemoryCacheController();
-        controller.cleanup(); // <-- we don't want no timer to run!
-    }
-
-    @Before
-    @After
-    public void deleteTempFile() {
-        tempFile.delete();
     }
 
     @After
@@ -909,7 +888,7 @@ public class InMemoryCacheControllerTest {
                 .build();
     }
 
-    private void insertResultPreparation() {
+    private void insertResultPreparation() throws OwsExceptionReport {
         observation = anObservation()
                 .setObservationConstellation(
                 anObservationConstellation()
@@ -998,7 +977,7 @@ public class InMemoryCacheControllerTest {
                                                   double xCoord,
                                                   double yCoord,
                                                   int epsgCode,
-                                                  String feature) {
+                                                  String feature) throws OwsExceptionReport {
         insertObservationRequestExample(procedure, xCoord, yCoord, epsgCode, feature, System.currentTimeMillis());
         controller.updateAfterObservationInsertion((InsertObservationRequest) request);
     }
@@ -1137,20 +1116,4 @@ public class InMemoryCacheControllerTest {
         return controller.getCache();
     }
 
-    private class TestableInMemoryCacheController extends InMemoryCacheController {
-
-        protected long getUpdateInterval() {
-            return 60000;
-        }
-
-        @Override
-        protected CacheFeederDAO getCacheDAO() {
-            return null;
-        }
-
-        @Override
-        protected File getCacheFile() {
-            return tempFile;
-        }
-    }
 }

@@ -41,8 +41,8 @@ import org.slf4j.LoggerFactory;
  * configured interval.
  */
 @Configurable
-public abstract class ScheduledContentCacheController implements ContentCacheController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledContentCacheController.class);
+public abstract class AbstractSchedulingContentCacheController implements ContentCacheController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSchedulingContentCacheController.class);
     private boolean initialized = false;
     private long updateInterval;
     private final Timer timer = new Timer("52n-sos-capabilities-cache-controller", true);
@@ -145,11 +145,8 @@ public abstract class ScheduledContentCacheController implements ContentCacheCon
         @Override
         public void run() {
             try {
-                if (updateCacheFromDatasource()) {
-                    LOGGER.info("Timertask: capabilities cache update successful!");
-                } else {
-                    LOGGER.warn("Timertask: capabilities cache update not successful!");
-                }
+                updateCacheFromDatasource();
+                LOGGER.info("Timertask: capabilities cache update successful!");
                 schedule();
             } catch (OwsExceptionReport e) {
                 LOGGER

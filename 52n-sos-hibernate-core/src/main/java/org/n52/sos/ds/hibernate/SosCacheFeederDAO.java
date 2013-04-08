@@ -39,6 +39,7 @@ import org.n52.sos.ds.hibernate.cache.ResultTemplateInsertionCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.SensorDeletionCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.SensorInsertionCacheUpdate;
 import org.n52.sos.exception.ConfigurationException;
+import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.util.Validation;
@@ -94,8 +95,15 @@ public class SosCacheFeederDAO extends HibernateSessionHolder implements CacheFe
     }
 
     @Override
+    @Deprecated
     public void updateAfterObservationDeletion(WritableContentCache cache) throws OwsExceptionReport {
-        update(cache, new ObservationDeletionCacheUpdate(getCacheThreadCount()));
+        updateCache(cache);
+    }
+
+    @Override
+    public void updateAfterObservationDeletion(WritableContentCache cache, SosObservation deletedObservation) throws
+            OwsExceptionReport {
+        update(cache, new ObservationDeletionCacheUpdate(deletedObservation));
     }
 
     @Override

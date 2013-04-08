@@ -39,12 +39,12 @@ import org.slf4j.LoggerFactory;
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @since 4.0
  */
-public class ResultTemplateInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ResultTemplateInsertionInMemoryCacheUpdate.class);
+public class ResultTemplateInsertionUpdate extends InMemoryCacheUpdate {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResultTemplateInsertionUpdate.class);
     private final InsertResultTemplateResponse response;
     private final InsertResultTemplateRequest request;
 
-    public ResultTemplateInsertionInMemoryCacheUpdate(InsertResultTemplateRequest request,
+    public ResultTemplateInsertionUpdate(InsertResultTemplateRequest request,
                                                       InsertResultTemplateResponse response) {
         if (request == null || response == null) {
             String msg = String.format("Missing argument: '%s': %s; '%s': %s",

@@ -21,18 +21,32 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.exception.ows.concrete;
 
-import org.n52.sos.decode.DecoderKey;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
+package org.n52.sos.cache;
+
+import java.io.File;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class NoDecoderForKeyException extends NoApplicableCodeException {
-    private static final long serialVersionUID = 2130152587752891589L;
+public class AbstractCacheControllerTest {
 
-    public NoDecoderForKeyException(DecoderKey k) {
-        withMessage("No decoder implementation is available for KvpBinding (%s)!", k);
+    @BeforeClass
+    public static void setUp() {
+        TestableInMemoryCacheController.setUp();
+    }
+
+    public static File getTempFile() {
+        return TestableInMemoryCacheController.getTempFile();
+    }
+
+    @Before
+    @After
+    public void deleteTempFile() {
+        TestableInMemoryCacheController.deleteTempFile();
     }
 }

@@ -23,6 +23,7 @@
  */
 package org.n52.sos.event.events;
 
+import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.AbstractServiceResponse;
 
@@ -32,7 +33,16 @@ import org.n52.sos.response.AbstractServiceResponse;
  * @since 4.0.0
  */
 public class ObservationDeletion extends SosDeletionEvent<AbstractServiceRequest, AbstractServiceResponse> {
-    public ObservationDeletion(AbstractServiceRequest request, AbstractServiceResponse response) {
+    private SosObservation deletedObservation;
+
+    public ObservationDeletion(AbstractServiceRequest request,
+                               AbstractServiceResponse response,
+                               SosObservation deletedObservation) {
         super(request, response);
+        this.deletedObservation = deletedObservation;
+    }
+
+    public SosObservation getDeletedObservation() {
+        return deletedObservation;
     }
 }

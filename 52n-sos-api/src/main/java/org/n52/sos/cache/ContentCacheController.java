@@ -45,55 +45,66 @@ public interface ContentCacheController extends Cleanupable {
     /**
      * Update the cache after a observation was deleted.
      *
+     * @param deletedObservation the deleted observation
+     *
      * @throws OwsExceptionReport if an error occurs
      */
-    void updateAfterObservationDeletion() throws OwsExceptionReport;
+    void updateAfterObservationDeletion(SosObservation deletedObservation) throws OwsExceptionReport;
 
     /**
      * Update the cache after a observation was inserted.
      *
      * @param sosRequest the InsertObservation request
+     *
+     * @throws OwsExceptionReport if an error occurs
      */
-    void updateAfterObservationInsertion(InsertObservationRequest sosRequest);
+    void updateAfterObservationInsertion(InsertObservationRequest sosRequest) throws OwsExceptionReport;
 
     /**
      * Update the cache after a result was inserted.
      *
      * @param templateIdentifier the identifier of the result template
      * @param sosObservation     the observation representing the inserted values
+     *
+     * @throws OwsExceptionReport if an error occurs
      */
-    void updateAfterResultInsertion(String templateIdentifier, SosObservation sosObservation);
+    void updateAfterResultInsertion(String templateIdentifier, SosObservation sosObservation) throws OwsExceptionReport;
 
     /**
      * Update the cache after a result template was inserted.
      *
      * @param sosRequest  the request
      * @param sosResponse the response
+     *
+     * @throws OwsExceptionReport if an error occurs
      */
     void updateAfterResultTemplateInsertion(InsertResultTemplateRequest sosRequest,
-                                            InsertResultTemplateResponse sosResponse);
+                                            InsertResultTemplateResponse sosResponse) throws OwsExceptionReport;
 
     /**
      * Update the cache after a sensor was deleted.
      *
      * @param sosRequest the DeleteSensor request
+     *
+     * @throws OwsExceptionReport if an error occurs
      */
-    void updateAfterSensorDeletion(DeleteSensorRequest sosRequest);
+    void updateAfterSensorDeletion(DeleteSensorRequest sosRequest) throws OwsExceptionReport;
 
     /**
      * Update the cache after a sensor was inserted.
      *
      * @param sosRequest  the request
      * @param sosResponse the response
+     *
+     * @throws OwsExceptionReport if an error occurs
      */
-    void updateAfterSensorInsertion(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse);
+    void updateAfterSensorInsertion(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse) throws
+            OwsExceptionReport;
 
     /**
      * Update the cache from the underlying datasource.
      *
-     * @return if the update was executed
-     *
      * @throws OwsExceptionReport if an error occurs
      */
-    boolean updateCacheFromDatasource() throws OwsExceptionReport;
+    void updateCacheFromDatasource() throws OwsExceptionReport;
 }
