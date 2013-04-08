@@ -28,6 +28,11 @@ import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.AbstractServiceResponse;
 
 /**
+ * Abstract event that can be fired if a successfull request changed the contents of this service.
+ *
+ * @param <I> the request type
+ * @param <O> the response type
+ *
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public abstract class SosContentChangeEvent<I extends AbstractServiceRequest, O extends AbstractServiceResponse> implements SosEvent {
@@ -46,7 +51,7 @@ public abstract class SosContentChangeEvent<I extends AbstractServiceRequest, O 
     public O getResponse() {
         return response;
     }
-    
+
     @Override
     public String toString() {
         return String.format("%s[request=%s, response=%s]", getClass().getSimpleName(), getRequest(), getResponse());
