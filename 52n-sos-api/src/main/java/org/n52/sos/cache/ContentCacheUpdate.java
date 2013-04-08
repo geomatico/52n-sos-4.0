@@ -22,16 +22,15 @@
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
 
-package org.n52.sos.cache.ctrl;
+package org.n52.sos.cache;
 
-import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.util.Action;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class CacheUpdate implements Action {
+public abstract class ContentCacheUpdate implements Action {
     private WritableContentCache cache;
     private OwsExceptionReport exceptionReport;
 
@@ -49,7 +48,7 @@ public abstract class CacheUpdate implements Action {
      *
      * @return this
      */
-    protected CacheUpdate fail(OwsExceptionReport exceptionReport) {
+    protected ContentCacheUpdate fail(OwsExceptionReport exceptionReport) {
         this.exceptionReport = exceptionReport;
         return this;
     }
@@ -73,7 +72,7 @@ public abstract class CacheUpdate implements Action {
      *
      * @return this
      */
-    public CacheUpdate setCache(WritableContentCache cache) {
+    public ContentCacheUpdate setCache(WritableContentCache cache) {
         this.cache = cache;
         return this;
     }
@@ -83,7 +82,7 @@ public abstract class CacheUpdate implements Action {
      *
      * @return this
      */
-    public CacheUpdate reset() {
+    public ContentCacheUpdate reset() {
         this.exceptionReport = null;
         return this;
     }

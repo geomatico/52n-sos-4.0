@@ -48,7 +48,9 @@ public interface ContentCacheController extends Cleanupable {
      * @param deletedObservation the deleted observation
      *
      * @throws OwsExceptionReport if an error occurs
+     * @deprecated use {@link #update(org.n52.sos.cache.ContentCacheUpdate)}
      */
+    @Deprecated
     void updateAfterObservationDeletion(SosObservation deletedObservation) throws OwsExceptionReport;
 
     /**
@@ -57,7 +59,9 @@ public interface ContentCacheController extends Cleanupable {
      * @param sosRequest the InsertObservation request
      *
      * @throws OwsExceptionReport if an error occurs
+     * @deprecated use {@link #update(org.n52.sos.cache.ContentCacheUpdate)}
      */
+    @Deprecated
     void updateAfterObservationInsertion(InsertObservationRequest sosRequest) throws OwsExceptionReport;
 
     /**
@@ -67,7 +71,9 @@ public interface ContentCacheController extends Cleanupable {
      * @param sosObservation     the observation representing the inserted values
      *
      * @throws OwsExceptionReport if an error occurs
+     * @deprecated use {@link #update(org.n52.sos.cache.ContentCacheUpdate)}
      */
+    @Deprecated
     void updateAfterResultInsertion(String templateIdentifier, SosObservation sosObservation) throws OwsExceptionReport;
 
     /**
@@ -77,7 +83,9 @@ public interface ContentCacheController extends Cleanupable {
      * @param sosResponse the response
      *
      * @throws OwsExceptionReport if an error occurs
+     * @deprecated use {@link #update(org.n52.sos.cache.ContentCacheUpdate)}
      */
+    @Deprecated
     void updateAfterResultTemplateInsertion(InsertResultTemplateRequest sosRequest,
                                             InsertResultTemplateResponse sosResponse) throws OwsExceptionReport;
 
@@ -87,7 +95,9 @@ public interface ContentCacheController extends Cleanupable {
      * @param sosRequest the DeleteSensor request
      *
      * @throws OwsExceptionReport if an error occurs
+     * @deprecated use {@link #update(org.n52.sos.cache.ContentCacheUpdate)}
      */
+    @Deprecated
     void updateAfterSensorDeletion(DeleteSensorRequest sosRequest) throws OwsExceptionReport;
 
     /**
@@ -97,7 +107,9 @@ public interface ContentCacheController extends Cleanupable {
      * @param sosResponse the response
      *
      * @throws OwsExceptionReport if an error occurs
+     * @deprecated use {@link #update(org.n52.sos.cache.ContentCacheUpdate)}
      */
+    @Deprecated
     void updateAfterSensorInsertion(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse) throws
             OwsExceptionReport;
 
@@ -105,6 +117,24 @@ public interface ContentCacheController extends Cleanupable {
      * Update the cache from the underlying datasource.
      *
      * @throws OwsExceptionReport if an error occurs
+     * @deprecated use {@link #update()}
      */
+    @Deprecated
     void updateCacheFromDatasource() throws OwsExceptionReport;
+
+    /**
+     * Update the content cache with the specified update.
+     *
+     * @param update the update
+     *
+     * @throws OwsExceptionReport if an error occurs while updating the cache
+     */
+    void update(ContentCacheUpdate update) throws OwsExceptionReport;
+
+    /**
+     * Renew the content cache completly.
+     *
+     * @throws OwsExceptionReport if an error occurs while updating the cache
+     */
+    void update() throws OwsExceptionReport;
 }

@@ -54,6 +54,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.n52.sos.cache.ctrl.ContentCacheControllerImpl;
+import org.n52.sos.cache.ctrl.action.ObservationInsertionUpdate;
+import org.n52.sos.cache.ctrl.action.ResultInsertionUpdate;
+import org.n52.sos.cache.ctrl.action.ResultTemplateInsertionUpdate;
+import org.n52.sos.cache.ctrl.action.SensorDeletionUpdate;
+import org.n52.sos.cache.ctrl.action.SensorInsertionUpdate;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
@@ -113,14 +118,6 @@ public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
         controller = null;
         observation = null;
         response = null;
-    }
-
-    /* TESTS */
-    /* Update after InsertObservation */
-    @Test(expected = IllegalArgumentException.class)
-    public void should_throw_IllegalArgumentException_when_receiving_null_parameter_after_InsertObservation()
-            throws OwsExceptionReport {
-        controller.updateAfterObservationInsertion(null);
     }
 
     @Test
@@ -273,19 +270,6 @@ public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
                    && getCache().getObservationIdentifiersForProcedure(PROCEDURE).contains(OBSERVATION_ID));
     }
 
-    /* Update after InsertSensor */
-    @Test(expected = IllegalArgumentException.class)
-    public void should_throw_IllegalArgumentException_if_called_with_one_or_more_null_parameters_after_InsertSensor()
-            throws OwsExceptionReport {
-        controller.updateAfterSensorInsertion(null, null);
-        insertSensorRequestExample(PROCEDURE);
-        controller.updateAfterSensorInsertion((InsertSensorRequest) request, null);
-        request = null;
-        insertSensorResponseExample(PROCEDURE);
-        controller.updateAfterSensorInsertion(null, (InsertSensorResponse) response);
-
-    }
-
     @Test
     public void should_contain_procedure_after_InsertSensor()
             throws OwsExceptionReport {
@@ -374,13 +358,6 @@ public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
                     .getIdentifier()
                     .getValue()).contains(relatedFeature.getRole()));
         }
-    }
-
-    /* Update after DeleteSensor */
-    @Test(expected = IllegalArgumentException.class)
-    public void should_throw_IllegalArgumentException_if_receiving_null_parameter_after_DeleteSensor()
-            throws OwsExceptionReport {
-        controller.updateAfterSensorDeletion(null);
     }
 
     @Test
@@ -699,15 +676,6 @@ public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
                 .contains(RESULT_TEMPLATE_IDENTIFIER));
     }
 
-    /* Update after InsertResult */
-    @Test(expected = IllegalArgumentException.class)
-    public void should_throw_IllegalArgumentException_when_receiving_null_parameter_after_InsertResult()
-            throws OwsExceptionReport {
-        controller.updateAfterResultInsertion(null, null);
-        controller.updateAfterResultInsertion("", null);
-        controller.updateAfterResultInsertion(null, new SosObservation());
-    }
-
     @Test
     public void should_update_global_temporal_BoundingBox_after_InsertResult()
             throws OwsExceptionReport {
@@ -878,8 +846,8 @@ public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
             throws OwsExceptionReport {
         insertResultTemplateResponse(resultTemplateIdentifier);
         insertResultTemplateRequest(OFFERING);
-        controller
-                .updateAfterResultTemplateInsertion((InsertResultTemplateRequest) request, (InsertResultTemplateResponse) response);
+        controller.update(new ResultTemplateInsertionUpdate((InsertResultTemplateRequest) request,
+                                                            (InsertResultTemplateResponse) response));
     }
 
     private void insertResultTemplateRequest(String offeringForResultTemplate) {
@@ -923,7 +891,7 @@ public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
                 .setIdentifier(CODESPACE, OBSERVATION_ID)
                 .build();
 
-        controller.updateAfterResultInsertion(RESULT_TEMPLATE_IDENTIFIER, observation);
+        controller.update(new ResultInsertionUpdate(RESULT_TEMPLATE_IDENTIFIER, observation));
     }
 
     private void insertResultTemplateResponse(String resultTemplateIdentifier) {
@@ -958,19 +926,19 @@ public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
         request = DeleteSensorRequestBuilder.aDeleteSensorRequest()
                 .setProcedure(PROCEDURE)
                 .build();
-        controller.updateAfterSensorDeletion((DeleteSensorRequest) request);
+        controller.update(new SensorDeletionUpdate(((DeleteSensorRequest) request)));
     }
 
     private void updateCacheWithSingleObservation(String procedure)
             throws OwsExceptionReport {
         insertObservationRequestExample(procedure);
-        controller.updateAfterObservationInsertion((InsertObservationRequest) request);
+        controller.update(new ObservationInsertionUpdate((InsertObservationRequest) request));
     }
 
     private void updateCacheWithSingleObservation(String procedure, long phenomenonTime)
             throws OwsExceptionReport {
         insertObservationRequestExample(procedure, phenomenonTime);
-        controller.updateAfterObservationInsertion((InsertObservationRequest) request);
+        controller.update(new ObservationInsertionUpdate((InsertObservationRequest) request));
     }
 
     private void updateCacheWithSingleObservation(String procedure,
@@ -979,14 +947,14 @@ public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
                                                   int epsgCode,
                                                   String feature) throws OwsExceptionReport {
         insertObservationRequestExample(procedure, xCoord, yCoord, epsgCode, feature, System.currentTimeMillis());
-        controller.updateAfterObservationInsertion((InsertObservationRequest) request);
+        controller.update(new ObservationInsertionUpdate((InsertObservationRequest) request));
     }
 
     private void updateCacheWithInsertSensor(String procedureIdentifier)
             throws OwsExceptionReport {
         insertSensorRequestExample(procedureIdentifier);
         insertSensorResponseExample(procedureIdentifier);
-        controller.updateAfterSensorInsertion((InsertSensorRequest) request, (InsertSensorResponse) response);
+        controller.update(new SensorInsertionUpdate((InsertSensorRequest) request, (InsertSensorResponse) response));
     }
 
     private DateTime getPhenomenonTimeFromObservation() {

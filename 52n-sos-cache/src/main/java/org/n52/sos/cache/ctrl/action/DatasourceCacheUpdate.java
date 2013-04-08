@@ -24,7 +24,7 @@
 
 package org.n52.sos.cache.ctrl.action;
 
-import org.n52.sos.cache.ctrl.CacheUpdate;
+import org.n52.sos.cache.ContentCacheUpdate;
 import org.n52.sos.ds.CacheFeederDAO;
 import org.n52.sos.exception.ows.concrete.NoImplementationFoundException;
 import org.n52.sos.service.Configurator;
@@ -32,7 +32,7 @@ import org.n52.sos.service.Configurator;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class DatasourceCacheUpdate extends CacheUpdate {
+public abstract class DatasourceCacheUpdate extends ContentCacheUpdate {
     private CacheFeederDAO cacheFeederDAO;
 
     protected CacheFeederDAO getDao() throws NoImplementationFoundException {

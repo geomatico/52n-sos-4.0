@@ -28,7 +28,7 @@ import static org.junit.Assert.assertThat;
 import static org.n52.sos.cache.Existing.existing;
 
 import org.junit.Test;
-import org.n52.sos.cache.ctrl.AbstractContentCacheController;
+import org.n52.sos.cache.ctrl.ContentCacheControllerImpl;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
@@ -39,7 +39,7 @@ public class PersistingCacheControllerTest extends AbstractCacheControllerTest {
     @Test
     public void testSerialization() {
         assertThat(getTempFile(), is(not(existing())));
-        AbstractContentCacheController cc = new TestableInMemoryCacheController();
+        ContentCacheControllerImpl cc = new TestableInMemoryCacheController();
         assertThat(cc.getCache().getObservationIdentifiers(), is(empty()));
         cc.getCache().addObservationIdentifier(IDENTIFIER);
         assertThat(cc.getCache().getObservationIdentifiers(), contains(IDENTIFIER));

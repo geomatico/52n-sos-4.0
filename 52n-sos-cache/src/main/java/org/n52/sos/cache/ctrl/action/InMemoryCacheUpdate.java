@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.n52.sos.cache.ctrl.CacheUpdate;
+import org.n52.sos.cache.ContentCacheUpdate;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.SosFeatureCollection;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
@@ -43,7 +43,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @since 4.0
  *
  */
-public abstract class InMemoryCacheUpdate extends CacheUpdate {
+public abstract class InMemoryCacheUpdate extends ContentCacheUpdate {
     private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryCacheUpdate.class);
 
     /**

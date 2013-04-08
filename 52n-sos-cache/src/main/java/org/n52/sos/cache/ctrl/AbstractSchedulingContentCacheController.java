@@ -145,7 +145,7 @@ public abstract class AbstractSchedulingContentCacheController implements Conten
         @Override
         public void run() {
             try {
-                updateCacheFromDatasource();
+                update();
                 LOGGER.info("Timertask: capabilities cache update successful!");
                 schedule();
             } catch (OwsExceptionReport e) {

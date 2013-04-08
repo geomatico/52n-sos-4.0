@@ -68,11 +68,20 @@ public class TestableInMemoryCacheController extends ContentCacheControllerImpl 
     }
 
     @Override
+    @Deprecated
     public void updateCacheFromDatasource() throws OwsExceptionReport {
+        // noop
     }
 
     @Override
+    public void update() throws OwsExceptionReport {
+        // noop
+    }
+
+    @Override
+    @Deprecated
     public void updateAfterObservationDeletion(SosObservation deletedObservation) throws OwsExceptionReport {
+        // noop
     }
 
 }

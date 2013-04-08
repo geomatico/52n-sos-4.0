@@ -29,7 +29,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.n52.sos.cache.ctrl.CacheUpdate;
 import org.n52.sos.exception.ows.concrete.GenericThrowableWrapperException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.util.GroupedAndNamedThreadFactory;
@@ -90,7 +89,7 @@ public class UpdateSchedulingTest extends AbstractCacheControllerTest {
         }
     }
 
-    private class NonBlockingCacheUpdate extends CacheUpdate implements Runnable {
+    private class NonBlockingCacheUpdate extends ContentCacheUpdate implements Runnable {
         private final TestableInMemoryCacheController executor;
         private final String offering;
 
