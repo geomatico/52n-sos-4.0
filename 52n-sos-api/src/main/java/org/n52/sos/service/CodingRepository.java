@@ -298,11 +298,7 @@ public class CodingRepository {
         this.decoderByKey.clear();
         for (Decoder<?, ?> decoder : getDecoders()) {
             for (DecoderKey key : decoder.getDecoderKeyTypes()) {
-                Set<Decoder<?, ?>> decodersForKey = decoderByKey.get(key);
-                if (decodersForKey == null) {
-                    decoderByKey.put(key, decodersForKey = set());
-                }
-                decodersForKey.add(decoder);
+                decoderByKey.add(key, decoder);
             }
         }
     }
