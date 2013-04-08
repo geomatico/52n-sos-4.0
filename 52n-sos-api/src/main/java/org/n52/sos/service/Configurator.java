@@ -23,6 +23,8 @@
  */
 package org.n52.sos.service;
 
+import static org.n52.sos.util.ConfiguringSingletonServiceLoader.loadAndConfigure;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
@@ -32,22 +34,21 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.n52.sos.binding.BindingRepository;
 import org.n52.sos.cache.ContentCache;
 import org.n52.sos.cache.ContentCacheController;
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.convert.ConverterRepository;
 import org.n52.sos.ds.CacheFeederDAO;
 import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.ds.DataConnectionProvider;
-import org.n52.sos.ds.IFeatureConnectionProvider;
 import org.n52.sos.ds.FeatureQueryHandler;
+import org.n52.sos.ds.IFeatureConnectionProvider;
 import org.n52.sos.ds.OperationDAORepository;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ConfigurationException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.ows.SosServiceIdentificationFactory;
 import org.n52.sos.ogc.ows.SosServiceProvider;
 import org.n52.sos.ogc.ows.SosServiceProviderFactory;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.service.admin.operator.AdminServiceOperator;
 import org.n52.sos.service.admin.request.operator.AdminRequestOperatorRepository;
@@ -59,7 +60,6 @@ import org.n52.sos.tasking.Tasking;
 import org.n52.sos.util.Cleanupable;
 import org.n52.sos.util.ConfiguringSingletonServiceLoader;
 import org.n52.sos.util.Producer;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -173,14 +173,6 @@ public class Configurator implements Cleanupable {
         }
     }
 
-    private static <T> T loadAndConfigure(Class<? extends T> t, boolean required) {
-        return new ConfiguringSingletonServiceLoader<T>(t, required).get();
-
-    }
-
-    private static <T> T loadAndConfigure(Class<? extends T> t, boolean required, T defaultImplementation) {
-        return new ConfiguringSingletonServiceLoader<T>(t, required, defaultImplementation).get();
-    }
     /**
      * base path for configuration files.
      */
@@ -634,9 +626,9 @@ public class Configurator implements Cleanupable {
     }
 
     protected void initializeConnectionProviders() throws ConfigurationException {
-        dataConnectionProvider = Configurator
+        dataConnectionProvider = ConfiguringSingletonServiceLoader
                 .<ConnectionProvider>loadAndConfigure(DataConnectionProvider.class, true);
-        featureConnectionProvider = Configurator
+        featureConnectionProvider = ConfiguringSingletonServiceLoader
                 .<ConnectionProvider>loadAndConfigure(IFeatureConnectionProvider.class, false);
         dataConnectionProvider.initialize(dataConnectionProviderProperties);
         if (featureConnectionProvider != null) {

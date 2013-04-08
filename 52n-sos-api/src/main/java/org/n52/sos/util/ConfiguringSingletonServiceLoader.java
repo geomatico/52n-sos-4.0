@@ -23,10 +23,17 @@
  */
 package org.n52.sos.util;
 
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingsManager;
+import org.n52.sos.exception.ConfigurationException;
 
 public class ConfiguringSingletonServiceLoader<T> extends SingletonServiceLoader<T> {
+    public static <T> T loadAndConfigure(Class<? extends T> t, boolean required) {
+        return new ConfiguringSingletonServiceLoader<T>(t, required).get();
+    }
+
+    public static <T> T loadAndConfigure(Class<? extends T> t, boolean required, T defaultImplementation) {
+        return new ConfiguringSingletonServiceLoader<T>(t, required, defaultImplementation).get();
+    }
 
     public ConfiguringSingletonServiceLoader(Class<? extends T> c, boolean failIfNotFound) {
         super(c, failIfNotFound);
