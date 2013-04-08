@@ -44,5 +44,8 @@ public class CacheFactory {
 
     private static class LazyHolder {
         private static final CacheFactory INSTANCE = new CacheFactory();
+
+        private LazyHolder() {
+        }
     }
 }
