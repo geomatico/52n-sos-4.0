@@ -42,11 +42,13 @@ import org.n52.sos.config.settings.IntegerSettingDefinition;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
+/*
+ * this class contains unnecessary raw types as the OpenJDK
+ * 1.6.0 comiler will fail on wrong incompatiple type errors
+ */
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class SettingDefinitionEncoder {
-    /*
-     * this class contains unnecessary raw types as the OpenJDK
-     * 1.6.0 comiler will fail on wrong incompatiple type errors
-     */
+    
     public JSONObject encode(Map<SettingDefinitionGroup, Set<SettingDefinition>> grouped) throws JSONException {
         JSONArray sections = new JSONArray();
         List<SettingDefinitionGroup> sortedGroups = new ArrayList<SettingDefinitionGroup>(grouped.keySet());

@@ -42,7 +42,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
+/*
+ * this class contains unnecessary raw types as the OpenJDK
+ * 1.6.0 comiler will fail on wrong incompatiple type errors
+ */
 @Controller
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class SettingDefinitonController extends AbstractController {
 
     private static final SettingDefinitionGroup DEFAULT_SETTINGS_GROUP = new SettingDefinitionGroup().setTitle("Settings");
