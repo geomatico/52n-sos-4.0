@@ -32,17 +32,17 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class ObservationDeletionUpdate extends DatasourceCacheUpdate {
-    private final SosObservation deletedObservation;
+    private final SosObservation o;
 
-    public ObservationDeletionUpdate(CacheFeederDAO dao, SosObservation deletedObservation) {
+    public ObservationDeletionUpdate(CacheFeederDAO dao, SosObservation o) {
         super(dao);
-        this.deletedObservation = deletedObservation;
+        this.o = o;
     }
 
     @Override
     public void execute() {
         try {
-            getDao().updateAfterObservationDeletion(getCache(), deletedObservation);
+            getDao().updateAfterObservationDeletion(getCache(), o);
         } catch (OwsExceptionReport e) {
             fail(e);
         }

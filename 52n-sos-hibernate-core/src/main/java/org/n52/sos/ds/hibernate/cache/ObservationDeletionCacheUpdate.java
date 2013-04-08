@@ -67,8 +67,8 @@ public class ObservationDeletionCacheUpdate extends CacheUpdate {
     private static final String PROCEDURE = HibernateConstants.PARAMETER_PROCEDURE;
     private static final String OBSERVATION_CONSTELLATION = HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION;
     private static final String FEATURE_OF_INTEREST = HibernateConstants.PARAMETER_FEATURE_OF_INTEREST;
-    private static final String OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPE =
-                                HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPE;
+    private static final String OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPES =
+                                HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPES;
     private static final String DELETED = HibernateConstants.PARAMETER_DELETED;
     /**
      * Boolean to keep track if we already updated the global bounding box.
@@ -325,7 +325,7 @@ public class ObservationDeletionCacheUpdate extends CacheUpdate {
         oc.createCriteria(FEATURE_OF_INTEREST)
                 .add(eq(IDENTIFIER, feature));
         oc.createCriteria(OBSERVATION_CONSTELLATION)
-                .createCriteria(OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPE)
+                .createCriteria(OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPES)
                 .createCriteria(OFFERING)
                 .add(eq(IDENTIFIER, offering));
         return isEmpty(oc);

@@ -93,6 +93,4 @@ public class ContentCacheControllerImpl extends AbstractContentCacheController {
     public void updateAfterResultInsertion(String id, SosObservation o) throws OwsExceptionReport {
         update(new ResultInsertionUpdate(id, o));
     }
-
-   
 }
