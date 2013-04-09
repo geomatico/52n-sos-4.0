@@ -107,7 +107,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void addResultTemplate(String resultTemplate) {
         notNullOrEmpty("resultTemplate", resultTemplate);
-        log.trace("Adding ResultTemplate {}", resultTemplate);
+        log.trace("Adding SosResultTemplate {}", resultTemplate);
         getResultTemplatesSet().add(resultTemplate);
     }
 
@@ -199,7 +199,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void removeResultTemplate(String resultTemplate) {
         notNullOrEmpty("resultTemplate", resultTemplate);
-        log.trace("Removing ResultTemplate {}", resultTemplate);
+        log.trace("Removing SosResultTemplate {}", resultTemplate);
         getResultTemplatesSet().remove(resultTemplate);
     }
 
@@ -394,7 +394,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     public void addFeatureOfInterestForResultTemplate(String resultTemplate, String featureOfInterest) {
         notNullOrEmpty("resultTemplate", resultTemplate);
         notNullOrEmpty("featureOfInterest", featureOfInterest);
-        log.trace("Adding FeatureOfInterest {} to ResultTemplate {}", featureOfInterest, resultTemplate);
+        log.trace("Adding FeatureOfInterest {} to SosResultTemplate {}", featureOfInterest, resultTemplate);
         getFeaturesOfInterestForResultTemplatesMap().add(resultTemplate, featureOfInterest);
     }
 
@@ -402,7 +402,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     public void addFeaturesOfInterestForResultTemplate(String resultTemplate, Collection<String> featuresOfInterest) {
         notNullOrEmpty("resultTemplate", resultTemplate);
         noNullValues("featuresOfInterest", featuresOfInterest);
-        log.trace("Adding FeatureOfInterest {} to ResultTemplate {}", featuresOfInterest, resultTemplate);
+        log.trace("Adding FeatureOfInterest {} to SosResultTemplate {}", featuresOfInterest, resultTemplate);
         getFeaturesOfInterestForResultTemplatesMap().addAll(resultTemplate, featuresOfInterest);
     }
 
