@@ -249,18 +249,39 @@ public interface HibernateRelations {
         void setType(String type);
     }
 
-    interface HasCoordinate {
+    interface HasSrid {
+        String SRID = "srid";
+        int getSrid();
+        void setSrid(int srid);
+    }
+
+    interface HasCoordinate extends HasSrid {
         String LONGITUDE = "longitude";
         String LATITUDE = "latitude";
         String ALTITUDE = "altitude";
-        String SRID = "srid";
-        public Object getLongitude();
-        public void setLongitude(Object longitude);
-        public Object getLatitude();
-        public void setLatitude(Object latitude);
-        public Object getAltitude();
-        public void setAltitude(Object altitude);
-        public int getSrid();
-        public void setSrid(int srid);
+        Object getLongitude();
+        void setLongitude(Object longitude);
+        Object getLatitude();
+        void setLatitude(Object latitude);
+        Object getAltitude();
+        void setAltitude(Object altitude);
+    }
+
+    interface HasQualities {
+        String QUALITIES = "qualities";
+        Set<Quality> getQualities();
+        void setQualities(Set<Quality> qualities);
+    }
+
+    interface HasSpatialFilteringProfiles {
+        String SPATIAL_FILTERING_PROFILES = "spatialFilteringProfiles";
+        Set<SpatialFilteringProfile> getSpatialFilteringProfiles();
+        void setSpatialFilteringProfiles(Set<SpatialFilteringProfile> spatialFilteringProfiles);
+    }
+
+    interface HasValidProcedureTimes {
+        String VALID_PROCEDURE_TIMES = "validProcedureTimes";
+        Set<ValidProcedureTime> getValidProcedureTimes();
+        void setValidProcedureTimes(Set<ValidProcedureTime> validProcedureTimes);
     }
 }
