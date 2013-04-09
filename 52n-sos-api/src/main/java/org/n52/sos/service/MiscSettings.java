@@ -23,12 +23,15 @@
  */
 package org.n52.sos.service;
 
+import static java.lang.Boolean.FALSE;
+
 import java.util.Collections;
 import java.util.Set;
 
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingDefinitionGroup;
 import org.n52.sos.config.SettingDefinitionProvider;
+import org.n52.sos.config.settings.BooleanSettingDefinition;
 import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.util.CollectionHelper;
 
@@ -48,6 +51,7 @@ public class MiscSettings implements SettingDefinitionProvider {
     public static final String DEFAULT_PROCEDURE_PREFIX = "misc.defaultProcedurePrefix";
     public static final String DEFAULT_OBSERVABLEPROPERTY_PREFIX = "misc.defaultObservablePropertyPrefix";
     public static final String DEFAULT_FEATURE_PREFIX = "misc.defaultFeaturePrefix";
+    public static final String HTTP_STATUS_CODE_USE_IN_KVP_POX_BINDING = "misc.httpResponseCodeUseInKvpAndPoxBinding";
     
     /**
      * @deprecated not used by any code, check for external use or remove
@@ -152,6 +156,14 @@ public class MiscSettings implements SettingDefinitionProvider {
             .setTitle("Default Feature Prefix")
             .setDescription("The default prefix for features (values from custom db).");
     
+    public static final BooleanSettingDefinition HTTP_STATUS_CODE_USE_IN_KVP_POX_BINDING_DEFINITION = new BooleanSettingDefinition()
+    		.setGroup(GROUP)
+    		.setOrder(12)
+    		.setKey(HTTP_STATUS_CODE_USE_IN_KVP_POX_BINDING)
+    		.setDefaultValue(FALSE)
+    		.setTitle("HTTP Status Code Usage in KVP and POX Binding")
+    		.setDescription("Should the response returned by KVP and POX binding use the exception specific HTTP status code or always <tt>HTTP 200 - OK</tt>.");
+    
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
             MiscSettings.TOKEN_SEPERATOR_DEFINITION,
             MiscSettings.TUPLE_SEPERATOR_DEFINITION,
@@ -163,7 +175,8 @@ public class MiscSettings implements SettingDefinitionProvider {
             MiscSettings.DEFAULT_PROCEDURE_PREFIX_DEFINITION,
             MiscSettings.DEFAULT_OBSERVABLEPROPERTY_PREFIX_DEFINITION,
             MiscSettings.DEFAULT_FEATURE_PREFIX_DEFINITION,
-            MiscSettings.CHARACTER_ENCODING_DEFINITION);
+            MiscSettings.CHARACTER_ENCODING_DEFINITION,
+            MiscSettings.HTTP_STATUS_CODE_USE_IN_KVP_POX_BINDING_DEFINITION);
 
     @Override
     public Set<SettingDefinition<?, ?>> getSettingDefinitions() {

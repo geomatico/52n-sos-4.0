@@ -316,7 +316,7 @@ public abstract class Binding implements ConformanceClass {
                     throw createOEREFException(null);
                 }
             }
-            if (oer.hasResponseCode()) 
+            if (isUseHttpResponseCodes() && oer.hasResponseCode()) 
             {
                 serviceResponse.setHttpResponseCode(oer.getStatus().getCode());
             }
@@ -326,7 +326,12 @@ public abstract class Binding implements ConformanceClass {
         }
     }
     
-    private OwsExceptionReportEncodingFailedException createOEREFException(final Exception e) {
+	protected boolean isUseHttpResponseCodes()
+	{
+		return Configurator.getInstance().getServiceConfiguration().isUseHttpStatusCodesInKvpAndPoxBinding();
+	}
+
+	private OwsExceptionReportEncodingFailedException createOEREFException(final Exception e) {
     	final OwsExceptionReportEncodingFailedException oerefe = new OwsExceptionReportEncodingFailedException();
     	if (e != null)
     	{

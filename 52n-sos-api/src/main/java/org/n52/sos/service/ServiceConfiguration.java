@@ -55,7 +55,7 @@ public class ServiceConfiguration {
      * @deprecated not used by any code, check for external use or remove
      */
     @Deprecated
-    private Map<String, String> configFileMap = new HashMap<String, String>(0);
+    private final Map<String, String> configFileMap = new HashMap<String, String>(0);
 
     private String defaultOfferingPrefix;
     
@@ -66,7 +66,10 @@ public class ServiceConfiguration {
     private String defaultFeaturePrefix;
     
     private boolean useDefaultPrefixes;
-    /**
+    
+    private boolean useHttpStatusCodesInKvpAndPoxBinding;
+    
+	/**
      * date format of gml.
      */
     private String gmlDateFormat;
@@ -134,23 +137,23 @@ public class ServiceConfiguration {
      * @return the tokenSeperator.
      */
     public String getTokenSeparator() {
-        return this.tokenSeparator;
+        return tokenSeparator;
     }
 
     @Setting(MiscSettings.TOKEN_SEPARATOR)
-    public void setTokenSeparator(String separator) throws ConfigurationException {
+    public void setTokenSeparator(final String separator) throws ConfigurationException {
         Validation.notNullOrEmpty("Token separator", separator);
-        this.tokenSeparator = separator;
+        tokenSeparator = separator;
     }
 
     public String getTupleSeparator() {
-        return this.tupleSeparator;
+        return tupleSeparator;
     }
 
     @Setting(MiscSettings.TUPLE_SEPARATOR)
-    public void setTupleSeparator(String separator) throws ConfigurationException {
+    public void setTupleSeparator(final String separator) throws ConfigurationException {
         Validation.notNullOrEmpty("Tuple separator", separator);
-        this.tupleSeparator = separator;
+        tupleSeparator = separator;
     }
 
     /**
@@ -160,13 +163,13 @@ public class ServiceConfiguration {
      */
     @Deprecated
     public String getCharacterEncoding() {
-        return this.characterEncoding;
+        return characterEncoding;
     }
 
     @Setting(CHARACTER_ENCODING)
-    public void setCharacterEncoding(String encoding) throws ConfigurationException {
+    public void setCharacterEncoding(final String encoding) throws ConfigurationException {
         Validation.notNullOrEmpty("Character Encoding", encoding);
-        this.characterEncoding = encoding;
+        characterEncoding = encoding;
         XmlOptionsHelper.getInstance().setCharacterEncoding(characterEncoding);
     }
 
@@ -187,14 +190,14 @@ public class ServiceConfiguration {
      */
     @Deprecated
     @Setting(CONFIGURATION_FILES)
-    public void setConfigurationFiles(String configurationFiles) {
-        if (configurationFiles != null && !configurationFiles.isEmpty()) {
-            for (String kvp : configurationFiles.split(";")) {
-                String[] keyValue = kvp.split(" ");
-                this.configFileMap.put(keyValue[0], keyValue[1]);
+    public void setConfigurationFiles(final String configurationFiles) {
+        if ((configurationFiles != null) && !configurationFiles.isEmpty()) {
+            for (final String kvp : configurationFiles.split(";")) {
+                final String[] keyValue = kvp.split(" ");
+                configFileMap.put(keyValue[0], keyValue[1]);
             }
         } else {
-            this.configFileMap.clear();
+            configFileMap.clear();
         }
     }
 
@@ -207,7 +210,7 @@ public class ServiceConfiguration {
      */
     @Deprecated
     public String getDecimalSeparator() {
-        return this.decimalSeparator;
+        return decimalSeparator;
     }
 
     /**
@@ -215,9 +218,9 @@ public class ServiceConfiguration {
      */
     @Deprecated
     @Setting(DECIMAL_SEPARATOR)
-    public void setDecimalSeperator(String seperator) throws ConfigurationException {
+    public void setDecimalSeperator(final String seperator) throws ConfigurationException {
         Validation.notNullOrEmpty("Decimal seperator", seperator);
-        this.decimalSeparator = seperator;
+        decimalSeparator = seperator;
     }
 
     /**
@@ -226,12 +229,12 @@ public class ServiceConfiguration {
      * @return the minimum threshold
      */
     public int getMinimumGzipSize() {
-        return this.minimumGzipSize;
+        return minimumGzipSize;
     }
 
     @Setting(MINIMUM_GZIP_SIZE)
-    public void setMinimumGzipSize(int size) {
-        this.minimumGzipSize = size;
+    public void setMinimumGzipSize(final int size) {
+        minimumGzipSize = size;
     }
 
     /**
@@ -239,7 +242,7 @@ public class ServiceConfiguration {
      */
     @Deprecated
     public int getMaxGetObsResults() {
-        return this.maxGetObsResults;
+        return maxGetObsResults;
     }
 
     /**
@@ -249,58 +252,58 @@ public class ServiceConfiguration {
      */
     @Deprecated
     @Setting(MAX_GET_OBSERVATION_RESULTS)
-    public void setMaxGetObservationResults(int maxResults) {
-        this.maxGetObsResults = maxResults;
+    public void setMaxGetObservationResults(final int maxResults) {
+        maxGetObsResults = maxResults;
     }
 
 
     public String getDefaultOfferingPrefix() {
-        return this.defaultOfferingPrefix;
+        return defaultOfferingPrefix;
     }
 
 
     @Setting(DEFAULT_OFFERING_PREFIX)
-    public void setDefaultOfferingPrefix(String prefix) {
-        this.defaultOfferingPrefix = prefix;
+    public void setDefaultOfferingPrefix(final String prefix) {
+        defaultOfferingPrefix = prefix;
     }
     
     public String getDefaultProcedurePrefix() {
-        return this.defaultProcedurePrefix;
+        return defaultProcedurePrefix;
     }
     
     @Setting(DEFAULT_OBSERVABLEPROPERTY_PREFIX)
-    public void setDefaultObservablePropertyPrefix(String prefix) {
-        this.defaultObservablePropertyPrefix = prefix;
+    public void setDefaultObservablePropertyPrefix(final String prefix) {
+        defaultObservablePropertyPrefix = prefix;
     }
     
     public String getDefaultObservablePropertyPrefix() {
-        return this.defaultObservablePropertyPrefix;
+        return defaultObservablePropertyPrefix;
     }
 
 
     @Setting(DEFAULT_PROCEDURE_PREFIX)
-    public void setDefaultProcedurePrefix(String prefix) {
-        this.defaultProcedurePrefix = prefix;
+    public void setDefaultProcedurePrefix(final String prefix) {
+        defaultProcedurePrefix = prefix;
     }
     
     public String getDefaultFeaturePrefix() {
-        return this.defaultFeaturePrefix;
+        return defaultFeaturePrefix;
     }
 
 
     @Setting(DEFAULT_FEATURE_PREFIX)
-    public void setDefaultFeaturePrefix(String prefix) {
-        this.defaultFeaturePrefix = prefix;
+    public void setDefaultFeaturePrefix(final String prefix) {
+        defaultFeaturePrefix = prefix;
     }
     
     public boolean isUseDefaultPrefixes() {
-        return this.useDefaultPrefixes;
+        return useDefaultPrefixes;
     }
 
 
     @Setting(USE_DEFAULT_PREFIXES)
-    public void setUseDefaultPrefixes(boolean prefix) {
-        this.useDefaultPrefixes = prefix;
+    public void setUseDefaultPrefixes(final boolean prefix) {
+        useDefaultPrefixes = prefix;
     }
 
     /**
@@ -310,7 +313,7 @@ public class ServiceConfiguration {
      */
     @Deprecated
     public int getLease() {
-        return this.lease;
+        return lease;
     }
 
     /**
@@ -321,7 +324,7 @@ public class ServiceConfiguration {
      */
     @Deprecated
     @Setting(LEASE)
-    public void setLease(int lease) throws ConfigurationException {
+    public void setLease(final int lease) throws ConfigurationException {
         Validation.greaterZero("Lease", lease);
         this.lease = lease;
     }
@@ -333,7 +336,7 @@ public class ServiceConfiguration {
      */
     @Deprecated
     public boolean isSkipDuplicateObservations() {
-        return this.skipDuplicateObservations;
+        return skipDuplicateObservations;
     }
 
     /**
@@ -343,8 +346,8 @@ public class ServiceConfiguration {
      */
     @Deprecated
     @Setting(SKIP_DUPLICATE_OBSERVATIONS)
-    public void setSkipDuplicateObservations(boolean skip) {
-        this.skipDuplicateObservations = skip;
+    public void setSkipDuplicateObservations(final boolean skip) {
+        skipDuplicateObservations = skip;
     }
 
     /**
@@ -352,11 +355,11 @@ public class ServiceConfiguration {
      */
     //HibernateObservationUtilities
     public boolean isSupportsQuality() {
-        return this.supportsQuality;
+        return supportsQuality;
     }
 
     @Setting(SUPPORTS_QUALITY)
-    public void setSupportsQuality(boolean supportsQuality) {
+    public void setSupportsQuality(final boolean supportsQuality) {
         this.supportsQuality = supportsQuality;
     }
 
@@ -367,26 +370,37 @@ public class ServiceConfiguration {
      */
     @Deprecated
     public String getGmlDateFormat() {
-        return this.gmlDateFormat;
+        return gmlDateFormat;
     }
 
     @Setting(GML_DATE_FORMAT)
-    public void setGmlDateFormat(String format) {
+    public void setGmlDateFormat(final String format) {
         // TODO remove variable?
-        this.gmlDateFormat = format;
-        DateTimeHelper.setResponseFormat(this.gmlDateFormat);
+        gmlDateFormat = format;
+        DateTimeHelper.setResponseFormat(gmlDateFormat);
     }
+    
+    public boolean isUseHttpStatusCodesInKvpAndPoxBinding()
+	{
+		return useHttpStatusCodesInKvpAndPoxBinding;
+	}
+
+    @Setting(HTTP_STATUS_CODE_USE_IN_KVP_POX_BINDING)
+	public void setUseHttpStatusCodesInKvpAndPoxBinding(final boolean useHttpStatusCodesInKvpAndPoxBinding)
+	{
+		this.useHttpStatusCodesInKvpAndPoxBinding = useHttpStatusCodesInKvpAndPoxBinding;
+	}
 
     /**
      * @return Returns the sensor description directory
      */
     //HibernateProcedureUtilities
     public String getSensorDir() {
-        return this.sensorDirectory;
+        return sensorDirectory;
     }
 
     @Setting(SENSOR_DIRECTORY)
-    public void setSensorDirectory(String sensorDirectory) {
+    public void setSensorDirectory(final String sensorDirectory) {
         this.sensorDirectory = sensorDirectory;
     }
 
@@ -396,11 +410,11 @@ public class ServiceConfiguration {
      * @return the service URL
      */
     public String getServiceURL() {
-        return this.serviceURL;
+        return serviceURL;
     }
 
     @Setting(SERVICE_URL)
-    public void setServiceURL(URI serviceURL) throws ConfigurationException {
+    public void setServiceURL(final URI serviceURL) throws ConfigurationException {
         Validation.notNull("Service URL", serviceURL);
         String url = serviceURL.toString();
         if (url.contains("?")) {
@@ -419,7 +433,7 @@ public class ServiceConfiguration {
      * ITRequestEncoder
      */
     public String getSrsNamePrefix() {
-        return this.srsNamePrefix;
+        return srsNamePrefix;
     }
 
     @Setting(SRS_NAME_PREFIX_SOS_V1)
@@ -427,7 +441,7 @@ public class ServiceConfiguration {
         if (!prefix.endsWith(":") && !prefix.isEmpty()) {
             prefix += ":";
         }
-        this.srsNamePrefix = prefix;
+        srsNamePrefix = prefix;
     }
 
     /**
@@ -440,7 +454,7 @@ public class ServiceConfiguration {
      * SosEncoderv100
      */
     public String getSrsNamePrefixSosV2() {
-        return this.srsNamePrefixSosV2;
+        return srsNamePrefixSosV2;
     }
 
     @Setting(SRS_NAME_PREFIX_SOS_V2)
@@ -448,7 +462,7 @@ public class ServiceConfiguration {
         if (!prefix.endsWith("/") && !prefix.isEmpty()) {
             prefix += "/";
         }
-        this.srsNamePrefixSosV2 = prefix;
+        srsNamePrefixSosV2 = prefix;
     }
 
 }
