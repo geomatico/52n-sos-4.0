@@ -29,7 +29,8 @@ import java.util.Set;
 
 import org.n52.sos.event.SosEvent;
 import org.n52.sos.event.SosEventListener;
-import org.n52.sos.event.events.OwsExceptionReportEvent;
+import org.n52.sos.event.events.ExceptionEvent;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,20 +38,42 @@ import org.slf4j.LoggerFactory;
  * Single point of exception logging.
  *
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
-public class OwsExceptionReportLogger implements SosEventListener {
-    private static final Logger log = LoggerFactory.getLogger(OwsExceptionReportLogger.class);
-    public static final Set<Class<? extends SosEvent>> EVENTS = Collections
-            .<Class<? extends SosEvent>>singleton(OwsExceptionReportEvent.class);
+public class ExceptionLogger implements SosEventListener {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionLogger.class);
+	public static final Set<Class<? extends SosEvent>> EVENTS = Collections
+			.<Class<? extends SosEvent>>singleton(ExceptionEvent.class);
 
-    @Override
-    public Set<Class<? extends SosEvent>> getTypes() {
-        return EVENTS;
-    }
+	@Override
+	public Set<Class<? extends SosEvent>> getTypes() {
+		return EVENTS;
+	}
 
-    @Override
-    public void handle(SosEvent event) {
-        OwsExceptionReportEvent owsere = (OwsExceptionReportEvent) event;
-        log.debug("Error processing request", owsere.getExceptionReport());
-    }
+	@Override
+	public void handle(final SosEvent event) {
+		final ExceptionEvent ee = (ExceptionEvent) event;
+
+		if (ee.getException() instanceof OwsExceptionReport)
+		{
+			final OwsExceptionReport owse = (OwsExceptionReport) ee.getException();
+			if (owse.getStatus().getCode() >= 500)
+			{
+				LOGGER.error("Exception thrown", owse);
+			}
+			else if (owse.getStatus().getCode() >= 400)
+			{
+				LOGGER.warn("Exception thrown", owse);
+			}
+			else {
+				LOGGER.debug("Exception thrown", owse);
+			}
+		}
+		else
+		{
+			LOGGER.debug("Error processing request", ee.getException());
+		}
+	}
 }

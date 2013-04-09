@@ -23,6 +23,8 @@
  */
 package org.n52.sos.binding;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.BAD_REQUEST;
+
 import java.util.Collections;
 import java.util.Set;
 
@@ -36,9 +38,9 @@ import org.n52.sos.decode.XmlOperationDecoderKey;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.event.SosEventBus;
-import org.n52.sos.event.events.OwsExceptionReportEvent;
+import org.n52.sos.event.events.ExceptionEvent;
+import org.n52.sos.exception.OwsExceptionReportEncodingFailedException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.exception.ows.concrete.MethodNotSupportedException;
 import org.n52.sos.exception.ows.concrete.NoEncoderForKeyException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
@@ -56,128 +58,138 @@ import org.slf4j.LoggerFactory;
 
 public class SoapBinding extends Binding {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SoapBinding.class);
-    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_SOAP_BINDING);
-    private static final String urlPattern = "/soap";
+	private static final Logger LOGGER = LoggerFactory.getLogger(SoapBinding.class);
+	private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_SOAP_BINDING);
+	private static final String urlPattern = "/soap";
 
-    @Override
-    public ServiceResponse doGetOperation(HttpServletRequest request) throws OwsExceptionReport {
-        SoapResponse soapResponse = new SoapResponse();
-        OwsExceptionReport owse = new MethodNotSupportedException("SOAP", "GET");
-        soapResponse.setException(owse);
-        soapResponse.setSoapVersion(SOAPConstants.SOAP_1_2_PROTOCOL);
-        soapResponse.setSoapNamespace(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE);
+	@Override
+	public ServiceResponse doPostOperation(final HttpServletRequest request) throws OwsExceptionReportEncodingFailedException {
+		final String version = null;
+		String soapVersion = null;
+		String soapNamespace = null;
+		final SoapResponse soapResponse = new SoapResponse();
+		try {
+			final String soapAction = SoapHelper.checkSoapHeader(request);
+			final XmlObject doc = XmlHelper.parseXmlSosRequest(request);
+			LOGGER.debug("SOAP-REQUEST: {}", doc.xmlText());
+			// TODO add null check to decoder
+			final Decoder<?,XmlObject> decoder = getDecoder(CodingHelper.getDecoderKey(doc));
+			// decode SOAP message
+			final Object abstractRequest = decoder.decode(doc);
+			if (!(abstractRequest instanceof SoapRequest))
+			{
+				throw new NoApplicableCodeException()
+				.withMessage("Request type '%s' not supported. Expected '%s'.",
+						abstractRequest!=null?abstractRequest.getClass().getName():abstractRequest,
+								SoapRequest.class.getName())
+								.setStatus(BAD_REQUEST);
+			}
+			else
+			{
+				final SoapRequest soapRequest = (SoapRequest) abstractRequest;
+				if ((soapRequest.getSoapAction() == null) && (soapAction != null)) {
+					soapRequest.setAction(soapAction);
+				}
+				soapResponse.setSoapVersion(soapRequest.getSoapVersion());
+				soapVersion = soapRequest.getSoapVersion();
+				soapNamespace = soapRequest.getSoapNamespace();
+				soapResponse.setSoapNamespace(soapNamespace);
+				soapResponse.setHeader(soapRequest.getSoapHeader());
+				if (soapRequest.getSoapFault() == null) {
+					final XmlObject xmlObject = soapRequest.getSoapBodyContent();
+					// TODO add null check to decoder
+					final Decoder<?, XmlObject> bodyDecoder = getDecoder(CodingHelper.getDecoderKey(xmlObject));
+					// Decode SOAPBody content
+					final Object aBodyRequest = bodyDecoder.decode(xmlObject);
+					if (!(aBodyRequest instanceof AbstractServiceRequest)) {
+						throw new NoApplicableCodeException()
+						.withMessage("The returned object is not an AbstractServiceRequest implementation")
+						.setStatus(BAD_REQUEST);
+					} else {
+						final AbstractServiceRequest bodyRequest = (AbstractServiceRequest) aBodyRequest;
+						checkServiceOperatorKeyTypes(bodyRequest);
+						for (final ServiceOperatorKeyType sokt : bodyRequest.getServiceOperatorKeyType()) {
+							final ServiceOperator so = getServiceOperatorRepository().getServiceOperator(sokt);
+							if (so != null) {
+								final ServiceResponse bodyResponse = so.receiveRequest(bodyRequest);
+								if (!bodyResponse.isXmlResponse()) {
+									// FIXME how to encode non xml encoded data
+									// in soap responses?
+									return bodyResponse;
+								}
+								soapResponse.setSoapBodyContent(bodyResponse);
+								break;
+							}
+						}
+					}
+				}
+				// Encode SOAP response
+				final EncoderKey key = CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse);
+				final Encoder<?, SoapResponse> encoder = getEncoder(key);
+				if (encoder != null) {
+					return (ServiceResponse) encoder.encode(soapResponse);
+				} else {
+					throw new NoEncoderForKeyException(key);
+				}
+			}
+		} catch (final OwsExceptionReport t) {
+			return encodeOwsExceptionReport(version, soapVersion, soapNamespace, soapResponse, t);
+		}
+	}
 
-        return (ServiceResponse) CodingHelper.encodeObjectToXml(soapResponse.getSoapNamespace(), soapResponse);
-    }
+	private ServiceResponse encodeOwsExceptionReport(final String version,
+			final String soapVersion,
+			final String soapNamespace,
+			final SoapResponse soapResponse,
+			final OwsExceptionReport owse) throws OwsExceptionReportEncodingFailedException {
 
-    @Override
-    public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport {
-        String version = null;
-        String soapVersion = null;
-        String soapNamespace = null;
-        SoapResponse soapResponse = new SoapResponse();
-        try {
-            String soapAction = SoapHelper.checkSoapHeader(request);
-            XmlObject doc = XmlHelper.parseXmlSosRequest(request);
-            LOGGER.debug("SOAP-REQUEST: {}", doc.xmlText());
-            Decoder<?,XmlObject> decoder = getDecoder(CodingHelper.getDecoderKey(doc));
-            // decode SOAP message
-            Object abstractRequest = decoder.decode(doc);
-            if (!(abstractRequest instanceof SoapRequest)) 
-            {
-            	throw new NoApplicableCodeException().withMessage("Request type '%s' not supported. Expected '%s'.", 
-            			abstractRequest!=null?abstractRequest.getClass().getName():abstractRequest,
-            					SoapRequest.class.getName());
-            } 
-            else 
-            {
-                SoapRequest soapRequest = (SoapRequest) abstractRequest;
-                if (soapRequest.getSoapAction() == null && soapAction != null) {
-                    soapRequest.setAction(soapAction);
-                }
-                soapResponse.setSoapVersion(soapRequest.getSoapVersion());
-                soapVersion = soapRequest.getSoapVersion();
-                soapNamespace = soapRequest.getSoapNamespace();
-                soapResponse.setSoapNamespace(soapNamespace);
-                soapResponse.setHeader(soapRequest.getSoapHeader());
-                if (soapRequest.getSoapFault() == null) {
-                    XmlObject xmlObject = soapRequest.getSoapBodyContent();
-                    Decoder<?, XmlObject> bodyDecoder = getDecoder(CodingHelper.getDecoderKey(xmlObject));
-                    // Decode SOAPBody content
-                    Object aBodyRequest = bodyDecoder.decode(xmlObject);
-                    if (aBodyRequest instanceof AbstractServiceRequest) {
-                        AbstractServiceRequest bodyRequest = (AbstractServiceRequest) aBodyRequest;
-                        checkServiceOperatorKeyTypes(bodyRequest);
-                        for (ServiceOperatorKeyType sokt : bodyRequest.getServiceOperatorKeyType()) {
-                            ServiceOperator so = getServiceOperatorRepository().getServiceOperator(sokt);
-                            if (so != null) {
-                                ServiceResponse bodyResponse = so.receiveRequest(bodyRequest);
-                                if (!bodyResponse.isXmlResponse()) {
-                                    // FIXME how to encode non xml encoded data
-                                    // in soap responses?
-                                    return bodyResponse;
-                                }
-                                soapResponse.setSoapBodyContent(bodyResponse);
-                                break;
-                            }
-                        }
-                    } else {
-                        throw new NoApplicableCodeException()
-                                .withMessage("The returned object is not an AbstractServiceRequest implementation");
-                    }
-                } 
-                // Encode SOAP response
-                EncoderKey key = CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse);
-                Encoder<?, SoapResponse> encoder = getEncoder(key);
-                if (encoder != null) {
-                    return (ServiceResponse) encoder.encode(soapResponse);
-                } else {
-                    throw new NoEncoderForKeyException(key);
-                }
-            }
-        } catch (Throwable t) {
-            OwsExceptionReport owse;
-            if (t instanceof OwsExceptionReport) {
-                owse = (OwsExceptionReport) t;
-            } else {
-                owse = new NoApplicableCodeException().causedBy(t);
-            }
-            soapResponse.setException(owse.setVersion(version));
-            if (soapVersion == null || !soapVersion.isEmpty()) {
-                soapResponse.setSoapVersion(SOAPConstants.SOAP_1_2_PROTOCOL);
-            } else {
-                soapResponse.setSoapVersion(soapVersion);
-            }
-            if (soapNamespace == null || (soapVersion != null && !soapVersion.isEmpty())) {
-                soapResponse.setSoapNamespace(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE);
-            } else {
-                soapResponse.setSoapNamespace(soapNamespace);
-            }
-            EncoderKey key = CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse);
-            Encoder<?, SoapResponse> encoder = getEncoder(key);
-            if (encoder != null) {
-                ServiceResponse response = (ServiceResponse) encoder.encode(soapResponse);
-                SosEventBus.fire(new OwsExceptionReportEvent(owse));
-                return response;
-            } else {
-                throw new NoEncoderForKeyException(key);
-            }
-        }
-    }
+		soapResponse.setException(owse.setVersion(version));
+		// set SOAP version
+		if ((soapVersion == null) || !soapVersion.isEmpty()) {
+			soapResponse.setSoapVersion(SOAPConstants.SOAP_1_2_PROTOCOL);
+		} else {
+			soapResponse.setSoapVersion(soapVersion);
+		}
+		// set SOAP namespace
+		if ((soapNamespace == null) || ((soapVersion != null) && !soapVersion.isEmpty())) {
+			soapResponse.setSoapNamespace(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE);
+		} else {
+			soapResponse.setSoapNamespace(soapNamespace);
+		}
+		// encode SOAP body
+		final EncoderKey key = CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse);
+		final Encoder<?, SoapResponse> encoder = getEncoder(key);
+		try {
+			if (encoder != null) {
+				final ServiceResponse response = (ServiceResponse) encoder.encode(soapResponse);
+				SosEventBus.fire(new ExceptionEvent(owse));
+				if (owse.hasResponseCode())
+				{
+					response.setHttpResponseCode(owse.getStatus().getCode());
+				}
+				return response;
+			} else {
+				throw new NoEncoderForKeyException(key);
+			}
+		} catch (final Throwable t2) {
+			final OwsExceptionReportEncodingFailedException oerfe = new OwsExceptionReportEncodingFailedException();
+			oerfe.initCause(t2);
+			throw oerfe;
+		}
+	}
 
-    @Override
-    public String getUrlPattern() {
-        return urlPattern;
-    }
+	@Override
+	public String getUrlPattern() {
+		return urlPattern;
+	}
 
-    @Override
-    public boolean checkOperationHttpPostSupported(OperationDecoderKey k) throws OwsExceptionReport {
-        return getDecoder(new XmlOperationDecoderKey(k)) != null;
-    }
+	@Override
+	public boolean checkOperationHttpPostSupported(final OperationDecoderKey k) {
+		return getDecoder(new XmlOperationDecoderKey(k)) != null;
+	}
 
-    @Override
-    public Set<String> getConformanceClasses() {
-        return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
-    }
+	@Override
+	public Set<String> getConformanceClasses() {
+		return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
+	}
 }

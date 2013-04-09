@@ -23,21 +23,30 @@
  */
 package org.n52.sos.binding;
 
+import java.io.ByteArrayOutputStream;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.decode.Decoder;
 import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.EncoderKey;
-import org.n52.sos.exception.ows.concrete.ServiceNotSupportedException;
-import org.n52.sos.exception.ows.concrete.VersionNotSupportedException;
+import org.n52.sos.encode.XmlEncoderKey;
+import org.n52.sos.event.SosEventBus;
+import org.n52.sos.event.events.ExceptionEvent;
+import org.n52.sos.exception.HTTPException;
+import org.n52.sos.exception.OwsExceptionReportEncodingFailedException;
+import org.n52.sos.exception.ows.concrete.InvalidAcceptVersionsParameterException;
 import org.n52.sos.exception.ows.concrete.MissingServiceParameterException;
 import org.n52.sos.exception.ows.concrete.MissingVersionParameterException;
-import org.n52.sos.exception.ows.concrete.InvalidAcceptVersionsParameterException;
+import org.n52.sos.exception.ows.concrete.ServiceNotSupportedException;
+import org.n52.sos.exception.ows.concrete.VersionNotSupportedException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.ServiceResponse;
@@ -45,6 +54,7 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ConformanceClass;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.service.operator.ServiceOperatorRepository;
+import org.n52.sos.util.XmlOptionsHelper;
 
 /**
  * Abstract Super class for binding implementations<br />
@@ -56,6 +66,8 @@ import org.n52.sos.service.operator.ServiceOperatorRepository;
  *
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @author <a href="mailto:c.hollmann@52north.org">Carsten Hollmann</a>
+ * 
+ * @since 4.0.0
  */
 public abstract class Binding implements ConformanceClass {
     /**
@@ -77,7 +89,7 @@ public abstract class Binding implements ConformanceClass {
      *
      * @throws OwsExceptionReport
      */
-    public ServiceResponse doDeleteOperation(HttpServletRequest request) throws OwsExceptionReport {
+    public ServiceResponse doDeleteOperation(final HttpServletRequest request) throws OwsExceptionReportEncodingFailedException {
         return createNotImplementedContentLessServiceResponse();
     }
 
@@ -91,7 +103,7 @@ public abstract class Binding implements ConformanceClass {
      *
      * @throws OwsExceptionReport
      */
-    public ServiceResponse doGetOperation(HttpServletRequest request) throws OwsExceptionReport {
+    public ServiceResponse doGetOperation(final HttpServletRequest request) throws OwsExceptionReportEncodingFailedException {
         return createNotImplementedContentLessServiceResponse();
     }
 
@@ -105,7 +117,7 @@ public abstract class Binding implements ConformanceClass {
      *
      * @throws OwsExceptionReport
      */
-    public ServiceResponse doOptionsOperation(HttpServletRequest request) throws OwsExceptionReport {
+    public ServiceResponse doOptionsOperation(final HttpServletRequest request) throws OwsExceptionReportEncodingFailedException {
         return createNotImplementedContentLessServiceResponse();
     }
 
@@ -119,7 +131,7 @@ public abstract class Binding implements ConformanceClass {
      *
      * @throws OwsExceptionReport
      */
-    public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport {
+    public ServiceResponse doPostOperation(final HttpServletRequest request) throws OwsExceptionReportEncodingFailedException {
         return createNotImplementedContentLessServiceResponse();
     }
 
@@ -133,7 +145,7 @@ public abstract class Binding implements ConformanceClass {
      *
      * @throws OwsExceptionReport
      */
-    public ServiceResponse doPutOperation(HttpServletRequest request) throws OwsExceptionReport {
+    public ServiceResponse doPutOperation(final HttpServletRequest request) throws OwsExceptionReportEncodingFailedException {
         return createNotImplementedContentLessServiceResponse();
     }
 
@@ -155,9 +167,9 @@ public abstract class Binding implements ConformanceClass {
      * @return true, if the decoder <code>decoderKey</code> supports HTTP-Delete for * operation <code>operationName</code>
      *
      *
-     * @throws OwsExceptionReport
+     * @throws HTTPException
      */
-    public boolean checkOperationHttpDeleteSupported(OperationDecoderKey decoderKey) throws OwsExceptionReport {
+    public boolean checkOperationHttpDeleteSupported(final OperationDecoderKey decoderKey) throws HTTPException {
         return false;
     }
 
@@ -169,9 +181,9 @@ public abstract class Binding implements ConformanceClass {
      * @return true, if the decoder <code>decoderKey</code> supports HTTP-Get for operation <code>operationName</code>
      *
      *
-     * @throws OwsExceptionReport
+     * @throws HTTPException
      */
-    public boolean checkOperationHttpGetSupported(OperationDecoderKey decoderKey) throws OwsExceptionReport {
+    public boolean checkOperationHttpGetSupported(final OperationDecoderKey decoderKey) throws HTTPException {
         return false;
     }
 
@@ -183,9 +195,9 @@ public abstract class Binding implements ConformanceClass {
      * @return true, if the decoder <code>decoderKey</code> supports HTTP-Post for operation <code>operationName</code>
      *
      *
-     * @throws OwsExceptionReport
+     * @throws HTTPException
      */
-    public boolean checkOperationHttpPostSupported(OperationDecoderKey decoderKey) throws OwsExceptionReport {
+    public boolean checkOperationHttpPostSupported(final OperationDecoderKey decoderKey) throws HTTPException {
         return false;
     }
 
@@ -197,9 +209,9 @@ public abstract class Binding implements ConformanceClass {
      * @return true, if the decoder <code>decoderKey</code> supports HTTP-Post for operation <code>operationName</code>
      *
      *
-     * @throws OwsExceptionReport
+     * @throws HTTPException
      */
-    public boolean checkOperationHttpOptionsSupported(OperationDecoderKey decoderKey) throws OwsExceptionReport {
+    public boolean checkOperationHttpOptionsSupported(final OperationDecoderKey decoderKey) throws HTTPException {
         return false;
     }
 
@@ -211,15 +223,15 @@ public abstract class Binding implements ConformanceClass {
      * @return true, if the decoder <code>decoderKey</code> supports HTTP-Put for operation <code>operationName</code>
      *
      *
-     * @throws OwsExceptionReport
+     * @throws HTTPException
      */
-    public boolean checkOperationHttpPutSupported(OperationDecoderKey decoderKey) throws OwsExceptionReport {
+    public boolean checkOperationHttpPutSupported(final OperationDecoderKey decoderKey) throws HTTPException {
         return false;
     }
 
-    protected void checkServiceOperatorKeyTypes(AbstractServiceRequest request) throws OwsExceptionReport {
-        CompositeOwsException exceptions = new CompositeOwsException();
-        for (ServiceOperatorKeyType sokt : request.getServiceOperatorKeyType()) {
+    protected void checkServiceOperatorKeyTypes(final AbstractServiceRequest request) throws OwsExceptionReport {
+        final CompositeOwsException exceptions = new CompositeOwsException();
+        for (final ServiceOperatorKeyType sokt : request.getServiceOperatorKeyType()) {
             if (sokt.getService() != null) {
                 if (sokt.getService().isEmpty()) {
                     exceptions.add(new MissingServiceParameterException());
@@ -228,10 +240,10 @@ public abstract class Binding implements ConformanceClass {
                 }
             }
             if (request instanceof GetCapabilitiesRequest) {
-                GetCapabilitiesRequest gcr = (GetCapabilitiesRequest) request;
+                final GetCapabilitiesRequest gcr = (GetCapabilitiesRequest) request;
                 if (gcr.isSetAcceptVersions()) {
                     boolean hasSupportedVersion = false;
-                    for (String acceptVersion : gcr.getAcceptVersions()) {
+                    for (final String acceptVersion : gcr.getAcceptVersions()) {
                         if (isVersionSupported(acceptVersion)) {
                             hasSupportedVersion = true;
                         }
@@ -255,11 +267,11 @@ public abstract class Binding implements ConformanceClass {
         exceptions.throwIfNotEmpty();
     }
 
-    protected boolean isVersionSupported(String acceptVersion) {
+    protected boolean isVersionSupported(final String acceptVersion) {
         return getServiceOperatorRepository().isVersionSupported(acceptVersion);
     }
 
-    protected boolean isServiceSupported(String service) {
+    protected boolean isServiceSupported(final String service) {
         return getServiceOperatorRepository().isServiceSupported(service);
     }
 
@@ -267,11 +279,59 @@ public abstract class Binding implements ConformanceClass {
         return Configurator.getInstance().getServiceOperatorRepository();
     }
 
-    protected <F, T> Decoder<F, T> getDecoder(DecoderKey key) {
+    protected <F, T> Decoder<F, T> getDecoder(final DecoderKey key) {
         return Configurator.getInstance().getCodingRepository().getDecoder(key);
     }
 
-    protected <F, T> Encoder<F, T> getEncoder(EncoderKey key) {
+    protected <F, T> Encoder<F, T> getEncoder(final EncoderKey key) {
         return Configurator.getInstance().getCodingRepository().getEncoder(key);
+    }
+    
+    protected ServiceResponse encodeOwsExceptionReport(final OwsExceptionReport oer, final boolean setStatusFromException) throws OwsExceptionReportEncodingFailedException
+    {
+    	try {
+            ServiceResponse serviceResponse = null;
+            SosEventBus.fire(new ExceptionEvent(oer));
+            final EncoderKey key = new XmlEncoderKey(oer.getNamespace(), oer.getClass());
+            final Encoder<?, OwsExceptionReport> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
+            if (encoder == null)
+            {
+            	throw createOEREFException(null);
+            }
+            else
+            {
+                final Object encodedObject = encoder.encode(oer);
+                if (encodedObject instanceof XmlObject)
+                {
+                    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
+                    serviceResponse = new ServiceResponse(baos, SosConstants.CONTENT_TYPE_XML, false, true);
+                }
+                else if (encodedObject instanceof ServiceResponse)
+                {
+                    serviceResponse = (ServiceResponse) encodedObject;
+                } 
+                else 
+                {
+                    throw createOEREFException(null);
+                }
+            }
+            if (oer.hasResponseCode()) 
+            {
+                serviceResponse.setHttpResponseCode(oer.getStatus().getCode());
+            }
+            return serviceResponse;
+        } catch (final Exception e) {
+            throw createOEREFException(e);
+        }
+    }
+    
+    private OwsExceptionReportEncodingFailedException createOEREFException(final Exception e) {
+    	final OwsExceptionReportEncodingFailedException oerefe = new OwsExceptionReportEncodingFailedException();
+    	if (e != null)
+    	{
+    		oerefe.initCause(e);
+    	}
+    	return oerefe;
     }
 }

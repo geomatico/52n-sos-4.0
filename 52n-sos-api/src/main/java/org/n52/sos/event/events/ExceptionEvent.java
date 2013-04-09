@@ -24,25 +24,27 @@
 package org.n52.sos.event.events;
 
 import org.n52.sos.event.SosEvent;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
-public class OwsExceptionReportEvent implements SosEvent {
-    private OwsExceptionReport exceptionReport;
+public class ExceptionEvent implements SosEvent {
+	private final Exception exception;
 
-    public OwsExceptionReportEvent(OwsExceptionReport exceptionReport) {
-        this.exceptionReport = exceptionReport;
-    }
+	public ExceptionEvent(final Exception exception) {
+		this.exception = exception;
+	}
 
-    public OwsExceptionReport getExceptionReport() {
-        return exceptionReport;
-    }
+	public Exception getException() {
+		return exception;
+	}
 
-    @Override
-    public String toString() {
-        return String.format("OwsExceptionReportEvent[exceptionReport=%s]",
-                             getExceptionReport() != null ? getExceptionReport().getClass().getSimpleName() : getClass());
-    }
+	@Override
+	public String toString() {
+		return String.format("ExceptionEvent[exception=%s]",
+				getException() != null ? getException().getClass().getSimpleName() : getClass());
+	}
 }
