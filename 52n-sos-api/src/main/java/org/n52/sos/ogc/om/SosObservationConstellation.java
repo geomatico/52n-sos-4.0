@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.sos.ResultTemplate;
+import org.n52.sos.ogc.sos.SosResultTemplate;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 
 /**
@@ -54,7 +54,7 @@ public class SosObservationConstellation implements Serializable, Cloneable {
     /** type of the observation */
     private String observationType;
     
-    private ResultTemplate resultTemplate;
+    private SosResultTemplate sosResultTemplate;
 
     /**
      * default constructor
@@ -248,16 +248,16 @@ public class SosObservationConstellation implements Serializable, Cloneable {
                     .equals(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION));
     }
     
-    public ResultTemplate getResultTemplate() {
-        return resultTemplate;
+    public SosResultTemplate getResultTemplate() {
+        return sosResultTemplate;
     }
     
-    public void setResultTemplate(ResultTemplate resultTemplate) {
-        this.resultTemplate = resultTemplate;
+    public void setResultTemplate(SosResultTemplate sosResultTemplate) {
+        this.sosResultTemplate = sosResultTemplate;
     }
 
     public boolean isSetResultTemplate() {
-        return resultTemplate != null;
+        return sosResultTemplate != null;
     }
 
     public boolean isSetObservationType() {

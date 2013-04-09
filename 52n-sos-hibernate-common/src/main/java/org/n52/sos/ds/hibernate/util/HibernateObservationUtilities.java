@@ -168,8 +168,8 @@ public class HibernateObservationUtilities {
         Map<String, SosProcedureDescription> procedures = new HashMap<String, SosProcedureDescription>(0);
         Map<Integer, SosObservationConstellation> observationConstellations =
                 new HashMap<Integer, SosObservationConstellation>(0);
-        Map<String, org.n52.sos.ogc.sos.ResultTemplate> resultTemplates =
-                new HashMap<String, org.n52.sos.ogc.sos.ResultTemplate>(0);
+        Map<String, org.n52.sos.ogc.sos.SosResultTemplate> sosResultTemplates =
+                new HashMap<String, org.n52.sos.ogc.sos.SosResultTemplate>(0);
         if (observations != null) {
             // now iterate over resultset and create Measurement for each row
             for (Observation hObservation : observations) {
@@ -277,22 +277,22 @@ public class HibernateObservationUtilities {
                         List<ResultTemplate> hResultTemplates =
                                 HibernateCriteriaQueryUtilities.getResultTemplateObjectsForObservationConstellation(
                                         hObservationConstellation, session);
-                        // Set<ResultTemplate> hResultTemplates =
+                        // Set<SosResultTemplate> hResultTemplates =
                         // hObservationConstellation.getResultTemplates();
                         if (hResultTemplates != null && !hResultTemplates.isEmpty()) {
                             for (ResultTemplate hResultTemplate : hResultTemplates) {
                                 if (hResultTemplate.getIdentifier() != null
                                         && !hResultTemplate.getIdentifier().isEmpty()) {
-                                    org.n52.sos.ogc.sos.ResultTemplate resultTemplate;
-                                    if (resultTemplates.containsKey(hResultTemplate.getIdentifier())) {
-                                        resultTemplate = resultTemplates.get(hResultTemplate.getIdentifier());
+                                    org.n52.sos.ogc.sos.SosResultTemplate sosResultTemplate;
+                                    if (sosResultTemplates.containsKey(hResultTemplate.getIdentifier())) {
+                                        sosResultTemplate = sosResultTemplates.get(hResultTemplate.getIdentifier());
                                     } else {
-                                        resultTemplate = new org.n52.sos.ogc.sos.ResultTemplate();
-                                        resultTemplate.setXmlResultStructure(hResultTemplate.getResultStructure());
-                                        resultTemplate.setXmResultEncoding(hResultTemplate.getResultEncoding());
-                                        resultTemplates.put(hResultTemplate.getIdentifier(), resultTemplate);
+                                        sosResultTemplate = new org.n52.sos.ogc.sos.SosResultTemplate();
+                                        sosResultTemplate.setXmlResultStructure(hResultTemplate.getResultStructure());
+                                        sosResultTemplate.setXmResultEncoding(hResultTemplate.getResultEncoding());
+                                        sosResultTemplates.put(hResultTemplate.getIdentifier(), sosResultTemplate);
                                     }
-                                    obsConst.setResultTemplate(resultTemplate);
+                                    obsConst.setResultTemplate(sosResultTemplate);
                                     break;
                                 }
                             }

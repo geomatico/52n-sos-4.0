@@ -32,7 +32,7 @@ import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
 import org.n52.sos.util.CodingHelper;
 
-public class ResultTemplate {
+public class SosResultTemplate {
 
     private CodeWithAuthority identifier;
 

@@ -42,7 +42,7 @@ import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.om.values.TVPValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.ResultTemplate;
+import org.n52.sos.ogc.sos.SosResultTemplate;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
@@ -75,13 +75,13 @@ public class SweHelper {
 
     private static SosSweDataArray createSosSweDataArrayWithResultTemplate(SosObservation sosObservation)
             throws OwsExceptionReport {
-        ResultTemplate resultTemplate = sosObservation.getObservationConstellation().getResultTemplate();
+        SosResultTemplate sosResultTemplate = sosObservation.getObservationConstellation().getResultTemplate();
         String observablePropertyIdentifier =
                 sosObservation.getObservationConstellation().getObservableProperty().getIdentifier();
         SweDataArrayValue dataArrayValue = new SweDataArrayValue();
         SosSweDataArray dataArray = new SosSweDataArray();
-        dataArray.setElementType(resultTemplate.getResultStructure());
-        dataArray.setEncoding(resultTemplate.getResultEncoding());
+        dataArray.setElementType(sosResultTemplate.getResultStructure());
+        dataArray.setEncoding(sosResultTemplate.getResultEncoding());
         dataArrayValue.setValue(dataArray);
         if (sosObservation.getValue() instanceof SosSingleObservationValue) {
             SosSingleObservationValue<?> singleValue = (SosSingleObservationValue) sosObservation.getValue();
