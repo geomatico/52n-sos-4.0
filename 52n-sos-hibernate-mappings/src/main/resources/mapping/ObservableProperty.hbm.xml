@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 10.07.2012 15:18:27 by Hibernate Tools 3.4.0.CR1 -->
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="org.n52.sos.ds.hibernate.entities.ObservableProperty" table="observable_property">
         <id name="observablePropertyId" type="long">
@@ -16,22 +15,6 @@
         <property name="description" type="string">
             <column name="description" />
         </property>
-        <!-- <set name="requests" table="request_has_observable_property" inverse="true" lazy="true" fetch="join">
-            <key>
-                <column name="observable_property_id" not-null="true" />
-            </key>
-            <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.Request">
-                <column name="request_id" not-null="true" />
-            </many-to-many>
-        </set>
-    	<set name="compositePhenomenons" table="composite_phenomenon_has_observable_property" inverse="true" lazy="true" fetch="join">
-            <key>
-                <column name="observable_property_id" not-null="true" />
-            </key>
-            <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.CompositePhenomenon">
-                <column name="composite_phenomenon_id" not-null="true" />
-            </many-to-many>
-        </set> -->
         <set name="observationConstellations" table="observation_constellation" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="observable_property_id" not-null="true" />

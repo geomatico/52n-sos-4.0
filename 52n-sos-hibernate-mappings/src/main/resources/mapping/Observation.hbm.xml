@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 10.07.2012 15:18:27 by Hibernate Tools 3.4.0.CR1 -->
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="org.n52.sos.ds.hibernate.entities.Observation" table="observation">
         <id name="observationId" type="long">
@@ -23,7 +22,7 @@
             <column name="codespace_id" not-null="true" />
         </many-to-one>
         <property name="deleted" type="boolean">
-            <column name="deleted" not-null="true" default="true"/>
+            <column name="deleted" not-null="true" default="false"/>
         </property>
         <property name="phenomenonTimeStart" type="timestamp">
             <column name="phenomenon_time_start" length="29" not-null="true" />

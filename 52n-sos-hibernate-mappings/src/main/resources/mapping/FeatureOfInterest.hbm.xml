@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 10.07.2012 15:18:27 by Hibernate Tools 3.4.0.CR1 -->
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="org.n52.sos.ds.hibernate.entities.FeatureOfInterest" table="feature_of_interest">
         <id name="featureOfInterestId" type="long">
@@ -32,7 +31,8 @@
             <column name="url" unique="true" />
         </property>
         <!-- supports types big_decimal and string -->
-       <!--  <property name="longitude" type="big_decimal">
+        <!--  
+        <property name="longitude" type="big_decimal">
            <column name="longitude" unique="true" />
         </property>
         <property name="latitude" type="big_decimal">
@@ -43,13 +43,8 @@
         </property>
         <property name="srid" type="integer">
         	<column name="srid" unique="true" />
-        </property> -->
-        <!-- <set name="observations" table="observation" inverse="true" lazy="true" fetch="select">
-            <key>
-                <column name="feature_of_interest_id" not-null="true" />
-            </key>
-            <one-to-many class="org.n52.sos.ds.hibernate.entities.Observation" />
-        </set> -->
+        </property> 
+        -->
         <set name="featureOfInterestsForChildFeatureId" table="feature_relation" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="parent_feature_id" not-null="true" />
@@ -66,11 +61,5 @@
                 <column name="parent_feature_id" not-null="true" />
             </many-to-many>
         </set>
-        <!-- <set name="resultTemplates" table="result_template" inverse="true" lazy="true" fetch="select">
-            <key>
-                <column name="feature_of_interest_id" not-null="true" />
-            </key>
-            <one-to-many class="org.n52.sos.ds.hibernate.entities.ResultTemplate" />
-        </set> -->
     </class>
 </hibernate-mapping>

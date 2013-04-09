@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 10.07.2012 15:18:27 by Hibernate Tools 3.4.0.CR1 -->
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="org.n52.sos.ds.hibernate.entities.ObservationConstellation" table="observation_constellation">
         <id name="observationConstellationId" type="long">
@@ -23,25 +22,5 @@
             </key>
             <one-to-many class="org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType" />
         </set>
-   
-        <!--
-        <many-to-one name="observationType" class="org.n52.sos.ds.hibernate.entities.ObservationType" fetch="join">
-            <column name="observation_type_id" not-null="false" />
-        </many-to-one> 
-        <many-to-one name="offering" class="org.n52.sos.ds.hibernate.entities.Offering" fetch="join">
-            <column name="offering_id" not-null="true" />
-        </many-to-one>
-        <set name="resultTemplates" table="result_template" inverse="true" lazy="extra" fetch="select">
-            <key>
-                <column name="observation_constellation_id" not-null="true" />
-            </key>
-            <one-to-many class="org.n52.sos.ds.hibernate.entities.ResultTemplate" />
-        </set>
-        <set name="observations" table="observation" inverse="true" lazy="extra" fetch="select">
-            <key>
-                <column name="observation_constellation_id" not-null="true" />
-            </key>
-            <one-to-many class="org.n52.sos.ds.hibernate.entities.Observation" />
-        </set> -->
     </class>
 </hibernate-mapping>

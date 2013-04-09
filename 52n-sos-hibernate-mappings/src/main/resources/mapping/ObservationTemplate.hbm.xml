@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 10.07.2012 15:18:27 by Hibernate Tools 3.4.0.CR1 -->
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="org.n52.sos.ds.hibernate.entities.ObservationTemplate" table="observation_template">
         <id name="observationTemplateId" type="long">
@@ -10,12 +9,6 @@
             	<param name="sequence">observation_template_id_seq</param>
             </generator>
         </id>
-        <!-- <many-to-one name="request" class="org.n52.sos.ds.hibernate.entities.Request" lazy="true" fetch="select">
-            <column name="request_id" not-null="true" />
-        </many-to-one>
-        <many-to-one name="procedure" class="org.n52.sos.ds.hibernate.entities.Procedure" fetch="join">
-            <column name="procedure_id" not-null="true" />
-        </many-to-one> -->
         <property name="observationTemplate" type="string">
             <column name="observation_template" />
         </property>

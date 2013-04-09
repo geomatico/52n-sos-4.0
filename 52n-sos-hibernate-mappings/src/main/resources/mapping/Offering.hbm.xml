@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 10.07.2012 15:18:27 by Hibernate Tools 3.4.0.CR1 -->
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="org.n52.sos.ds.hibernate.entities.Offering" table="offering">
         <id name="offeringId" type="long">
@@ -16,18 +15,6 @@
         <property name="name" type="string">
             <column name="name" />
         </property>
-        <!-- <set name="observationConstellationOfferingObservationTypes" table="observation_constellation_offering_observation_type" inverse="true" lazy="true" fetch="select">
-            <key>
-                <column name="offering_id" not-null="true" />
-            </key>
-            <one-to-many class="org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType" />
-        </set>
-        <set name="requests" table="request" inverse="true" lazy="true" fetch="select">
-            <key>
-                <column name="offering_id" not-null="true" />
-            </key>
-            <one-to-many class="org.n52.sos.ds.hibernate.entities.Request" />
-        </set> -->
         <set name="relatedFeatures" table="offering_has_related_feature" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="offering_id" not-null="true" />

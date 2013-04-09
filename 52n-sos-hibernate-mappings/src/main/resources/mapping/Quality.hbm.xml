@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 10.07.2012 15:18:27 by Hibernate Tools 3.4.0.CR1 -->
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="org.n52.sos.ds.hibernate.entities.Quality" table="quality">
         <id name="qualityId" type="long">
@@ -22,13 +21,5 @@
         <property name="value" type="string">
             <column name="value" not-null="true" />
         </property>
-       <!-- <set name="observations" table="observation_has_quality" inverse="true" lazy="true" fetch="join">
-            <key>
-                <column name="quality_id" not-null="true" />
-            </key>
-            <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.Observation">
-                <column name="observation_id" not-null="true" />
-            </many-to-many>
-        </set> -->
     </class>
 </hibernate-mapping>
