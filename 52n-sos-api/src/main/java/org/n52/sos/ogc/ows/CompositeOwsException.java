@@ -54,6 +54,9 @@ public class CompositeOwsException extends OwsExceptionReport {
             for (OwsExceptionReport e : exceptions) {
                 this.exceptions.addAll(e.getExceptions());
             }
+            if (getCause() == null && !this.exceptions.isEmpty()) {
+                initCause(this.exceptions.get(0));
+            }
         }
         return this;
     }
