@@ -193,16 +193,16 @@ public interface ContentCache extends Serializable {
     Set<String> getFeaturesOfInterestForOffering(String offering);
 
     /**
-     * Returns all FeaturesOfInterest for the specified ResultTemplate.
+     * Returns all FeaturesOfInterest for the specified SosResultTemplate.
      *
      * @param resultTemplate the resultTemplate
      *
-     * @return the features associated with the resulte ResultTemplate
+     * @return the features associated with the resulte SosResultTemplate
      */
     Set<String> getFeaturesOfInterestForResultTemplate(String resultTemplate);
 
     /**
-     * @return all features that are associated with a ResultTemplate
+     * @return all features that are associated with a SosResultTemplate
      */
     Set<String> getFeaturesOfInterestWithResultTemplate();
 
