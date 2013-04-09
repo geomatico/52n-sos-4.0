@@ -24,21 +24,29 @@
 
 package org.n52.sos.exception.ows.concrete;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.INTERNAL_SERVER_ERROR;
+
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 
-
+/**
+ * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ *
+ * @since 4.0.0
+ */
 public class NoImplementationFoundException extends NoApplicableCodeException {
     private static final long serialVersionUID = 8191563379756983127L;
 
-    public NoImplementationFoundException(Class<?> required) {
+    public NoImplementationFoundException(final Class<?> required) {
         this(required.getSimpleName());
     }
 
-    public NoImplementationFoundException(String format, Object... args) {
+    public NoImplementationFoundException(final String format, final Object... args) {
         this(String.format(format, args));
     }
 
-    public NoImplementationFoundException(String required) {
-        withMessage("No implementation for {} found.", required);
+    public NoImplementationFoundException(final String required) {
+        withMessage("No implementation for '{}' found.", required);
+        setStatus(INTERNAL_SERVER_ERROR);
     }
 }

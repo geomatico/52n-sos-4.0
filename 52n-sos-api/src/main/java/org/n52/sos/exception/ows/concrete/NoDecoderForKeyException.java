@@ -23,16 +23,22 @@
  */
 package org.n52.sos.exception.ows.concrete;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.INTERNAL_SERVER_ERROR;
+
 import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class NoDecoderForKeyException extends NoApplicableCodeException {
     private static final long serialVersionUID = 2130152587752891589L;
 
-    public NoDecoderForKeyException(DecoderKey k) {
-        withMessage("No decoder implementation is available for KvpBinding (%s)!", k);
+    public NoDecoderForKeyException(final DecoderKey k) {
+        withMessage("No decoder implementation is available for key: %s!", k);
+        setStatus(INTERNAL_SERVER_ERROR);
     }
 }

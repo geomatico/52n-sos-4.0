@@ -23,22 +23,29 @@
  */
 package org.n52.sos.exception.ows;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.BAD_REQUEST;
+
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class InvalidParameterValueException extends CodedOwsException {
     private static final long serialVersionUID = 7664405001972222761L;
 
     public InvalidParameterValueException() {
         super(OwsExceptionCode.InvalidParameterValue);
+        setStatus(BAD_REQUEST);
     }
 
-    public InvalidParameterValueException(String parameterName, String value) {
+    public InvalidParameterValueException(final String parameterName, final String value) {
         super(OwsExceptionCode.InvalidParameterValue);
         withMessage("The value '%s' of the parameter '%s' is invalid", value, parameterName).at(parameterName);
+        setStatus(BAD_REQUEST);
     }
 
-    public InvalidParameterValueException(Enum<?> parameterName, String value) {
+    public InvalidParameterValueException(final Enum<?> parameterName, final String value) {
         this(parameterName.name(), value);
     }
 }

@@ -23,18 +23,26 @@
  */
 package org.n52.sos.exception.ows.concrete;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.INTERNAL_SERVER_ERROR;
+
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 
+/**
+ * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ *
+ * @since 4.0.0
+ */
 public class UnsupportedEncoderInputException extends NoApplicableCodeException {
     private static final long serialVersionUID = 7033551424176154646L;
 
-    public UnsupportedEncoderInputException(Encoder<?, ?> encoder, Object o) {
+    public UnsupportedEncoderInputException(final Encoder<?, ?> encoder, final Object o) {
         if (o == null) {
             withMessage("Encoder %s can not encode 'null'", encoder.getClass().getName());
         } else {
             withMessage("%s can not be encoded by Encoder %s", o.getClass().getName(), encoder.getClass().getName());
         }
-
+        setStatus(INTERNAL_SERVER_ERROR);
     }
 }

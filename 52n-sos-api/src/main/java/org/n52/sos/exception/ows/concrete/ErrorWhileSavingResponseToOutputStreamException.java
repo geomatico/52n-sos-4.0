@@ -23,17 +23,23 @@
  */
 package org.n52.sos.exception.ows.concrete;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.INTERNAL_SERVER_ERROR;
+
 import java.io.IOException;
 
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class ErrorWhileSavingResponseToOutputStreamException extends NoApplicableCodeException {
-    private static final long serialVersionUID = -5999201023324478127L;
+    private static final long serialVersionUID = 52L;
 
-    public ErrorWhileSavingResponseToOutputStreamException(IOException ioe) {
+    public ErrorWhileSavingResponseToOutputStreamException(final IOException ioe) {
         withMessage("Error occurs while saving response to output stream!").causedBy(ioe);
+        setStatus(INTERNAL_SERVER_ERROR);
     }
 }

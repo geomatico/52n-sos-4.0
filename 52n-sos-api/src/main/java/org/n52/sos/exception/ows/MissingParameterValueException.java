@@ -23,8 +23,8 @@
  */
 package org.n52.sos.exception.ows;
 
-import org.n52.sos.exception.ows.CodedOwsException;
-import org.n52.sos.exception.ows.OwsExceptionCode;
+import static org.n52.sos.util.HTTPConstants.StatusCode.BAD_REQUEST;
+
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
@@ -32,12 +32,13 @@ import org.n52.sos.exception.ows.OwsExceptionCode;
 public class MissingParameterValueException extends CodedOwsException {
     private static final long serialVersionUID = 236478803986562631L;
 
-    public MissingParameterValueException(String parameter) {
+    public MissingParameterValueException(final String parameter) {
         super(OwsExceptionCode.MissingParameterValue);
         at(parameter).withMessage("The value for the parameter '%s' is missing in the request!", parameter);
+        setStatus(BAD_REQUEST);
     }
 
-    public MissingParameterValueException(Enum<?> parameter) {
+    public MissingParameterValueException(final Enum<?> parameter) {
         this(parameter.name());
     }
 }

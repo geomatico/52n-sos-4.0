@@ -24,14 +24,19 @@
 package org.n52.sos.exception.ows.concrete;
 
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.util.HTTPConstants.StatusCode;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class MethodNotSupportedException extends NoApplicableCodeException {
     private static final long serialVersionUID = 5636725554502040487L;
 
-    public MethodNotSupportedException(String binding, String method) {
+    public MethodNotSupportedException(final String binding, final String method) {
         withMessage("HTTP %s is no supported for %s binding!", method, binding);
+        setStatus(StatusCode.METHOD_NOT_ALLOWED);
     }
 }

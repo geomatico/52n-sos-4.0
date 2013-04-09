@@ -26,4 +26,6 @@ package org.n52.sos.exception.ows.concrete;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 
 public abstract class DateTimeException extends NoApplicableCodeException {
+
+	private static final long serialVersionUID = 52L;
 }

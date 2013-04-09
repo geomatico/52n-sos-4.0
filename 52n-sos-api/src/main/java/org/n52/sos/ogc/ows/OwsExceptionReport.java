@@ -30,91 +30,105 @@ import org.n52.sos.exception.CodedException;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.HTTPConstants;
 
 /**
  * Implementation of the ows service exception. The exception codes are defined according the ows common spec. version
  * 1.1.0
  *
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public abstract class OwsExceptionReport extends Exception {
-    private static final String namespace = OWSConstants.NS_OWS;
-    private Integer responseCode;
-    private String version;
-    
-    /**
-     * @return Returns the ExceptionTypes of this exception
-     */
-    public abstract List<? extends CodedException> getExceptions();
 
-    /**
-     * Set SOS version
-     *
-     * @param version the version to set
-     *
-     * @return this
-     */
-    public OwsExceptionReport setVersion(String version) {
-        this.version = version;
-        return this;
-    }
+	private static final long serialVersionUID = 52L;
+	private static final String namespace = OWSConstants.NS_OWS;
+	private HTTPConstants.StatusCode status;
+	private String version;
 
-    /**
-     * Get SOS version
-     *
-     * @return SOS version
-     */
-    public String getVersion() {
-        if (this.version == null) {
-            /* FIXME shouldn't this be the other way around? defaulting to the newest version? */
-            this.version = Configurator.getInstance().getServiceOperatorRepository()
-                    .isVersionSupported(Sos1Constants.SERVICEVERSION)
-                           ? Sos1Constants.SERVICEVERSION
-                           : Sos2Constants.SERVICEVERSION;
-        }
-        return this.version;
-    }
+	/**
+	 * @return Returns the ExceptionTypes of this exception
+	 */
+	public abstract List<? extends CodedException> getExceptions();
 
-    public String getNamespace() {
-        return namespace;
-    }
+	/**
+	 * Set SOS version
+	 *
+	 * @param version the version to set
+	 *
+	 * @return this
+	 */
+	public OwsExceptionReport setVersion(final String version) {
+		this.version = version;
+		return this;
+	}
 
-    @Override
-    public String getMessage() {
-        StringBuilder faultString = new StringBuilder();
-        Iterator<? extends CodedException> i = getExceptions().iterator();
-        if (i.hasNext()) {
-            faultString.append(i.next().getMessage());
-        }
-        while (i.hasNext()) {
-            faultString.append('\n').append(i.next().getMessage());
-        }
-        return faultString.toString();
-    }
+	/**
+	 * Get SOS version
+	 *
+	 * @return SOS version
+	 */
+	public String getVersion() {
+		if (version == null) {
+			/* FIXME shouldn't this be the other way around? defaulting to the newest version? */
+			version = Configurator.getInstance().getServiceOperatorRepository()
+					.isVersionSupported(Sos1Constants.SERVICEVERSION)
+					? Sos1Constants.SERVICEVERSION
+							: Sos2Constants.SERVICEVERSION;
+		}
+		return version;
+	}
 
-    /**
-     * @return the HTTP response code of this {@code OwsExceptionReport} or {@code null} if it is not set
-     */
-    public Integer getResponseCode() {
-        return responseCode;
-    }
+	public String getNamespace() {
+		return namespace;
+	}
 
-    /**
-     * @return if the HTTP response code for this {@code OwsExceptionReport} is set
-     */
-    public boolean hasResponseCode() {
-        return this.responseCode != null;
-    }
+	@Override
+	public String getMessage() {
+		final StringBuilder faultString = new StringBuilder();
+		final Iterator<? extends CodedException> i = getExceptions().iterator();
+		if (i.hasNext()) {
+			faultString.append(i.next().getMessage());
+		}
+		while (i.hasNext()) {
+			faultString.append('\n').append(i.next().getMessage());
+		}
+		return faultString.toString();
+	}
 
-    /**
-     * Sets the HTTP response code for this {@code OwsExceptionReport}.
-     *
-     * @param responseCode the code
-     *
-     * @return this (for method chaining)
-     */
-    public OwsExceptionReport setResponseCode(int responseCode) {
-        this.responseCode = responseCode;
-        return this;
-    }
+	/**
+	 * @return the HTTP response code of this {@code OwsExceptionReport} or<br>
+	 * 			{@code getExceptions().get(0).getStatus()} if it is not set and 
+	 * 			{@code getExceptions().get(0) != this}.
+	 */
+	public HTTPConstants.StatusCode getStatus() {
+		if ((status == null) && (getExceptions().get(0) != this))
+		{
+			return getExceptions().get(0).getStatus();
+		}
+		return status;
+	}
+
+	/**
+	 * @return <tt>true</tt>, if a HTTP response code for this 
+	 * 			{@code OwsExceptionReport} or any sub exception is available
+	 */
+	public boolean hasResponseCode() {
+		return getStatus() != null;
+	}
+
+	/**
+	 * Sets the HTTP response code for this {@code OwsExceptionReport}.
+	 *
+	 * @param status the code
+	 *
+	 * @return this (for method chaining)
+	 */
+	public OwsExceptionReport setStatus(final HTTPConstants.StatusCode responseCode) {
+		status = responseCode;
+		return this;
+	}
+
 }

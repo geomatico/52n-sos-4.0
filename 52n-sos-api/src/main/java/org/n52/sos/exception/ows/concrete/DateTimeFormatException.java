@@ -23,34 +23,41 @@
  */
 package org.n52.sos.exception.ows.concrete;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.BAD_REQUEST;
+
 import org.joda.time.DateTime;
 import org.n52.sos.ogc.gml.time.ITime;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class DateTimeFormatException extends DateTimeException {
     private static final long serialVersionUID = 4594521785170898431L;
 
-    public DateTimeFormatException(ITime value) {
+    public DateTimeFormatException(final ITime value) {
         this(value, null);
     }
 
-    public DateTimeFormatException(ITime value, Throwable cause) {
+    public DateTimeFormatException(final ITime value, final Throwable cause) {
         withMessage("Error formatting ITime %s", value);
         if (cause != null) {
             causedBy(cause);
         }
+        setStatus(BAD_REQUEST);
     }
 
-    public DateTimeFormatException(DateTime value) {
+    public DateTimeFormatException(final DateTime value) {
         this(value, null);
     }
 
-    public DateTimeFormatException(DateTime value, Throwable cause) {
+    public DateTimeFormatException(final DateTime value, final Throwable cause) {
         withMessage("Error formatting DateTime %s", value);
         if (cause != null) {
             causedBy(cause);
         }
+        setStatus(BAD_REQUEST);
     }
 }

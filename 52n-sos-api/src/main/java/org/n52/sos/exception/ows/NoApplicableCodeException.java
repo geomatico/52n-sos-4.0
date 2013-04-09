@@ -25,6 +25,8 @@ package org.n52.sos.exception.ows;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * 
+ * @since 4.0.0
  */
 public class NoApplicableCodeException extends CodedOwsException {
     private static final long serialVersionUID = -2872459106299660578L;

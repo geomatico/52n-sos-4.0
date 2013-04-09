@@ -23,13 +23,19 @@
  */
 package org.n52.sos.exception.ows;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.BAD_REQUEST;
+
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class OptionNotSupportedException extends CodedOwsException {
     private static final long serialVersionUID = 924921678757905952L;
 
     public OptionNotSupportedException() {
         super(OwsExceptionCode.OptionNotSupported);
+        setStatus(BAD_REQUEST);
     }
 }

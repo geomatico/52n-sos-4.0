@@ -23,28 +23,40 @@
  */
 package org.n52.sos.exception.ows.concrete;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.INTERNAL_SERVER_ERROR;
+
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.util.HTTPConstants;
 import org.n52.sos.util.StringHelper;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class NotYetSupportedException extends NoApplicableCodeException {
     private static final long serialVersionUID = 8214490617892996058L;
+    
+    private final HTTPConstants.StatusCode status = INTERNAL_SERVER_ERROR;
 
     public NotYetSupportedException() {
+        setStatus(status);
     }
 
-    public NotYetSupportedException(String feature) {
+    public NotYetSupportedException(final String feature) {
         withMessage("%s is not yet supported", feature);
+        setStatus(status);
     }
 
-    public NotYetSupportedException(String type, Object feature) {
+    public NotYetSupportedException(final String type, final Object feature) {
         withMessage("The %s %s is not yet supported", type, feature);
+        setStatus(status);
     }
 
-    public NotYetSupportedException(String type, Object feature, Object... supportedFeatures) {
+    public NotYetSupportedException(final String type, final Object feature, final Object... supportedFeatures) {
         withMessage("The %s %s is not yet supported. Currently supported: %s",
                     type, feature, StringHelper.join(", ", supportedFeatures));
+        setStatus(status);
     }
 }

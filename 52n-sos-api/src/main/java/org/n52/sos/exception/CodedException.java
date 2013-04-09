@@ -31,14 +31,18 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public abstract class CodedException extends OwsExceptionReport {
-    private final List<CodedException> exceptions = Collections.singletonList(this);
+	private static final long serialVersionUID = 52L;
+	private final List<CodedException> exceptions = Collections.singletonList(this);
     private final ExceptionCode code;
     private String locator;
     private String message;
 
-    public CodedException(ExceptionCode code) {
+    public CodedException(final ExceptionCode code) {
         this.code = code;
     }
 
@@ -60,12 +64,12 @@ public abstract class CodedException extends OwsExceptionReport {
         return exceptions;
     }
 
-    public CodedException at(String locator) {
+    public CodedException at(final String locator) {
         this.locator = locator;
         return this;
     }
 
-    public CodedException at(Enum<?> locator) {
+    public CodedException at(final Enum<?> locator) {
         return at(locator.name());
     }
 
@@ -77,8 +81,8 @@ public abstract class CodedException extends OwsExceptionReport {
      *
      * @see {@link String#format(java.lang.String, java.lang.Object[])}
      */
-    public CodedException withMessage(String message, Object... args) {
-        if (args != null && args.length > 0) {
+    public CodedException withMessage(final String message, final Object... args) {
+        if ((args != null) && (args.length > 0)) {
             this.message = String.format(message, args);
         } else {
             this.message = message;
@@ -86,7 +90,7 @@ public abstract class CodedException extends OwsExceptionReport {
         return this;
     }
 
-    public CodedException causedBy(Throwable exception) {
+    public CodedException causedBy(final Throwable exception) {
         return (CodedException) initCause(exception);
     }
 }

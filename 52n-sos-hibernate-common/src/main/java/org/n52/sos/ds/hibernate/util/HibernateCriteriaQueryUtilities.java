@@ -1231,7 +1231,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
 
     @SuppressWarnings("unchecked")
     public static ResultTemplate getResultTemplateObject(String offering, String observedProperty, Session session) {
-        // Criteria criteria = session.createCriteria(ResultTemplate.class);
+        // Criteria criteria = session.createCriteria(SosResultTemplate.class);
         Map<String, String> aliases = new HashMap<String, String>();
         String obsConstOffObsTypeAlias = addObservationConstellationOfferingObservationTypeAliasToMap(aliases, null);
         String obsConstAlias = addObservationConstallationAliasToMap(aliases, obsConstOffObsTypeAlias);
@@ -1256,7 +1256,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     @SuppressWarnings("unchecked")
     public static List<ResultTemplate> getResultTemplateObject(String offering, String observedProperty,
                                                                Collection<String> featureOfInterest, Session session) {
-        // Criteria criteria = session.createCriteria(ResultTemplate.class);
+        // Criteria criteria = session.createCriteria(SosResultTemplate.class);
         Map<String, String> aliases = new HashMap<String, String>();
         String obsConstOffObsTypeAlias = addObservationConstellationOfferingObservationTypeAliasToMap(aliases, null);
         String offeringAlias = addOfferingAliasToMap(aliases, obsConstOffObsTypeAlias);

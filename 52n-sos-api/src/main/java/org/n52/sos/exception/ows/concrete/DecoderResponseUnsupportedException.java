@@ -23,17 +23,23 @@
  */
 package org.n52.sos.exception.ows.concrete;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.INTERNAL_SERVER_ERROR;
+
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class DecoderResponseUnsupportedException extends NoApplicableCodeException {
     private static final long serialVersionUID = 7821283328920709066L;
 
-    public DecoderResponseUnsupportedException(String valueToDecode, Object decodedValue) {
+    public DecoderResponseUnsupportedException(final String valueToDecode, final Object decodedValue) {
         withMessage("Decoding of string \"%s\" failed. Returned type is \"%s\".",
                     valueToDecode,
                     decodedValue == null ? null : decodedValue.getClass().getName());
+        setStatus(INTERNAL_SERVER_ERROR);
     }
 }

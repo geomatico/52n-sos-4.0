@@ -24,18 +24,24 @@
 
 package org.n52.sos.exception.ows.concrete;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.BAD_REQUEST;
+
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a> 
+ *
+ * @since 4.0.0
  */
 public class DateTimeParseException extends DateTimeException {
 
     private static final long serialVersionUID = 8746024085392577840L;
 
-    public DateTimeParseException(String value) {
+    public DateTimeParseException(final String value) {
         this(value, null);
+        setStatus(BAD_REQUEST);
     }
 
-    public DateTimeParseException(String value, Throwable cause) {
+    public DateTimeParseException(final String value, final Throwable cause) {
         withMessage("Error parsing time string '%s'", value);
         if (cause != null) {
             causedBy(cause);

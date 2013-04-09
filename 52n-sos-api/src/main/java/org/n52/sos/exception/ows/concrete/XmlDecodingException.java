@@ -23,16 +23,22 @@
  */
 package org.n52.sos.exception.ows.concrete;
 
-import org.n52.sos.exception.ows.NoApplicableCodeException;
+import static org.n52.sos.util.HTTPConstants.StatusCode.INTERNAL_SERVER_ERROR;
+
 import org.apache.xmlbeans.XmlException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class XmlDecodingException extends NoApplicableCodeException {
     private static final long serialVersionUID = -495706406337738990L;
 
-    public XmlDecodingException(String name, String xml, XmlException e) {
+    public XmlDecodingException(final String name, final String xml, final XmlException e) {
         withMessage("Error while decoding %s:\n%s", name, xml).causedBy(e);
+        setStatus(INTERNAL_SERVER_ERROR);
     }
 }

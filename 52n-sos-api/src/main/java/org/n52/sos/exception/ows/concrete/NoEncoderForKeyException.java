@@ -23,16 +23,22 @@
  */
 package org.n52.sos.exception.ows.concrete;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.INTERNAL_SERVER_ERROR;
+
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class NoEncoderForKeyException extends NoApplicableCodeException {
     private static final long serialVersionUID = -5532147003138146625L;
 
-    public NoEncoderForKeyException(EncoderKey key) {
+    public NoEncoderForKeyException(final EncoderKey key) {
         withMessage("Could not find encoder for key '%s'.", key.toString());
+        setStatus(INTERNAL_SERVER_ERROR);
     }
 }

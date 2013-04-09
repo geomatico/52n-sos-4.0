@@ -32,7 +32,7 @@ import javax.wsdl.WSDLException;
 import org.n52.sos.binding.Binding;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.exception.ConfigurationException;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.HTTPException;
 import org.n52.sos.request.operator.RequestOperator;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.request.operator.RequestOperatorRepository;
@@ -55,31 +55,29 @@ public class WSDLFactory implements Producer<String> {
     public String get() throws ConfigurationException {
         try {
             return getWSDL();
-        } catch (OwsExceptionReport ex) {
-            throw new ConfigurationException(ex);
-        } catch (WSDLException ex) {
+        } catch (final Exception ex) {
             throw new ConfigurationException(ex);
         }
     }
     
-    private String getWSDL() throws OwsExceptionReport, WSDLException {
-        WSDLBuilder builder = new WSDLBuilder();
+    private String getWSDL() throws HTTPException, WSDLException {
+        final WSDLBuilder builder = new WSDLBuilder();
         if (Configurator.getInstance() != null) {
-            Map<String, Binding> bindings = Configurator.getInstance()
+            final Map<String, Binding> bindings = Configurator.getInstance()
                     .getBindingRepository().getBindings();
             final RequestOperatorRepository repo = Configurator.getInstance().getRequestOperatorRepository();
 
-            Set<RequestOperatorKeyType> requestOperators = repo.getActiveRequestOperatorKeyTypes();
+            final Set<RequestOperatorKeyType> requestOperators = repo.getActiveRequestOperatorKeyTypes();
 
-            String serviceUrl = Configurator.getInstance().getServiceURL();
+            final String serviceUrl = Configurator.getInstance().getServiceURL();
             
             if (bindings.containsKey(SOAP_BINDING_ENDPOINT)) {
                 builder.setSoapEndpoint(URI.create(serviceUrl + SOAP_BINDING_ENDPOINT));
-                Binding b = bindings.get(SOAP_BINDING_ENDPOINT);
-                for (RequestOperatorKeyType o : requestOperators) {
-                    RequestOperator op = repo.getRequestOperator(o);
+                final Binding b = bindings.get(SOAP_BINDING_ENDPOINT);
+                for (final RequestOperatorKeyType o : requestOperators) {
+                    final RequestOperator op = repo.getRequestOperator(o);
                     if (op instanceof WSDLAwareRequestOperator) {
-                        WSDLAwareRequestOperator wop = (WSDLAwareRequestOperator) op;
+                        final WSDLAwareRequestOperator wop = (WSDLAwareRequestOperator) op;
                         if (wop.getSosOperationDefinition() != null) {
                             if (isHttpPostSupported(b, wop)) {
                                 builder.addSoapOperation(wop.getSosOperationDefinition());
@@ -92,11 +90,11 @@ public class WSDLFactory implements Producer<String> {
             }
             if (bindings.containsKey(POX_BINDING_ENDPOINT)) {
                 builder.setPoxEndpoint(URI.create(serviceUrl + POX_BINDING_ENDPOINT));
-                Binding b = bindings.get(POX_BINDING_ENDPOINT);
-                for (RequestOperatorKeyType o : requestOperators) {
-                    RequestOperator op = repo.getRequestOperator(o);
+                final Binding b = bindings.get(POX_BINDING_ENDPOINT);
+                for (final RequestOperatorKeyType o : requestOperators) {
+                    final RequestOperator op = repo.getRequestOperator(o);
                     if (op instanceof WSDLAwareRequestOperator) {
-                        WSDLAwareRequestOperator wop = (WSDLAwareRequestOperator) op;
+                        final WSDLAwareRequestOperator wop = (WSDLAwareRequestOperator) op;
                         if (wop.getSosOperationDefinition() != null) {
                             if (isHttpPostSupported(b, wop)) {
                                 builder.addPoxOperation(wop.getSosOperationDefinition());
@@ -109,11 +107,11 @@ public class WSDLFactory implements Producer<String> {
             }
             if (bindings.containsKey(KVP_BINDING_ENDPOINT)) {
                 builder.setKvpEndpoint(URI.create(serviceUrl + KVP_BINDING_ENDPOINT + "?"));
-                Binding b = bindings.get(KVP_BINDING_ENDPOINT);
-                for (RequestOperatorKeyType o : requestOperators) {
-                    RequestOperator op = repo.getRequestOperator(o);
+                final Binding b = bindings.get(KVP_BINDING_ENDPOINT);
+                for (final RequestOperatorKeyType o : requestOperators) {
+                    final RequestOperator op = repo.getRequestOperator(o);
                     if (op instanceof WSDLAwareRequestOperator) {
-                        WSDLAwareRequestOperator wop = (WSDLAwareRequestOperator) op;
+                        final WSDLAwareRequestOperator wop = (WSDLAwareRequestOperator) op;
                         if (wop.getSosOperationDefinition() != null) {
                             if (isHttpGetSupported(b, wop)) {
                                 builder.addKvpOperation(wop.getSosOperationDefinition());
@@ -128,35 +126,35 @@ public class WSDLFactory implements Producer<String> {
         return builder.build();
     }
 
-    private OperationDecoderKey toOperationDecoderKey(RequestOperatorKeyType requestOperatorKeyType) {
+    private OperationDecoderKey toOperationDecoderKey(final RequestOperatorKeyType requestOperatorKeyType) {
         return new OperationDecoderKey(requestOperatorKeyType.getServiceOperatorKeyType()
                 .getService(), requestOperatorKeyType.getServiceOperatorKeyType().getVersion(),
                 requestOperatorKeyType.getOperationName());
     }
 
-    private void addAdditionalPrefixes(WSDLAwareRequestOperator op, WSDLBuilder builder) {
-        Map<String, String> additionalPrefixes = op.getAdditionalPrefixes();
+    private void addAdditionalPrefixes(final WSDLAwareRequestOperator op, final WSDLBuilder builder) {
+        final Map<String, String> additionalPrefixes = op.getAdditionalPrefixes();
         if (additionalPrefixes != null) {
-            for (Map.Entry<String,String> ap : additionalPrefixes.entrySet()) {
+            for (final Map.Entry<String,String> ap : additionalPrefixes.entrySet()) {
                 builder.addNamespace(ap.getKey(), ap.getValue());
             }
         }
     }
 
-    private void addAdditionalSchemaImports(WSDLAwareRequestOperator op, WSDLBuilder builder) throws WSDLException {
-        Map<String, String> additionalSchemaImports = op.getAdditionalSchemaImports();
+    private void addAdditionalSchemaImports(final WSDLAwareRequestOperator op, final WSDLBuilder builder) throws WSDLException {
+        final Map<String, String> additionalSchemaImports = op.getAdditionalSchemaImports();
         if (additionalSchemaImports != null) {
-            for (Map.Entry<String,String> as : additionalSchemaImports.entrySet()) {
+            for (final Map.Entry<String,String> as : additionalSchemaImports.entrySet()) {
                 builder.addSchemaImport(as.getKey(), as.getValue());
             }
         }
     }
 
-    private boolean isHttpPostSupported(Binding b, RequestOperator ro) throws OwsExceptionReport {
+    private boolean isHttpPostSupported(final Binding b, final RequestOperator ro) throws HTTPException {
         return b.checkOperationHttpPostSupported(toOperationDecoderKey(ro.getRequestOperatorKeyType()));
     }
 
-    private boolean isHttpGetSupported(Binding b, RequestOperator ro) throws OwsExceptionReport {
+    private boolean isHttpGetSupported(final Binding b, final RequestOperator ro) throws HTTPException{
         return b.checkOperationHttpGetSupported(toOperationDecoderKey(ro.getRequestOperatorKeyType()));
     }
 }

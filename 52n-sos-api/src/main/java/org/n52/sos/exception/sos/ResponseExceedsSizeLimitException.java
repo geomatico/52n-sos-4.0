@@ -23,6 +23,8 @@
  */
 package org.n52.sos.exception.sos;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.BAD_REQUEST;
+
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
@@ -31,9 +33,10 @@ public class ResponseExceedsSizeLimitException extends CodedSosException {
 
     public ResponseExceedsSizeLimitException() {
         super(SosExceptionCode.ResponseExceedsSizeLimit);
+        setStatus(BAD_REQUEST);
     }
 
-    public ResponseExceedsSizeLimitException forLimit(int size, int limit) {
+    public ResponseExceedsSizeLimitException forLimit(final int size, final int limit) {
         withMessage("The request matched %d observations, which exceeds this server's limit of %d", size, limit);
         return this;
     }

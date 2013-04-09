@@ -23,6 +23,8 @@
  */
 package org.n52.sos.exception.ows.concrete;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.BAD_REQUEST;
+
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.util.StringHelper;
 
@@ -34,11 +36,12 @@ public class ContentTypeNotSupportedException extends InvalidParameterValueExcep
 
 	private static final long serialVersionUID = 2047632165304004539L;
 
-	public ContentTypeNotSupportedException(String contentType, String... supportedContentType) {
+	public ContentTypeNotSupportedException(final String contentType, final String... supportedContentType) {
 		super("HTTP header Content-Type",contentType);
 		withMessage("Requested content type '%s' as specified in Accept header not supported. Please use something like: %s.", 
                 contentType,
                 StringHelper.join(", ", (Object[])supportedContentType));
+		setStatus(BAD_REQUEST);
 	}
 	
 }

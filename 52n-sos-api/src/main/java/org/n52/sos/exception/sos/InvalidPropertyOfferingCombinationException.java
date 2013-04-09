@@ -23,13 +23,19 @@
  */
 package org.n52.sos.exception.sos;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.BAD_REQUEST;
+
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class InvalidPropertyOfferingCombinationException extends CodedSosException {
     private static final long serialVersionUID = 7758576540177872103L;
 
     public InvalidPropertyOfferingCombinationException() {
         super(SosExceptionCode.InvalidPropertyOfferingCombination);
+        setStatus(BAD_REQUEST);
     }
 }

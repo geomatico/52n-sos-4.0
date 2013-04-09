@@ -33,10 +33,10 @@ import org.n52.sos.decode.Decoder;
 import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.KvpOperationDecoderKey;
 import org.n52.sos.decode.OperationDecoderKey;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.HTTPException;
+import org.n52.sos.exception.OwsExceptionReportEncodingFailedException;
 import org.n52.sos.exception.ows.concrete.InvalidAcceptVersionsParameterException;
 import org.n52.sos.exception.ows.concrete.InvalidServiceOrVersionException;
-import org.n52.sos.exception.ows.concrete.MethodNotSupportedException;
 import org.n52.sos.exception.ows.concrete.MissingRequestParameterException;
 import org.n52.sos.exception.ows.concrete.NoDecoderForKeyException;
 import org.n52.sos.exception.ows.concrete.ServiceNotSupportedException;
@@ -60,125 +60,115 @@ import org.slf4j.LoggerFactory;
  */
 public class KvpBinding extends Binding {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(KvpBinding.class);
-    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_KVP_CORE_BINDING);
-    private static final String URL_PATTERN = "/kvp";
+	private static final Logger LOGGER = LoggerFactory.getLogger(KvpBinding.class);
+	private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_KVP_CORE_BINDING);
+	private static final String URL_PATTERN = "/kvp";
 
-    @Override
-    public Set<String> getConformanceClasses() {
-        return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
-    }
+	@Override
+	public Set<String> getConformanceClasses() {
+		return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
+	}
 
-    @Override
-    public String getUrlPattern() {
-        return URL_PATTERN;
-    }
+	@Override
+	public String getUrlPattern() {
+		return URL_PATTERN;
+	}
 
-    @Override
-    public ServiceResponse doGetOperation(HttpServletRequest req) throws OwsExceptionReport {
-        LOGGER.debug("KVP-REQUEST: {}", req.getQueryString());
-        ServiceResponse response = null;
-        AbstractServiceRequest request = null;
-        try {
-            if (req.getParameterMap() == null || (req.getParameterMap() != null && req.getParameterMap().isEmpty())) {
-                throw new MissingRequestParameterException();
-            }
-            Map<String, String> parameterValueMap = KvpHelper.getKvpParameterValueMap(req);
-            // check if request contains request parameter
-            String operation = getRequestParameterValue(parameterValueMap);
-            KvpHelper.checkParameterValue(operation, RequestParams.request);
-            String service = getServiceParameterValue(parameterValueMap);
-            String version = getVersionParameterValue(parameterValueMap);
+	@Override
+	public ServiceResponse doGetOperation(final HttpServletRequest req) throws OwsExceptionReportEncodingFailedException {
+		LOGGER.debug("KVP-REQUEST: {}", req.getQueryString());
+		ServiceResponse response = null;
+		AbstractServiceRequest sosRequest = null;
+		try {
+			if ((req.getParameterMap() == null) || ((req.getParameterMap() != null) && req.getParameterMap().isEmpty())) {
+				throw new MissingRequestParameterException();
+			}
+			final Map<String, String> parameterValueMap = KvpHelper.getKvpParameterValueMap(req);
+			// check if request contains request parameter
+			final String operation = getRequestParameterValue(parameterValueMap);
+			KvpHelper.checkParameterValue(operation, RequestParams.request);
+			final String service = getServiceParameterValue(parameterValueMap);
+			final String version = getVersionParameterValue(parameterValueMap);
 
 
-            if (version != null && !isVersionSupported(version)) {
-                throw new VersionNotSupportedException();
-            }
-            DecoderKey k = new KvpOperationDecoderKey(service, version, operation);
-            Decoder<AbstractServiceRequest, Map<String, String>> decoder = getDecoder(k);
+			if ((version != null) && !isVersionSupported(version)) {
+				throw new VersionNotSupportedException();
+			}
+			final DecoderKey k = new KvpOperationDecoderKey(service, version, operation);
+			final Decoder<AbstractServiceRequest, Map<String, String>> decoder = getDecoder(k);
 
-            if (decoder != null) {
-                request = decoder.decode(parameterValueMap);
-            } else {
-                throw new NoDecoderForKeyException(k);
-            }
+			if (decoder != null) {
+				sosRequest = decoder.decode(parameterValueMap);
+			} else {
+				throw new NoDecoderForKeyException(k);
+			}
 
-            for (ServiceOperatorKeyType serviceVersionIdentifier : request.getServiceOperatorKeyType()) {
-                ServiceOperator serviceOperator = getServiceOperatorRepository()
-                        .getServiceOperator(serviceVersionIdentifier);
-                if (serviceOperator != null) {
-                    response = serviceOperator.receiveRequest(request);
-                    LOGGER.debug("{} operation executed successfully!", request.getOperationName());
-                    break;
-                }
-            }
-            if (response == null) {
-                if (request instanceof GetCapabilitiesRequest) {
-                    GetCapabilitiesRequest gcr = (GetCapabilitiesRequest) request;
-                    throw new InvalidAcceptVersionsParameterException(gcr.getAcceptVersions());
-                } else {
-                    throw new InvalidServiceOrVersionException(request.getService(), request.getVersion());
-                }
-            }
-        } catch (Throwable t) {
-            OwsExceptionReport owse;
-            if (t instanceof OwsExceptionReport) {
-                owse = (OwsExceptionReport) t;
-            } else {
-                owse = new NoApplicableCodeException().causedBy(t);
-            }
-            throw owse.setVersion(request != null ? request.getVersion() : null);
-        }
-        return response;
-    }
+			for (final ServiceOperatorKeyType serviceVersionIdentifier : sosRequest.getServiceOperatorKeyType()) {
+				final ServiceOperator serviceOperator = getServiceOperatorRepository()
+						.getServiceOperator(serviceVersionIdentifier);
+				if (serviceOperator != null) {
+					response = serviceOperator.receiveRequest(sosRequest);
+					LOGGER.debug("{} operation executed successfully!", sosRequest.getOperationName());
+					break;
+				}
+			}
+			if (response == null) {
+				if (sosRequest instanceof GetCapabilitiesRequest) {
+					final GetCapabilitiesRequest gcr = (GetCapabilitiesRequest) sosRequest;
+					throw new InvalidAcceptVersionsParameterException(gcr.getAcceptVersions());
+				} else {
+					throw new InvalidServiceOrVersionException(sosRequest.getService(), sosRequest.getVersion());
+				}
+			}
+		} catch (final OwsExceptionReport oer) {
+			oer.setVersion(sosRequest != null ? sosRequest.getVersion() : null);
+			return encodeOwsExceptionReport(oer, false);
+		}
+		return response;
+	}
 
-    @Override
-    public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport {
-        throw new MethodNotSupportedException("KVP", "POST");
-    }
+	private String getServiceParameterValue(final Map<String, String> parameterValueMap) throws OwsExceptionReport {
+		final String service = KvpHelper.getParameterValue(RequestParams.service, parameterValueMap);
+		final boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
+		if (isGetCapabilities && (service == null)) {
+			return SosConstants.SOS;
+		} else {
+			KvpHelper.checkParameterValue(service, RequestParams.service);
+		}
+		if (!isServiceSupported(service)) {
+			throw new ServiceNotSupportedException();
+		}
+		return service;
+	}
 
-    private String getServiceParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
-        String service = KvpHelper.getParameterValue(RequestParams.service, parameterValueMap);
-        boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
-        if (isGetCapabilities && service == null) {
-            return SosConstants.SOS;
-        } else {
-            KvpHelper.checkParameterValue(service, RequestParams.service);
-        }
-        if (!isServiceSupported(service)) {
-            throw new ServiceNotSupportedException();
-        }
-        return service;
-    }
+	private String getVersionParameterValue(final Map<String, String> parameterValueMap) throws OwsExceptionReport {
+		final String version = KvpHelper.getParameterValue(RequestParams.version, parameterValueMap);
+		final boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
+		if (!isGetCapabilities) {
+			KvpHelper.checkParameterValue(version, RequestParams.version);
+			if (!isVersionSupported(version)) {
+				throw new VersionNotSupportedException();
+			}
+		}
+		return version;
+	}
 
-    private String getVersionParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
-        String version = KvpHelper.getParameterValue(RequestParams.version, parameterValueMap);
-        boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
-        if (!isGetCapabilities) {
-            KvpHelper.checkParameterValue(version, RequestParams.version);
-            if (!isVersionSupported(version)) {
-                throw new VersionNotSupportedException();
-            }
-        }
-        return version;
-    }
+	protected boolean checkForGetCapabilities(final Map<String, String> parameterValueMap) throws OwsExceptionReport {
+		final String requestValue = getRequestParameterValue(parameterValueMap);
+		if ((requestValue != null) && requestValue.equals(SosConstants.Operations.GetCapabilities.name())) {
+			return true;
+		}
+		return false;
+	}
 
-    protected boolean checkForGetCapabilities(Map<String, String> parameterValueMap) throws OwsExceptionReport {
-        String requestValue = getRequestParameterValue(parameterValueMap);
-        if (requestValue != null && requestValue.equals(SosConstants.Operations.GetCapabilities.name())) {
-            return true;
-        }
-        return false;
-    }
+	public String getRequestParameterValue(final Map<String, String> parameterValueMap) throws OwsExceptionReport {
+		final String requestParameterValue = KvpHelper.getParameterValue(RequestParams.request, parameterValueMap);
+		KvpHelper.checkParameterValue(requestParameterValue, RequestParams.request);
+		return requestParameterValue;
+	}
 
-    public String getRequestParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
-        String requestParameterValue = KvpHelper.getParameterValue(RequestParams.request, parameterValueMap);
-        KvpHelper.checkParameterValue(requestParameterValue, RequestParams.request);
-        return requestParameterValue;
-    }
-
-    @Override
-    public boolean checkOperationHttpGetSupported(OperationDecoderKey k) throws OwsExceptionReport {
-        return getDecoder(new KvpOperationDecoderKey(k)) != null;
-    }
+	@Override
+	public boolean checkOperationHttpGetSupported(final OperationDecoderKey k) throws HTTPException{
+		return getDecoder(new KvpOperationDecoderKey(k)) != null;
+	}
 }

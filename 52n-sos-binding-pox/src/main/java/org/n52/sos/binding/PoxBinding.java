@@ -32,11 +32,11 @@ import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.decode.Decoder;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.decode.XmlOperationDecoderKey;
+import org.n52.sos.exception.HTTPException;
+import org.n52.sos.exception.OwsExceptionReportEncodingFailedException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.exception.ows.concrete.GenericThrowableWrapperException;
 import org.n52.sos.exception.ows.concrete.InvalidAcceptVersionsParameterException;
 import org.n52.sos.exception.ows.concrete.InvalidServiceOrVersionException;
-import org.n52.sos.exception.ows.concrete.MethodNotSupportedException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.request.AbstractServiceRequest;
@@ -56,25 +56,20 @@ public class PoxBinding extends Binding {
     private static final String URL_PATTERN = "/pox";
 
     @Override
-    public ServiceResponse doGetOperation(HttpServletRequest request) throws OwsExceptionReport {
-        throw new MethodNotSupportedException("POX", "GET");
-    }
-
-    @Override
-    public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport {
+    public ServiceResponse doPostOperation(final HttpServletRequest request) throws OwsExceptionReportEncodingFailedException{
         ServiceResponse serviceResponse = null;
         AbstractServiceRequest sosRequest = null;
         try {
-            XmlObject doc = XmlHelper.parseXmlSosRequest(request);
+            final XmlObject doc = XmlHelper.parseXmlSosRequest(request);
             LOGGER.debug("XML-REQUEST: {}", doc.xmlText());
-            Decoder<AbstractServiceRequest, XmlObject> decoder = getDecoder(CodingHelper.getDecoderKey(doc));
+            final Decoder<AbstractServiceRequest, XmlObject> decoder = getDecoder(CodingHelper.getDecoderKey(doc));
             // decode XML message
-            Object abstractRequest = decoder.decode(doc);
+            final Object abstractRequest = decoder.decode(doc);
             if (abstractRequest instanceof AbstractServiceRequest) {
                 sosRequest = (AbstractServiceRequest) abstractRequest;
                 checkServiceOperatorKeyTypes(sosRequest);
-                for (ServiceOperatorKeyType serviceVersionIdentifier : sosRequest.getServiceOperatorKeyType()) {
-                    ServiceOperator serviceOperator = getServiceOperatorRepository()
+                for (final ServiceOperatorKeyType serviceVersionIdentifier : sosRequest.getServiceOperatorKeyType()) {
+                    final ServiceOperator serviceOperator = getServiceOperatorRepository()
 							.getServiceOperator(serviceVersionIdentifier);
                     if (serviceOperator != null) {
                         serviceResponse = serviceOperator.receiveRequest(sosRequest);
@@ -83,7 +78,7 @@ public class PoxBinding extends Binding {
                 }
                 if (serviceResponse == null) {
                     if (sosRequest instanceof GetCapabilitiesRequest) {
-                        GetCapabilitiesRequest gcr = (GetCapabilitiesRequest) sosRequest;
+                        final GetCapabilitiesRequest gcr = (GetCapabilitiesRequest) sosRequest;
                         throw new InvalidAcceptVersionsParameterException(gcr.getAcceptVersions());
                     } else {
                         throw new InvalidServiceOrVersionException(sosRequest.getService(), sosRequest.getVersion());
@@ -93,14 +88,9 @@ public class PoxBinding extends Binding {
                 throw new NoApplicableCodeException()
                         .withMessage("The returned object is not an AbstractServiceRequest implementation");
             }
-        } catch (Throwable t) {
-            OwsExceptionReport owse;
-            if (t instanceof OwsExceptionReport) {
-                owse = (OwsExceptionReport) t;
-            } else {
-                owse = new GenericThrowableWrapperException(t);
-            }
-            throw owse.setVersion(sosRequest != null ? sosRequest.getVersion() : null);
+        } catch (final OwsExceptionReport oer) {
+        	oer.setVersion(sosRequest != null ? sosRequest.getVersion() : null);
+        	serviceResponse = encodeOwsExceptionReport(oer, false);
         }
         return serviceResponse;
     }
@@ -116,7 +106,7 @@ public class PoxBinding extends Binding {
     }
 
     @Override
-    public boolean checkOperationHttpPostSupported(OperationDecoderKey k) throws OwsExceptionReport {
+    public boolean checkOperationHttpPostSupported(final OperationDecoderKey k) throws HTTPException{
         return getDecoder(new XmlOperationDecoderKey(k)) != null;
     }
 }

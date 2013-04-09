@@ -23,15 +23,21 @@
  */
 package org.n52.sos.exception.ows.concrete;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.BAD_REQUEST;
+
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class InvalidSridException extends NoApplicableCodeException {
     private static final long serialVersionUID = -7826006594215854637L;
 
-    public InvalidSridException(int srid) {
-        withMessage("SRID may not be <= 0. Was %d", srid);
+    public InvalidSridException(final int srid) {
+        withMessage("SRID may not be <= 0. Was: '%d'", srid);
+        setStatus(BAD_REQUEST);
     }
 }

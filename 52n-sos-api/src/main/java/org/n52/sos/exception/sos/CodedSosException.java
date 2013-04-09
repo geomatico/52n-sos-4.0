@@ -29,7 +29,7 @@ import org.n52.sos.exception.CodedException;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public abstract class CodedSosException extends CodedException {
-    public CodedSosException(SosExceptionCode code) {
+    public CodedSosException(final SosExceptionCode code) {
         super(code);
     }
 }

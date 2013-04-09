@@ -24,6 +24,8 @@
 
 package org.n52.sos.exception.ows.concrete;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.INTERNAL_SERVER_ERROR;
+
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.decode.Decoder;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
@@ -31,22 +33,26 @@ import org.w3c.dom.Node;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class UnsupportedDecoderInputException extends NoApplicableCodeException {
     private static final long serialVersionUID = 5561451567407304739L;
 
-    public UnsupportedDecoderInputException(Decoder<?, ?> decoder, Object o) {
+    public UnsupportedDecoderInputException(final Decoder<?, ?> decoder, final Object o) {
         if (o == null) {
             withMessage("Decoder %s can not decode 'null'", decoder.getClass().getSimpleName());
         } else {
             String name;
             if (o instanceof XmlObject) {
-                Node n = ((XmlObject) o).getDomNode();
+                final Node n = ((XmlObject) o).getDomNode();
                 name = n.getPrefix() != null ? n.getPrefix() + ":" + n.getLocalName() : n.getLocalName();
             } else {
                 name = o.getClass().getName();
             }
             withMessage("%s can not be decoded by %s", name, decoder.getClass().getName());
         }
+        setStatus(INTERNAL_SERVER_ERROR);
     }
 }

@@ -25,15 +25,19 @@ package org.n52.sos.exception.ows;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class OperationNotSupportedException extends CodedOwsException {
     private static final long serialVersionUID = -5985965676110111858L;
 
     public OperationNotSupportedException() {
         super(OwsExceptionCode.OperationNotSupported);
+        setStatus(org.n52.sos.util.HTTPConstants.StatusCode.BAD_REQUEST);
     }
 
-    public OperationNotSupportedException(String operation) {
+    public OperationNotSupportedException(final String operation) {
         super(OwsExceptionCode.OperationNotSupported);
         at(operation).withMessage("The requested operation '%s' is not supported by this service!", operation);
     }

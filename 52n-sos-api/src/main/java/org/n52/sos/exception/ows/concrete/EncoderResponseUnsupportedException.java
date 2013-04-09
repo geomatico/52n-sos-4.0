@@ -23,15 +23,21 @@
  */
 package org.n52.sos.exception.ows.concrete;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.INTERNAL_SERVER_ERROR;
+
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class EncoderResponseUnsupportedException extends NoApplicableCodeException {
     private static final long serialVersionUID = 7222883731485291699L;
 
     public EncoderResponseUnsupportedException() {
         withMessage("The encoder response is not supported!");
+        setStatus(INTERNAL_SERVER_ERROR);
     }
 }

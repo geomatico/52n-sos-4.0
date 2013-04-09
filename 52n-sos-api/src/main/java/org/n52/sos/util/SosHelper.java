@@ -91,7 +91,7 @@ public class SosHelper {
         return config;
     }
 
-    protected static void setConfiguration(Configuration config) {
+    protected static void setConfiguration(final Configuration config) {
         SosHelper.config = config;
     }
 
@@ -107,8 +107,8 @@ public class SosHelper {
      *            Service URL
      * @return HTTP-Get request for featureOfInterst identifier
      */
-    public static String createFoiGetUrl(String foiId, String version, String serviceURL, String urlPattern) {
-        StringBuilder url = new StringBuilder();
+    public static String createFoiGetUrl(final String foiId, final String version, final String serviceURL, final String urlPattern) {
+        final StringBuilder url = new StringBuilder();
         // service URL
         url.append(getFoiGetUrl(version, serviceURL, urlPattern));
         // foi-id
@@ -125,8 +125,8 @@ public class SosHelper {
      *            Service URL
      * @return HTTP-Get request for FeatureOfInterest
      */
-    public static String getFoiGetUrl(String version, String serviceURL, String urlPattern) {
-        StringBuilder url = new StringBuilder();
+    public static String getFoiGetUrl(final String version, final String serviceURL, final String urlPattern) {
+        final StringBuilder url = new StringBuilder();
         // service URL
         url.append(serviceURL);
         // URL pattern for KVP
@@ -150,14 +150,14 @@ public class SosHelper {
         return url.toString();
     }
 
-    public static int parseSrsName(String srsName) throws OwsExceptionReport {
+    public static int parseSrsName(final String srsName) throws OwsExceptionReport {
         int srid = -1;
-        if (srsName != null && !srsName.isEmpty() && !srsName.equalsIgnoreCase("NOT_SET")) {
-            String urnSrsPrefix = getConfiguration().getSrsNamePrefix();
-            String urlSrsPrefix = getConfiguration().getSrsNamePrefixSosV2();
+        if ((srsName != null) && !srsName.isEmpty() && !srsName.equalsIgnoreCase("NOT_SET")) {
+            final String urnSrsPrefix = getConfiguration().getSrsNamePrefix();
+            final String urlSrsPrefix = getConfiguration().getSrsNamePrefixSosV2();
             try {
                 srid = Integer.valueOf(srsName.replace(urnSrsPrefix, "").replace(urlSrsPrefix, ""));
-            } catch (NumberFormatException nfe) {
+            } catch (final NumberFormatException nfe) {
                 throw new NoApplicableCodeException().causedBy(nfe).at(SosConstants.GetObservationParams.srsName)
                         .withMessage("Error while parsing srsName parameter! Parameter has to match "
                                      + "pattern '%s' or '%s' with appended EPSGcode number", urnSrsPrefix, urlSrsPrefix);
@@ -177,7 +177,7 @@ public class SosHelper {
         // avoid an OutOfMemoryError
         freeMem = Runtime.getRuntime().freeMemory();
         LOGGER.debug("Remaining Heap Size: " + (freeMem / 1024) + "KB");
-        if (Runtime.getRuntime().totalMemory() == Runtime.getRuntime().maxMemory() && freeMem < 256000) { // 256000
+        if ((Runtime.getRuntime().totalMemory() == Runtime.getRuntime().maxMemory()) && (freeMem < 256000)) { // 256000
             // accords to 256 kB create service exception
             throw new ResponseExceedsSizeLimitException()
                     .withMessage("The observation response is to big for the maximal heap size of %d Byte of the "
@@ -197,7 +197,7 @@ public class SosHelper {
      *            Geometry to include
      * @return Envelope that includes the Geometry
      */
-    public static Envelope checkEnvelope(Envelope envelope, Geometry geometry) {
+    public static Envelope checkEnvelope(final Envelope envelope, final Geometry geometry) {
         Envelope checkedEnvelope = envelope;
         if (checkedEnvelope == null) {
             checkedEnvelope = geometry.getEnvelopeInternal();
@@ -218,12 +218,12 @@ public class SosHelper {
      *
      * @throws OwsExceptionReport * If the parameter is not supported by this SOS.
      */
-    public static String parseHttpPostBodyWithParameter(Enumeration<?> paramNames, Map<?, ?> parameterMap) throws
+    public static String parseHttpPostBodyWithParameter(final Enumeration<?> paramNames, final Map<?, ?> parameterMap) throws
             OwsExceptionReport {
         while (paramNames.hasMoreElements()) {
-            String paramName = (String) paramNames.nextElement();
+            final String paramName = (String) paramNames.nextElement();
             if (paramName.equalsIgnoreCase(RequestParams.request.name())) {
-                String[] paramValues = (String[]) parameterMap.get(paramName);
+                final String[] paramValues = (String[]) parameterMap.get(paramName);
                 if (paramValues.length == 1) {
                     return paramValues[0];
                 } else {
@@ -251,7 +251,7 @@ public class SosHelper {
      * @throws OwsExceptionReport If the request contains critical characters
      */
     @Deprecated
-    public static void checkRequestString(String requestString) throws OwsExceptionReport {
+    public static void checkRequestString(final String requestString) throws OwsExceptionReport {
         if (requestString.contains("');")) {
             throw new InvalidRequestException()
                     .withMessage("Request contains critical character sequence '\');'! If ProstgreSQL database is used, critical code can be excecuted via the request!");
@@ -267,7 +267,7 @@ public class SosHelper {
      *            SOS version
      * @return True if the FOI identifier was generated
      */
-    public static boolean checkFeatureOfInterestIdentifierForSosV2(String featureOfInterestIdentifier, String version) {
+    public static boolean checkFeatureOfInterestIdentifierForSosV2(final String featureOfInterestIdentifier, final String version) {
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
             if (featureOfInterestIdentifier.startsWith(SosConstants.GENERATED_IDENTIFIER_PREFIX)) {
                 return false;
@@ -280,14 +280,14 @@ public class SosHelper {
      * @deprecated not used and quite buggy (e.g. REST binding may be selected)
      */
     @Deprecated
-    public static String getUrlPatternForHttpGetMethod(OperationDecoderKey decoderKey) throws OwsExceptionReport {
+    public static String getUrlPatternForHttpGetMethod(final OperationDecoderKey decoderKey) throws OwsExceptionReport {
         try {
-            for (Binding binding : getConfiguration().getBindings()) {
+            for (final Binding binding : getConfiguration().getBindings()) {
                 if (binding.checkOperationHttpGetSupported(decoderKey)) {
                     return binding.getUrlPattern();
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             if (e instanceof OwsExceptionReport) {
                 throw (OwsExceptionReport) e;
             }
@@ -309,10 +309,10 @@ public class SosHelper {
      * @deprecated not used; moved to WritableContentCache (?)
      */
     @Deprecated
-    public static <K, V> Map<V, Set<K>> invertHierarchy(Map<K, Set<V>> hierarchy) {
-        Map<V, Set<K>> invertedHierarchy = new HashMap<V, Set<K>>();
-        for (K key : hierarchy.keySet()) {
-            for (V value : hierarchy.get(key)) {
+    public static <K, V> Map<V, Set<K>> invertHierarchy(final Map<K, Set<V>> hierarchy) {
+        final Map<V, Set<K>> invertedHierarchy = new HashMap<V, Set<K>>();
+        for (final K key : hierarchy.keySet()) {
+            for (final V value : hierarchy.get(key)) {
                 if (invertedHierarchy.get(value) == null) {
                     invertedHierarchy.put(value, new HashSet<K>());
                 }
@@ -336,20 +336,20 @@ public class SosHelper {
      * @return collection of the full hierarchy
      */
     // FIXME move to ReadableCache
-    public static Set<String> getHierarchy(Map<String, Set<String>> hierarchy, String key, boolean fullHierarchy,
-                                           boolean includeStartKey) {
-        Set<String> hierarchyValues = new HashSet<String>();
+    public static Set<String> getHierarchy(final Map<String, Set<String>> hierarchy, final String key, final boolean fullHierarchy,
+                                           final boolean includeStartKey) {
+        final Set<String> hierarchyValues = new HashSet<String>();
         if (includeStartKey) {
             hierarchyValues.add(key);
 }
 
-        Stack<String> keysToCheck = new Stack<String>();
+        final Stack<String> keysToCheck = new Stack<String>();
 keysToCheck.push(key);
 
         while (!keysToCheck.isEmpty()) {
-            Collection<String> keyValues = hierarchy.get(keysToCheck.pop());
+            final Collection<String> keyValues = hierarchy.get(keysToCheck.pop());
             if (keyValues != null) {
-                for (String value : keyValues) {
+                for (final String value : keyValues) {
                     if (hierarchyValues.add(value) && fullHierarchy) {
                         keysToCheck.push(value);
                     }
@@ -371,10 +371,10 @@ keysToCheck.push(key);
      * @return collection of the full hierarchy
      */
     // FIXME move to ReadableCache
-    public static Set<String> getHierarchy(Map<String, Set<String>> hierarchy, Set<String> keys, boolean fullHierarchy,
-                                           boolean includeStartKeys) {
-        Set<String> parents = new HashSet<String>();
-        for (String key : keys) {
+    public static Set<String> getHierarchy(final Map<String, Set<String>> hierarchy, final Set<String> keys, final boolean fullHierarchy,
+                                           final boolean includeStartKeys) {
+        final Set<String> parents = new HashSet<String>();
+        for (final String key : keys) {
             parents.addAll(getHierarchy(hierarchy, key, fullHierarchy, includeStartKeys));
         }
         return parents;
@@ -395,9 +395,9 @@ keysToCheck.push(key);
      * @return Get-URL as String
      * @throws UnsupportedEncodingException
      */
-    public static String getDescribeSensorUrl(String version, String serviceURL, String procedureId, String urlPattern)
+    public static String getDescribeSensorUrl(final String version, final String serviceURL, final String procedureId, final String urlPattern)
             throws UnsupportedEncodingException {
-        StringBuilder url = new StringBuilder();
+        final StringBuilder url = new StringBuilder();
         // service URL
         url.append(serviceURL);
         // URL pattern
@@ -439,7 +439,7 @@ keysToCheck.push(key);
      *
      * @throws OwsExceptionReport * if the parameter value is incorrect
      */
-    public static boolean checkResponseFormat(String responseFormat, String version) throws OwsExceptionReport {
+    public static boolean checkResponseFormat(final String responseFormat, final String version) throws OwsExceptionReport {
         if (OMHelper.checkOMResponseFormat(responseFormat)) {
             return false;
         } else if (responseFormat.equalsIgnoreCase(SosConstants.CONTENT_TYPE_ZIP)) {
@@ -456,7 +456,7 @@ keysToCheck.push(key);
      *            String containing the value of the responseFormat parameter
      * @return boolean true if application/zip
      */
-    public static boolean checkResponseFormatForZipCompression(String responseFormat) {
+    public static boolean checkResponseFormatForZipCompression(final String responseFormat) {
         return responseFormat.equalsIgnoreCase(SosConstants.CONTENT_TYPE_ZIP);
     }
 
@@ -471,9 +471,9 @@ keysToCheck.push(key);
      *
      * @throws OwsExceptionReport if the value of the outputFormat parameter is incorrect
      */
-    public static void checkProcedureDescriptionFormat(String procedureDecriptionFormat, String parameterName) throws
+    public static void checkProcedureDescriptionFormat(final String procedureDecriptionFormat, final String parameterName) throws
             OwsExceptionReport {
-        if (procedureDecriptionFormat == null || procedureDecriptionFormat.isEmpty()
+        if ((procedureDecriptionFormat == null) || procedureDecriptionFormat.isEmpty()
             || procedureDecriptionFormat.equals(SosConstants.PARAMETER_NOT_SET)) {
             throw new MissingProcedureDescriptionFormatException();
         }
@@ -495,10 +495,10 @@ keysToCheck.push(key);
      *            SOS version
      * @return valid FOI identifiers
      */
-    public static Collection<String> getFeatureIDs(Collection<String> featureIDs, String version) {
+    public static Collection<String> getFeatureIDs(final Collection<String> featureIDs, final String version) {
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
-            Collection<String> validFeatureIDs = new ArrayList<String>(featureIDs.size());
-            for (String featureID : featureIDs) {
+            final Collection<String> validFeatureIDs = new ArrayList<String>(featureIDs.size());
+            for (final String featureID : featureIDs) {
                 if (checkFeatureOfInterestIdentifierForSosV2(featureID, version)) {
                     validFeatureIDs.add(featureID);
                 }
@@ -516,17 +516,17 @@ keysToCheck.push(key);
      * @return the {@code MinMax} describing the envelope
      * <p/>
      */
-    public static MinMax<String> getMinMaxFromEnvelope(Envelope envelope) {
+    public static MinMax<String> getMinMaxFromEnvelope(final Envelope envelope) {
         // TODO for full 3D support add minz to parameter in setStringValue
         return new MinMax<String>()
                 .setMaximum(envelope.getMaxX() + " " + envelope.getMaxY())
                 .setMinimum(envelope.getMinX() + " " + envelope.getMinY());
     }
 
-    public static SosObservableProperty createSosOberavablePropertyFromSosSMLIo(SosSMLIo<?> output) {
-        SosSweAbstractSimpleType<?> ioValue = output.getIoValue();
-        String identifier = ioValue.getDefinition();
-        String description = ioValue.getDescription();
+    public static SosObservableProperty createSosOberavablePropertyFromSosSMLIo(final SosSMLIo<?> output) {
+        final SosSweAbstractSimpleType<?> ioValue = output.getIoValue();
+        final String identifier = ioValue.getDefinition();
+        final String description = ioValue.getDescription();
         String unit = null;
         String valueType = SosConstants.NOT_DEFINED;
         switch (ioValue.getSimpleType()) {
@@ -565,7 +565,7 @@ keysToCheck.push(key);
         default:
             break;
         }
-        if (unit == null || unit.isEmpty()) {
+        if ((unit == null) || unit.isEmpty()) {
             unit = SosConstants.NOT_DEFINED;
         }
         return new SosObservableProperty(identifier, description, unit, valueType);
@@ -575,38 +575,44 @@ keysToCheck.push(key);
      * @deprecated use {@link CodingRepository#getSupportedResponseFormats(java.lang.String, java.lang.String) }
      */
     @Deprecated
-public static Collection<String> getSupportedResponseFormats(String service, String version) {
+public static Collection<String> getSupportedResponseFormats(final String service, final String version) {
         return Configurator.getInstance().getCodingRepository().getSupportedResponseFormats(service, version);
     }
     
-    public static <T extends Serializable> T duplicateObject(T objectToDuplicate) throws OwsExceptionReport {
+    /**
+     * @deprecated this method os not used anywhere (2013-04-08_15-35 CEST)
+     * FIXME remove before release
+     */
+    @Deprecated
+    public static <T extends Serializable> T duplicateObject(final T objectToDuplicate) throws OwsExceptionReport {
         try {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
             objectOutputStream.writeObject(objectToDuplicate);
-            ByteArrayInputStream byteArrayIntputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayIntputStream);
+            final ByteArrayInputStream byteArrayIntputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+            final ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayIntputStream);
             @SuppressWarnings("unchecked")
+			final
             T duplicatedObject = (T) objectInputStream.readObject();
             return duplicatedObject;
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new GenericThrowableWrapperException(e).withMessage("Error while duplicating object!");
-        } catch (ClassNotFoundException e) {
+        } catch (final ClassNotFoundException e) {
             throw new GenericThrowableWrapperException(e).withMessage("Error while duplicating object!");
         }
     }
 
-    public static void checkHref(String href, String parameterName) throws OwsExceptionReport {
+    public static void checkHref(final String href, final String parameterName) throws OwsExceptionReport {
         if (!href.startsWith("http") && !href.startsWith("urn")) {
             throw new InvalidParameterValueException().at(parameterName)
                     .withMessage("The reference (href) has an invalid style!");
         }
     }
 
-    public static String createCSVFromCodeTypeList(List<CodeType> values) {
-        StringBuilder builder = new StringBuilder();
-        if (values != null && !values.isEmpty()) {
-            for (CodeType value : values) {
+    public static String createCSVFromCodeTypeList(final List<CodeType> values) {
+        final StringBuilder builder = new StringBuilder();
+        if ((values != null) && !values.isEmpty()) {
+            for (final CodeType value : values) {
                 builder.append(value.getValue());
                 builder.append(',');
             }
@@ -615,10 +621,10 @@ public static Collection<String> getSupportedResponseFormats(String service, Str
         return builder.toString();
     }
 
-    public static List<CodeType> createCodeTypeListFromCSV(String csv) {
-        List<CodeType> names = new ArrayList<CodeType>(0);
-        if (csv != null && !csv.isEmpty()) {
-            for (String name : csv.split(",")) {
+    public static List<CodeType> createCodeTypeListFromCSV(final String csv) {
+        final List<CodeType> names = new ArrayList<CodeType>(0);
+        if ((csv != null) && !csv.isEmpty()) {
+            for (final String name : csv.split(",")) {
                 names.add(new CodeType(name));
             }
         }
@@ -630,8 +636,8 @@ public static Collection<String> getSupportedResponseFormats(String service, Str
      * @deprecated see {@link AbstractRequestOperator#checkObservationType(java.lang.String, java.lang.String)}
      */
     @Deprecated
-    public static void checkObservationType(String observationType, String parameterName) throws OwsExceptionReport {
-        Collection<String> validObservationTypes = getConfiguration().getObservationTypes();
+    public static void checkObservationType(final String observationType, final String parameterName) throws OwsExceptionReport {
+        final Collection<String> validObservationTypes = getConfiguration().getObservationTypes();
         if (observationType.isEmpty()) {
             throw new MissingParameterValueException(parameterName);
         } else if (!validObservationTypes.contains(observationType)) {
@@ -643,10 +649,10 @@ public static Collection<String> getSupportedResponseFormats(String service, Str
      * @deprecated not used; similar methods moved to GetObservationDAO
      */
     @Deprecated
-    public static boolean hasFirstLatestTemporalFilter(List<TemporalFilter> temporalFilters) {
-        for (TemporalFilter temporalFilter : temporalFilters) {
-            if (temporalFilter.getTime() != null && temporalFilter.getTime() instanceof TimeInstant) {
-                TimeInstant ti = (TimeInstant) temporalFilter.getTime();
+    public static boolean hasFirstLatestTemporalFilter(final List<TemporalFilter> temporalFilters) {
+        for (final TemporalFilter temporalFilter : temporalFilters) {
+            if ((temporalFilter.getTime() != null) && (temporalFilter.getTime() instanceof TimeInstant)) {
+                final TimeInstant ti = (TimeInstant) temporalFilter.getTime();
                 if (ti.isSetIndeterminateValue()) {
                     if (FirstLatest.contains(ti.getIndeterminateValue())) {
                         return true;
@@ -661,11 +667,11 @@ public static Collection<String> getSupportedResponseFormats(String service, Str
      * @deprecated moved to GetObservationDAO
      */
     @Deprecated
-    public static List<FirstLatest> getFirstLatestTemporalFilter(List<TemporalFilter> temporalFilters) {
-        List<FirstLatest> filters = new ArrayList<FirstLatest>(0);
-        for (TemporalFilter temporalFilter : temporalFilters) {
-            if (temporalFilter.getTime() != null && temporalFilter.getTime() instanceof TimeInstant) {
-                TimeInstant ti = (TimeInstant) temporalFilter.getTime();
+    public static List<FirstLatest> getFirstLatestTemporalFilter(final List<TemporalFilter> temporalFilters) {
+        final List<FirstLatest> filters = new ArrayList<FirstLatest>(0);
+        for (final TemporalFilter temporalFilter : temporalFilters) {
+            if ((temporalFilter.getTime() != null) && (temporalFilter.getTime() instanceof TimeInstant)) {
+                final TimeInstant ti = (TimeInstant) temporalFilter.getTime();
                 if (ti.isSetIndeterminateValue()) {
                     if (FirstLatest.contains(ti.getIndeterminateValue())) {
                         filters.add(FirstLatest.getEnumForString(ti.getIndeterminateValue()));
@@ -680,12 +686,12 @@ public static Collection<String> getSupportedResponseFormats(String service, Str
      * @deprecated moved to GetObservationDAO
      */
     @Deprecated
-    public static List<TemporalFilter> getNonFirstLatestTemporalFilter(List<TemporalFilter> temporalFilters) {
-        List<TemporalFilter> filters = new ArrayList<TemporalFilter>(0);
-        for (TemporalFilter temporalFilter : temporalFilters) {
+    public static List<TemporalFilter> getNonFirstLatestTemporalFilter(final List<TemporalFilter> temporalFilters) {
+        final List<TemporalFilter> filters = new ArrayList<TemporalFilter>(0);
+        for (final TemporalFilter temporalFilter : temporalFilters) {
             if (temporalFilter.getTime() != null) {
                 if (temporalFilter.getTime() instanceof TimeInstant) {
-                    TimeInstant ti = (TimeInstant) temporalFilter.getTime();
+                    final TimeInstant ti = (TimeInstant) temporalFilter.getTime();
                     if (!ti.isSetIndeterminateValue()
                             || (ti.isSetIndeterminateValue() && !FirstLatest.contains(ti.getIndeterminateValue()))) {
                         filters.add(temporalFilter);

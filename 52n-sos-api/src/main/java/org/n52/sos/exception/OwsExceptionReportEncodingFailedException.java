@@ -26,6 +26,7 @@ package org.n52.sos.exception;
 import org.n52.sos.binding.Binding;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.util.HTTPConstants.StatusCode;
 
 /**
  * This exception should be thrown if the encoding of an 
@@ -35,7 +36,10 @@ import org.n52.sos.response.ServiceResponse;
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @since 4.0.0
  */
-public class OwsExceptionReportEncodingFailedException extends Exception 
-{
+public class OwsExceptionReportEncodingFailedException extends HTTPException {
 	private static final long serialVersionUID = 52L;
+
+    public OwsExceptionReportEncodingFailedException() {
+        super(StatusCode.INTERNAL_SERVER_ERROR);
+    }
 }

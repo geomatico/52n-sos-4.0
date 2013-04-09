@@ -23,13 +23,19 @@
  */
 package org.n52.sos.exception.ows;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.BAD_REQUEST;
+
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class InvalidUpdateSequenceException extends CodedOwsException {
     private static final long serialVersionUID = -2764825556277141124L;
 
     public InvalidUpdateSequenceException() {
         super(OwsExceptionCode.InvalidUpdateSequence);
+        setStatus(BAD_REQUEST);
     }
 }
