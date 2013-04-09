@@ -248,4 +248,19 @@ public interface HibernateRelations {
         String getType();
         void setType(String type);
     }
+
+    interface HasCoordinate {
+        String LONGITUDE = "longitude";
+        String LATITUDE = "latitude";
+        String ALTITUDE = "altitude";
+        String SRID = "srid";
+        public Object getLongitude();
+        public void setLongitude(Object longitude);
+        public Object getLatitude();
+        public void setLatitude(Object latitude);
+        public Object getAltitude();
+        public void setAltitude(Object altitude);
+        public int getSrid();
+        public void setSrid(int srid);
+    }
 }
