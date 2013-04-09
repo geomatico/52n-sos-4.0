@@ -23,9 +23,15 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
+import java.io.Serializable;
+
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasGeometry;
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasIdentifier;
+
 import com.vividsolutions.jts.geom.Geometry;
 
-public class SpatialFilteringProfile implements java.io.Serializable {
+public class SpatialFilteringProfile implements Serializable, HasIdentifier, HasGeometry {
+    public static final String ID = "spatialFilteringProfileId";
     private static final long serialVersionUID = 4406553730754122998L;
     private long spatialFilteringProfileId;
     private String identifier;
@@ -42,18 +48,22 @@ public class SpatialFilteringProfile implements java.io.Serializable {
         this.spatialFilteringProfileId = spatialFilteringProfileId;
     }
 
+    @Override
     public String getIdentifier() {
         return this.identifier;
     }
 
+    @Override
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
     }
 
+    @Override
     public Geometry getGeom() {
         return this.geom;
     }
 
+    @Override
     public void setGeom(Geometry geom) {
         this.geom = geom;
     }

@@ -23,7 +23,12 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
-public class TextValue implements java.io.Serializable {
+import java.io.Serializable;
+
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValue;
+
+public class TextValue implements Serializable, HasValue<String> {
+    public static final String ID = "textValueId";
     private static final long serialVersionUID = 7996466028914951073L;
     private long textValueId;
     private String value;
@@ -39,10 +44,12 @@ public class TextValue implements java.io.Serializable {
         this.textValueId = textValueId;
     }
 
+    @Override
     public String getValue() {
         return this.value;
     }
 
+    @Override
     public void setValue(String value) {
         this.value = value;
     }

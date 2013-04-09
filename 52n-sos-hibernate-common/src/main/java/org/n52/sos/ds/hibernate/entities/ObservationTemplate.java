@@ -23,7 +23,11 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
-public class ObservationTemplate implements java.io.Serializable {
+import java.io.Serializable;
+
+public class ObservationTemplate implements Serializable {
+    public static final String ID = "observationTemplateId";
+    public static final String OBSERVATION_TEMPLATE = "observationTemplate";
     private static final long serialVersionUID = -6280834692412977352L;
     private long observationTemplateId;
     private String observationTemplate;

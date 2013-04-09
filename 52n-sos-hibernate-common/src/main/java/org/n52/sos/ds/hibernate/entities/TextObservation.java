@@ -23,14 +23,18 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
-public class TextObservation extends Observation {
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValue;
+
+public class TextObservation extends Observation implements HasValue<TextValue> {
     private static final long serialVersionUID = 1139695332890175636L;
     private TextValue value;
 
+    @Override
     public TextValue getValue() {
         return value;
     }
 
+    @Override
     public void setValue(TextValue value) {
         this.value = value;
     }

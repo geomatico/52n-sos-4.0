@@ -23,9 +23,17 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class ValidProcedureTime implements java.io.Serializable {
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasProcedure;
+
+public class ValidProcedureTime implements Serializable, HasProcedure {
+    public static final String ID = "validProcedureTimeId";
+    public static final String START_TIME = "startTime";
+    public static final String END_TIME = "endTime";
+    public static final String DESCRIPTION_URL = "descriptionUrl";
+    public static final String DESCRIPTION_XML = "descriptionXml";
     private static final long serialVersionUID = 826857082663455829L;
     private long validProcedureTimeId;
     private Procedure procedure;
@@ -45,10 +53,12 @@ public class ValidProcedureTime implements java.io.Serializable {
         this.validProcedureTimeId = validProcedureTimeId;
     }
 
+    @Override
     public Procedure getProcedure() {
         return this.procedure;
     }
 
+    @Override
     public void setProcedure(Procedure procedure) {
         this.procedure = procedure;
     }

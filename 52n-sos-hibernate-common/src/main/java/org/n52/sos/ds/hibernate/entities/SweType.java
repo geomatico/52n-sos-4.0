@@ -23,7 +23,13 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
-public class SweType implements java.io.Serializable {
+import java.io.Serializable;
+
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasSweType;
+
+public class SweType implements Serializable {
+    public static final String ID = "sweTypeId";
+    public static final String SWE_TYPE = HasSweType.SWE_TYPE;
     private static final long serialVersionUID = -5387124469743110362L;
     private long sweTypeId;
     private String sweType;

@@ -23,7 +23,10 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
-public class GeometryColumns implements java.io.Serializable {
+import java.io.Serializable;
+
+public class GeometryColumns implements Serializable {
+    public static final String ID = "id";
     private static final long serialVersionUID = -4900567735741903391L;
     private GeometryColumnsId id;
 

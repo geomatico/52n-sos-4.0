@@ -23,14 +23,18 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
-public class CountObservation extends Observation {
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValue;
+
+public class CountObservation extends Observation implements HasValue<CountValue> {
     private static final long serialVersionUID = 3467381564172910053L;
     private CountValue value;
 
+    @Override
     public CountValue getValue() {
         return value;
     }
 
+    @Override
     public void setValue(CountValue value) {
         this.value = value;
     }

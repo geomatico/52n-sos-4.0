@@ -23,7 +23,16 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
-public class SpatialRefSys implements java.io.Serializable {
+import java.io.Serializable;
+
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasSrid;
+
+public class SpatialRefSys implements Serializable, HasSrid {
+    public static final String ID = SRID;
+    public static final String AUTH_NAME = "authName";
+    public static final String AUTH_SRID = "authSrid";
+    public static final String SR_TEXT = "srtext";
+    public static final String PROJ4_TEXT = "proj4text";
     private static final long serialVersionUID = -7998487345621799526L;
     private int srid;
     private String authName;
@@ -46,10 +55,12 @@ public class SpatialRefSys implements java.io.Serializable {
         this.proj4text = proj4text;
     }
 
+    @Override
     public int getSrid() {
         return this.srid;
     }
 
+    @Override
     public void setSrid(int srid) {
         this.srid = srid;
     }

@@ -23,14 +23,18 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
-public class BooleanObservation extends Observation {
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValue;
+
+public class BooleanObservation extends Observation implements HasValue<BooleanValue> {
     private static final long serialVersionUID = -1839724413208580516L;
     private BooleanValue value;
 
+    @Override
     public BooleanValue getValue() {
         return value;
     }
 
+    @Override
     public void setValue(BooleanValue value) {
         this.value = value;
     }

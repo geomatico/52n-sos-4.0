@@ -23,7 +23,10 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
-public class GeographyColumns implements java.io.Serializable {
+import java.io.Serializable;
+
+public class GeographyColumns implements Serializable {
+    public static final String ID = "id";
     private static final long serialVersionUID = 1202298894693584797L;
     private GeographyColumnsId id;
 

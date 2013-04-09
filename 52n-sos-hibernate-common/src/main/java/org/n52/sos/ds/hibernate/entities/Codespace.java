@@ -23,12 +23,15 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
-public class Codespace implements java.io.Serializable {
-    
-    private static final long serialVersionUID = 1L;
+import java.io.Serializable;
 
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasCodespace;
+
+public class Codespace implements Serializable {
+    public static final String ID = "codespaceId";
+    public static final String CODESPACE = HasCodespace.CODESPACE;
+    private static final long serialVersionUID = 8795086004488469603L;
     private long codespaceId;
-    
     private String codespace;
 
     public Codespace() {

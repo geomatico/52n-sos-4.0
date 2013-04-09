@@ -23,7 +23,12 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
-public class GeographyColumnsId implements java.io.Serializable {
+import java.io.Serializable;
+
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.GeoColumnsId;
+
+public class GeographyColumnsId implements Serializable, GeoColumnsId {
+    public static final String COLUMN = "FGeographyColumn";
     private static final long serialVersionUID = 2973570817118481352L;
     private String FTableCatalog;
     private String FTableSchema;
@@ -47,26 +52,32 @@ public class GeographyColumnsId implements java.io.Serializable {
         this.type = type;
     }
 
+    @Override
     public String getFTableCatalog() {
         return this.FTableCatalog;
     }
 
+    @Override
     public void setFTableCatalog(String FTableCatalog) {
         this.FTableCatalog = FTableCatalog;
     }
 
+    @Override
     public String getFTableSchema() {
         return this.FTableSchema;
     }
 
+    @Override
     public void setFTableSchema(String FTableSchema) {
         this.FTableSchema = FTableSchema;
     }
 
+    @Override
     public String getFTableName() {
         return this.FTableName;
     }
 
+    @Override
     public void setFTableName(String FTableName) {
         this.FTableName = FTableName;
     }
@@ -79,81 +90,82 @@ public class GeographyColumnsId implements java.io.Serializable {
         this.FGeographyColumn = FGeographyColumn;
     }
 
+    @Override
     public Integer getCoordDimension() {
         return this.coordDimension;
     }
 
+    @Override
     public void setCoordDimension(Integer coordDimension) {
         this.coordDimension = coordDimension;
     }
 
+    @Override
     public Integer getSrid() {
         return this.srid;
     }
 
+    @Override
     public void setSrid(Integer srid) {
         this.srid = srid;
     }
 
+    @Override
     public String getType() {
         return this.type;
     }
 
+    @Override
     public void setType(String type) {
         this.type = type;
     }
 
-    public boolean equals(Object other) {
-        if ((this == other)) {
-            return true;
-        }
-        if ((other == null)) {
-            return false;
-        }
-        if (!(other instanceof GeographyColumnsId)) {
-            return false;
-        }
-        GeographyColumnsId castOther = (GeographyColumnsId) other;
-
-        return ((this.getFTableCatalog() == castOther.getFTableCatalog()) || (this.getFTableCatalog() != null
-                                                                              && castOther.getFTableCatalog() != null
-                                                                              && this.getFTableCatalog()
-                .equals(castOther.getFTableCatalog())))
-               && ((this.getFTableSchema() == castOther.getFTableSchema()) || (this.getFTableSchema() != null
-                                                                               && castOther.getFTableSchema() != null
-                                                                               && this.getFTableSchema().equals(
-                castOther.getFTableSchema())))
-               && ((this.getFTableName() == castOther.getFTableName()) || (this.getFTableName() != null
-                                                                           && castOther.getFTableName() != null && this
-                .getFTableName().equals(castOther.getFTableName())))
-               && ((this.getFGeographyColumn() == castOther.getFGeographyColumn()) || (this.getFGeographyColumn()
-                                                                                       != null
-                                                                                       && castOther
-                .getFGeographyColumn() != null && this.getFGeographyColumn().equals(
-                castOther.getFGeographyColumn())))
-               && ((this.getCoordDimension() == castOther.getCoordDimension()) || (this.getCoordDimension() != null
-                                                                                   && castOther.getCoordDimension()
-                                                                                      != null && this
-                .getCoordDimension().equals(
-                castOther.getCoordDimension())))
-               && ((this.getSrid() == castOther.getSrid()) || (this.getSrid() != null && castOther.getSrid() != null
-                                                               && this
-                .getSrid().equals(castOther.getSrid())))
-               && ((this.getType() == castOther.getType()) || (this.getType() != null && castOther.getType() != null
-                                                               && this
-                .getType().equals(castOther.getType())));
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 83 * hash + (this.FTableCatalog != null ? this.FTableCatalog.hashCode() : 0);
+        hash = 83 * hash + (this.FTableSchema != null ? this.FTableSchema.hashCode() : 0);
+        hash = 83 * hash + (this.FTableName != null ? this.FTableName.hashCode() : 0);
+        hash = 83 * hash + (this.FGeographyColumn != null ? this.FGeographyColumn.hashCode() : 0);
+        hash = 83 * hash + (this.coordDimension != null ? this.coordDimension.hashCode() : 0);
+        hash = 83 * hash + (this.srid != null ? this.srid.hashCode() : 0);
+        hash = 83 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
     }
 
-    public int hashCode() {
-        int result = 17;
-
-        result = 37 * result + (getFTableCatalog() == null ? 0 : this.getFTableCatalog().hashCode());
-        result = 37 * result + (getFTableSchema() == null ? 0 : this.getFTableSchema().hashCode());
-        result = 37 * result + (getFTableName() == null ? 0 : this.getFTableName().hashCode());
-        result = 37 * result + (getFGeographyColumn() == null ? 0 : this.getFGeographyColumn().hashCode());
-        result = 37 * result + (getCoordDimension() == null ? 0 : this.getCoordDimension().hashCode());
-        result = 37 * result + (getSrid() == null ? 0 : this.getSrid().hashCode());
-        result = 37 * result + (getType() == null ? 0 : this.getType().hashCode());
-        return result;
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final GeographyColumnsId other = (GeographyColumnsId) obj;
+        if ((this.FTableCatalog == null) ? (other.FTableCatalog != null)
+            : !this.FTableCatalog.equals(other.FTableCatalog)) {
+            return false;
+        }
+        if ((this.FTableSchema == null) ? (other.FTableSchema != null) : !this.FTableSchema.equals(other.FTableSchema)) {
+            return false;
+        }
+        if ((this.FTableName == null) ? (other.FTableName != null) : !this.FTableName.equals(other.FTableName)) {
+            return false;
+        }
+        if ((this.FGeographyColumn == null) ? (other.FGeographyColumn != null)
+            : !this.FGeographyColumn.equals(other.FGeographyColumn)) {
+            return false;
+        }
+        if (this.coordDimension != other.coordDimension && (this.coordDimension == null || !this.coordDimension
+                .equals(other.coordDimension))) {
+            return false;
+        }
+        if (this.srid != other.srid && (this.srid == null || !this.srid.equals(other.srid))) {
+            return false;
+        }
+        if ((this.type == null) ? (other.type != null) : !this.type.equals(other.type)) {
+            return false;
+        }
+        return true;
     }
 }

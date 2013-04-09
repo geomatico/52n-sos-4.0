@@ -23,7 +23,11 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
-public class RelatedFeatureRole implements java.io.Serializable {
+import java.io.Serializable;
+
+public class RelatedFeatureRole implements Serializable {
+    public static final String ID = "relatedFeatureRoleId";
+    public static final String RELATED_FEATURE_ROLE = "relatedFeatureRole";
     private static final long serialVersionUID = 5135865378607131537L;
     private long relatedFeatureRoleId;
     private String relatedFeatureRole;

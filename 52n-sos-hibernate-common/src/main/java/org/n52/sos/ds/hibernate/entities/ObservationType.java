@@ -23,7 +23,13 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
-public class ObservationType implements java.io.Serializable {
+import java.io.Serializable;
+
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservationType;
+
+public class ObservationType implements Serializable {
+    public static final String ID = "observationTypeId";
+    public static final String OBSERVATION_TYPE = HasObservationType.OBSERVATION_TYPE;
     private static final long serialVersionUID = 3937060814490234885L;
     private long observationTypeId;
     private String observationType;
