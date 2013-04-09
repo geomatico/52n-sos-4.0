@@ -227,13 +227,11 @@ public class Soap12Encoder extends AbstractSoapEncoder {
         return faultDoc;
     }
 
-    
-
-    private void checkAndValidateSoapMessage(XmlObject response) {
-        try {
-            XmlHelper.validateDocument(response);
-        } catch (OwsExceptionReport e) {
-            LOGGER.info("Error while checking SOAP response", e);
-        }
-    }
+//    private void checkAndValidateSoapMessage(XmlObject response) {
+//        try {
+//            XmlHelper.validateDocument(response);
+//        } catch (OwsExceptionReport e) {
+//            LOGGER.info("Error while checking SOAP response", e);
+//        }
+//    }
 }
