@@ -26,16 +26,18 @@ package org.n52.sos.ds.hibernate;
 import org.hibernate.Session;
 import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class HibernateSessionHolder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateSessionHolder.class);
-    
+    public static Session getSession(Object connection) throws OwsExceptionReport {
+        if (!(connection instanceof Session)) {
+            throw new NoApplicableCodeException().withMessage("The parameter connection is not an Hibernate Session!");
+        }
+        return (Session) connection;
+    }
     private final ConnectionProvider connectionProvider;
 
     public HibernateSessionHolder() {
@@ -52,12 +54,5 @@ public class HibernateSessionHolder {
 
     public void returnSession(Session session) {
         this.connectionProvider.returnConnection(session);
-    }
-
-    public Session getSession(Object connection) throws OwsExceptionReport {
-        if (!(connection instanceof Session)) {
-            throw new NoApplicableCodeException().withMessage("The parameter connection is not an Hibernate Session!");
-        }
-        return (Session) connection;
     }
 }
