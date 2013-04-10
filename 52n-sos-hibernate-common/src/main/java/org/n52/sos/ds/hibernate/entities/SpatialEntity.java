@@ -36,11 +36,10 @@ import com.vividsolutions.jts.geom.Geometry;
 public abstract class SpatialEntity implements HasGeometry, HasCoordinate {
 
 	private Geometry geom;
-	// FIXME reset before committing!
-	private Object longitude = 7.2;
-	private Object latitude = 52.0;
+	private Object longitude;
+	private Object latitude;
 	private Object altitude;
-	private int srid = 4326;
+	private int srid;
 
 	public SpatialEntity() {
 		super();
@@ -128,7 +127,7 @@ public abstract class SpatialEntity implements HasGeometry, HasCoordinate {
 	
 	public boolean isSpatial()
     {
-    	return isSetGeometry() || isSetLongLat() && isSetSrid();
+    	return isSetGeometry() || (isSetLongLat() && isSetSrid());
     }
 
 }
