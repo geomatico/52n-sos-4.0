@@ -39,7 +39,13 @@ import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasUrl;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class FeatureOfInterest implements Serializable, HasIdentifier, HasFeatureOfInterestType, HasGeometry,
+
+/**
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ *
+ * @since 4.0.0
+ */
+public class FeatureOfInterest extends SpatialEntity implements Serializable, HasIdentifier, HasFeatureOfInterestType, HasGeometry,
                                           HasDescriptionXml, HasName, HasUrl, HasCodespace, HasCoordinate {
     public static final String ID = "featureOfInterestId";
     public static final String FEATURE_OF_INTEREST_FOR_CHILD_FEATURE_ID = "featureOfInterestsForChildFeatureId";
@@ -50,13 +56,8 @@ public class FeatureOfInterest implements Serializable, HasIdentifier, HasFeatur
     private String identifier;
     private Codespace codespace;
     private String name;
-    private Geometry geom;
     private String descriptionXml;
     private String url;
-    private Object longitude;
-    private Object latitude;
-    private Object altitude;
-    private int srid;
     private Set<FeatureOfInterest> featureOfInterestsForChildFeatureId = new HashSet<FeatureOfInterest>(0);
     private Set<FeatureOfInterest> featureOfInterestsForParentFeatureId = new HashSet<FeatureOfInterest>(0);
 
@@ -64,162 +65,101 @@ public class FeatureOfInterest implements Serializable, HasIdentifier, HasFeatur
     }
 
     public long getFeatureOfInterestId() {
-        return this.featureOfInterestId;
+        return featureOfInterestId;
     }
 
-    public void setFeatureOfInterestId(long featureOfInterestId) {
+    public void setFeatureOfInterestId(final long featureOfInterestId) {
         this.featureOfInterestId = featureOfInterestId;
     }
 
     @Override
     public FeatureOfInterestType getFeatureOfInterestType() {
-        return this.featureOfInterestType;
+        return featureOfInterestType;
     }
 
     @Override
-    public void setFeatureOfInterestType(FeatureOfInterestType featureOfInterestType) {
+    public void setFeatureOfInterestType(final FeatureOfInterestType featureOfInterestType) {
         this.featureOfInterestType = featureOfInterestType;
     }
 
     @Override
     public String getIdentifier() {
-        return this.identifier;
+        return identifier;
     }
 
     @Override
-    public void setIdentifier(String identifier) {
+    public void setIdentifier(final String identifier) {
         this.identifier = identifier;
     }
 
     @Override
     public Codespace getCodespace() {
-        return this.codespace;
+        return codespace;
     }
 
     @Override
-    public void setCodespace(Codespace codespace) {
+    public void setCodespace(final Codespace codespace) {
         this.codespace = codespace;
     }
 
     @Override
     public String getName() {
-        return this.name;
+        return name;
     }
 
     @Override
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
-    }
-
-    /**
-     * DO NOT ACCESS THE GEOMETRY OF THIS OBJECT DIRECTLY.
-     * <p/>
-     * Instead use {@link FeatureQueryHandler#getFeatureByID(java.lang.String, java.lang.Object, java.lang.String, int)}
-     * to retrieve the Geometry.
-     */
-    @Override
-    public Geometry getGeom() {
-        return this.geom;
-    }
-
-    @Override
-    public void setGeom(Geometry geom) {
-        this.geom = geom;
     }
 
     @Override
     public String getDescriptionXml() {
-        return this.descriptionXml;
+        return descriptionXml;
     }
 
     @Override
-    public void setDescriptionXml(String descriptionXml) {
+    public void setDescriptionXml(final String descriptionXml) {
         this.descriptionXml = descriptionXml;
     }
 
     @Override
     public String getUrl() {
-        return this.url;
+        return url;
     }
 
     @Override
-    public void setUrl(String url) {
+    public void setUrl(final String url) {
         this.url = url;
     }
 
-    @Override
-    public Object getLongitude() {
-        return longitude;
-    }
-
-    @Override
-    public void setLongitude(Object longitude) {
-        this.longitude = longitude;
-    }
-
-    @Override
-    public Object getLatitude() {
-        return latitude;
-    }
-
-    @Override
-    public void setLatitude(Object latitude) {
-        this.latitude = latitude;
-    }
-
-    @Override
-    public Object getAltitude() {
-        return altitude;
-    }
-
-    @Override
-    public void setAltitude(Object altitude) {
-        this.altitude = altitude;
-    }
-
-    @Override
-    public int getSrid() {
-        return srid;
-    }
-
-    @Override
-    public void setSrid(int srid) {
-        this.srid = srid;
-    }
-
     public Set<FeatureOfInterest> getFeatureOfInterestsForChildFeatureId() {
-        return this.featureOfInterestsForChildFeatureId;
+        return featureOfInterestsForChildFeatureId;
     }
 
-    public void setFeatureOfInterestsForChildFeatureId(Set<FeatureOfInterest> featureOfInterestsForChildFeatureId) {
+    public void setFeatureOfInterestsForChildFeatureId(final Set<FeatureOfInterest> featureOfInterestsForChildFeatureId) {
         this.featureOfInterestsForChildFeatureId = featureOfInterestsForChildFeatureId;
     }
 
     public Set<FeatureOfInterest> getFeatureOfInterestsForParentFeatureId() {
-        return this.featureOfInterestsForParentFeatureId;
+        return featureOfInterestsForParentFeatureId;
     }
 
-    public void setFeatureOfInterestsForParentFeatureId(Set<FeatureOfInterest> featureOfInterestsForParentFeatureId) {
+    public void setFeatureOfInterestsForParentFeatureId(final Set<FeatureOfInterest> featureOfInterestsForParentFeatureId) {
         this.featureOfInterestsForParentFeatureId = featureOfInterestsForParentFeatureId;
-    }
-
-    public boolean isSetGeometry() {
-        return getGeom() != null;
-    }
-
-    public boolean isSetLongLat() {
-        return getLongitude() != null && getLatitude() != null;
-    }
-
-    public boolean isSetAltitude() {
-        return getAltitude() != null;
-    }
-
-    public boolean isSetSrid() {
-        return getSrid() > 0;
     }
 
     public boolean isSetCodespace() {
         return getCodespace() != null && getCodespace().isSetCodespace();
+    }
+    
+    /**
+	 * DO NOT ACCESS THE GEOMETRY OF THIS OBJECT DIRECTLY.
+	 * <p/>
+	 * Instead use {@link FeatureQueryHandler#getFeatureByID(java.lang.String, java.lang.Object, java.lang.String, int)}
+	 * to retrieve the Geometry.
+	 */
+    @Override
+	public Geometry getGeom() {
+    	return super.getGeom();
     }
 }
