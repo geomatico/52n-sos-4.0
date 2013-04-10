@@ -474,6 +474,8 @@ CREATE INDEX observation_has_geometry_value_FKIndex2 ON observation_has_geometry
 CREATE INDEX observation_phenTimeStart_idx ON observation(phenomenon_time_start);
 CREATE INDEX observation_phenTimeEnd_idx ON observation(phenomenon_time_end);
 CREATE INDEX observation_resultTime_idx ON observation(result_time);
+CREATE INDEX observation_identifier_idx ON observation(identifier);
+CREATE INDEX observation_setId_idx ON observation(set_id);
 
 -----------------------------------------------------------
 
