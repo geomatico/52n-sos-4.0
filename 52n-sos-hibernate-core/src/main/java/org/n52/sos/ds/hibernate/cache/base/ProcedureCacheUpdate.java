@@ -38,6 +38,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
+import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
@@ -71,8 +72,7 @@ public class ProcedureCacheUpdate extends CacheUpdate {
     protected Set<String> getObservationIdentifiers(Session session, String procedureIdentifier) {
         Map<String, String> aliases = new HashMap<String, String>(2);
         HibernateQueryObject queryObject = new HibernateQueryObject();
-        String ocAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
-        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, ocAlias);
+        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, null);
         queryObject.setAliases(aliases);
         queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), procedureIdentifier));
         queryObject.addProjection(Projections.distinct(Projections.property(HibernateConstants.PARAMETER_IDENTIFIER)));
@@ -91,7 +91,7 @@ public class ProcedureCacheUpdate extends CacheUpdate {
         for (Procedure p : hProcedures) {
             if (!p.isDeleted()) {
                 final String id = p.getIdentifier();
-                final Set<ObservationConstellation> ocs = p.getObservationConstellations();
+                final Set<ObservationConstellation> ocs = getObservationConstellations(p);
                 getCache().addProcedure(id);
                 getCache().setOfferingsForProcedure(id, getAllOfferingIdentifiersFrom(ocs));
                 getCache().setObservablePropertiesForProcedure(id, getObservableProperties(ocs));
@@ -99,5 +99,11 @@ public class ProcedureCacheUpdate extends CacheUpdate {
                 getCache().setObservationIdentifiersForProcedure(id, getObservationIdentifiers(getSession(), id));
             }
         }
+    }
+    
+    protected Set<ObservationConstellation> getObservationConstellations(Procedure procedure) {
+        HibernateQueryObject queryObject = new HibernateQueryObject();
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateConstants.PARAMETER_PROCEDURE, procedure));
+        return CollectionHelper.asSet(HibernateCriteriaQueryUtilities.getObservationConstellations(queryObject, getSession()));
     }
 }

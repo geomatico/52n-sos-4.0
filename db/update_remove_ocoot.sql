@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS observation_relates_to_obs_const_off_obs_type CASCADE;
+
+DROP SEQUENCE IF EXISTS observation_constellation_offering_observation_type_id_seq;

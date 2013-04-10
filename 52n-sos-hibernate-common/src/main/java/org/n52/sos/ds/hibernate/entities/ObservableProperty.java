@@ -24,20 +24,16 @@
 package org.n52.sos.ds.hibernate.entities;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasDescription;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasIdentifier;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservationConstellations;
 
-public class ObservableProperty implements Serializable, HasIdentifier, HasDescription, HasObservationConstellations {
+public class ObservableProperty implements Serializable, HasIdentifier, HasDescription {
     public static final String ID = "observablePropertyId";
     private static final long serialVersionUID = -7609321954357775125L;
     private long observablePropertyId;
     private String identifier;
     private String description;
-    private Set<ObservationConstellation> observationConstellations = new HashSet<ObservationConstellation>(0);
 
     public ObservableProperty() {
     }
@@ -68,15 +64,5 @@ public class ObservableProperty implements Serializable, HasIdentifier, HasDescr
     @Override
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    @Override
-    public Set<ObservationConstellation> getObservationConstellations() {
-        return this.observationConstellations;
-    }
-
-    @Override
-    public void setObservationConstellations(Set<ObservationConstellation> observationConstellations) {
-        this.observationConstellations = observationConstellations;
     }
 }

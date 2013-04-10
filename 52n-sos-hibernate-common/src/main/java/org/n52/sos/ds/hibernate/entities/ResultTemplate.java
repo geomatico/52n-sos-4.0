@@ -27,17 +27,17 @@ import java.io.Serializable;
 
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasFeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasIdentifier;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservationConstellationOfferingObservationType;
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasResultEncoding;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasResultStructure;
 
 public class ResultTemplate implements Serializable, HasIdentifier, HasFeatureOfInterest, HasResultStructure,
-                                       HasResultEncoding, HasObservationConstellationOfferingObservationType {
+                                       HasResultEncoding, HasObservationConstellation {
     public static final String ID = "resultTemplateId";
     private static final long serialVersionUID = -5283637712798249905L;
     private long resultTemplateId;
     private FeatureOfInterest featureOfInterest;
-    private ObservationConstellationOfferingObservationType observationConstellationOfferingObservationType;
+    private ObservationConstellation observationConstellation;
     private String identifier;
     private String resultStructure;
     private String resultEncoding;
@@ -64,14 +64,14 @@ public class ResultTemplate implements Serializable, HasIdentifier, HasFeatureOf
     }
 
     @Override
-    public ObservationConstellationOfferingObservationType getObservationConstellationOfferingObservationType() {
-        return this.observationConstellationOfferingObservationType;
+    public ObservationConstellation getObservationConstellation() {
+        return this.observationConstellation;
     }
 
     @Override
-    public void setObservationConstellationOfferingObservationType(
-            ObservationConstellationOfferingObservationType observationConstellationOfferingObservationType) {
-        this.observationConstellationOfferingObservationType = observationConstellationOfferingObservationType;
+    public void setObservationConstellation(
+            ObservationConstellation observationConstellation) {
+        this.observationConstellation = observationConstellation;
     }
 
     @Override

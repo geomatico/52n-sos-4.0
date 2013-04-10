@@ -7,7 +7,7 @@
 	xsi:schemaLocation="http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosInsert.xsd http://www.opengis.net/sampling/1.0 http://schemas.opengis.net/sampling/1.0.0/sampling.xsd http://www.opengis.net/om/1.0 http://schemas.opengis.net/om/1.0.0/extensions/observationSpecialization_override.xsd"
 	service="SOS" version="1.0.0">
 	
- <AssignedSensorId>urn:ogc:object:feature:Sensor:Derwent-Station-1</AssignedSensorId>
+ <AssignedSensorId>http://www.52north.org/test/procedure/Derwent-Station-1</AssignedSensorId>
 	
  <om:Observation>
 	
@@ -18,19 +18,19 @@
    </gml:TimePeriod>
   </om:samplingTime>
 		
-  <om:procedure xlink:href="urn:ogc:object:feature:Sensor:Derwent-Station-1" />
+  <om:procedure xlink:href="http://www.52north.org/test/procedure/Derwent-Station-1" />
 		
   <om:observedProperty>
    <swe:CompositePhenomenon gml:id="cpid0" dimension="1">
     <gml:name>resultComponents</gml:name>
     <swe:component xlink:href="urn:ogc:data:time:iso8601" />
-    <swe:component xlink:href="test_observable_property_6" />
-    <swe:component xlink:href="urn:ogc:def:phenomenon:OGC:1.0.30:temperature" />
+    <swe:component xlink:href="http://www.52north.org/test/observableProperty/6" />
+    <swe:component xlink:href="http://www.52north.org/test/observableProperty/temperature" />
    </swe:CompositePhenomenon>
   </om:observedProperty>
 		
   <om:featureOfInterest>
-     <sa:SamplingPoint gml:id="Hobart-1">
+     <sa:SamplingPoint gml:id="http://www.52north.org/test/featureOfInterest/Hobart-1">
       <gml:name>Hobart 1</gml:name>
       <sa:sampledFeature xlink:href=""/>
       <sa:position>
@@ -59,12 +59,12 @@
        <swe:Text definition="urn:ogc:dahttp://www.opengis.net/def/property/OGC/0/FeatureOfInterest" />
       </swe:field>
       <swe:field name="waterlevel">
-       <swe:Quantity definition="test_observable_property_6">
+       <swe:Quantity definition="http://www.52north.org/test/observableProperty/6">
         <swe:uom code="cm" />
        </swe:Quantity>
       </swe:field>
       <swe:field name="temperature">
-       <swe:Quantity definition="urn:ogc:def:phenomenon:OGC:1.0.30:temperature">
+       <swe:Quantity definition="http://www.52north.org/test/observableProperty/temperature">
         <swe:uom code="Cel" />
        </swe:Quantity>
       </swe:field>

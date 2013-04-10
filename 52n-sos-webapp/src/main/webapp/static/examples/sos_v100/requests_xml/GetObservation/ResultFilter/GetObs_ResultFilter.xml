@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GetObservation xmlns="http://www.opengis.net/sos/1.0"
+	xmlns:ows="http://www.opengis.net/ows/1.1"
+	xmlns:gml="http://www.opengis.net/gml"
+	xmlns:ogc="http://www.opengis.net/ogc"
+	xmlns:om="http://www.opengis.net/om/1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.opengis.net/sos/1.0
+	http://schemas.opengis.net/sos/1.0.0/sosGetObservation.xsd"
+	service="SOS" version="1.0.0" srsName="urn:ogc:def:crs:EPSG::4326">
+	
+	<offering>http://www.52north.org/test/offering/6</offering>
+	<observedProperty>http://www.52north.org/test/observableProperty/6</observedProperty>
+	
+	<result>
+		<ogc:PropertyIsBetween>
+			<ogc:PropertyName>http://www.52north.org/test/observableProperty/6</ogc:PropertyName>
+			<ogc:LowerBoundary>
+	        	<ogc:Literal>4.0</ogc:Literal>
+			</ogc:LowerBoundary>
+			<ogc:UpperBoundary>
+				<ogc:Literal>7.0</ogc:Literal>
+			</ogc:UpperBoundary>
+		</ogc:PropertyIsBetween>
+	</result>
+	
+	<!-- further valid resultFilter -->
+	<!-- 
+		<ogc:PropertyIsEqualTo>
+			<ogc:PropertyName>http://www.52north.org/test/observableProperty/6</ogc:PropertyName>
+			<ogc:Literal>6</ogc:Literal>
+		</ogc:PropertyIsEqualTo>
+	
+		<ogc:PropertyIsGreaterThan>
+			<ogc:PropertyName>http://www.52north.org/test/observableProperty/6</ogc:PropertyName>
+			<ogc:Literal>5</ogc:Literal>
+		</ogc:PropertyIsGreaterThan>
+		
+		<ogc:PropertyIsGreaterThanOrEqualTo>
+			<ogc:PropertyName>http://www.52north.org/test/observableProperty/6</ogc:PropertyName>
+			<ogc:Literal>6</ogc:Literal>
+		</ogc:PropertyIsGreaterThanOrEqualTo>
+		
+		<ogc:PropertyIsLike wildCard="*" singleChar="?" escapeChar="\">
+			<ogc:PropertyName>http://www.52north.org/test/observableProperty/6</ogc:PropertyName>
+			<ogc:Literal>?0.*</ogc:Literal>
+		</ogc:PropertyIsLike>
+		
+		<ogc:PropertyIsNull>
+			<ogc:PropertyName>http://www.52north.org/test/observableProperty/6</ogc:PropertyName>
+		</ogc:PropertyIsNull>
+		
+		<ogc:PropertyIsLessThan>
+			<ogc:PropertyName>http://www.52north.org/test/observableProperty/6</ogc:PropertyName>
+			<ogc:Literal>7</ogc:Literal>
+		</ogc:PropertyIsLessThan>
+		
+		<ogc:PropertyIsLessThanOrEqualTo>
+			<ogc:PropertyName>http://www.52north.org/test/observableProperty/6</ogc:PropertyName>
+			<ogc:Literal>7</ogc:Literal>
+		</ogc:PropertyIsLessThanOrEqualTo>
+		
+		<ogc:PropertyIsNotEqualTo>
+			<ogc:PropertyName>http://www.52north.org/test/observableProperty/6</ogc:PropertyName>
+			<ogc:Literal>9</ogc:Literal>
+		</ogc:PropertyIsNotEqualTo>
+		
+		<ogc:PropertyIsLike wildCard="*" singleChar="?" escapeChar="\">
+			<ogc:PropertyName>http://www.52north.org/test/observableProperty/patientCondition</ogc:PropertyName>
+			<ogc:Literal>*leg*</ogc:Literal>
+		</ogc:PropertyIsLike>
+	 -->
+	
+	<responseFormat>text/xml;subtype=&quot;om/1.0.0&quot;</responseFormat>
+
+</GetObservation>

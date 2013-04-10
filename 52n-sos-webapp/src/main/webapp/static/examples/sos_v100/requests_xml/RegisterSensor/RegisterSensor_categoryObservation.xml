@@ -25,11 +25,22 @@
 		          <sml:IdentifierList>
 		               <sml:identifier>
 		                    <sml:Term definition="urn:ogc:def:identifier:OGC:uniqueID">
-		                         <sml:value>patient_059345457</sml:value>
+		                         <sml:value>http://www.52north.org/test/procedure/patient_059345457</sml:value>
 		                    </sml:Term>
 		               </sml:identifier>
 		          </sml:IdentifierList>
 		     </sml:identification>
+		     
+			<!-- optional; generated if not present -->
+			<sml:identification xlink:title="offerings">
+				<sml:IdentifierList>
+					<sml:identifier name="Offering for sensor patient">
+						<sml:Term definition="urn:ogc:def:identifier:OGC:offeringID">
+							<sml:value>http://www.52north.org/test/offering/PatientCondition</sml:value>
+						</sml:Term>
+					</sml:identifier>
+				</sml:IdentifierList>
+			</sml:identification>
 		
 		     <!-- last measured position of sensor -->
 		     <sml:position name="sensorPosition">
@@ -63,7 +74,7 @@
 		     <sml:inputs>
 		          <sml:InputList>
 		               <sml:input name="text">
-		                    <swe:ObservableProperty definition="urn:ogc:def:phenomenon:OGC:1.0.30:mood"/>
+		                    <swe:ObservableProperty definition="http://www.52north.org/test/observableProperty/mood"/>
 		               </sml:input>
 		          </sml:InputList>
 		     </sml:inputs>
@@ -72,14 +83,7 @@
 		      <sml:outputs>
 		           <sml:OutputList>
 		                <sml:output name="text">
-		                     <swe:Category definition="urn:ogc:def:phenomenon:OGC:1.0.30:patientCondition">
-		                     	<gml:metaDataProperty>
-									<offering>
-										<id>PatientCondition</id>
-										<name>Condition of patient</name>
-									</offering>
-								</gml:metaDataProperty>
-		                     </swe:Category>
+		                     <swe:Category definition="http://www.52north.org/test/observableProperty/patientCondition" />
 		                </sml:output>
 		           </sml:OutputList>
 		      </sml:outputs>

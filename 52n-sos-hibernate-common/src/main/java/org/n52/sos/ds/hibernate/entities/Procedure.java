@@ -31,7 +31,6 @@ import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasCoordinate;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasDeletedFlag;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasGeometry;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasIdentifier;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservationConstellations;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasProcedureDescriptionFormat;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValidProcedureTimes;
 
@@ -40,7 +39,7 @@ import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValidProcedureTim
  *
  * @since 4.0.0
  */
-public class Procedure extends SpatialEntity implements Serializable, HasIdentifier, HasObservationConstellations, HasDeletedFlag,
+public class Procedure extends SpatialEntity implements Serializable, HasIdentifier, HasDeletedFlag,
                                   HasProcedureDescriptionFormat, HasValidProcedureTimes, HasGeometry, HasCoordinate {
     public static final String ID = "procedureId";
     public static final String PROCEDURES_FOR_CHILD_SENSOR_ID = "proceduresForChildSensorId";
@@ -51,7 +50,6 @@ public class Procedure extends SpatialEntity implements Serializable, HasIdentif
     private String identifier;
     private boolean deleted;
     private Set<ValidProcedureTime> validProcedureTimes = new HashSet<ValidProcedureTime>(0);
-    private Set<ObservationConstellation> observationConstellations = new HashSet<ObservationConstellation>(0);
     private Set<Procedure> proceduresForChildSensorId = new HashSet<Procedure>(0);
     private Set<Procedure> proceduresForParentSensorId = new HashSet<Procedure>(0);
 
@@ -91,8 +89,7 @@ public class Procedure extends SpatialEntity implements Serializable, HasIdentif
         return deleted;
     }
 
-    @Override
-    public void setDeleted(final boolean deleted) {
+    public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
 
@@ -104,16 +101,6 @@ public class Procedure extends SpatialEntity implements Serializable, HasIdentif
     @Override
     public void setValidProcedureTimes(final Set<ValidProcedureTime> validProcedureTimes) {
         this.validProcedureTimes = validProcedureTimes;
-    }
-
-    @Override
-    public Set<ObservationConstellation> getObservationConstellations() {
-        return observationConstellations;
-    }
-
-    @Override
-    public void setObservationConstellations(final Set<ObservationConstellation> observationConstellations) {
-        this.observationConstellations = observationConstellations;
     }
 
     public Set<Procedure> getProceduresForChildSensorId() {

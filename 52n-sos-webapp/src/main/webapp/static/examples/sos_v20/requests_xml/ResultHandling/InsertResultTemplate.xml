@@ -9,18 +9,18 @@
 	xsi:schemaLocation="http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sos.xsd">
 	<sos:proposedTemplate>
 		<sos:ResultTemplate>
-			<swes:identifier>http://www.example.org/sensors/107/template/1</swes:identifier>
-			<sos:offering>test_offering_7</sos:offering>
+			<swes:identifier>http://www.52north.org/test/procedure/107/template/1</swes:identifier>
+			<sos:offering>http://www.52north.org/test/offering/7</sos:offering>
 			<sos:observationTemplate>
 				<om:OM_Observation gml:id="sensor2obsTemplate">
 					<om:type xlink:href="http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement" />
 					<om:phenomenonTime nilReason="template"/>
 					<om:resultTime nilReason="template"/>
-					<om:procedure xlink:href="http://www.example.org/sensors/107"/>
-					<om:observedProperty xlink:href="test_observable_property_7"/>
+					<om:procedure xlink:href="http://www.52north.org/test/procedure/107"/>
+					<om:observedProperty xlink:href="http://www.52north.org/test/observableProperty/7"/>
 					<om:featureOfInterest>
 						<sams:SF_SpatialSamplingFeature gml:id="sf_test_feature_7">
-					      <gml:identifier codeSpace="">test_feature_7</gml:identifier>
+					      <gml:identifier codeSpace="">http://www.52north.org/test/featureOfInterest/7</gml:identifier>
 					      <sf:type xlink:href="http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint"/>
 					      <sf:sampledFeature xlink:href="http://www.opengis.net/def/nil/OGC/0/unknown"/>
 					      <sams:shape>
@@ -40,7 +40,7 @@
 	                  </swe:Time>
 	               </swe:field>
 	               <swe:field name="test_observable_property_7">
-	                  <swe:Quantity definition="test_observable_property_7">
+	                  <swe:Quantity definition="http://www.52north.org/test/observableProperty/7">
 	                     <swe:uom code="test_unit_7"/>
 	                  </swe:Quantity>
 	               </swe:field>

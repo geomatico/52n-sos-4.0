@@ -27,8 +27,19 @@
 						<sml:IdentifierList>
 							<sml:identifier>
 								<sml:Term definition="urn:ogc:def:identifier:OGC:uniqueID">
-									<sml:value>urn:ogc:object:sensor:TrackingSystem
+									<sml:value>http://www.52north.org/test/procedure/TrackingSystem
 									</sml:value>
+								</sml:Term>
+							</sml:identifier>
+						</sml:IdentifierList>
+					</sml:identification>
+					
+					<!-- optional; generated if not present -->
+					<sml:identification xlink:title="offerings">
+						<sml:IdentifierList>
+							<sml:identifier name="Offering for sensor TrackingSystem">
+								<sml:Term definition="urn:ogc:def:identifier:OGC:offeringID">
+									<sml:value>http://www.52north.org/test/offering/TrackingPositions</sml:value>
 								</sml:Term>
 							</sml:identifier>
 						</sml:IdentifierList>
@@ -80,14 +91,7 @@
 					<sml:outputs>
 						<sml:OutputList>
 							<sml:output name="position">
-								<swe:Position definition="urn:ogc:def:phenomenon:OGC:1.0.30:position">
-									<gml:metaDataProperty>
-										<offering>
-											<id>TrackingPositions</id>
-											<name>Tracked Positions in Hitachi Building</name>
-										</offering>
-									</gml:metaDataProperty>
-								</swe:Position>
+								<swe:Position definition="http://www.52north.org/test/observableProperty/position" />
 							</sml:output>
 						</sml:OutputList>
 					</sml:outputs>
@@ -104,7 +108,7 @@
 										<sml:IdentifierList>
 											<sml:identifier>
 												<sml:Term definition="urn:ogc:def:identifier:OGC:uniqueID">
-													<sml:value>urn:ogc:object:feature:Sensor:trackingDevice
+													<sml:value>http://www.52north.org/test/observableProperty/trackingDevice
 													</sml:value>
 												</sml:Term>
 											</sml:identifier>
@@ -114,14 +118,14 @@
 										<sml:InputList>
 											<sml:input name="position">
 												<swe:ObservableProperty
-													definition="urn:ogc:def:property:OGC:1.0:position" />
+													definition="http://www.52north.org/test/observableProperty/position" />
 											</sml:input>
 										</sml:InputList>
 									</sml:inputs>
 									<sml:outputs>
 										<sml:OutputList>
 											<sml:output name="position">
-												<swe:Position />
+												<swe:Position definition="http://www.52north.org/test/observableProperty/position" />
 											</sml:output>
 										</sml:OutputList>
 									</sml:outputs>

@@ -1,4 +1,4 @@
-﻿--
+--
 -- Copyright (C) 2013
 -- by 52 North Initiative for Geospatial Open Source Software GmbH
 --
@@ -278,7 +278,7 @@ $$
 $$
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION insert_procedure(text,timestamp,text,numeric,numeric,numeric) RETURNS bigint AS
+CREATE OR REPLACE FUNCTION insert_procedure(text,timestamp with time zone,text,numeric,numeric,numeric) RETURNS bigint AS
 $$
 	INSERT INTO procedure(identifier, procedure_description_format_id, deleted) SELECT 
 		$1, get_sensor_ml_description_format(), false WHERE $1 NOT IN (
@@ -291,84 +291,29 @@ $$
 $$
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION get_observation_constellation(bigint,bigint) RETURNS bigint AS
+CREATE OR REPLACE FUNCTION get_observation_constellation(bigint,bigint,bigint,bigint) RETURNS bigint AS
 $$
-	SELECT observation_constellation_id FROM observation_constellation  
-		WHERE procedure_id = $1 AND observable_property_id = $2;
-$$
-LANGUAGE 'sql';
-
-CREATE OR REPLACE FUNCTION insert_observation_constellation(bigint,bigint) RETURNS bigint AS
-$$
-	INSERT INTO observation_constellation(procedure_id, observable_property_id)
-	SELECT $1, $2 WHERE $1 NOT IN (
-		SELECT procedure_id
-		FROM observation_constellation  
-		WHERE procedure_id = $1 
-		  AND observable_property_id = $2
-		);
-	SELECT get_observation_constellation($1, $2);
+	SELECT observation_constellation_id FROM observation_constellation WHERE procedure_id = $1 AND observable_property_id = $2 AND offering_id = $3 AND observation_type_id = $4;
 $$
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION insert_observation_constellation(text,text) RETURNS bigint AS
+CREATE OR REPLACE FUNCTION get_observation_constellation(text,text,text,text) RETURNS bigint AS
 $$
-	SELECT insert_observation_constellation(get_procedure($1), get_observable_property($2));
-$$
-LANGUAGE 'sql';
-
-CREATE OR REPLACE FUNCTION get_observation_constellation(text,text) RETURNS bigint AS
-$$
-	SELECT get_observation_constellation(get_procedure($1), get_observable_property($2));
+	SELECT get_observation_constellation(get_procedure($1), get_observable_property($2), get_offering($3), get_observation_type($4));
 $$
 LANGUAGE 'sql';
 
-
-CREATE OR REPLACE FUNCTION insert_observation_constellation_offering_observation_type(bigint,bigint,bigint) RETURNS VOID AS
+CREATE OR REPLACE FUNCTION insert_observation_constellation(bigint,bigint,bigint,bigint) RETURNS VOID AS
 $$
-	INSERT INTO observation_constellation_offering_observation_type(observation_constellation_id, offering_id, observation_type_id)
-	SELECT $1,$2,$3 WHERE $1 NOT IN (
-		SELECT observation_constellation_id
-		FROM observation_constellation_offering_observation_type
-		WHERE observation_constellation_id = $1
-		  AND offering_id = $2
-		  AND observation_type_id = $3
-	);
+	INSERT INTO observation_constellation (procedure_id, observable_property_id, offering_id, observation_type_id) VALUES ($1, $2, $3, $4);
 $$
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION insert_observation_constellation_offering_observation_type(text,text,text,text) RETURNS VOID AS
+CREATE OR REPLACE FUNCTION insert_observation_constellation(text,text,text,text) RETURNS VOID AS
 $$
-	SELECT insert_observation_constellation_offering_observation_type(get_observation_constellation($1, $2),get_offering($4), get_observation_type($3));
-$$
-LANGUAGE 'sql';
-
-CREATE OR REPLACE FUNCTION get_observation_constellation_offering_observation_type(bigint,bigint,bigint,bigint) RETURNS bigint AS
-$$
-	SELECT observation_constellation_offering_observation_type_id FROM observation_constellation_offering_observation_type  
-		WHERE observation_constellation_id = get_observation_constellation($1,$2) AND observation_type_id = $3 AND offering_id = $4;
+	SELECT insert_observation_constellation(get_procedure($1), get_observable_property($2), get_offering($3), get_observation_type($4));
 $$
 LANGUAGE 'sql';
-
-CREATE OR REPLACE FUNCTION get_observation_constellation_offering_observation_type(text,text,text,text) RETURNS bigint AS
-$$
-	SELECT get_observation_constellation_offering_observation_type(get_procedure($1), get_observable_property($2), get_observation_type($3), get_offering($4));
-$$
-LANGUAGE 'sql';
-
-CREATE OR REPLACE FUNCTION insert_observation_observation_constellation_offering_observation_type(bigint,bigint) RETURNS VOID AS
-$$
-	INSERT INTO observation_relates_to_obs_const_off_obs_type(observation_id, observation_constellation_offering_observation_type_id)
-	SELECT $1,$2 WHERE $1 NOT IN (
-		SELECT observation_id
-		FROM observation_relates_to_obs_const_off_obs_type
-		WHERE observation_id = $1
-		  AND observation_constellation_offering_observation_type_id = $2
-	);
-		
-$$
-LANGUAGE 'sql';
-
 
 -- UNIT
 CREATE OR REPLACE FUNCTION get_unit(text) RETURNS bigint AS
@@ -386,27 +331,41 @@ $$
 $$
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION insert_observation(bigint, text, text, timestamp) RETURNS bigint AS
-$$ 
-	INSERT INTO observation(observation_constellation_id, feature_of_interest_id, unit_id, phenomenon_time_start, phenomenon_time_end, result_time)
-	SELECT $1, get_feature_of_interest($2), get_unit($3), $4, $4, $4 WHERE $1 NOT IN (
-		SELECT observation_constellation_id FROM observation
-		WHERE observation_constellation_id = $1 AND feature_of_interest_id = get_feature_of_interest($2) 
-				AND unit_id = get_unit($3) AND phenomenon_time_start = $4 AND phenomenon_time_end = $4 AND result_time = $4);
-
-	SELECT observation_id FROM observation 
-	WHERE feature_of_interest_id = get_feature_of_interest($2)
-		AND observation_constellation_id = $1 AND unit_id = get_unit($3) 
-		AND phenomenon_time_start = $4;
+CREATE OR REPLACE FUNCTION insert_observation_offering(bigint, bigint) RETURNS VOID AS
+$$
+	INSERT INTO observation_relates_to_offering (observation_id, offering_id) VALUES ($1, $2);
 $$
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION get_observation(bigint, text, text, timestamp) RETURNS bigint AS
+CREATE OR REPLACE FUNCTION insert_observation(text, text, text, text, timestamp with time zone, text) RETURNS bigint AS
+$$ 
+	INSERT INTO observation(procedure_id, observable_property_id, feature_of_interest_id, unit_id, phenomenon_time_start, phenomenon_time_end, result_time)
+	SELECT get_procedure($1), get_observable_property($2), get_feature_of_interest($3), get_unit($4), $5, $5, $5 WHERE get_procedure($1) NOT IN (
+		SELECT procedure_id FROM observation
+		WHERE procedure_id = get_procedure($1) AND observable_property_id = get_observable_property($2) AND feature_of_interest_id = get_feature_of_interest($3) 
+				AND unit_id = get_unit($4) AND phenomenon_time_start = $5 AND phenomenon_time_end = $5 AND result_time = $5)
+		AND get_observable_property($2) NOT IN (SELECT observable_property_id FROM observation
+		WHERE procedure_id = get_procedure($1) AND observable_property_id = get_observable_property($2) AND feature_of_interest_id = get_feature_of_interest($3) 
+				AND unit_id = get_unit($4) AND phenomenon_time_start = $5 AND phenomenon_time_end = $5 AND result_time = $5);
+				
+	SELECT insert_observation_offering((SELECT observation_id FROM observation 
+	WHERE feature_of_interest_id = get_feature_of_interest($3)
+		AND procedure_id = get_procedure($1) AND observable_property_id = get_observable_property($2) AND unit_id = get_unit($4) 
+		AND phenomenon_time_start = $5), get_offering($6));
+
+	SELECT observation_id FROM observation 
+	WHERE feature_of_interest_id = get_feature_of_interest($3)
+		AND procedure_id = get_procedure($1) AND observable_property_id = get_observable_property($2) AND unit_id = get_unit($4) 
+		AND phenomenon_time_start = $5;
+$$
+LANGUAGE 'sql';
+
+CREATE OR REPLACE FUNCTION get_observation(bigint, bigint, text, text, timestamp with time zone) RETURNS bigint AS
 $$ 
 	SELECT observation_id FROM observation 
-	WHERE feature_of_interest_id = get_feature_of_interest($2)
-		AND observation_constellation_id = $1 AND unit_id = get_unit($3) 
-		AND phenomenon_time_start = $4;
+	WHERE feature_of_interest_id = get_feature_of_interest($3)
+		AND procedure_id = $1 AND observable_property_id = $2 AND unit_id = get_unit($4) 
+		AND phenomenon_time_start = $5;
 $$
 LANGUAGE 'sql';
 
@@ -452,10 +411,10 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insert_result_template(bigint,bigint,text,text,text) RETURNS bigint AS
 $$ 
- 	INSERT INTO result_template(observation_constellation_offering_observation_type_id, feature_of_interest_id, identifier, result_structure, result_encoding)
+ 	INSERT INTO result_template(observation_constellation_id, feature_of_interest_id, identifier, result_structure, result_encoding)
  	SELECT  $1, $2, $3, $4, $5 WHERE $3 NOT IN (
  		SELECT identifier FROM result_template 
- 		WHERE observation_constellation_offering_observation_type_id = $1 
+ 		WHERE observation_constellation_id = $1 
 	 		AND feature_of_interest_id = $2 
 	 		AND identifier = $3 
 	 		AND result_structure = $4 
@@ -466,7 +425,7 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insert_result_template(text,text,text,text,text,text) RETURNS bigint AS
 $$ 
- 	SELECT insert_result_template(get_observation_constellation_offering_observation_type($1, $2, $3, $4), get_feature_of_interest($5),
+ 	SELECT insert_result_template(get_observation_constellation($1, $2, $3, $4), get_feature_of_interest($5),
 		$1 || '/template/1'::text,
 		'<swe:DataRecord xmlns:swe="http://www.opengis.net/swe/2.0" xmlns:xlink="http://www.w3.org/1999/xlink">
 			<swe:field name="phenomenonTime">
@@ -506,34 +465,34 @@ SELECT insert_feature_of_interest_type('http://www.opengis.net/def/nil/OGC/0/unk
 SELECT insert_procedure_description_format('http://www.opengis.net/sensorML/1.0.1');
 
 ---- OFFERING
-SELECT insert_offering('test_offering_1');
-SELECT insert_offering('test_offering_2');
-SELECT insert_offering('test_offering_3');
-SELECT insert_offering('test_offering_4');
-SELECT insert_offering('test_offering_5');
-SELECT insert_offering('test_offering_6');
+SELECT insert_offering('http://www.52north.org/test/offering/1');
+SELECT insert_offering('http://www.52north.org/test/offering/2');
+SELECT insert_offering('http://www.52north.org/test/offering/3');
+SELECT insert_offering('http://www.52north.org/test/offering/4');
+SELECT insert_offering('http://www.52north.org/test/offering/5');
+SELECT insert_offering('http://www.52north.org/test/offering/6');
 
-SELECT insert_allowed_observation_types_for_offering('test_offering_1', 'Measurement');
-SELECT insert_allowed_observation_types_for_offering('test_offering_2', 'CountObservation');
-SELECT insert_allowed_observation_types_for_offering('test_offering_3', 'TruthObservation');
-SELECT insert_allowed_observation_types_for_offering('test_offering_4', 'CategoryObservation');
-SELECT insert_allowed_observation_types_for_offering('test_offering_5', 'TextObservation');
-SELECT insert_allowed_observation_types_for_offering('test_offering_6', 'SWEArrayObservation');
+SELECT insert_allowed_observation_types_for_offering('http://www.52north.org/test/offering/1', 'Measurement');
+SELECT insert_allowed_observation_types_for_offering('http://www.52north.org/test/offering/2', 'CountObservation');
+SELECT insert_allowed_observation_types_for_offering('http://www.52north.org/test/offering/3', 'TruthObservation');
+SELECT insert_allowed_observation_types_for_offering('http://www.52north.org/test/offering/4', 'CategoryObservation');
+SELECT insert_allowed_observation_types_for_offering('http://www.52north.org/test/offering/5', 'TextObservation');
+SELECT insert_allowed_observation_types_for_offering('http://www.52north.org/test/offering/6', 'SWEArrayObservation');
 
-SELECT insert_allowed_feature_of_interest_types_for_offering('test_offering_1', 'Point');
-SELECT insert_allowed_feature_of_interest_types_for_offering('test_offering_2', 'Point');
-SELECT insert_allowed_feature_of_interest_types_for_offering('test_offering_3', 'Point');
-SELECT insert_allowed_feature_of_interest_types_for_offering('test_offering_4', 'Point');
-SELECT insert_allowed_feature_of_interest_types_for_offering('test_offering_5', 'Point');
-SELECT insert_allowed_feature_of_interest_types_for_offering('test_offering_6', 'Point');
+SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north.org/test/offering/1', 'Point');
+SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north.org/test/offering/2', 'Point');
+SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north.org/test/offering/3', 'Point');
+SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north.org/test/offering/4', 'Point');
+SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north.org/test/offering/5', 'Point');
+SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north.org/test/offering/6', 'Point');
 
 ---- FEATURE_OF_INTEREST
-SELECT insert_feature_of_interest('test_feature_1', 20.401108, 49.594538);
-SELECT insert_feature_of_interest('test_feature_2',  8.401108, 52.980090);
-SELECT insert_feature_of_interest('test_feature_3', 10.401108, 52.512348);
-SELECT insert_feature_of_interest('test_feature_4',  2.401108, 51.594538);
-SELECT insert_feature_of_interest('test_feature_5', 21.401108, 52.127812);
-SELECT insert_feature_of_interest('test_feature_6', 12.412312, 53.123212);
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/1', 20.401108, 49.594538);
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/2',  8.401108, 52.980090);
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/3', 10.401108, 52.512348);
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/4',  2.401108, 51.594538);
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/5', 21.401108, 52.127812);
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/6', 12.412312, 53.123212);
 
 ---- UNIT
 SELECT insert_unit('test_unit_1');
@@ -544,297 +503,131 @@ SELECT insert_unit('test_unit_5');
 SELECT insert_unit('test_unit_6');
 
 ---- OBSERVABLE_PROPERTY
-SELECT insert_observable_property('test_observable_property_1');
-SELECT insert_observable_property('test_observable_property_2');
-SELECT insert_observable_property('test_observable_property_3');
-SELECT insert_observable_property('test_observable_property_4');
-SELECT insert_observable_property('test_observable_property_5');
-SELECT insert_observable_property('test_observable_property_6');
+SELECT insert_observable_property('http://www.52north.org/test/observableProperty/1');
+SELECT insert_observable_property('http://www.52north.org/test/observableProperty/2');
+SELECT insert_observable_property('http://www.52north.org/test/observableProperty/3');
+SELECT insert_observable_property('http://www.52north.org/test/observableProperty/4');
+SELECT insert_observable_property('http://www.52north.org/test/observableProperty/5');
+SELECT insert_observable_property('http://www.52north.org/test/observableProperty/6');
 
 -- PROCEDURES
-SELECT insert_procedure('http://www.example.org/sensors/101', '2012-11-19 13:00', 'test_observable_property_1', 20.401108, 49.594538, 0.0);
-SELECT insert_procedure('http://www.example.org/sensors/102', '2012-11-19 13:00', 'test_observable_property_2',  8.401108, 52.980090, 0.0);
-SELECT insert_procedure('http://www.example.org/sensors/103', '2012-11-19 13:00', 'test_observable_property_3', 10.401108, 52.512348, 0.0);
-SELECT insert_procedure('http://www.example.org/sensors/104', '2012-11-19 13:00', 'test_observable_property_4',  2.401108, 51.594538, 0.0);
-SELECT insert_procedure('http://www.example.org/sensors/105', '2012-11-19 13:00', 'test_observable_property_5', 21.401108, 52.127812, 0.0);
-SELECT insert_procedure('http://www.example.org/sensors/106', '2012-11-19 13:00', 'test_observable_property_6', 12.412312, 53.123212, 0.0);
+SELECT insert_procedure('http://www.52north.org/test/procedure/101', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/1', 20.401108, 49.594538, 0.0);
+SELECT insert_procedure('http://www.52north.org/test/procedure/102', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/2',  8.401108, 52.980090, 0.0);
+SELECT insert_procedure('http://www.52north.org/test/procedure/103', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/3', 10.401108, 52.512348, 0.0);
+SELECT insert_procedure('http://www.52north.org/test/procedure/104', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/4',  2.401108, 51.594538, 0.0);
+SELECT insert_procedure('http://www.52north.org/test/procedure/105', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/5', 21.401108, 52.127812, 0.0);
+SELECT insert_procedure('http://www.52north.org/test/procedure/106', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/6', 12.412312, 53.123212, 0.0);
 
 -- OBSERVATION_CONSTELLATION
-SELECT insert_observation_constellation('http://www.example.org/sensors/101', 'test_observable_property_1');
-SELECT insert_observation_constellation('http://www.example.org/sensors/102', 'test_observable_property_2');
-SELECT insert_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3');
-SELECT insert_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4');
-SELECT insert_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5');
-SELECT insert_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6');
-
--- OBSERVATION_CONSTELLATION OFFERING OBSERVATION TYPE
-SELECT insert_observation_constellation_offering_observation_type('http://www.example.org/sensors/101', 'test_observable_property_1', 'Measurement', 'test_offering_1');
-SELECT insert_observation_constellation_offering_observation_type('http://www.example.org/sensors/102', 'test_observable_property_2', 'CountObservation','test_offering_2');
-SELECT insert_observation_constellation_offering_observation_type('http://www.example.org/sensors/103', 'test_observable_property_3', 'TruthObservation', 'test_offering_3');
-SELECT insert_observation_constellation_offering_observation_type('http://www.example.org/sensors/104', 'test_observable_property_4', 'CategoryObservation', 'test_offering_4');
-SELECT insert_observation_constellation_offering_observation_type('http://www.example.org/sensors/105', 'test_observable_property_5', 'TextObservation',  'test_offering_5');
-SELECT insert_observation_constellation_offering_observation_type('http://www.example.org/sensors/106', 'test_observable_property_6', 'SWEArrayObservation',  'test_offering_6');
+SELECT insert_observation_constellation('http://www.52north.org/test/procedure/101', 'http://www.52north.org/test/observableProperty/1', 'http://www.52north.org/test/offering/1', 'Measurement');
+SELECT insert_observation_constellation('http://www.52north.org/test/procedure/102', 'http://www.52north.org/test/observableProperty/2', 'http://www.52north.org/test/offering/2', 'CountObservation');
+SELECT insert_observation_constellation('http://www.52north.org/test/procedure/103', 'http://www.52north.org/test/observableProperty/3', 'http://www.52north.org/test/offering/3', 'TruthObservation');
+SELECT insert_observation_constellation('http://www.52north.org/test/procedure/104', 'http://www.52north.org/test/observableProperty/4', 'http://www.52north.org/test/offering/4', 'CategoryObservation');
+SELECT insert_observation_constellation('http://www.52north.org/test/procedure/105', 'http://www.52north.org/test/observableProperty/5', 'http://www.52north.org/test/offering/5', 'TextObservation');
+SELECT insert_observation_constellation('http://www.52north.org/test/procedure/106', 'http://www.52north.org/test/observableProperty/6', 'http://www.52north.org/test/offering/6', 'SWEArrayObservation');
 
 -- INSERT OBSERVATIONS
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:00'), 1.2);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:00'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/101', 'test_observable_property_1', 'Measurement', 'test_offering_1'));	
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:01'), 1.3);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:01'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/101', 'test_observable_property_1', 'Measurement', 'test_offering_1'));	
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:02'), 1.4);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:02'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/101', 'test_observable_property_1', 'Measurement', 'test_offering_1'));	
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:03'), 1.5);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:03'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/101', 'test_observable_property_1', 'Measurement', 'test_offering_1'));	
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:04'), 1.6);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:04'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/101', 'test_observable_property_1', 'Measurement', 'test_offering_1'));	
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:05'), 1.7);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:05'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/101', 'test_observable_property_1', 'Measurement', 'test_offering_1'));	
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:06'), 1.8);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:06'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/101', 'test_observable_property_1', 'Measurement', 'test_offering_1'));	
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:07'), 1.9);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:07'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/101', 'test_observable_property_1', 'Measurement', 'test_offering_1'));	
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:08'), 2.0);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:08'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/101', 'test_observable_property_1', 'Measurement', 'test_offering_1'));	
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:09'), 2.1);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-	'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:09'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/101', 'test_observable_property_1', 'Measurement', 'test_offering_1'));	
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/101', 'http://www.52north.org/test/observableProperty/1', 'http://www.52north.org/test/featureOfInterest/1', 'test_unit_1', '2012-11-19 13:00Z', 'http://www.52north.org/test/offering/1'), 1.2);	
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/101', 'http://www.52north.org/test/observableProperty/1', 'http://www.52north.org/test/featureOfInterest/1', 'test_unit_1', '2012-11-19 13:01Z', 'http://www.52north.org/test/offering/1'), 1.3); 
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/101', 'http://www.52north.org/test/observableProperty/1', 'http://www.52north.org/test/featureOfInterest/1', 'test_unit_1', '2012-11-19 13:02Z', 'http://www.52north.org/test/offering/1'), 1.4);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/101', 'http://www.52north.org/test/observableProperty/1', 'http://www.52north.org/test/featureOfInterest/1', 'test_unit_1', '2012-11-19 13:03Z', 'http://www.52north.org/test/offering/1'), 1.5);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/101', 'http://www.52north.org/test/observableProperty/1', 'http://www.52north.org/test/featureOfInterest/1', 'test_unit_1', '2012-11-19 13:04Z', 'http://www.52north.org/test/offering/1'), 1.6);	
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/101', 'http://www.52north.org/test/observableProperty/1', 'http://www.52north.org/test/featureOfInterest/1', 'test_unit_1', '2012-11-19 13:05Z', 'http://www.52north.org/test/offering/1'), 1.7);	
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/101', 'http://www.52north.org/test/observableProperty/1', 'http://www.52north.org/test/featureOfInterest/1', 'test_unit_1', '2012-11-19 13:06Z', 'http://www.52north.org/test/offering/1'), 1.8);	
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/101', 'http://www.52north.org/test/observableProperty/1', 'http://www.52north.org/test/featureOfInterest/1', 'test_unit_1', '2012-11-19 13:07Z', 'http://www.52north.org/test/offering/1'), 1.9);	
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/101', 'http://www.52north.org/test/observableProperty/1', 'http://www.52north.org/test/featureOfInterest/1', 'test_unit_1', '2012-11-19 13:08Z', 'http://www.52north.org/test/offering/1'), 2.0);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/101', 'http://www.52north.org/test/observableProperty/1', 'http://www.52north.org/test/featureOfInterest/1', 'test_unit_1', '2012-11-19 13:09Z', 'http://www.52north.org/test/offering/1'), 2.1);	
+	
+SELECT insert_count_observation(insert_observation('http://www.52north.org/test/procedure/102', 'http://www.52north.org/test/observableProperty/2', 'http://www.52north.org/test/featureOfInterest/2', 'test_unit_2', '2012-11-19 13:00Z', 'http://www.52north.org/test/offering/2'), 1);
+SELECT insert_count_observation(insert_observation('http://www.52north.org/test/procedure/102', 'http://www.52north.org/test/observableProperty/2', 'http://www.52north.org/test/featureOfInterest/2', 'test_unit_2', '2012-11-19 13:01Z', 'http://www.52north.org/test/offering/2'), 2);
+SELECT insert_count_observation(insert_observation('http://www.52north.org/test/procedure/102', 'http://www.52north.org/test/observableProperty/2', 'http://www.52north.org/test/featureOfInterest/2', 'test_unit_2', '2012-11-19 13:02Z', 'http://www.52north.org/test/offering/2'), 3);
+SELECT insert_count_observation(insert_observation('http://www.52north.org/test/procedure/102', 'http://www.52north.org/test/observableProperty/2', 'http://www.52north.org/test/featureOfInterest/2', 'test_unit_2', '2012-11-19 13:03Z', 'http://www.52north.org/test/offering/2'), 4);
+SELECT insert_count_observation(insert_observation('http://www.52north.org/test/procedure/102', 'http://www.52north.org/test/observableProperty/2', 'http://www.52north.org/test/featureOfInterest/2', 'test_unit_2', '2012-11-19 13:04Z', 'http://www.52north.org/test/offering/2'), 5);
+SELECT insert_count_observation(insert_observation('http://www.52north.org/test/procedure/102', 'http://www.52north.org/test/observableProperty/2', 'http://www.52north.org/test/featureOfInterest/2', 'test_unit_2', '2012-11-19 13:05Z', 'http://www.52north.org/test/offering/2'), 6);
+SELECT insert_count_observation(insert_observation('http://www.52north.org/test/procedure/102', 'http://www.52north.org/test/observableProperty/2', 'http://www.52north.org/test/featureOfInterest/2', 'test_unit_2', '2012-11-19 13:06Z', 'http://www.52north.org/test/offering/2'), 7);
+SELECT insert_count_observation(insert_observation('http://www.52north.org/test/procedure/102', 'http://www.52north.org/test/observableProperty/2', 'http://www.52north.org/test/featureOfInterest/2', 'test_unit_2', '2012-11-19 13:07Z', 'http://www.52north.org/test/offering/2'), 8);
+SELECT insert_count_observation(insert_observation('http://www.52north.org/test/procedure/102', 'http://www.52north.org/test/observableProperty/2', 'http://www.52north.org/test/featureOfInterest/2', 'test_unit_2', '2012-11-19 13:08Z', 'http://www.52north.org/test/offering/2'), 9);
+SELECT insert_count_observation(insert_observation('http://www.52north.org/test/procedure/102', 'http://www.52north.org/test/observableProperty/2', 'http://www.52north.org/test/featureOfInterest/2', 'test_unit_2', '2012-11-19 13:09Z', 'http://www.52north.org/test/offering/2'), 10);
 
+SELECT insert_boolean_observation(insert_observation('http://www.52north.org/test/procedure/103', 'http://www.52north.org/test/observableProperty/3', 'http://www.52north.org/test/featureOfInterest/3', 'test_unit_3', '2012-11-19 13:00Z', 'http://www.52north.org/test/offering/3'), true);
+SELECT insert_boolean_observation(insert_observation('http://www.52north.org/test/procedure/103', 'http://www.52north.org/test/observableProperty/3', 'http://www.52north.org/test/featureOfInterest/3', 'test_unit_3', '2012-11-19 13:01Z', 'http://www.52north.org/test/offering/3'), false);
+SELECT insert_boolean_observation(insert_observation('http://www.52north.org/test/procedure/103', 'http://www.52north.org/test/observableProperty/3', 'http://www.52north.org/test/featureOfInterest/3', 'test_unit_3', '2012-11-19 13:02Z', 'http://www.52north.org/test/offering/3'), false);
+SELECT insert_boolean_observation(insert_observation('http://www.52north.org/test/procedure/103', 'http://www.52north.org/test/observableProperty/3', 'http://www.52north.org/test/featureOfInterest/3', 'test_unit_3', '2012-11-19 13:03Z', 'http://www.52north.org/test/offering/3'), true);
+SELECT insert_boolean_observation(insert_observation('http://www.52north.org/test/procedure/103', 'http://www.52north.org/test/observableProperty/3', 'http://www.52north.org/test/featureOfInterest/3', 'test_unit_3', '2012-11-19 13:04Z', 'http://www.52north.org/test/offering/3'), false);
+SELECT insert_boolean_observation(insert_observation('http://www.52north.org/test/procedure/103', 'http://www.52north.org/test/observableProperty/3', 'http://www.52north.org/test/featureOfInterest/3', 'test_unit_3', '2012-11-19 13:05Z', 'http://www.52north.org/test/offering/3'), true);
+SELECT insert_boolean_observation(insert_observation('http://www.52north.org/test/procedure/103', 'http://www.52north.org/test/observableProperty/3', 'http://www.52north.org/test/featureOfInterest/3', 'test_unit_3', '2012-11-19 13:06Z', 'http://www.52north.org/test/offering/3'), true);
+SELECT insert_boolean_observation(insert_observation('http://www.52north.org/test/procedure/103', 'http://www.52north.org/test/observableProperty/3', 'http://www.52north.org/test/featureOfInterest/3', 'test_unit_3', '2012-11-19 13:07Z', 'http://www.52north.org/test/offering/3'), false);
+SELECT insert_boolean_observation(insert_observation('http://www.52north.org/test/procedure/103', 'http://www.52north.org/test/observableProperty/3', 'http://www.52north.org/test/featureOfInterest/3', 'test_unit_3', '2012-11-19 13:08Z', 'http://www.52north.org/test/offering/3'), false);
+SELECT insert_boolean_observation(insert_observation('http://www.52north.org/test/procedure/103', 'http://www.52north.org/test/observableProperty/3', 'http://www.52north.org/test/featureOfInterest/3', 'test_unit_3', '2012-11-19 13:09Z', 'http://www.52north.org/test/offering/3'), true);
 
-SELECT insert_count_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/102', 
-	'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:00'), 1);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/102', 
-	'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:00'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/102', 'test_observable_property_2', 'CountObservation', 'test_offering_2'));	
-SELECT insert_count_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/102', 
-	'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:01'), 2);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/102', 
-'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:01'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/102', 'test_observable_property_2', 'CountObservation', 'test_offering_2'));	
-SELECT insert_count_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/102', 
-	'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:02'), 3);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/102', 
-	'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:02'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/102', 'test_observable_property_2', 'CountObservation', 'test_offering_2'));	
-SELECT insert_count_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/102', 
-	'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:03'), 4);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/102', 
-	'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:03'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/102', 'test_observable_property_2', 'CountObservation', 'test_offering_2'));	
-SELECT insert_count_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/102', 
-	'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:04'), 5);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/102', 
-	'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:04'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/102', 'test_observable_property_2', 'CountObservation', 'test_offering_2'));	
-SELECT insert_count_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/102', 
-	'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:05'), 6);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/102', 
-	'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:05'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/102', 'test_observable_property_2', 'CountObservation', 'test_offering_2'));	
-SELECT insert_count_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/102', 'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:06'), 7);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/102', 'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:06'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/102', 'test_observable_property_2', 'CountObservation', 'test_offering_2'));	
-SELECT insert_count_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/102', 'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:07'), 8);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/102', 'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:07'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/102', 'test_observable_property_2', 'CountObservation', 'test_offering_2'));	
-SELECT insert_count_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/102', 'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:08'), 9);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/102', 'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:08'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/102', 'test_observable_property_2', 'CountObservation', 'test_offering_2'));	
-SELECT insert_count_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/102', 'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:09'), 10);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/102', 'test_observable_property_2'), 'test_feature_2', 'test_unit_2', '2012-11-19 13:09'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/102', 'test_observable_property_2', 'CountObservation', 'test_offering_2'));	
+SELECT insert_category_observation(insert_observation('http://www.52north.org/test/procedure/104', 'http://www.52north.org/test/observableProperty/4', 'http://www.52north.org/test/featureOfInterest/4', 'test_unit_4', '2012-11-19 13:00Z', 'http://www.52north.org/test/offering/4'), 'test_category_1');
+SELECT insert_category_observation(insert_observation('http://www.52north.org/test/procedure/104', 'http://www.52north.org/test/observableProperty/4', 'http://www.52north.org/test/featureOfInterest/4', 'test_unit_4', '2012-11-19 13:01Z', 'http://www.52north.org/test/offering/4'), 'test_category_2');
+SELECT insert_category_observation(insert_observation('http://www.52north.org/test/procedure/104', 'http://www.52north.org/test/observableProperty/4', 'http://www.52north.org/test/featureOfInterest/4', 'test_unit_4', '2012-11-19 13:02Z', 'http://www.52north.org/test/offering/4'), 'test_category_1');
+SELECT insert_category_observation(insert_observation('http://www.52north.org/test/procedure/104', 'http://www.52north.org/test/observableProperty/4', 'http://www.52north.org/test/featureOfInterest/4', 'test_unit_4', '2012-11-19 13:03Z', 'http://www.52north.org/test/offering/4'), 'test_category_5');
+SELECT insert_category_observation(insert_observation('http://www.52north.org/test/procedure/104', 'http://www.52north.org/test/observableProperty/4', 'http://www.52north.org/test/featureOfInterest/4', 'test_unit_4', '2012-11-19 13:04Z', 'http://www.52north.org/test/offering/4'), 'test_category_4');
+SELECT insert_category_observation(insert_observation('http://www.52north.org/test/procedure/104', 'http://www.52north.org/test/observableProperty/4', 'http://www.52north.org/test/featureOfInterest/4', 'test_unit_4', '2012-11-19 13:05Z', 'http://www.52north.org/test/offering/4'), 'test_category_3');
+SELECT insert_category_observation(insert_observation('http://www.52north.org/test/procedure/104', 'http://www.52north.org/test/observableProperty/4', 'http://www.52north.org/test/featureOfInterest/4', 'test_unit_4', '2012-11-19 13:06Z', 'http://www.52north.org/test/offering/4'), 'test_category_1');
+SELECT insert_category_observation(insert_observation('http://www.52north.org/test/procedure/104', 'http://www.52north.org/test/observableProperty/4', 'http://www.52north.org/test/featureOfInterest/4', 'test_unit_4', '2012-11-19 13:07Z', 'http://www.52north.org/test/offering/4'), 'test_category_2');
+SELECT insert_category_observation(insert_observation('http://www.52north.org/test/procedure/104', 'http://www.52north.org/test/observableProperty/4', 'http://www.52north.org/test/featureOfInterest/4', 'test_unit_4', '2012-11-19 13:08Z', 'http://www.52north.org/test/offering/4'), 'test_category_1');
+SELECT insert_category_observation(insert_observation('http://www.52north.org/test/procedure/104', 'http://www.52north.org/test/observableProperty/4', 'http://www.52north.org/test/featureOfInterest/4', 'test_unit_4', '2012-11-19 13:09Z', 'http://www.52north.org/test/offering/4'), 'test_category_6');
 
-SELECT insert_boolean_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:00'), true);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:00'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/103', 'test_observable_property_3', 'TruthObservation', 'test_offering_3'));
-SELECT insert_boolean_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:01'), false);
-	SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:01'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/103', 'test_observable_property_3', 'TruthObservation', 'test_offering_3'));
-SELECT insert_boolean_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:02'), false);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:02'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/103', 'test_observable_property_3', 'TruthObservation', 'test_offering_3'));
-SELECT insert_boolean_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:03'), true);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:03'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/103', 'test_observable_property_3', 'TruthObservation', 'test_offering_3'));
-SELECT insert_boolean_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:04'), false);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:04'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/103', 'test_observable_property_3', 'TruthObservation', 'test_offering_3'));
-SELECT insert_boolean_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:05'), true);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:05'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/103', 'test_observable_property_3', 'TruthObservation', 'test_offering_3'));
-SELECT insert_boolean_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:06'), true);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:06'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/103', 'test_observable_property_3', 'TruthObservation', 'test_offering_3'));
-SELECT insert_boolean_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:07'), false);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:07'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/103', 'test_observable_property_3', 'TruthObservation', 'test_offering_3'));
-SELECT insert_boolean_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:08'), false);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:08'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/103', 'test_observable_property_3', 'TruthObservation', 'test_offering_3'));
-SELECT insert_boolean_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:09'), true);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/103', 'test_observable_property_3'), 'test_feature_3', 'test_unit_3', '2012-11-19 13:09'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/103', 'test_observable_property_3', 'TruthObservation', 'test_offering_3'));
+SELECT insert_text_observation(insert_observation('http://www.52north.org/test/procedure/105', 'http://www.52north.org/test/observableProperty/5', 'http://www.52north.org/test/featureOfInterest/5', 'test_unit_5', '2012-11-19 13:00Z', 'http://www.52north.org/test/offering/5'), 'test_text_value_0');
+SELECT insert_text_observation(insert_observation('http://www.52north.org/test/procedure/105', 'http://www.52north.org/test/observableProperty/5', 'http://www.52north.org/test/featureOfInterest/5', 'test_unit_5', '2012-11-19 13:01Z', 'http://www.52north.org/test/offering/5'), 'test_text_value_1');
+SELECT insert_text_observation(insert_observation('http://www.52north.org/test/procedure/105', 'http://www.52north.org/test/observableProperty/5', 'http://www.52north.org/test/featureOfInterest/5', 'test_unit_5', '2012-11-19 13:02Z', 'http://www.52north.org/test/offering/5'), 'test_text_value_3');
+SELECT insert_text_observation(insert_observation('http://www.52north.org/test/procedure/105', 'http://www.52north.org/test/observableProperty/5', 'http://www.52north.org/test/featureOfInterest/5', 'test_unit_5', '2012-11-19 13:03Z', 'http://www.52north.org/test/offering/5'), 'test_text_value_4');
+SELECT insert_text_observation(insert_observation('http://www.52north.org/test/procedure/105', 'http://www.52north.org/test/observableProperty/5', 'http://www.52north.org/test/featureOfInterest/5', 'test_unit_5', '2012-11-19 13:04Z', 'http://www.52north.org/test/offering/5'), 'test_text_value_5');
+SELECT insert_text_observation(insert_observation('http://www.52north.org/test/procedure/105', 'http://www.52north.org/test/observableProperty/5', 'http://www.52north.org/test/featureOfInterest/5', 'test_unit_5', '2012-11-19 13:05Z', 'http://www.52north.org/test/offering/5'), 'test_text_value_6');
+SELECT insert_text_observation(insert_observation('http://www.52north.org/test/procedure/105', 'http://www.52north.org/test/observableProperty/5', 'http://www.52north.org/test/featureOfInterest/5', 'test_unit_5', '2012-11-19 13:06Z', 'http://www.52north.org/test/offering/5'), 'test_text_value_7');
+SELECT insert_text_observation(insert_observation('http://www.52north.org/test/procedure/105', 'http://www.52north.org/test/observableProperty/5', 'http://www.52north.org/test/featureOfInterest/5', 'test_unit_5', '2012-11-19 13:07Z', 'http://www.52north.org/test/offering/5'), 'test_text_value_8');
+SELECT insert_text_observation(insert_observation('http://www.52north.org/test/procedure/105', 'http://www.52north.org/test/observableProperty/5', 'http://www.52north.org/test/featureOfInterest/5', 'test_unit_5', '2012-11-19 13:08Z', 'http://www.52north.org/test/offering/5'), 'test_text_value_9');
+SELECT insert_text_observation(insert_observation('http://www.52north.org/test/procedure/105', 'http://www.52north.org/test/observableProperty/5', 'http://www.52north.org/test/featureOfInterest/5', 'test_unit_5', '2012-11-19 13:09Z', 'http://www.52north.org/test/offering/5'), 'test_text_value_10');
 
-SELECT insert_category_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:00'), 'test_category_1');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:00'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/104', 'test_observable_property_4', 'CategoryObservation', 'test_offering_4'));
-SELECT insert_category_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:01'), 'test_category_2');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:01'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/104', 'test_observable_property_4', 'CategoryObservation', 'test_offering_4'));
-SELECT insert_category_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:02'), 'test_category_1');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:02'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/104', 'test_observable_property_4', 'CategoryObservation', 'test_offering_4'));
-SELECT insert_category_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:03'), 'test_category_5');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:03'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/104', 'test_observable_property_4', 'CategoryObservation', 'test_offering_4'));
-SELECT insert_category_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:04'), 'test_category_4');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:04'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/104', 'test_observable_property_4', 'CategoryObservation', 'test_offering_4'));
-SELECT insert_category_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:05'), 'test_category_3');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:05'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/104', 'test_observable_property_4', 'CategoryObservation', 'test_offering_4'));
-SELECT insert_category_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:06'), 'test_category_1');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:06'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/104', 'test_observable_property_4', 'CategoryObservation', 'test_offering_4'));
-SELECT insert_category_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:07'), 'test_category_2');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:07'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/104', 'test_observable_property_4', 'CategoryObservation', 'test_offering_4'));
-SELECT insert_category_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:08'), 'test_category_1');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:08'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/104', 'test_observable_property_4', 'CategoryObservation', 'test_offering_4'));
-SELECT insert_category_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:09'), 'test_category_6');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/104', 'test_observable_property_4'), 'test_feature_4', 'test_unit_4', '2012-11-19 13:09'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/104', 'test_observable_property_4', 'CategoryObservation', 'test_offering_4'));
+SELECT insert_result_template('http://www.52north.org/test/procedure/106', 'http://www.52north.org/test/observableProperty/6', 'http://www.52north.org/test/offering/6', 'SWEArrayObservation', 'http://www.52north.org/test/featureOfInterest/6', 'test_unit_6');
 
-SELECT insert_text_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:00'), 'test_text_value_0');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:00'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/105', 'test_observable_property_5', 'TextObservation', 'test_offering_5'));
-SELECT insert_text_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:01'), 'test_text_value_1');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:01'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/105', 'test_observable_property_5', 'TextObservation', 'test_offering_5'));
-SELECT insert_text_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:02'), 'test_text_value_3');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:02'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/105', 'test_observable_property_5', 'TextObservation', 'test_offering_5'));
-SELECT insert_text_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:03'), 'test_text_value_4');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:03'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/105', 'test_observable_property_5', 'TextObservation', 'test_offering_5'));
-SELECT insert_text_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:04'), 'test_text_value_5');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:04'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/105', 'test_observable_property_5', 'TextObservation', 'test_offering_5'));
-SELECT insert_text_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:05'), 'test_text_value_6');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:05'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/105', 'test_observable_property_5', 'TextObservation', 'test_offering_5'));
-SELECT insert_text_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:06'), 'test_text_value_7');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:06'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/105', 'test_observable_property_5', 'TextObservation', 'test_offering_5'));
-SELECT insert_text_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:07'), 'test_text_value_8');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:07'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/105', 'test_observable_property_5', 'TextObservation', 'test_offering_5'));
-SELECT insert_text_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:08'), 'test_text_value_9');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:08'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/105', 'test_observable_property_5', 'TextObservation', 'test_offering_5'));
-SELECT insert_text_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:09'), 'test_text_value_10');
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/105', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:09'), 
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/105', 'test_observable_property_5', 'TextObservation', 'test_offering_5'));
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/106', 'http://www.52north.org/test/observableProperty/6', 'http://www.52north.org/test/featureOfInterest/6', 'test_unit_6', '2012-11-19 13:00Z', 'http://www.52north.org/test/offering/6'), 1.2);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/106', 'http://www.52north.org/test/observableProperty/6', 'http://www.52north.org/test/featureOfInterest/6', 'test_unit_6', '2012-11-19 13:01Z', 'http://www.52north.org/test/offering/6'), 1.3);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/106', 'http://www.52north.org/test/observableProperty/6', 'http://www.52north.org/test/featureOfInterest/6', 'test_unit_6', '2012-11-19 13:02Z', 'http://www.52north.org/test/offering/6'), 1.4);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/106', 'http://www.52north.org/test/observableProperty/6', 'http://www.52north.org/test/featureOfInterest/6', 'test_unit_6', '2012-11-19 13:03Z', 'http://www.52north.org/test/offering/6'), 1.5);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/106', 'http://www.52north.org/test/observableProperty/6', 'http://www.52north.org/test/featureOfInterest/6', 'test_unit_6', '2012-11-19 13:04Z', 'http://www.52north.org/test/offering/6'), 1.6);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/106', 'http://www.52north.org/test/observableProperty/6', 'http://www.52north.org/test/featureOfInterest/6', 'test_unit_6', '2012-11-19 13:05Z', 'http://www.52north.org/test/offering/6'), 1.7);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/106', 'http://www.52north.org/test/observableProperty/6', 'http://www.52north.org/test/featureOfInterest/6', 'test_unit_6', '2012-11-19 13:06Z', 'http://www.52north.org/test/offering/6'), 1.8);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/106', 'http://www.52north.org/test/observableProperty/6', 'http://www.52north.org/test/featureOfInterest/6', 'test_unit_6', '2012-11-19 13:07Z', 'http://www.52north.org/test/offering/6'), 1.9);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/106', 'http://www.52north.org/test/observableProperty/6', 'http://www.52north.org/test/featureOfInterest/6', 'test_unit_6', '2012-11-19 13:08Z', 'http://www.52north.org/test/offering/6'), 2.0);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/106', 'http://www.52north.org/test/observableProperty/6', 'http://www.52north.org/test/featureOfInterest/6', 'test_unit_6', '2012-11-19 13:09Z', 'http://www.52north.org/test/offering/6'), 2.1);
 
+INSERT INTO observation(procedure_id, observable_property_id, feature_of_interest_id, unit_id, phenomenon_time_start, phenomenon_time_end, result_time, identifier)
+	SELECT  get_procedure('http://www.52north.org/test/procedure/101'), get_observable_property('http://www.52north.org/test/observableProperty/1'),
+			get_feature_of_interest('http://www.52north.org/test/featureOfInterest/1'), get_unit('test_unit_1'), '2012-11-19 13:10Z', '2012-11-19 13:15Z', '2012-11-19 13:16Z', 'http://www.52north.org/test/observation/1'
+	WHERE 'http://www.52north.org/test/observation/1' NOT IN (SELECT identifier FROM observation WHERE identifier = 'http://www.52north.org/test/observation/1');
 
-SELECT insert_result_template('http://www.example.org/sensors/106', 'test_observable_property_6', 'SWEArrayObservation', 'test_offering_6', 'test_feature_6', 'test_unit_6');
-
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:00'), 1.2);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:00'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/106', 'test_observable_property_6', 'SWEArrayObservation', 'test_offering_6'));
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:01'), 1.3);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:01'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/106', 'test_observable_property_6', 'SWEArrayObservation', 'test_offering_6'));
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:02'), 1.4);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:02'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/106', 'test_observable_property_6', 'SWEArrayObservation', 'test_offering_6'));
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:03'), 1.5);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:03'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/106', 'test_observable_property_6', 'SWEArrayObservation', 'test_offering_6'));
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:04'), 1.6);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:04'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/106', 'test_observable_property_6', 'SWEArrayObservation', 'test_offering_6'));
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:05'), 1.7);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:05'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/106', 'test_observable_property_6', 'SWEArrayObservation', 'test_offering_6'));
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:06'), 1.8);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:06'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/106', 'test_observable_property_6', 'SWEArrayObservation', 'test_offering_6'));
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:07'), 1.9);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:07'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/106', 'test_observable_property_6', 'SWEArrayObservation', 'test_offering_6'));
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:08'), 2.0);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:08'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/106', 'test_observable_property_6', 'SWEArrayObservation', 'test_offering_6'));
-SELECT insert_numeric_observation(insert_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:09'), 2.1);
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/106', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:09'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/106', 'test_observable_property_6', 'SWEArrayObservation', 'test_offering_6'));
-
-INSERT INTO observation(observation_constellation_id, feature_of_interest_id, unit_id, phenomenon_time_start, phenomenon_time_end, result_time, identifier)
-	SELECT  get_observation_constellation('http://www.example.org/sensors/101', 'test_observable_property_1'),
-			get_feature_of_interest('test_feature_1'), get_unit('test_unit_1'), '2012-11-19 13:10', '2012-11-19 13:15', '2012-11-19 13:16', 'test_observation_1'
-	WHERE 'test_observation_1' NOT IN (SELECT identifier FROM observation WHERE identifier = 'test_observation_1');
-
+INSERT INTO observation_relates_to_offering (observation_id, offering_id) VALUES ((SELECT observation_id FROM observation WHERE identifier = 'http://www.52north.org/test/observation/1'), get_offering('http://www.52north.org/test/offering/1'));
+	
 INSERT INTO observation_has_numeric_value(observation_id, numeric_value_id) 
 		SELECT o.observation_id, insert_numeric_value(3.5) 
 		FROM observation AS o 
-		WHERE o.identifier = 'test_observation_1'
+		WHERE o.identifier = 'http://www.52north.org/test/observation/1'
 			AND o.observation_id NOT IN (SELECT observation_id FROM observation_has_numeric_value AS ohnv
 											WHERE ohnv.observation_id = o.observation_id);
 
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/101', 
-'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:10'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/101', 'test_observable_property_1', 'Measurement', 'test_offering_1'));
+INSERT INTO observation(procedure_id, observable_property_id, feature_of_interest_id, unit_id, phenomenon_time_start, phenomenon_time_end, result_time, identifier)
+	SELECT  get_procedure('http://www.52north.org/test/procedure/101'), get_observable_property('http://www.52north.org/test/observableProperty/1'),
+			get_feature_of_interest('http://www.52north.org/test/featureOfInterest/1'), get_unit('test_unit_1'), '2012-11-19 13:15Z', '2012-11-19 13:20Z', '2012-11-19 13:21Z', 'http://www.52north.org/test/observation/2'
+	WHERE 'http://www.52north.org/test/observation/2' NOT IN (SELECT identifier FROM observation WHERE identifier = 'http://www.52north.org/test/observation/2');
 
-INSERT INTO observation(observation_constellation_id, feature_of_interest_id, unit_id, phenomenon_time_start, phenomenon_time_end, result_time, identifier)
-	SELECT  get_observation_constellation('http://www.example.org/sensors/101', 'test_observable_property_1'),
-			get_feature_of_interest('test_feature_1'), get_unit('test_unit_1'), '2012-11-19 13:15', '2012-11-19 13:20', '2012-11-19 13:21', 'test_observation_2'
-	WHERE 'test_observation_2' NOT IN (SELECT identifier FROM observation WHERE identifier = 'test_observation_2');
-
+INSERT INTO observation_relates_to_offering (observation_id, offering_id) VALUES ((SELECT observation_id FROM observation WHERE identifier = 'http://www.52north.org/test/observation/2'), get_offering('http://www.52north.org/test/offering/1'));	
+	
 INSERT INTO observation_has_numeric_value(observation_id, numeric_value_id) 
 		SELECT o.observation_id, insert_numeric_value(4.2) 
 		FROM observation AS o 
-		WHERE o.identifier = 'test_observation_2'
+		WHERE o.identifier = 'http://www.52north.org/test/observation/2'
 			AND o.observation_id NOT IN (SELECT observation_id FROM observation_has_numeric_value AS ohnv
 											WHERE ohnv.observation_id = o.observation_id);
-
-SELECT insert_observation_observation_constellation_offering_observation_type(get_observation(get_observation_constellation('http://www.example.org/sensors/101', 'test_observable_property_1'), 'test_feature_1', 'test_unit_1', '2012-11-19 13:15'),
-	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/101', 'test_observable_property_1', 'Measurement', 'test_offering_1'));
-
 
 DROP FUNCTION get_feature_of_interest(text);
 DROP FUNCTION get_feature_of_interest_type(text);
 DROP FUNCTION get_observable_property(text);
-DROP FUNCTION get_observation_constellation(bigint,bigint);
-DROP FUNCTION get_observation_constellation(text,text);
+DROP FUNCTION get_observation_constellation(bigint,bigint,bigint,bigint);
+DROP FUNCTION get_observation_constellation(text,text,text,text);
 DROP FUNCTION get_observation_type(text);
 DROP FUNCTION get_offering(text);
 DROP FUNCTION get_procedure(text);
@@ -851,13 +644,14 @@ DROP FUNCTION insert_geometry_value(geometry);
 DROP FUNCTION insert_numeric_observation(bigint, numeric);
 DROP FUNCTION insert_numeric_value(numeric);
 DROP FUNCTION insert_observable_property(text);
-DROP FUNCTION insert_observation(bigint,text, text,timestamp);
-DROP FUNCTION insert_observation_constellation(bigint,bigint);
-DROP FUNCTION insert_observation_constellation(text,text);
+DROP FUNCTION insert_observation(text, text, text, text, timestamp with time zone, text);
+DROP FUNCTION insert_observation_constellation(bigint,bigint,bigint,bigint);
+DROP FUNCTION insert_observation_constellation(text,text,text,text);
 DROP FUNCTION insert_observation_type(text);
 DROP FUNCTION insert_offering(text);
+DROP FUNCTION insert_observation_offering(bigint, bigint);
 DROP FUNCTION insert_procedure_description_format(text);
-DROP FUNCTION insert_procedure(text,timestamp,text,numeric,numeric,numeric);
+DROP FUNCTION insert_procedure(text,timestamp with time zone,text,numeric,numeric,numeric);
 DROP FUNCTION insert_text_observation(bigint, text);
 DROP FUNCTION insert_text_value(text);
 DROP FUNCTION insert_unit(text);
@@ -866,11 +660,6 @@ DROP FUNCTION insert_result_template(bigint,bigint,text,text,text);
 DROP FUNCTION insert_allowed_observation_types_for_offering(text,text);
 DROP FUNCTION insert_allowed_observation_types_for_offering(bigint,bigint);
 DROP FUNCTION insert_allowed_feature_of_interest_types_for_offering(text,text);
-DROP FUNCTION insert_observation_constellation_offering_observation_type(bigint,bigint,bigint);
-DROP FUNCTION insert_observation_constellation_offering_observation_type(text,text,text,text);
-DROP FUNCTION get_observation_constellation_offering_observation_type(bigint,bigint,bigint,bigint);
-DROP FUNCTION get_observation_constellation_offering_observation_type(text,text,text,text);
-DROP FUNCTION insert_observation_observation_constellation_offering_observation_type(bigint,bigint);
-DROP FUNCTION insert_allowed_feature_of_interest_types_for_offering(bigint,bigint)
-DROP FUNCTION get_observation(bigint,text,text,timestamp)
-DROP FUNCTION create_sensor_description(text,text,numeric,numeric,numeric)
+DROP FUNCTION insert_allowed_feature_of_interest_types_for_offering(bigint,bigint);
+DROP FUNCTION get_observation(bigint, bigint, text, text, timestamp with time zone);
+DROP FUNCTION create_sensor_description(text,text,numeric,numeric,numeric);

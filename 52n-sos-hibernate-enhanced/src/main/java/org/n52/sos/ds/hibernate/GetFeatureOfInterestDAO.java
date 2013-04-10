@@ -108,7 +108,6 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
         // String obsAlias =
         // HibernateCriteriaQueryUtilities.addObservationAliasToMap(aliases,
         // null);
-        String obsConstAlias = null;
         // featureOfInterest identifiers
         if (sosRequest.isSetFeatureOfInterestIdentifiers()) {
             Set<String> featureIdentifiers = checkFeatureIdentifiersForRelatedFeatures(sosRequest.getFeatureIdentifiers());
@@ -119,21 +118,15 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
         }
         // observableProperties
         if (sosRequest.isSetObservableProperties()) {
-            if (obsConstAlias == null) {
-                obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
-            }
             String obsPropAlias =
-                    HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, obsConstAlias);
+                    HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, null);
             queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                     HibernateCriteriaQueryUtilities.getIdentifierParameter(obsPropAlias),
                     sosRequest.getObservedProperties()));
         }
         // procedures
         if (sosRequest.isSetProcedures()) {
-            if (obsConstAlias == null) {
-                obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
-            }
-            String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, obsConstAlias);
+            String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, null);
             queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                     HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), sosRequest.getProcedures()));
         }

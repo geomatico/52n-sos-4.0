@@ -36,9 +36,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.n52.sos.cache.ContentCache;
 import org.n52.sos.ds.FeatureQueryHandler;
+import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.entities.BlobObservation;
 import org.n52.sos.ds.hibernate.entities.BooleanObservation;
 import org.n52.sos.ds.hibernate.entities.CategoryObservation;
@@ -46,9 +48,10 @@ import org.n52.sos.ds.hibernate.entities.CountObservation;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.GeometryObservation;
 import org.n52.sos.ds.hibernate.entities.NumericObservation;
+import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
+import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.Quality;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
@@ -96,7 +99,6 @@ import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.SosHelper;
 
-
 public class HibernateObservationUtilities {
 
     private static Configuration configuration;
@@ -109,9 +111,11 @@ public class HibernateObservationUtilities {
     }
 
     /**
-     * Set the configuration for this Helper to decouple it from the Configurator.
-     *
-     * @param configuration the configuration
+     * Set the configuration for this Helper to decouple it from the
+     * Configurator.
+     * 
+     * @param configuration
+     *            the configuration
      */
     protected static void setConfiguration(Configuration configuration) {
         HibernateObservationUtilities.configuration = configuration;
@@ -140,7 +144,7 @@ public class HibernateObservationUtilities {
     public static boolean isSupportsQuality() {
         return getConfiguration().isSupportsQuality();
     }
-    
+
     /**
      * Create SOS internal observation from Observation objects
      * 
@@ -153,14 +157,14 @@ public class HibernateObservationUtilities {
      * @param session
      *            Hibernate session
      * @return SOS internal observation
-
-     *
-     * @throws OwsExceptionReport     *             If an error occurs
+     * 
+     * 
+     * @throws OwsExceptionReport
+     *             * If an error occurs
      */
     @SuppressWarnings("unchecked")
     public static List<SosObservation> createSosObservationsFromObservations(Collection<Observation> observations,
-                                                                             String version, Session session) throws
-            OwsExceptionReport {
+            String version, Session session) throws OwsExceptionReport {
         List<SosObservation> observationCollection = new ArrayList<SosObservation>(0);
 
         Map<String, SosAbstractFeature> features = new HashMap<String, SosAbstractFeature>(0);
@@ -177,22 +181,27 @@ public class HibernateObservationUtilities {
                 // reached
                 SosHelper.checkFreeMemory();
 
-                Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes =
-                        hObservation.getObservationConstellationOfferingObservationTypes();
-                Iterator<ObservationConstellationOfferingObservationType> iterator =
-                        observationConstellationOfferingObservationTypes.iterator();
-                ObservationConstellationOfferingObservationType hObservationConstellationOfferingObservationType =
-                        null;
-                while (iterator.hasNext()) {
-                    hObservationConstellationOfferingObservationType = iterator.next();
-                    break;
-                }
+                // Set<ObservationConstellationOfferingObservationType>
+                // observationConstellationOfferingObservationTypes =
+                // hObservation.getObservationConstellationOfferingObservationTypes();
+                // Iterator<ObservationConstellationOfferingObservationType>
+                // iterator =
+                // observationConstellationOfferingObservationTypes.iterator();
+                // ObservationConstellationOfferingObservationType
+                // hObservationConstellationOfferingObservationType =
+                // null;
+                // while (iterator.hasNext()) {
+                // hObservationConstellationOfferingObservationType =
+                // iterator.next();
+                // break;
+                // }
 
-                ObservationConstellation hObservationConstellation = hObservation.getObservationConstellation();
+                // ObservationConstellation hObservationConstellation =
+                // hObservation.getObservationConstellation();
                 FeatureOfInterest hFeatureOfInterest = hObservation.getFeatureOfInterest();
 
                 // TODO get full description
-                Procedure hProcedure = hObservationConstellation.getProcedure();
+                Procedure hProcedure = hObservation.getProcedure();
                 String procedureIdentifier = hProcedure.getIdentifier();
                 SosProcedureDescription procedure;
                 if (procedures.containsKey(procedureIdentifier)) {
@@ -205,22 +214,18 @@ public class HibernateObservationUtilities {
                     procedures.put(procedureIdentifier, procedure);
                 }
 
-                //FIXME possible NPE
-                String observationType =
-                        hObservationConstellationOfferingObservationType.getObservationType().getObservationType();
-
                 // feature of interest
                 String foiID = hFeatureOfInterest.getIdentifier();
                 if (!features.containsKey(foiID)) {
                     SosAbstractFeature featureByID =
-                            getConfiguration().getFeatureQueryHandler()
-                                    .getFeatureByID(foiID, session, version, -1);
+                            getConfiguration().getFeatureQueryHandler().getFeatureByID(foiID, session, version, -1);
                     features.put(foiID, featureByID);
                 }
 
                 // phenomenon
-                String phenID = hObservationConstellation.getObservableProperty().getIdentifier();
-                String description = hObservationConstellation.getObservableProperty().getDescription();
+                ObservableProperty hObservableProperty = hObservation.getObservableProperty();
+                String phenID = hObservation.getObservableProperty().getIdentifier();
+                String description = hObservation.getObservableProperty().getDescription();
                 if (!obsProps.containsKey(phenID)) {
                     obsProps.put(phenID, new SosObservableProperty(phenID, description, null, null));
                 }
@@ -261,39 +266,47 @@ public class HibernateObservationUtilities {
                 }
                 checkOrSetObservablePropertyUnit(obsProps.get(phenID), value.getUnit());
                 final SosObservationConstellation obsConst =
-                        new SosObservationConstellation(procedure, obsProps.get(phenID), null, features.get(foiID),
-                                observationType);
+                        new SosObservationConstellation(procedure, obsProps.get(phenID), features.get(foiID));
                 /* get the offerings to find the templates */
                 if (obsConst.getOfferings() == null) {
-                    HashSet<String> offerings = new HashSet<String>(getCache()
-                            .getOfferingsForObservableProperty(obsConst.getObservableProperty().getIdentifier()));
-                    offerings.retainAll(getCache().getOfferingsForProcedure(obsConst.getProcedure()
-                            .getIdentifier()));
+                    HashSet<String> offerings =
+                            new HashSet<String>(getCache().getOfferingsForObservableProperty(
+                                    obsConst.getObservableProperty().getIdentifier()));
+                    offerings.retainAll(getCache().getOfferingsForProcedure(obsConst.getProcedure().getIdentifier()));
                     obsConst.setOfferings(offerings);
                 }
                 int obsConstHash = obsConst.hashCode();
                 if (!observationConstellations.containsKey(obsConstHash)) {
-                    if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)) {
-                        List<ResultTemplate> hResultTemplates =
-                                HibernateCriteriaQueryUtilities.getResultTemplateObjectsForObservationConstellation(
-                                        hObservationConstellation, session);
-                        // Set<SosResultTemplate> hResultTemplates =
-                        // hObservationConstellation.getResultTemplates();
-                        if (hResultTemplates != null && !hResultTemplates.isEmpty()) {
-                            for (ResultTemplate hResultTemplate : hResultTemplates) {
-                                if (hResultTemplate.getIdentifier() != null
-                                        && !hResultTemplate.getIdentifier().isEmpty()) {
-                                    org.n52.sos.ogc.sos.SosResultTemplate sosResultTemplate;
-                                    if (sosResultTemplates.containsKey(hResultTemplate.getIdentifier())) {
-                                        sosResultTemplate = sosResultTemplates.get(hResultTemplate.getIdentifier());
-                                    } else {
-                                        sosResultTemplate = new org.n52.sos.ogc.sos.SosResultTemplate();
-                                        sosResultTemplate.setXmlResultStructure(hResultTemplate.getResultStructure());
-                                        sosResultTemplate.setXmResultEncoding(hResultTemplate.getResultEncoding());
-                                        sosResultTemplates.put(hResultTemplate.getIdentifier(), sosResultTemplate);
+                    // FIXME could it be null?
+                    ObservationConstellation hObservationConstellation =
+                            getObservationConstellation(hProcedure, hObservableProperty, hObservation.getOfferings(),
+                                    session);
+                    if (obsConst != null) {
+                        String observationType = hObservationConstellation.getObservationType().getObservationType();
+                        obsConst.setObservationType(observationType);
+                        if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)) {
+                            List<ResultTemplate> hResultTemplates =
+                                    HibernateCriteriaQueryUtilities
+                                            .getResultTemplateObjectsForObservationConstellation(
+                                                    hObservationConstellation, session);
+                            // Set<ResultTemplate> hResultTemplates =
+                            // hObservationConstellation.getResultTemplates();
+                            if (hResultTemplates != null && !hResultTemplates.isEmpty()) {
+                                for (ResultTemplate hResultTemplate : hResultTemplates) {
+                                    if (hResultTemplate.getIdentifier() != null
+                                            && !hResultTemplate.getIdentifier().isEmpty()) {
+                                        org.n52.sos.ogc.sos.SosResultTemplate sosResultTemplate;
+                                        if (sosResultTemplates.containsKey(hResultTemplate.getIdentifier())) {
+                                            sosResultTemplate = sosResultTemplates.get(hResultTemplate.getIdentifier());
+                                        } else {
+                                            sosResultTemplate = new org.n52.sos.ogc.sos.SosResultTemplate();
+                                            sosResultTemplate.setXmlResultStructure(hResultTemplate.getResultStructure());
+                                            sosResultTemplate.setXmResultEncoding(hResultTemplate.getResultEncoding());
+                                            sosResultTemplates.put(hResultTemplate.getIdentifier(), sosResultTemplate);
+                                        }
+                                        obsConst.setResultTemplate(sosResultTemplate);
+                                        break;
                                     }
-                                    obsConst.setResultTemplate(sosResultTemplate);
-                                    break;
                                 }
                             }
                         }
@@ -321,11 +334,13 @@ public class HibernateObservationUtilities {
             SensorML procedure = new SensorML();
             procedure.setIdentifier(procID);
             // TODO remove unused code
-//            SosSMLIdentifier identifier =
-//                    new SosSMLIdentifier("uniqueID", "urn:ogc:def:identifier:OGC:uniqueID", procID);
-//            List<SosSMLIdentifier> identifiers = new ArrayList<SosSMLIdentifier>(1);
-//            identifiers.add(identifier);
-//            procedure.setIdentifications(identifiers);
+            // SosSMLIdentifier identifier =
+            // new SosSMLIdentifier("uniqueID",
+            // "urn:ogc:def:identifier:OGC:uniqueID", procID);
+            // List<SosSMLIdentifier> identifiers = new
+            // ArrayList<SosSMLIdentifier>(1);
+            // identifiers.add(identifier);
+            // procedure.setIdentifications(identifiers);
 
             // phenomenon
             String phenID = observationConstellation.getObservableProperty().getIdentifier();
@@ -334,15 +349,15 @@ public class HibernateObservationUtilities {
 
             for (String featureIdentifier : featureOfInterestIdentifiers) {
                 SosAbstractFeature feature =
-                        getFeatureQueryHandler()
-                                .getFeatureByID(featureIdentifier, session, version, -1);
+                        getFeatureQueryHandler().getFeatureByID(featureIdentifier, session, version, -1);
 
                 final SosObservationConstellation obsConst =
                         new SosObservationConstellation(procedure, obsProp, null, feature, null);
                 /* get the offerings to find the templates */
                 if (obsConst.getOfferings() == null) {
-                    Set<String> offerings = new HashSet<String>(getCache().getOfferingsForProcedure(
-                            obsConst.getProcedure().getIdentifier()));
+                    Set<String> offerings =
+                            new HashSet<String>(getCache().getOfferingsForProcedure(
+                                    obsConst.getProcedure().getIdentifier()));
                     offerings.retainAll(new HashSet<String>(getCache().getOfferingsForProcedure(
                             obsConst.getProcedure().getIdentifier())));
                     obsConst.setOfferings(offerings);
@@ -429,8 +444,8 @@ public class HibernateObservationUtilities {
             return new org.n52.sos.ogc.om.values.CategoryValue(((CategoryObservation) hObservation).getValue()
                     .getValue());
         } else if (hObservation instanceof CountObservation) {
-            return new org.n52.sos.ogc.om.values.CountValue(Integer.valueOf(((CountObservation) hObservation).getValue()
-                    .getValue()));
+            return new org.n52.sos.ogc.om.values.CountValue(Integer.valueOf(((CountObservation) hObservation)
+                    .getValue().getValue()));
         } else if (hObservation instanceof TextObservation) {
             return new org.n52.sos.ogc.om.values.TextValue(((TextObservation) hObservation).getValue().getValue());
         } else if (hObservation instanceof GeometryObservation) {
@@ -551,9 +566,8 @@ public class HibernateObservationUtilities {
                     && arrayValue.getValue().getElementType() instanceof SosSweDataRecord) {
                 elementType = (SosSweDataRecord) arrayValue.getValue().getElementType();
             } else {
-                throw new NoApplicableCodeException()
-                        .withMessage("sweElementType type \"%s\" not supported",
-                                     elementType != null ? elementType.getClass().getName() : "null");
+                throw new NoApplicableCodeException().withMessage("sweElementType type \"%s\" not supported",
+                        elementType != null ? elementType.getClass().getName() : "null");
             }
 
             for (List<String> block : values) {
@@ -581,8 +595,8 @@ public class HibernateObservationUtilities {
                                  * FIXME what is the valid exception code if the
                                  * result is not correct?
                                  */
-                                throw new NoApplicableCodeException().causedBy(e)
-                                        .withMessage("Error while parse time String to DateTime!");
+                                throw new NoApplicableCodeException().causedBy(e).withMessage(
+                                        "Error while parse time String to DateTime!");
                             }
                         }
                     } else if (fieldForToken instanceof SosSweTimeRange) {
@@ -599,8 +613,8 @@ public class HibernateObservationUtilities {
                                  * FIXME what is the valid exception code if the
                                  * result is not correct?
                                  */
-                                throw new NoApplicableCodeException().causedBy(e)
-                                        .withMessage("Error while parse time String to DateTime!");
+                                throw new NoApplicableCodeException().causedBy(e).withMessage(
+                                        "Error while parse time String to DateTime!");
                             }
                         }
                     }
@@ -620,9 +634,8 @@ public class HibernateObservationUtilities {
                     } else if (fieldForToken instanceof SosSweCount) {
                         observedValue = new CountValue(Integer.parseInt(token));
                     } else {
-                        throw new NoApplicableCodeException()
-                                .withMessage("sweField type '%s' not supported",
-                                             fieldForToken != null ? fieldForToken.getClass().getName() : "null");
+                        throw new NoApplicableCodeException().withMessage("sweField type '%s' not supported",
+                                fieldForToken != null ? fieldForToken.getClass().getName() : "null");
                     }
                     if (observedValue != null) {
                         definitionsForObservedValues.put(observedValue, fieldForToken.getDefinition());
@@ -643,7 +656,7 @@ public class HibernateObservationUtilities {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static SosObservation createSingleValueObservation(SosObservation multiObservation, ITime phenomenonTime,
-                                                               IValue<?> iValue) {
+            IValue<?> iValue) {
         IObservationValue<?> value = new SosSingleObservationValue(phenomenonTime, iValue);
         SosObservation newObservation = new SosObservation();
         newObservation.setNoDataValue(multiObservation.getNoDataValue());
@@ -667,12 +680,29 @@ public class HibernateObservationUtilities {
         return newObservation;
     }
 
+    private static ObservationConstellation getObservationConstellation(Procedure procedure,
+            ObservableProperty observableProperty, Collection<Offering> offerings, Session session) {
+        HibernateQueryObject queryObject = new HibernateQueryObject();
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
+                HibernateConstants.PARAMETER_PROCEDURE, procedure));
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
+                HibernateConstants.PARAMETER_OBSERVABLE_PROPERTY, observableProperty));
+        queryObject.addCriterion(Restrictions.in(HibernateConstants.PARAMETER_OFFERING, offerings));
+        List<ObservationConstellation> observationConstellations =
+                HibernateCriteriaQueryUtilities.getObservationConstellations(queryObject, session);
+        Iterator<ObservationConstellation> iterator = observationConstellations.iterator();
+        if (iterator.hasNext()) {
+            return iterator.next();
+        }
+        return null;
+    }
+
     /**
-     * Class to make this Helper more testable. Test cases may overwrite methods to decouple this class from the
-     * Configurator.
+     * Class to make this Helper more testable. Test cases may overwrite methods
+     * to decouple this class from the Configurator.
      */
     protected static class Configuration {
-        
+
         /**
          * @see Configurator#getTupleSeparator()
          */

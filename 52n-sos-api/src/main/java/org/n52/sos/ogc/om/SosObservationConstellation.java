@@ -62,6 +62,24 @@ public class SosObservationConstellation implements Serializable, Cloneable {
     public SosObservationConstellation() {
         super();
     }
+    
+    /**
+     * constructor
+     * 
+     * @param procedure
+     *            Procedure by which the observation is made
+     * @param observableProperty
+     *            observableProperty to which the observation accords to
+     * @param featureOfInterest
+     *            featureOfInterest to which this observation belongs
+     */
+    public SosObservationConstellation(SosProcedureDescription procedure, AbstractSosPhenomenon observableProperty,
+            SosAbstractFeature featureOfInterest) {
+        super();
+        this.procedure = procedure;
+        this.observableProperty = observableProperty;
+        this.featureOfInterest = featureOfInterest;
+    }
 
     /**
      * constructor
@@ -224,7 +242,7 @@ public class SosObservationConstellation implements Serializable, Cloneable {
         hash = prime * hash + (this.observableProperty != null ? this.observableProperty.hashCode() : 0);
         hash = prime * hash + (this.offerings != null ? this.offerings.hashCode() : 0);
         hash = prime * hash + (this.featureOfInterest != null ? this.featureOfInterest.hashCode() : 0);
-        hash = prime * hash + (this.observationType != null ? this.observationType.hashCode() : 0);
+//        hash = prime * hash + (this.observationType != null ? this.observationType.hashCode() : 0);
         return hash;
     }
 

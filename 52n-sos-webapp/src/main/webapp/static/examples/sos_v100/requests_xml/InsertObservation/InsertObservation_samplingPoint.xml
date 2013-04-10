@@ -16,7 +16,7 @@
 	http://schemas.opengis.net/om/1.0.0/extensions/observationSpecialization_override.xsd"
 	service="SOS" version="1.0.0">
 	
-	<AssignedSensorId>urn:ogc:object:feature:Sensor:IFGI:ifgi-sensor-1</AssignedSensorId>
+	<AssignedSensorId>http://www.52north.org/test/procedure/sensor-1</AssignedSensorId>
 	
 	<om:Measurement>
 	     
@@ -26,11 +26,11 @@
 	          </gml:TimeInstant>
 	     </om:samplingTime>
 	     
-	     <om:procedure xlink:href="urn:ogc:object:feature:Sensor:IFGI:ifgi-sensor-1"/>
-	     <om:observedProperty xlink:href="test_observable_property_6"/>
+	     <om:procedure xlink:href="http://www.52north.org/test/procedure/sensor-1"/>
+	     <om:observedProperty xlink:href="http://www.52north.org/test/observableProperty/6"/>
 	     
 	     <om:featureOfInterest>
-	          <sa:SamplingPoint gml:id="test_feature_6">
+	          <sa:SamplingPoint gml:id="http://www.52north.org/test/featureOfInterest/6">
 	              <gml:name>SamplingPoint 1</gml:name>
 	              <sa:sampledFeature xlink:href=""/>
 	              <sa:position>

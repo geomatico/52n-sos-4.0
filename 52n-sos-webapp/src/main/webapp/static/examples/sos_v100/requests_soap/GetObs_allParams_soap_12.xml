@@ -9,7 +9,7 @@
 			xsi:schemaLocation="http://www.opengis.net/sos/1.0
 	http://schemas.opengis.net/sos/1.0.0/sosGetObservation.xsd"
 			service="SOS" version="1.0.0" srsName="urn:ogc:def:crs:EPSG::4326">
-			<sos:offering>test_offering_6</sos:offering>
+			<sos:offering>http://www.52north.org/test/offering/6</sos:offering>
 			<sos:eventTime>
 				<ogc:TM_During>
 					<ogc:PropertyName>om:samplingTime</ogc:PropertyName>
@@ -19,8 +19,8 @@
 					</gml:TimePeriod>
 				</ogc:TM_During>
 			</sos:eventTime>
-			<sos:procedure>http://www.example.org/sensors/106</sos:procedure>
-			<sos:observedProperty>test_observable_property_6</sos:observedProperty>
+			<sos:procedure>http://www.52north.org/test/procedure/106</sos:procedure>
+			<sos:observedProperty>http://www.52north.org/test/observableProperty/6</sos:observedProperty>
 			<sos:featureOfInterest>
 				<ogc:BBOX>
 					<ogc:PropertyName>urn:ogc:data:location</ogc:PropertyName>
@@ -32,7 +32,7 @@
 			</sos:featureOfInterest>
 			<sos:result>
 				<ogc:PropertyIsGreaterThan>
-					<ogc:PropertyName>test_observable_property_6</ogc:PropertyName>
+					<ogc:PropertyName>http://www.52north.org/test/observableProperty/6</ogc:PropertyName>
 					<ogc:Literal>5</ogc:Literal>
 				</ogc:PropertyIsGreaterThan>
 			</sos:result>

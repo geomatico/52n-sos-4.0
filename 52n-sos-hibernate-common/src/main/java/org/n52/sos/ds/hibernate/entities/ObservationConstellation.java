@@ -24,22 +24,22 @@
 package org.n52.sos.ds.hibernate.entities;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasDeletedFlag;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservableProperty;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservationConstellationOfferingObservationTypes;
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservationType;
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasOffering;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasProcedure;
 
-public class ObservationConstellation implements Serializable, HasProcedure, HasObservableProperty,
-                                                 HasObservationConstellationOfferingObservationTypes {
-    public static final String ID = "observationConstellationId";
+public class ObservationConstellation implements Serializable, HasProcedure, HasObservableProperty, HasOffering, HasObservationType, HasDeletedFlag {
+public static final String ID = "observationConstellationId";
     private static final long serialVersionUID = -3890149740562709928L;
     private long observationConstellationId;
     private ObservableProperty observableProperty;
     private Procedure procedure;
-    private Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes =
-                                                                 new HashSet<ObservationConstellationOfferingObservationType>(0);
+    private ObservationType observationType;
+    private Offering offering;
+    private Boolean deleted;
 
     public ObservationConstellation() {
     }
@@ -71,15 +71,38 @@ public class ObservationConstellation implements Serializable, HasProcedure, Has
     public void setProcedure(Procedure procedure) {
         this.procedure = procedure;
     }
-
+    
     @Override
-    public Set<ObservationConstellationOfferingObservationType> getObservationConstellationOfferingObservationTypes() {
-        return this.observationConstellationOfferingObservationTypes;
+    public ObservationType getObservationType() {
+        return this.observationType;
     }
 
     @Override
-    public void setObservationConstellationOfferingObservationTypes(
-            Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes) {
-        this.observationConstellationOfferingObservationTypes = observationConstellationOfferingObservationTypes;
+    public void setObservationType(ObservationType observationType) {
+        this.observationType = observationType;
+    }
+    
+    @Override
+    public Offering getOffering() {
+        return this.offering;
+    }
+
+    @Override
+    public void setOffering(Offering offering) {
+        this.offering = offering;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    @Override
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    @Override
+    public boolean isDeleted() {
+        return deleted;
     }
 }

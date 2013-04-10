@@ -1,4 +1,4 @@
-﻿--
+--
 -- Copyright (C) 2013
 -- by 52 North Initiative for Geospatial Open Source Software GmbH
 --
@@ -34,131 +34,118 @@ DELETE FROM category_value WHERE value LIKE 'test_category%';
 
 DELETE FROM observation_has_numeric_value AS ohnv
 USING   observation AS o, 
-        observation_constellation  AS oc,
         feature_of_interest AS f,
         procedure AS p,
         unit AS u,
         observable_property AS op
 WHERE   ohnv.observation_id = o.observation_id AND
-        o.observation_constellation_id = oc.observation_constellation_id AND
         f.feature_of_interest_id = o.feature_of_interest_id AND
         u.unit_id = o.unit_id AND
-        p.procedure_id = oc.procedure_id AND
-        oc.observable_property_id = op.observable_property_id AND
+        p.procedure_id = o.procedure_id AND
+        o.observable_property_id = op.observable_property_id AND
         (
-            p.identifier LIKE 'http://www.example.org/sensors/%' OR
-            f.identifier LIKE 'test_feature%' OR
-            op.identifier LIKE 'test_observable_property%' OR
-            u.unit LIKE 'test_unit%'
+            p.identifier LIKE 'http://www.52north.org/test/procedure/%' OR
+            f.identifier LIKE 'http://www.52north.org/test/featureOfInterest/%' OR
+            op.identifier LIKE 'http://www.52north.org/test/observableProperty/%' OR
+            u.unit LIKE 'test_unit_%'
             
         );
     
 DELETE FROM observation_has_boolean_value AS ohbv
 USING   observation AS o, 
-        observation_constellation  AS oc,
         feature_of_interest AS f,
         procedure AS p,
         unit AS u,
         observable_property AS op
 WHERE   ohbv.observation_id = o.observation_id AND
-        o.observation_constellation_id = oc.observation_constellation_id AND
         f.feature_of_interest_id = o.feature_of_interest_id AND
         u.unit_id = o.unit_id AND
-        p.procedure_id = oc.procedure_id AND
-        oc.observable_property_id = op.observable_property_id AND
+        p.procedure_id = o.procedure_id AND
+        o.observable_property_id = op.observable_property_id AND
         (
-            p.identifier LIKE 'http://www.example.org/sensors/%' OR
-            f.identifier LIKE 'test_feature%' OR
-            op.identifier LIKE 'test_observable_property%' OR
-            u.unit LIKE 'test_unit%'
+            p.identifier LIKE 'http://www.52north.org/test/procedure/%' OR
+            f.identifier LIKE 'http://www.52north.org/test/featureOfInterest/%' OR
+            op.identifier LIKE 'http://www.52north.org/test/observableProperty/%' OR
+            u.unit LIKE 'test_unit_%'
             
         );
 
 DELETE FROM observation_has_blob_value AS ohbv
 USING   observation AS o, 
-        observation_constellation  AS oc,
         feature_of_interest AS f,
         procedure AS p,
         unit AS u,
         observable_property AS op
 WHERE   ohbv.observation_id = o.observation_id AND
-        o.observation_constellation_id = oc.observation_constellation_id AND
         f.feature_of_interest_id = o.feature_of_interest_id AND
         u.unit_id = o.unit_id AND
-        p.procedure_id = oc.procedure_id AND
-        oc.observable_property_id = op.observable_property_id AND
+        p.procedure_id = o.procedure_id AND
+        o.observable_property_id = op.observable_property_id AND
         (
-            p.identifier LIKE 'http://www.example.org/sensors/%' OR
-            f.identifier LIKE 'test_feature%' OR
-            op.identifier LIKE 'test_observable_property%' OR
-            u.unit LIKE 'test_unit%'
+            p.identifier LIKE 'http://www.52north.org/test/procedure/%' OR
+            f.identifier LIKE 'http://www.52north.org/test/featureOfInterest/%' OR
+            op.identifier LIKE 'http://www.52north.org/test/observableProperty/%' OR
+            u.unit LIKE 'test_unit_%'
             
         );
 
 DELETE FROM observation_has_count_value AS ohcv
 USING   observation AS o, 
-        observation_constellation  AS oc,
         feature_of_interest AS f,
         procedure AS p,
         unit AS u,
         observable_property AS op
 WHERE   ohcv.observation_id = o.observation_id AND
-        o.observation_constellation_id = oc.observation_constellation_id AND
         f.feature_of_interest_id = o.feature_of_interest_id AND
         u.unit_id = o.unit_id AND
-        p.procedure_id = oc.procedure_id AND
-        oc.observable_property_id = op.observable_property_id AND
+        p.procedure_id = o.procedure_id AND
+        o.observable_property_id = op.observable_property_id AND
         (
-            p.identifier LIKE 'http://www.example.org/sensors/%' OR
-            f.identifier LIKE 'test_feature%' OR
-            op.identifier LIKE 'test_observable_property%' OR
-            u.unit LIKE 'test_unit%'
+            p.identifier LIKE 'http://www.52north.org/test/procedure/%' OR
+            f.identifier LIKE 'http://www.52north.org/test/featureOfInterest/%' OR
+            op.identifier LIKE 'http://www.52north.org/test/observableProperty/%' OR
+            u.unit LIKE 'test_unit_%'
             
         );
 
-DELETE FROM observation_relates_to_obs_const_off_obs_type AS ortocoot
-USING   observation_constellation  AS oc,
-	procedure AS p,
-	offering AS off,
-	observation_constellation_offering_observation_type AS ocoot
-WHERE	ortocoot.observation_constellation_offering_observation_type_id = ocoot.observation_constellation_offering_observation_type_id AND
-	ocoot.offering_id = off.offering_id AND
-	oc.procedure_id = p.procedure_id AND
-	(
-            p.identifier LIKE 'http://www.example.org/sensors/%' OR
-            off.identifier LIKE 'test_offering%'
-        );
-
-DELETE FROM result_template WHERE identifier LIKE 'http://www.example.org/sensors/%';
-
-DELETE FROM observation_constellation_offering_observation_type AS ocoot
-USING   observation_constellation  AS oc,
+DELETE FROM observation_relates_to_offering AS ortooff
+USING   observation  AS o,
 	procedure AS p,
 	offering AS off
-WHERE	ocoot.observation_constellation_id = oc.observation_constellation_id AND
-	ocoot.offering_id = off.offering_id AND
+WHERE ortooff.offering_id = off.offering_id AND
+	o.procedure_id = p.procedure_id AND
+	(
+            p.identifier LIKE 'http://www.52north.org/test/procedure/%' OR
+            off.identifier LIKE 'http://www.52north.org/test/offering/%'
+        );
+
+DELETE FROM result_template WHERE identifier LIKE 'http://www.52north.org/test/procedure/%';
+
+DELETE FROM observation_constellation AS oc
+USING	procedure AS p,
+	offering AS off
+WHERE
+	oc.offering_id = off.offering_id AND
 	oc.procedure_id = p.procedure_id AND
 	(
-            p.identifier LIKE 'http://www.example.org/sensors/%' OR
-            off.identifier LIKE 'test_offering%'
+            p.identifier LIKE 'http://www.52north.org/test/procedure/%' OR
+            off.identifier LIKE 'http://www.52north.org/test/offering/%'
         );
 
 DELETE FROM observation AS o
-USING   observation_constellation  AS oc,
-        feature_of_interest AS f,
+USING   feature_of_interest AS f,
         procedure AS p,
         unit AS u,
         observable_property AS op
-WHERE   o.observation_constellation_id = oc.observation_constellation_id AND
-        f.feature_of_interest_id = o.feature_of_interest_id AND
+WHERE   f.feature_of_interest_id = o.feature_of_interest_id AND
         u.unit_id = o.unit_id AND
-        p.procedure_id = oc.procedure_id AND
-        oc.observable_property_id = op.observable_property_id AND
+        p.procedure_id = o.procedure_id AND
+        o.observable_property_id = op.observable_property_id AND
         (
-            p.identifier LIKE 'http://www.example.org/sensors/%' OR
-            f.identifier LIKE 'test_feature%' OR
-            op.identifier LIKE 'test_observable_property%' OR
-            u.unit LIKE 'test_unit%'
+            p.identifier LIKE 'http://www.52north.org/test/procedure/%' OR
+            f.identifier LIKE 'http://www.52north.org/test/featureOfInterest/%' OR
+            op.identifier LIKE 'http://www.52north.org/test/observableProperty/%' OR
+            u.unit LIKE 'test_unit_%'
             
         );
 
@@ -170,27 +157,27 @@ USING   procedure AS p,
 WHERE   p.procedure_id = oc.procedure_id AND
         oc.observable_property_id = op.observable_property_id AND
         (
-            p.identifier LIKE 'http://www.example.org/sensors/%' OR
-            op.identifier LIKE 'test_observable_property%'
+            p.identifier LIKE 'http://www.52north.org/test/procedure/%' OR
+            op.identifier LIKE 'http://www.52north.org/test/observableProperty/%'
         );
 
 DELETE FROM valid_procedure_time AS vt
 USING   procedure AS p
 WHERE   p.procedure_id = vt.procedure_id AND 
-        p.identifier LIKE 'http://www.example.org/sensors/%';
+        p.identifier LIKE 'http://www.52north.org/test/procedure/%';
 
 DELETE FROM offering_has_allowed_feature_of_interest_type AS t
 USING   offering AS o
 WHERE   o.offering_id = t.offering_id AND 
-        o.identifier LIKE 'test_offering%'; 
+        o.identifier LIKE 'http://www.52north.org/test/offering/%'; 
 
 DELETE FROM offering_has_allowed_observation_type AS t
 USING   offering AS o
 WHERE   o.offering_id = t.offering_id AND 
-        o.identifier LIKE 'test_offering%'; 
+        o.identifier LIKE 'http://www.52north.org/test/offering/%'; 
 
-DELETE FROM procedure WHERE identifier LIKE 'http://www.example.org/sensors/%';
-DELETE FROM offering WHERE identifier LIKE 'test_offering%';
-DELETE FROM feature_of_interest WHERE identifier LIKE 'test_feature%';
-DELETE FROM observable_property WHERE identifier LIKE 'test_observable_property%';
-DELETE FROM unit WHERE unit LIKE 'test_unit%';
+DELETE FROM procedure WHERE identifier LIKE 'http://www.52north.org/test/procedure/%';
+DELETE FROM offering WHERE identifier LIKE 'http://www.52north.org/test/offering/%';
+DELETE FROM feature_of_interest WHERE identifier LIKE 'http://www.52north.org/test/featureOfInterest/%';
+DELETE FROM observable_property WHERE identifier LIKE 'http://www.52north.org/test/observableProperty/%';
+DELETE FROM unit WHERE unit LIKE 'test_unit_%';

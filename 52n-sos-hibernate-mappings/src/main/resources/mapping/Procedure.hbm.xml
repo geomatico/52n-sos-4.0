@@ -24,12 +24,6 @@
             </key>
             <one-to-many class="org.n52.sos.ds.hibernate.entities.ValidProcedureTime" />
         </set>
-        <set name="observationConstellations" table="observation_constellation" inverse="true" lazy="true" fetch="select">
-            <key>
-                <column name="procedure_id" not-null="true" />
-            </key>
-            <one-to-many class="org.n52.sos.ds.hibernate.entities.ObservationConstellation" />
-        </set>
         <set name="proceduresForChildSensorId" table="sensor_system" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="parent_sensor_id" not-null="true" />

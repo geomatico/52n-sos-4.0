@@ -6,6 +6,6 @@
 	http://schemas.opengis.net/sos/1.0.0/sosDescribeSensor.xsd"
 	outputFormat="text/xml;subtype=&quot;sensorML/1.0.1&quot;">
 	
-	<procedure>http://www.example.org/sensors/106</procedure>
+	<procedure>http://www.52north.org/test/procedure/106</procedure>
 	
 </DescribeSensor>

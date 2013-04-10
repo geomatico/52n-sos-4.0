@@ -12,15 +12,15 @@
 	</soap:Header>
 	<soap:Body>
 		<sos:GetDataAvailability service="SOS" version="2.0.0" xmlns:sos="http://www.opengis.net/sos/2.0">
-			<sos:observedProperty>test_observable_property_1</sos:observedProperty>
-			<sos:observedProperty>test_observable_property_2</sos:observedProperty>
-			<sos:observedProperty>test_observable_property_3</sos:observedProperty>
-			<sos:observedProperty>test_observable_property_4</sos:observedProperty>
-			<sos:observedProperty>test_observable_property_5</sos:observedProperty>
-			<sos:featureOfInterest>test_feature_1</sos:featureOfInterest>
-			<sos:featureOfInterest>test_feature_4</sos:featureOfInterest>
-			<sos:procedure>http://www.example.org/sensors/101</sos:procedure>
-			<sos:procedure>http://www.example.org/sensors/104</sos:procedure>
+			<sos:observedProperty>http://www.52north.org/test/observableProperty/1</sos:observedProperty>
+			<sos:observedProperty>http://www.52north.org/test/observableProperty/2</sos:observedProperty>
+			<sos:observedProperty>http://www.52north.org/test/observableProperty/3</sos:observedProperty>
+			<sos:observedProperty>http://www.52north.org/test/observableProperty/4</sos:observedProperty>
+			<sos:observedProperty>http://www.52north.org/test/observableProperty/5</sos:observedProperty>
+			<sos:featureOfInterest>http://www.52north.org/test/featureOfInterest/1</sos:featureOfInterest>
+			<sos:featureOfInterest>http://www.52north.org/test/featureOfInterest/4</sos:featureOfInterest>
+			<sos:procedure>http://www.52north.org/test/procedure/101</sos:procedure>
+			<sos:procedure>http://www.52north.org/test/procedure/104</sos:procedure>
 		</sos:GetDataAvailability>
 	</soap:Body>
 </soap:Envelope>

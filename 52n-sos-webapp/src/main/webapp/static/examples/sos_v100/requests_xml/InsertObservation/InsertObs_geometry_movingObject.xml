@@ -18,7 +18,7 @@
 	http://schemas.opengis.net/om/1.0.0/extensions/observationSpecialization_override.xsd"
 	service="SOS" version="1.0.0">
 
-	<AssignedSensorId>urn:ogc:object:sensor:TrackingSystem</AssignedSensorId>
+	<AssignedSensorId>http://www.52north.org/test/procedure/TrackingSystem</AssignedSensorId>
 	
 	<om:GeometryObservation>
 	
@@ -28,11 +28,11 @@
 			</gml:TimeInstant>
 		</om:samplingTime>
 		
-		<om:procedure xlink:href="urn:ogc:object:sensor:TrackingSystem" />
-		<om:observedProperty xlink:href="urn:ogc:def:phenomenon:OGC:1.0.30:position" />
+		<om:procedure xlink:href="http://www.52north.org/test/procedure/TrackingSystem" />
+		<om:observedProperty xlink:href="http://www.52north.org/test/observableProperty/position" />
 		
 		<om:featureOfInterest>
-			<n52:movingObject gml:id="human1"/>
+			<n52:movingObject gml:id="http://www.52north.org/test/featureOfInterest/human1"/>
 		</om:featureOfInterest>
 		
 		<om:result>

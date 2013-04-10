@@ -1,4 +1,4 @@
-﻿--
+--
 -- Copyright (C) 2013
 -- by 52 North Initiative for Geospatial Open Source Software GmbH
 --
@@ -25,6 +25,7 @@
 TRUNCATE 
  blob_value,
  category_value,
+ codespace,
  composite_phenomenon,
  composite_phenomenon_has_observable_property,
  feature_of_interest,
@@ -35,7 +36,6 @@ TRUNCATE
  observable_property,
  observation,
  observation_constellation,
- observation_constellation_offering_observation_type,
  observation_has_blob_value,
  observation_has_boolean_value,
  observation_has_category_value,
@@ -45,7 +45,7 @@ TRUNCATE
  observation_has_quality,
  observation_has_spatial_filtering_profile,
  observation_has_text_value,
- observation_relates_to_obs_const_off_obs_type,
+ observation_relates_to_offering,
  observation_template,
  observation_type,
  offering,

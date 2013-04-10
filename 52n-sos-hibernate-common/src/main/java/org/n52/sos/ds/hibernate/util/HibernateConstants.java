@@ -50,8 +50,9 @@ public interface HibernateConstants {
     
     String PARAMETER_OBSERVATION_CONSTELLATIONS = "observationConstellations";
 
+    @Deprecated
     String PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPE = "observationConstellationOfferingObservationType";
-
+    @Deprecated
     String PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPES = "observationConstellationOfferingObservationTypes";
 
     String PARAMETER_OBSERVATION_CONSTELLATIONS_ID = "observationConstellationId";

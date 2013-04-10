@@ -100,28 +100,24 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         long start = System.currentTimeMillis();
         Map<String, String> observationAliases = new HashMap<String, String>();
         HibernateQueryObject observationQueryObject = new HibernateQueryObject();
-        String obsConstAlias =
-                HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(observationAliases, null);
-        String obsConstOffObsTypeAlias = HibernateCriteriaQueryUtilities.addObservationConstellationOfferingObservationTypesAliasToMap(
-                observationAliases, obsConstAlias);
 
         // offering
         if (request.isSetOffering()) {
-            observationQueryObject.addCriterion(getCriterionForOffering(observationAliases,
-                    obsConstOffObsTypeAlias, request.getOfferings()));
+            observationQueryObject.addCriterion(getCriterionForOffering(observationAliases, null,
+                    request.getOfferings()));
         }
         // observableProperties
         if (request.isSetObservableProperty()) {
-            observationQueryObject.addCriterion(getCriterionForObservableProperties(observationAliases, obsConstAlias,
+            observationQueryObject.addCriterion(getCriterionForObservableProperties(observationAliases, null,
                     request.getObservedProperties()));
         }
         // procedures
         if (request.isSetProcedure()) {
-            observationQueryObject.addCriterion(getCriterionForProcedures(observationAliases, obsConstAlias,
+            observationQueryObject.addCriterion(getCriterionForProcedures(observationAliases, null,
                     request.getProcedures()));
         }
-        observationQueryObject.addCriterion(Restrictions.isNotNull(HibernateCriteriaQueryUtilities
-                .getParameterWithPrefix(HibernateConstants.PARAMETER_OBSERVATION_TYPE, obsConstOffObsTypeAlias)));
+//        observationQueryObject.addCriterion(Restrictions.isNotNull(HibernateCriteriaQueryUtilities
+//                .getParameterWithPrefix(HibernateConstants.PARAMETER_OBSERVATION_TYPE, obsConstAlias)));
 
         // feature identifier
         Set<String> featureIdentifier =
@@ -202,27 +198,27 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         long start = System.currentTimeMillis();
         Map<String, String> observationConstellationAliases = new HashMap<String, String>();
         HibernateQueryObject observationConstellationQueryObject = new HibernateQueryObject();
-        String obsConstOffObsTypeAlias =
-                HibernateCriteriaQueryUtilities.addObservationConstellationOfferingObservationTypesAliasToMap(
+        String obsConstAlias =
+                HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(
                         observationConstellationAliases, null);
         
         Map<String, String> observationAliases = new HashMap<String, String>();
         HibernateQueryObject observationQueryObject = new HibernateQueryObject();
-        String obsConstAlias =
+        String observationAlias =
                 HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(observationAliases, null);
-        HibernateCriteriaQueryUtilities.addObservationConstellationOfferingObservationTypesAliasToMap(
-                observationAliases, null);
 
         // offering
         if (request.isSetOffering()) {
-            observationConstellationQueryObject.addCriterion(getCriterionForOffering(observationConstellationAliases,
-                    obsConstOffObsTypeAlias, request.getOfferings()));
+            observationConstellationQueryObject.addCriterion(getCriterionForOfferingObsCon(observationConstellationAliases,
+                    obsConstAlias, request.getOfferings()));
+            observationQueryObject.addCriterion(getCriterionForOffering(observationAliases,
+                    null, request.getOfferings()));
         }
         // observableProperties
         if (request.isSetObservableProperty()) {
             observationConstellationQueryObject.addCriterion(getCriterionForObservableProperties(
                     observationConstellationAliases, null, request.getObservedProperties()));
-            observationQueryObject.addCriterion(getCriterionForObservableProperties(observationAliases, obsConstAlias,
+            observationQueryObject.addCriterion(getCriterionForObservableProperties(observationAliases, null,
                     request.getObservedProperties()));
         }
         // procedures
@@ -233,9 +229,9 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
                     request.getProcedures()));
         }
         observationConstellationQueryObject.addCriterion(Restrictions.isNotNull(HibernateCriteriaQueryUtilities
-                .getParameterWithPrefix(HibernateConstants.PARAMETER_OBSERVATION_TYPE, obsConstOffObsTypeAlias)));
+                .getParameterWithPrefix(HibernateConstants.PARAMETER_OBSERVATION_TYPE, obsConstAlias)));
         observationQueryObject.addCriterion(Restrictions.isNotNull(HibernateCriteriaQueryUtilities
-                .getParameterWithPrefix(HibernateConstants.PARAMETER_OBSERVATION_TYPE, obsConstOffObsTypeAlias)));
+                .getParameterWithPrefix(HibernateConstants.PARAMETER_OBSERVATION_TYPE, observationAlias)));
 
         observationConstellationQueryObject.setAliases(observationConstellationAliases);
         List<ObservationConstellation> observationConstallations =
@@ -334,8 +330,16 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         }
     }
 
-    private Criterion getCriterionForOffering(Map<String, String> aliasMap, String prefix, List<String> offerings) {
+    private Criterion getCriterionForOfferingObsCon(Map<String, String> aliasMap,
+            String prefix, List<String> offerings) {
         String offAlias = HibernateCriteriaQueryUtilities.addOfferingAliasToMap(aliasMap, prefix);
+        return HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+                HibernateCriteriaQueryUtilities.getIdentifierParameter(offAlias), offerings);
+    }
+
+    private Criterion getCriterionForOffering(Map<String, String> aliasMap, String prefix, List<String> offerings) {
+        String offAlias = HibernateCriteriaQueryUtilities.addOfferingsAliasToMap(aliasMap, prefix);
+//        String offeringAliaString = HibernateCriteriaQueryUtilities.addOfferingAliasToMap(aliasMap, offAlias);
         return HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(offAlias), offerings);
     }

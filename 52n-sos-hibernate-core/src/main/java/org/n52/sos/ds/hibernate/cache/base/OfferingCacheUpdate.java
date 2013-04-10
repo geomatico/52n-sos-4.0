@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_DELETED;
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getOfferingObjects;
 
 import java.util.Collection;
@@ -38,7 +39,7 @@ import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.ThreadLocalSessionFactory;
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
+import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
@@ -102,12 +103,12 @@ public class OfferingCacheUpdate extends CacheUpdate {
         }
     }
 
-    protected boolean containsDeletedProcedure(Collection<ObservationConstellationOfferingObservationType> set) {
-        for (ObservationConstellationOfferingObservationType obsConstOffObsType : set) {
-            return obsConstOffObsType.getObservationConstellation().getProcedure().isDeleted();
-        }
-        return true;
-    }
+//    protected boolean containsDeletedProcedure(Collection<ObservationConstellation> set) {
+//        for (ObservationConstellation obsConst : set) {
+//            return obsConst.getProcedure().isDeleted();
+//        }
+//        return true;
+//    }
 
     protected void queueTasks(List<Offering> hOfferings) {
         for (Offering offering : hOfferings) {
@@ -118,9 +119,11 @@ public class OfferingCacheUpdate extends CacheUpdate {
     protected void queueTask(Offering offering) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         queryObject.addCriterion(Restrictions.eq(HibernateConstants.PARAMETER_OFFERING, offering));
-        List<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationType =
-                HibernateCriteriaQueryUtilities.getObservationConstellationOfferingObservationType(queryObject, getSession());
-        if (!containsDeletedProcedure(observationConstellationOfferingObservationType)) {
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(PARAMETER_DELETED, false));
+        List<ObservationConstellation> observationConstellation =
+                HibernateCriteriaQueryUtilities.getObservationConstellations(queryObject, getSession());
+//        !containsDeletedProcedure(observationConstellation)
+        if (observationConstellation != null && !observationConstellation.isEmpty()) {
             // create runnable for offeringId
             Runnable task =
                      new OfferingCacheUpdateTask(getCountDownLatch(), getSessionFactory(), getCache(), offering, errors);

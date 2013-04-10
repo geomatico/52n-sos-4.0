@@ -55,6 +55,7 @@ DROP TABLE IF EXISTS request_has_composite_phenomenon CASCADE;
 DROP TABLE IF EXISTS request_has_observable_property CASCADE;
 DROP TABLE IF EXISTS observation_constellation CASCADE;
 DROP TABLE IF EXISTS valid_procedure_time CASCADE;
+DROP TABLE IF EXISTS observation_relates_to_offering CASCADE;
 DROP TABLE IF EXISTS observation_constellation_offering_observation_type CASCADE;
 DROP TABLE IF EXISTS observation_relates_to_obs_const_off_obs_type CASCADE;
 DROP TABLE IF EXISTS composite_phenomenon_has_observable_property CASCADE;

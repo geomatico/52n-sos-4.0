@@ -9,12 +9,12 @@
 	http://schemas.opengis.net/sos/1.0.0/sosGetObservation.xsd"
 	service="SOS" version="1.0.0" srsName="urn:ogc:def:crs:EPSG::4326">
 	
-	<offering>ALL_TYPES</offering>
+	<offering>http://www.52north.org/test/offering/ALL_TYPES</offering>
 		
-	<observedProperty>urn:ogc:def:phenomenon:OGC:1.0.30:active</observedProperty>
-    <observedProperty>urn:ogc:def:phenomenon:OGC:1.0.30:conditions</observedProperty>
-    <observedProperty>urn:ogc:def:phenomenon:OGC:1.0.30:lastCheck</observedProperty>
-    <observedProperty>urn:ogc:def:phenomenon:OGC:1.0.30:lastCheckDescription</observedProperty>
+	<observedProperty>http://www.52north.org/test/observableProperty/active</observedProperty>
+    <observedProperty>http://www.52north.org/test/observableProperty/conditions</observedProperty>
+    <observedProperty>http://www.52north.org/test/observableProperty/lastCheck</observedProperty>
+    <observedProperty>http://www.52north.org/test/observableProperty/lastCheckDescription</observedProperty>
 	
 	<responseFormat>text/xml;subtype=&quot;om/1.0.0&quot;</responseFormat>
 	<resultModel>om:CategoryObservation</resultModel>

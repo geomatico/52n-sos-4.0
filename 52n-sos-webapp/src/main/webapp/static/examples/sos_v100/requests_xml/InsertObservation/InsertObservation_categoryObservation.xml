@@ -19,7 +19,7 @@
 	http://schemas.opengis.net/om/1.0.0/extensions/observationSpecialization_override.xsd"
 	service="SOS" version="1.0.0">
 
-	<AssignedSensorId>patient_059345457</AssignedSensorId>
+	<AssignedSensorId>http://www.52north.org/test/procedure/patient_059345457</AssignedSensorId>
 	
 	<om:CategoryObservation>
 	
@@ -29,12 +29,12 @@
 	          </gml:TimeInstant>
 	     </om:samplingTime>
 	     
-	     <om:procedure xlink:href="patient_059345457"/>
-	     <om:observedProperty xlink:href="urn:ogc:def:phenomenon:OGC:1.0.30:patientCondition"/>
+	     <om:procedure xlink:href="http://www.52north.org/test/procedure/patient_059345457"/>
+	     <om:observedProperty xlink:href="http://www.52north.org/test/observableProperty/patientCondition"/>
 	     
 	     <om:featureOfInterest>
 	         <!-- a sampling feature is needed to insert CategoryObservations -->
-	         <sa:SamplingPoint gml:id="foi_2001">
+	         <sa:SamplingPoint gml:id="http://www.52north.org/test/featureOfInterest/2001">
 	             <gml:name>PADER</gml:name>
 	             <sa:sampledFeature xlink:href=""/>
 	             <sa:position>

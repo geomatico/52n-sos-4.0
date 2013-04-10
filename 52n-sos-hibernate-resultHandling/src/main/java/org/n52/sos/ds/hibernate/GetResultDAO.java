@@ -112,14 +112,13 @@ public class GetResultDAO extends AbstractGetResultDAO {
                                                  Session session) throws OwsExceptionReport {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
-        String obsConstOffObsTypeAlias = HibernateCriteriaQueryUtilities.addObservationConstellationOfferingObservationTypesAliasToMap(aliases, null);
-        String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
         // offering
-        String offAlias = HibernateCriteriaQueryUtilities.addOfferingAliasToMap(aliases, obsConstOffObsTypeAlias);
+        String offsAlias = HibernateCriteriaQueryUtilities.addOfferingsAliasToMap(aliases, null);
+//        String offeringAlias =HibernateCriteriaQueryUtilities.addOfferingAliasToMap(aliases, offsAlias);
         queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                HibernateCriteriaQueryUtilities.getIdentifierParameter(offAlias), request.getOffering()));
+                HibernateCriteriaQueryUtilities.getIdentifierParameter(offsAlias), request.getOffering()));
         // observableProperties
-        String obsPropAlias = HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, obsConstAlias);
+        String obsPropAlias = HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, null);
         queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(obsPropAlias), request.getObservedProperty()));
         // deleted

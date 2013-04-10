@@ -36,7 +36,7 @@ import org.hibernate.Session;
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.ThreadLocalSessionFactory;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
+import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
@@ -106,17 +106,17 @@ class OfferingCacheUpdateTask extends RunnableAction {
         // Procedures
         HibernateQueryObject queryObject = new HibernateQueryObject();
         queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateConstants.PARAMETER_OFFERING, offering));
-        List<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationType =
-                HibernateCriteriaQueryUtilities.getObservationConstellationOfferingObservationType(queryObject, session);
+        List<ObservationConstellation> observationConstellations =
+                HibernateCriteriaQueryUtilities.getObservationConstellations(queryObject, session);
         final Set<String> procedureIdentifiers =
-                          getProcedureIdentifierFrom(observationConstellationOfferingObservationType);
+                          getProcedureIdentifierFrom(observationConstellations);
         getCache().setProceduresForOffering(offeringId, procedureIdentifiers);
         // Observable properties
-        getCache().setObservablePropertiesForOffering(offeringId, getObservablePropertyIdentifierFrom(observationConstellationOfferingObservationType));
+        getCache().setObservablePropertiesForOffering(offeringId, getObservablePropertyIdentifierFrom(observationConstellations));
         // Related features
         getCache().setRelatedFeaturesForOffering(offeringId, getRelatedFeatureIdentifiersFrom(getOffering()));
         // Observation types
-        getCache().setObservationTypesForOffering(offeringId, getObservationTypesFrom(observationConstellationOfferingObservationType));
+        getCache().setObservationTypesForOffering(offeringId, getObservationTypesFrom(observationConstellations));
         getCache()
                 .setAllowedObservationTypeForOffering(offeringId, getObservationTypesFromObservationType(getOffering()
                 .getObservationTypes()));
@@ -137,10 +137,10 @@ class OfferingCacheUpdateTask extends RunnableAction {
                 .getMaxResultTime4Offering(dsOfferingId, session));
     }
 
-    protected Set<String> getProcedureIdentifierFrom(Collection<ObservationConstellationOfferingObservationType> set) {
+    protected Set<String> getProcedureIdentifierFrom(Collection<ObservationConstellation> set) {
         Set<String> procedures = new HashSet<String>(set.size());
-        for (ObservationConstellationOfferingObservationType ocoot : set) {
-            procedures.add(CacheHelper.addPrefixOrGetProcedureIdentifier(ocoot.getObservationConstellation().getProcedure().getIdentifier()));
+        for (ObservationConstellation oc : set) {
+            procedures.add(CacheHelper.addPrefixOrGetProcedureIdentifier(oc.getProcedure().getIdentifier()));
         }
         return procedures;
     }
@@ -161,21 +161,21 @@ class OfferingCacheUpdateTask extends RunnableAction {
        return features;
     }
 
-    protected Set<String> getObservablePropertyIdentifierFrom(Collection<ObservationConstellationOfferingObservationType> set) {
+    protected Set<String> getObservablePropertyIdentifierFrom(Collection<ObservationConstellation> set) {
         Set<String> observableProperties = new HashSet<String>(set.size());
-        for (ObservationConstellationOfferingObservationType ocoot : set) {
-            if (ocoot.getObservationConstellation().getObservableProperty() != null) {
-                observableProperties.add(CacheHelper.addPrefixOrGetObservablePropertyIdentifier(ocoot.getObservationConstellation().getObservableProperty().getIdentifier()));
+        for (ObservationConstellation oc : set) {
+            if (oc.getObservableProperty() != null) {
+                observableProperties.add(CacheHelper.addPrefixOrGetObservablePropertyIdentifier(oc.getObservableProperty().getIdentifier()));
             }
         }
         return observableProperties;
     }
 
-    protected Set<String> getObservationTypesFrom(Collection<ObservationConstellationOfferingObservationType> set) {
+    protected Set<String> getObservationTypesFrom(Collection<ObservationConstellation> set) {
         Set<String> observationTypes = new HashSet<String>(set.size());
-        for (ObservationConstellationOfferingObservationType ocoot : set) {
-            if (ocoot.getObservationType() != null) {
-                observationTypes.add(ocoot.getObservationType().getObservationType());
+        for (ObservationConstellation oc : set) {
+            if (oc.getObservationType() != null) {
+                observationTypes.add(oc.getObservationType().getObservationType());
             }
         }
         return observationTypes;

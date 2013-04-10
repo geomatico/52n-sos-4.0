@@ -34,11 +34,11 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.n52.sos.ds.AbstractDeleteSensorDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
+import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.response.DeleteSensorResponse;
 import org.slf4j.Logger;
@@ -93,18 +93,16 @@ public class DeleteSensorDAO extends AbstractDeleteSensorDAO {
             String procedureIdentifier, Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>(0);
-        String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
-        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, obsConstAlias);
+        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, null);
         queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), procedureIdentifier));
         queryObject.setAliases(aliases);
-        List<ObservationConstellationOfferingObservationType> obsConstOffObsTypes =
+        List<ObservationConstellation> hObservationConstellations =
                                                               HibernateCriteriaQueryUtilities
-                .getObservationConstellationOfferingObservationType(queryObject,
-                                                                    session);
-        for (ObservationConstellationOfferingObservationType obsConstOffObsType : obsConstOffObsTypes) {
-            obsConstOffObsType.setDeleted(true);
-            session.saveOrUpdate(obsConstOffObsType);
+                .getObservationConstellations(queryObject,session);
+        for (ObservationConstellation hObservationConstellation : hObservationConstellations) {
+            hObservationConstellation.setDeleted(true);
+            session.saveOrUpdate(hObservationConstellation);
             session.flush();
         }
     }
@@ -112,8 +110,8 @@ public class DeleteSensorDAO extends AbstractDeleteSensorDAO {
     private void setObservationsAsDeletedForProcedure(String procedureIdentifier, Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>(0);
-        String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
-        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, obsConstAlias);
+//        String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
+        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, null);
         queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), procedureIdentifier));
         queryObject.setAliases(aliases);

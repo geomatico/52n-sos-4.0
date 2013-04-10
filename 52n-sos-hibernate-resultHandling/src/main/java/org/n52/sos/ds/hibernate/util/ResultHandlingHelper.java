@@ -37,7 +37,6 @@ import org.n52.sos.ds.hibernate.entities.CountObservation;
 import org.n52.sos.ds.hibernate.entities.GeometryObservation;
 import org.n52.sos.ds.hibernate.entities.NumericObservation;
 import org.n52.sos.ds.hibernate.entities.Observation;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.TextObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosResultEncoding;
@@ -155,8 +154,7 @@ public class ResultHandlingHelper {
     }
 
     private static String getValueAsStringForObservedProperty(Observation observation, String definition) {
-        ObservationConstellation observationConstellation = observation.getObservationConstellation();
-        String observedProperty = observationConstellation.getObservableProperty().getIdentifier();
+        String observedProperty = observation.getObservableProperty().getIdentifier();
         
 		if (observedProperty.equals(definition)) {
 		        if (observation instanceof NumericObservation) {

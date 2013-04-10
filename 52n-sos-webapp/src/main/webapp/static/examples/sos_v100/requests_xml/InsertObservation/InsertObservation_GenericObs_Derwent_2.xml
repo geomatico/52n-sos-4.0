@@ -7,7 +7,7 @@
   xsi:schemaLocation="http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosInsert.xsd http://www.opengis.net/sampling/1.0 http://schemas.opengis.net/sampling/1.0.0/sampling.xsd http://www.opengis.net/om/1.0 http://schemas.opengis.net/om/1.0.0/extensions/observationSpecialization_override.xsd"
   service="SOS" version="1.0.0">
   
- <AssignedSensorId>urn:ogc:object:feature:Sensor:Derwent-Station-2</AssignedSensorId>
+ <AssignedSensorId>http://www.52north.org/test/procedure/Derwent-Station-2</AssignedSensorId>
   
  <om:Observation>
   
@@ -18,20 +18,20 @@
    </gml:TimePeriod>
   </om:samplingTime>
     
-  <om:procedure xlink:href="urn:ogc:object:feature:Sensor:Derwent-Station-2" />
+  <om:procedure xlink:href="http://www.52north.org/test/procedure/Derwent-Station-2" />
     
   <om:observedProperty>
    <swe:CompositePhenomenon gml:id="cpid0" dimension="1">
     <gml:name>resultComponents</gml:name>
     <swe:component xlink:href="http://www.opengis.net/def/uom/ISO-8601/0/Gregorian" />
-    <swe:component xlink:href="urn:ogc:def:phenomenon:OGC:1.0.30:temperature" />
-    <swe:component xlink:href="urn:ogc:def:phenomenon:OGC:1.0.30:conditions" />
-    <swe:component xlink:href="urn:ogc:def:phenomenon:OGC:1.0.30:position" />
+    <swe:component xlink:href="http://www.52north.org/test/observableProperty/temperature" />
+    <swe:component xlink:href="http://www.52north.org/test/observableProperty/conditions" />
+    <swe:component xlink:href="http://www.52north.org/test/observableProperty/position" />
    </swe:CompositePhenomenon>
   </om:observedProperty>
     
   <om:featureOfInterest>
-     <sa:SamplingPoint gml:id="Hobart-2">
+     <sa:SamplingPoint gml:id="http://www.52north.org/test/featureOfInterest/Hobart-2">
       <gml:name>Hobart 2</gml:name>
       <sa:sampledFeature xlink:href=""/>
       <sa:position>
@@ -60,16 +60,16 @@
        <swe:Text definition="http://www.opengis.net/def/property/OGC/0/FeatureOfInterest" />
       </swe:field>
       <swe:field name="temperature">
-       <swe:Quantity definition="urn:ogc:def:phenomenon:OGC:1.0.30:temperature">
+       <swe:Quantity definition="http://www.52north.org/test/observableProperty/temperature">
         <swe:uom code="Cel" />
        </swe:Quantity>
       </swe:field>
       <swe:field name="conditions">
-       <swe:Category definition="urn:ogc:def:phenomenon:OGC:1.0.30:conditions">
+       <swe:Category definition="http://www.52north.org/test/observableProperty/conditions">
        </swe:Category>
       </swe:field>
       <swe:field name="position">
-       <swe:Position definition="urn:ogc:def:phenomenon:OGC:1.0.30:position">
+       <swe:Position definition="http://www.52north.org/test/observableProperty/position">
        </swe:Position>
       </swe:field>
      </swe:DataRecord>

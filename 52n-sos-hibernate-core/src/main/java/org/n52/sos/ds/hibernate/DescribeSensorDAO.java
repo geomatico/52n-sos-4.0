@@ -103,10 +103,8 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
                                                                    Session session) throws OwsExceptionReport {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>(3);
-        String obsConstAlias =
-                HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
         // procedures
-        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, obsConstAlias);
+        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, null);
         queryObject.setAliases(aliases);
         List<String> list = new ArrayList<String>(1);
         list.add(procedureIdentifier);

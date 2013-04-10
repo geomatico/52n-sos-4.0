@@ -22,8 +22,19 @@
 						<sml:IdentifierList>
 							<sml:identifier>
 								<sml:Term definition="urn:ogc:def:identifier:OGC:uniqueID">
-									<sml:value>urn:ogc:object:feature:Sensor:IFGI:ifgi-sensor-5
+									<sml:value>http://www.52north.org/test/procedure/sensor-5
 									</sml:value>
+								</sml:Term>
+							</sml:identifier>
+						</sml:IdentifierList>
+					</sml:identification>
+					
+					<!-- optional; generated if not present -->
+					<sml:identification xlink:title="offerings">
+						<sml:IdentifierList>
+							<sml:identifier name="Offering for sensor sensor-5">
+								<sml:Term definition="urn:ogc:def:identifier:OGC:offeringID">
+									<sml:value>http://www.52north.org/test/offering/sensor-5</sml:value>
 								</sml:Term>
 							</sml:identifier>
 						</sml:IdentifierList>
@@ -62,7 +73,7 @@
 						<sml:InputList>
 							<sml:input name="waterlevel">
 								<swe:ObservableProperty
-									definition="test_observable_property_6" />
+									definition="http://www.52north.org/test/observableProperty/6" />
 							</sml:input>
 						</sml:InputList>
 					</sml:inputs>
@@ -74,13 +85,7 @@
 					<sml:outputs>
 						<sml:OutputList>
 							<sml:output name="waterlevel">
-								<swe:Quantity definition="test_observable_property_6">
-									<gml:metaDataProperty>
-										<offering>
-											<id>test_offering_6</id>
-											<name>gauge height in Muenster</name>
-										</offering>
-									</gml:metaDataProperty>
+								<swe:Quantity definition="http://www.52north.org/test/observableProperty/6">
 									<swe:uom code="cm" />
 								</swe:Quantity>
 							</sml:output>
@@ -107,14 +112,14 @@
 										<sml:InputList>
 											<sml:input name="gaugeHeight">
 												<swe:ObservableProperty
-													definition="test_observable_property_6" />
+													definition="http://www.52north.org/test/observableProperty/6" />
 											</sml:input>
 										</sml:InputList>
 									</sml:inputs>
 									<sml:outputs>
 										<sml:OutputList>
 											<sml:output name="gaugeHeight">
-												<swe:Quantity definition="test_observable_property_6">
+												<swe:Quantity definition="http://www.52north.org/test/observableProperty/6">
 													<swe:uom code="cm" />
 												</swe:Quantity>
 											</sml:output>
@@ -137,7 +142,7 @@
 			<om:procedure />
 			<om:observedProperty />
 			<om:featureOfInterest>
-				<sa:SamplingPoint gml:id="foi_3001">
+				<sa:SamplingPoint gml:id="http://www.52north.org/test/featureOfInterest/3001">
 					<gml:name>SamplingPoint 3</gml:name>
 					<sa:sampledFeature/>
 					<sa:position>

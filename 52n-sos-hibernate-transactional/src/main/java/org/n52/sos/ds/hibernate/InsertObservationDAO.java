@@ -38,7 +38,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.n52.sos.ds.AbstractInsertObservationDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
+import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateUtilities;
@@ -82,45 +82,45 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
             CompositeOwsException exceptions = new CompositeOwsException();
             for (SosObservation sosObservation : request.getObservations()) {
                 SosObservationConstellation sosObsConst = sosObservation.getObservationConstellation();
-                Set<ObservationConstellationOfferingObservationType> hObsConstOffObsTypes =
-                                                                     new HashSet<ObservationConstellationOfferingObservationType>(0);
+                Set<ObservationConstellation> hObservationConstellations =
+                                                                     new HashSet<ObservationConstellation>(0);
                 FeatureOfInterest hFeature = null;
                 for (String offeringID : sosObsConst.getOfferings()) {
-                    ObservationConstellationOfferingObservationType hObsConstOffObsType = null;
+                    ObservationConstellation hObservationConstellation = null;
                     try {
-                        hObsConstOffObsType =
+                        hObservationConstellation =
                         // HibernateUtilities.checkObservationConstellationForObservation(sosObsConst,
                         // offeringID, session,
                         // Sos2Constants.InsertObservationParams.observationType.name());
-                        HibernateUtilities.checkObservationConstellationOfferingObservationTypeForObservation(
+                        HibernateUtilities.checkObservationConstellation(
                                 sosObsConst, offeringID, session,
                                 Sos2Constants.InsertObservationParams.observationType.name());
                     } catch (OwsExceptionReport owse) {
                         exceptions.add(owse);
                     }
-                    if (hObsConstOffObsType != null) {
+                    if (hObservationConstellation != null) {
                         hFeature =
                         HibernateUtilities.checkOrInsertFeatureOfInterest(sosObservation
                                 .getObservationConstellation().getFeatureOfInterest(), session);
                         HibernateUtilities.checkOrInsertFeatureOfInterestRelatedFeatureRelation(hFeature,
-                                                                                                hObsConstOffObsType
+                                hObservationConstellation
                                 .getOffering(), session);
-                        if (isSweArrayObservation(hObsConstOffObsType)) {
+                        if (isSweArrayObservation(hObservationConstellation)) {
                             ResultTemplate resultTemplate =
-                                           createResultTemplate(sosObservation, hObsConstOffObsType, hFeature);
+                                           createResultTemplate(sosObservation, hObservationConstellation, hFeature);
                             session.save(resultTemplate);
                             session.flush();
                         }
-                        hObsConstOffObsTypes.add(hObsConstOffObsType);
+                        hObservationConstellations.add(hObservationConstellation);
                     }
                 }
 
-                if (!hObsConstOffObsTypes.isEmpty()) {
+                if (!hObservationConstellations.isEmpty()) {
                     if (sosObservation.getValue() instanceof SosSingleObservationValue) {
-                        HibernateCriteriaTransactionalUtilities.insertObservationSingleValue(hObsConstOffObsTypes,
+                        HibernateCriteriaTransactionalUtilities.insertObservationSingleValue(hObservationConstellations,
                                                                                              hFeature, sosObservation, session);
                     } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
-                        HibernateCriteriaTransactionalUtilities.insertObservationMutliValue(hObsConstOffObsTypes,
+                        HibernateCriteriaTransactionalUtilities.insertObservationMutliValue(hObservationConstellations,
                                                                                             hFeature, sosObservation, session);
                     }
                 }
@@ -147,13 +147,13 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
         return response;
     }
 
-    private boolean isSweArrayObservation(ObservationConstellationOfferingObservationType hObsConstOffObsType) {
-        return hObsConstOffObsType.getObservationType().getObservationType()
+    private boolean isSweArrayObservation(ObservationConstellation hObsConst) {
+        return hObsConst.getObservationType().getObservationType()
                 .equalsIgnoreCase(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
     }
 
     private ResultTemplate createResultTemplate(SosObservation observation,
-                                                ObservationConstellationOfferingObservationType hObsConstOffObsType,
+                                                ObservationConstellation hObsConst,
                                                 FeatureOfInterest feature)
             throws OwsExceptionReport {
         ResultTemplate resultTemplate = new ResultTemplate();
@@ -166,7 +166,7 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
             identifier = UUID.randomUUID().toString();
         }
         resultTemplate.setIdentifier(identifier);
-        resultTemplate.setObservationConstellationOfferingObservationType(hObsConstOffObsType);
+        resultTemplate.setObservationConstellation(hObsConst);
         resultTemplate.setFeatureOfInterest(feature);
         SosSweDataArray dataArray = ((SweDataArrayValue) observation.getValue().getValue()).getValue();
 

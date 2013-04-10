@@ -13,11 +13,22 @@ http://schemas.opengis.net/sos/1.0.0/sosRegisterSensor.xsd http://www.opengis.ne
                <sml:IdentifierList>
                     <sml:identifier>
                          <sml:Term definition="urn:ogc:def:identifier:OGC:uniqueID">
-                              <sml:value>urn:ogc:object:feature:Sensor:Derwent-Station-2</sml:value>
+                              <sml:value>http://www.52north.org/test/procedure/Derwent-Station-2</sml:value>
                          </sml:Term>
                     </sml:identifier>
                </sml:IdentifierList>
           </sml:identification>
+          
+          <!-- optional; generated if not present -->
+					<sml:identification xlink:title="offerings">
+						<sml:IdentifierList>
+							<sml:identifier name="Offering for sensor Derwent-Station-2">
+								<sml:Term definition="urn:ogc:def:identifier:OGC:offeringID">
+									<sml:value>http://www.52north.org/test/offering/HOBART</sml:value>
+								</sml:Term>
+							</sml:identifier>
+						</sml:IdentifierList>
+					</sml:identification>
           
           <!-- last measured position of sensor -->
           <sml:position name="sensorPosition">
@@ -51,13 +62,13 @@ http://schemas.opengis.net/sos/1.0.0/sosRegisterSensor.xsd http://www.opengis.ne
           <sml:inputs>
                <sml:InputList>
                     <sml:input name="Temperature">
-                         <swe:ObservableProperty definition="urn:ogc:def:phenomenon:OGC:1.0.30:temperature"/>
+                         <swe:ObservableProperty definition="http://www.52north.org/test/observableProperty/temperature"/>
                     </sml:input>
                     <sml:input name="Sunny">
-                         <swe:ObservableProperty definition="urn:ogc:def:phenomenon:OGC:1.0.30:conditions"/>
+                         <swe:ObservableProperty definition="http://www.52north.org/test/observableProperty/conditions"/>
                     </sml:input>
                     <sml:input name="Position">
-                         <swe:ObservableProperty definition="urn:ogc:def:phenomenon:OGC:1.0.30:position"/>
+                         <swe:ObservableProperty definition="http://www.52north.org/test/observableProperty/position"/>
                     </sml:input>
                </sml:InputList>
           </sml:inputs>
@@ -66,73 +77,20 @@ http://schemas.opengis.net/sos/1.0.0/sosRegisterSensor.xsd http://www.opengis.ne
           <sml:outputs>
                <sml:OutputList>
                     <sml:output name="temperature">
-                         <swe:Quantity definition="urn:ogc:def:phenomenon:OGC:1.0.30:temperature">
-                                <gml:metaDataProperty>
-                    <offering>
-                      <id>HOBART</id>
-                      <name>Temperature,Weather and Position in Hobart</name>
-                    </offering>
-                </gml:metaDataProperty>
+                         <swe:Quantity definition="http://www.52north.org/test/observableProperty/temperature">
                               <swe:uom code="Cel"/>
                          </swe:Quantity>
                     </sml:output>
                     <sml:output name="conditions">
-                         <swe:Category definition="urn:ogc:def:phenomenon:OGC:1.0.30:conditions">
-                                <gml:metaDataProperty>
-                    <offering>
-                      <id>HOBART</id>
-                      <name>Temperature,Weather and Position in Hobart</name>
-                    </offering>
-                </gml:metaDataProperty>
+                         <swe:Category definition="http://www.52north.org/test/observableProperty/conditions">
                          </swe:Category>
                     </sml:output>
                      <sml:output name="position">
-                         <swe:Position definition="urn:ogc:def:phenomenon:OGC:1.0.30:position">
-                                <gml:metaDataProperty>
-                    <offering>
-                      <id>HOBART</id>
-                      <name>Temperature,Weather and Position in Hobart</name>
-                    </offering>
-                </gml:metaDataProperty>
+                         <swe:Position definition="http://www.52north.org/test/observableProperty/position">
                          </swe:Position>
                     </sml:output>
                </sml:OutputList>
           </sml:outputs>
-          
-          <!-- description of components of this sensor system; these are currently not used by the 52N SOS -->
-          <sml:components>
-               <sml:ComponentList>
-                    <sml:component name="thermometer">
-                         <sml:Component>
-                              <sml:identification>
-                                   <sml:IdentifierList>
-                                        <sml:identifier>
-                                             <sml:Term definition="urn:ogc:def:identifier:OGC:uniqueID">
-                                                  <sml:value>urn:ogc:object:feature:Sensor:IfGI_WS_WESEL_1</sml:value>
-                                             </sml:Term>
-                                        </sml:identifier>
-                                   </sml:IdentifierList>
-                              </sml:identification>
-                              <sml:inputs>
-                                   <sml:InputList>
-                                        <sml:input name="atmosphericTemperature">
-                                             <swe:ObservableProperty definition="urn:ogc:def:property:OGC:1.0:temperature"/>
-                                        </sml:input>
-                                   </sml:InputList>
-                              </sml:inputs>
-                              <sml:outputs>
-                                   <sml:OutputList>
-                                        <sml:output name="temperature">
-                                             <swe:Quantity definition="urn:ogc:def:property:OGC:1.0:temperature">
-                                                  <swe:uom code="deg"/>
-                                             </swe:Quantity>
-                                        </sml:output>
-                                   </sml:OutputList>
-                              </sml:outputs>
-                         </sml:Component>
-                    </sml:component>
-               </sml:ComponentList>
-          </sml:components>
      </sml:System>
      </sml:member>
      </sml:SensorML>

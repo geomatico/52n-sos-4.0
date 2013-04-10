@@ -15,11 +15,5 @@
         <property name="description" type="string">
             <column name="description" />
         </property>
-        <set name="observationConstellations" table="observation_constellation" inverse="true" lazy="true" fetch="select">
-            <key>
-                <column name="observable_property_id" not-null="true" />
-            </key>
-            <one-to-many class="org.n52.sos.ds.hibernate.entities.ObservationConstellation" />
-        </set>
     </class>
 </hibernate-mapping>

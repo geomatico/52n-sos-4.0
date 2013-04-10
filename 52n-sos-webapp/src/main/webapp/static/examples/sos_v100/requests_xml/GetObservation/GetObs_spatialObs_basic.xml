@@ -6,8 +6,8 @@
 	xsi:schemaLocation="http://www.opengis.net/sos/1.0
 http://schemas.opengis.net/sos/1.0.0/sosGetObservation.xsd"
 	service="SOS" version="1.0.0" srsName="urn:ogc:def:crs:EPSG::4326">
-	<offering>TrackingPositions</offering>
-	<observedProperty>urn:ogc:def:phenomenon:OGC:1.0.30:position</observedProperty>
+	<offering>http://www.52north.org/test/offering/TrackingPositions</offering>
+	<observedProperty>http://www.52north.org/test/observableProperty/position</observedProperty>
 	<responseFormat>text/xml;subtype=&quot;om/1.0.0&quot;</responseFormat>
 	<resultModel>om:SpatialObservation</resultModel>
 </GetObservation>

@@ -39,10 +39,12 @@ import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.GeometryObservation;
 import org.n52.sos.ds.hibernate.entities.NumericObservation;
 import org.n52.sos.ds.hibernate.entities.Observation;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
+import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.TextObservation;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
@@ -58,13 +60,11 @@ import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.om.values.UnknownValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.Configurator;
 
 public class HibernateUtilities {
-    public static ObservationConstellationOfferingObservationType checkObservationConstellationOfferingObservationTypeForObservation(
+    public static ObservationConstellation checkObservationConstellation(
             SosObservationConstellation sosObservationConstellation, String offeringIdentifier, Session session,
             String parameterName)
             throws OwsExceptionReport, HibernateException {
@@ -72,36 +72,35 @@ public class HibernateUtilities {
         // check if multiple offerings.
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
-        String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
         String offAlias = HibernateCriteriaQueryUtilities.addOfferingAliasToMap(aliases, null);
         queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(offAlias), offeringIdentifier));
-        String obsPropAlias = HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, obsConstAlias);
+        String obsPropAlias = HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, null);
         queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateCriteriaQueryUtilities
                 .getIdentifierParameter(obsPropAlias), sosObservationConstellation.getObservableProperty()
                 .getIdentifier()));
-        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, obsConstAlias);
+        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, null);
         queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias),
                 sosObservationConstellation.getProcedure().getIdentifier()));
         queryObject.setAliases(aliases);
-        List<ObservationConstellationOfferingObservationType> obsConstsOffObsTypes = HibernateCriteriaQueryUtilities
-                .getObservationConstellationOfferingObservationType(queryObject, session);
-        if (obsConstsOffObsTypes != null && !obsConstsOffObsTypes.isEmpty()) {
-            for (ObservationConstellationOfferingObservationType obsConstsOffObsType : obsConstsOffObsTypes) {
-                if (obsConstsOffObsType.getObservationType() == null
-                    || (obsConstsOffObsType.getObservationType() != null && (obsConstsOffObsType.getObservationType()
+        List<ObservationConstellation> hObservationConstellations = HibernateCriteriaQueryUtilities
+                .getObservationConstellations(queryObject, session);
+        if (hObservationConstellations != null && !hObservationConstellations.isEmpty()) {
+            for (ObservationConstellation hObservationConstellation : hObservationConstellations) {
+                if (hObservationConstellation.getObservationType() == null
+                    || (hObservationConstellation.getObservationType() != null && (hObservationConstellation.getObservationType()
                         .getObservationType()
-                        .equals("NOT_DEFINED") || obsConstsOffObsType.getObservationType().getObservationType()
+                        .equals("NOT_DEFINED") || hObservationConstellation.getObservationType().getObservationType()
                         .isEmpty()))) {
                     return HibernateCriteriaTransactionalUtilities
-                            .updateObservationConstellationOfferingObservationType(obsConstsOffObsType,
+                            .updateObservationConstellation(hObservationConstellation,
                                                                                    sosObservationConstellation
                             .getObservationType(), session);
                 } else {
-                    if (obsConstsOffObsType.getObservationType().getObservationType()
+                    if (hObservationConstellation.getObservationType().getObservationType()
                             .equals(sosObservationConstellation.getObservationType())) {
-                        return obsConstsOffObsType;
+                        return hObservationConstellation;
                     } else {
                         throw new InvalidParameterValueException().at(parameterName)
                                 .withMessage("The requested observationType (%s) is invalid for procedure = %s, observedProperty = %s and offering = %s! The valid observationType is '%s'!",
@@ -109,7 +108,7 @@ public class HibernateUtilities {
                                              sosObservationConstellation.getProcedure(),
                                              sosObservationConstellation.getObservableProperty().getIdentifier(),
                                              sosObservationConstellation.getOfferings(),
-                                             obsConstsOffObsType.getObservationType().getObservationType());
+                                             hObservationConstellation.getObservationType().getObservationType());
                     }
                 }
             }

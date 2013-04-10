@@ -52,10 +52,9 @@ public class ResultTemplateCacheUpdate extends CacheUpdate {
         for (ResultTemplate resultTemplate : resultTemplates) {
             String id = resultTemplate.getIdentifier();
             getCache().addResultTemplate(id);
-            getCache().addResultTemplateForOffering(resultTemplate.getObservationConstellationOfferingObservationType()
+            getCache().addResultTemplateForOffering(resultTemplate.getObservationConstellation()
                     .getOffering().getIdentifier(), id);
             getCache().addObservablePropertyForResultTemplate(id, resultTemplate
-                    .getObservationConstellationOfferingObservationType()
                     .getObservationConstellation()
                     .getObservableProperty()
                     .getIdentifier());

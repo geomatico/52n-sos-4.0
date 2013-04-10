@@ -15,7 +15,7 @@
 			xmlns:xs="http://www.w3.org/2001/XMLSchema"
 			xsi:schemaLocation="http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sos.xsd">
 			<!-- multiple offerings are possible -->
-			<sos:offering>test_offering_7</sos:offering>
+			<sos:offering>http://www.52north.org/test/offering/7</sos:offering>
 			<sos:observation>
 				<om:OM_Observation gml:id="o1">
 					<om:type xlink:href="http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CountObservation"/>
@@ -25,13 +25,13 @@
 						</gml:TimeInstant>
 					</om:phenomenonTime>
 					<om:resultTime xlink:href="#phenomenonTime"/>
-					<om:procedure xlink:href="http://www.example.org/sensors/107"/>
-					<om:observedProperty xlink:href="test_observable_property_7_2"/>
+					<om:procedure xlink:href="http://www.52north.org/test/procedure/107"/>
+					<om:observedProperty xlink:href="http://www.52north.org/test/observableProperty/7_2"/>
 					<om:featureOfInterest>
 						<sams:SF_SpatialSamplingFeature gml:id="ssf_test_feature_7_2"> 
-							<gml:identifier codeSpace="">test_feature_7_2</gml:identifier> 
+							<gml:identifier codeSpace="">http://www.52north.org/test/featureOfInterest/7_2</gml:identifier> 
 							<sf:type xlink:href="http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint"/> 
-							<sf:sampledFeature xlink:href="test_feature_7_2"/> 
+							<sf:sampledFeature xlink:href="http://www.52north.org/test/featureOfInterest/1"/> 
 							<sams:shape> 
 								<gml:Point gml:id="test_feature_7_2"> 
 									<gml:pos srsName="http://www.opengis.net/def/crs/EPSG/0/4326">52.980090 8.401108</gml:pos> 

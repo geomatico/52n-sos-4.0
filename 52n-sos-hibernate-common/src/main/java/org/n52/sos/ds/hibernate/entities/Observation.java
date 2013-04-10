@@ -32,15 +32,16 @@ import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasCodespace;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasDeletedFlag;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasFeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasIdentifier;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservationConstellation;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservationConstellationOfferingObservationTypes;
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservableProperty;
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasOfferings;
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasProcedure;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasQualities;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasSpatialFilteringProfiles;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasUnit;
 
-public class Observation implements Serializable, HasIdentifier, HasDeletedFlag, HasFeatureOfInterest,
-                                    HasObservationConstellation, HasCodespace, HasUnit, HasSpatialFilteringProfiles,
-                                    HasObservationConstellationOfferingObservationTypes, HasQualities {
+public class Observation implements Serializable, HasIdentifier, HasDeletedFlag, HasObservableProperty, HasProcedure, HasFeatureOfInterest,
+                                    HasOfferings, HasCodespace, HasUnit, HasSpatialFilteringProfiles,
+                                    HasQualities {
     public static final String ID = "observationId";
     public static final String PHENOMENON_TIME_START = "phenomenonTimeStart";
     public static final String PHENOMENON_TIME_END = "phenomenonTimeEnd";
@@ -52,7 +53,8 @@ public class Observation implements Serializable, HasIdentifier, HasDeletedFlag,
     private long observationId;
     private Boolean deleted;
     private FeatureOfInterest featureOfInterest;
-    private ObservationConstellation observationConstellation;
+    private ObservableProperty observableProperty;
+    private Procedure procedure;
     private String identifier;
     private Codespace codespace;
     private Date phenomenonTimeStart;
@@ -62,8 +64,7 @@ public class Observation implements Serializable, HasIdentifier, HasDeletedFlag,
     private Date validTimeEnd;
     private Unit unit;
     private String setId;
-    private Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes =
-                                                                 new HashSet<ObservationConstellationOfferingObservationType>(0);
+    private Set<Offering> offerings = new HashSet<Offering>(0);
     private Set<SpatialFilteringProfile> spatialFilteringProfiles;
     private Set<Quality> qualities = new HashSet<Quality>(0);
 
@@ -87,15 +88,24 @@ public class Observation implements Serializable, HasIdentifier, HasDeletedFlag,
     public void setFeatureOfInterest(FeatureOfInterest featureOfInterest) {
         this.featureOfInterest = featureOfInterest;
     }
-
+    
     @Override
-    public ObservationConstellation getObservationConstellation() {
-        return this.observationConstellation;
+    public ObservableProperty getObservableProperty() {
+        return this.observableProperty;
+    }
+    @Override
+    public void setObservableProperty(ObservableProperty observableProperty) {
+        this.observableProperty = observableProperty;
     }
 
     @Override
-    public void setObservationConstellation(ObservationConstellation observationConstellation) {
-        this.observationConstellation = observationConstellation;
+    public Procedure getProcedure() {
+        return this.procedure;
+    }
+
+    @Override
+    public void setProcedure(Procedure procedure) {
+        this.procedure = procedure;
     }
 
     @Override
@@ -177,14 +187,14 @@ public class Observation implements Serializable, HasIdentifier, HasDeletedFlag,
     }
 
     @Override
-    public Set<ObservationConstellationOfferingObservationType> getObservationConstellationOfferingObservationTypes() {
-        return this.observationConstellationOfferingObservationTypes;
+    public Set<Offering> getOfferings() {
+        return this.offerings;
     }
 
     @Override
-    public void setObservationConstellationOfferingObservationTypes(
-            Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes) {
-        this.observationConstellationOfferingObservationTypes = observationConstellationOfferingObservationTypes;
+    public void setOfferings(
+            Set<Offering> offerings) {
+        this.offerings = offerings;
     }
 
     @Override

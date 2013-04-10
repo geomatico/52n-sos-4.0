@@ -65,7 +65,6 @@ import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.ObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
@@ -102,7 +101,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
 
     /**
      * Get min phenomenon time from observations
-      * 
+     * 
      * @param session
      *            Hibernate session
      * @return min time
@@ -120,15 +119,16 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
 
     /**
      * Get min result time from observations
-     *
-     * @param session Hibernate session
-     *
+     * 
+     * @param session
+     *            Hibernate session
+     * 
      * @return min time
      */
     public static DateTime getMinResultTime(Session session) {
-        Object min = session.createCriteria(Observation.class)
-                .setProjection(Projections.min(PARAMETER_RESULT_TIME))
-                .add(Restrictions.eq(PARAMETER_DELETED, false)).uniqueResult();
+        Object min =
+                session.createCriteria(Observation.class).setProjection(Projections.min(PARAMETER_RESULT_TIME))
+                        .add(Restrictions.eq(PARAMETER_DELETED, false)).uniqueResult();
         if (min != null) {
             return new DateTime(min);
         }
@@ -137,16 +137,16 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
 
     /**
      * Get max phenomenon from observations
-     *
-     * @param session Hibernate session
-     *
+     * 
+     * @param session
+     *            Hibernate session
+     * 
      * @return max time
      */
     public static DateTime getMaxResultTime(Session session) {
         Object max =
-               session.createCriteria(Observation.class)
-                .setProjection(Projections.max(PARAMETER_RESULT_TIME))
-                .add(Restrictions.eq(PARAMETER_DELETED, false)).uniqueResult();
+                session.createCriteria(Observation.class).setProjection(Projections.max(PARAMETER_RESULT_TIME))
+                        .add(Restrictions.eq(PARAMETER_DELETED, false)).uniqueResult();
         if (max == null) {
             return null;
         } else {
@@ -161,9 +161,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     public static TimePeriod getGlobalTemporalBoundingBox(Session session) {
         if (session != null) {
             Map<String, String> aliases = new HashMap<String, String>();
-            String obsConstOffObsTypeAlias =
-                    addObservationConstellationOfferingObservationTypesAliasToMap(aliases, null);
-            addOfferingAliasToMap(aliases, obsConstOffObsTypeAlias);
+            String offAlias = addOfferingsAliasToMap(aliases, null);
 
             ProjectionList projections = Projections.projectionList();
             projections.add(Projections.min(PARAMETER_PHENOMENON_TIME_START));
@@ -208,23 +206,19 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         if (session != null) {
             //
             Map<String, String> aliases = new HashMap<String, String>();
-            String obsConstOffObsTypeAlias =
-                    addObservationConstellationOfferingObservationTypesAliasToMap(aliases, null);
-            addOfferingAliasToMap(aliases, obsConstOffObsTypeAlias);
+            String offAlias = addOfferingsAliasToMap(aliases, null);
 
             ProjectionList projections = Projections.projectionList();
             projections.add(Projections.min(PARAMETER_PHENOMENON_TIME_START));
             projections.add(Projections.max(PARAMETER_PHENOMENON_TIME_START));
             projections.add(Projections.max(PARAMETER_PHENOMENON_TIME_END));
-            projections.add(Projections
-                    .groupProperty(PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPE));
+            projections.add(Projections.groupProperty(PARAMETER_OBSERVATION_CONSTELLATION));
 
             Criteria criteria = session.createCriteria(Observation.class);
             addAliasesToCriteria(criteria, aliases);
             criteria.add(getEqualRestriction(PARAMETER_DELETED, false));
             criteria.setProjection(projections);
-            criteria.addOrder(Order
-                    .asc(PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPE));
+            criteria.addOrder(Order.asc(PARAMETER_OBSERVATION_CONSTELLATION));
 
             List<?> temporalBoundingBoxes = criteria.list();
             if (!temporalBoundingBoxes.isEmpty()) {
@@ -233,9 +227,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
                 for (Object recordObj : temporalBoundingBoxes) {
                     if (recordObj instanceof Object[]) {
                         Object[] record = (Object[]) recordObj;
-                        String key =
-                                ((ObservationConstellationOfferingObservationType) record[3]).getOffering()
-                                        .getIdentifier();
+                        String key = ((ObservationConstellation) record[3]).getOffering().getIdentifier();
                         TimePeriod value =
                                 createTimePeriod((Timestamp) record[0], (Timestamp) record[1], (Timestamp) record[2]);
                         temporalBBoxMap.put(key, value);
@@ -262,7 +254,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
 
     /**
      * Get max phenomenon from observations
-      * 
+     * 
      * @param session
      *            Hibernate session
      * @return max time
@@ -302,14 +294,12 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     public static DateTime getMinDate4Offering(String offering, Session session) {
         Criteria criteria = session.createCriteria(Observation.class);
         Map<String, String> aliases = new HashMap<String, String>();
-        String obsConstOffObsTypeAlias = addObservationConstellationOfferingObservationTypesAliasToMap(aliases, null);
-        String offeringAlias = addOfferingAliasToMap(aliases, obsConstOffObsTypeAlias);
+        String offAlias = addOfferingsAliasToMap(aliases, null);
+//        String offeringAlias = addOfferingAliasToMap(aliases, offAlias);
         addAliasesToCriteria(criteria, aliases);
-        criteria.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering)).add(
+        criteria.add(getEqualRestriction(getIdentifierParameter(offAlias), offering)).add(
                 getEqualRestriction(PARAMETER_DELETED, false));
-        Object min =
-                criteria.setProjection(Projections.min(PARAMETER_PHENOMENON_TIME_START))
-                        .uniqueResult();
+        Object min = criteria.setProjection(Projections.min(PARAMETER_PHENOMENON_TIME_START)).uniqueResult();
         if (min != null) {
             return new DateTime(min);
         }
@@ -318,23 +308,23 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
 
     /**
      * Get min result time from observations for offering
-     *
-     * @param offering Offering identifier
-     * @param session Hibernate session
-     *
+     * 
+     * @param offering
+     *            Offering identifier
+     * @param session
+     *            Hibernate session
+     * 
      * @return min result time for offering
      */
     public static DateTime getMinResultTime4Offering(String offering, Session session) {
         Criteria criteria = session.createCriteria(Observation.class);
         Map<String, String> aliases = new HashMap<String, String>();
-        String obsConstOffObsTypeAlias = addObservationConstellationOfferingObservationTypesAliasToMap(aliases, null);
-        String offeringAlias = addOfferingAliasToMap(aliases, obsConstOffObsTypeAlias);
-        addAliasesToCriteria(criteria, aliases);
-        criteria.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering)).add(
-                getEqualRestriction(PARAMETER_DELETED, false));
-        Object min =
-               criteria.setProjection(Projections.min(PARAMETER_RESULT_TIME))
-                .uniqueResult();
+        String offAlias = addOfferingsAliasToMap(aliases, null);
+//      String offeringAlias = addOfferingAliasToMap(aliases, offAlias);
+      addAliasesToCriteria(criteria, aliases);
+      criteria.add(getEqualRestriction(getIdentifierParameter(offAlias), offering)).add(
+              getEqualRestriction(PARAMETER_DELETED, false));
+        Object min = criteria.setProjection(Projections.min(PARAMETER_RESULT_TIME)).uniqueResult();
         if (min != null) {
             return new DateTime(min);
         }
@@ -353,17 +343,17 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     public static DateTime getMaxDate4Offering(String offering, Session session) {
         Criteria criteriaStart = session.createCriteria(Observation.class);
         Map<String, String> aliases = new HashMap<String, String>();
-        String obsConstOffObsTypeAlias = addObservationConstellationOfferingObservationTypesAliasToMap(aliases, null);
-        String offeringAlias = addOfferingAliasToMap(aliases, obsConstOffObsTypeAlias);
-        addAliasesToCriteria(criteriaStart, aliases);
-        criteriaStart.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering)).add(
-                getEqualRestriction(PARAMETER_DELETED, false));
+        String offAlias = addOfferingsAliasToMap(aliases, null);
+//      String offeringAlias = addOfferingAliasToMap(aliases, offAlias);
+      addAliasesToCriteria(criteriaStart, aliases);
+      criteriaStart.add(getEqualRestriction(getIdentifierParameter(offAlias), offering)).add(
+              getEqualRestriction(PARAMETER_DELETED, false));
         Object maxStart =
                 criteriaStart.setProjection(Projections.max(HibernateConstants.PARAMETER_PHENOMENON_TIME_START))
                         .uniqueResult();
         Criteria criteriaEnd = session.createCriteria(Observation.class);
         addAliasesToCriteria(criteriaEnd, aliases);
-        criteriaEnd.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering)).add(
+        criteriaEnd.add(getEqualRestriction(getIdentifierParameter(offAlias), offering)).add(
                 getEqualRestriction(HibernateConstants.PARAMETER_DELETED, false));
         Object maxEnd =
                 criteriaEnd.setProjection(Projections.max(HibernateConstants.PARAMETER_PHENOMENON_TIME_END))
@@ -384,20 +374,22 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
 
     /**
      * Get max result time from observations for offering
-     *
-     * @param offering Offering identifier
-     * @param session Hibernate session
-     *
+     * 
+     * @param offering
+     *            Offering identifier
+     * @param session
+     *            Hibernate session
+     * 
      * @return max result time for offering
      */
     public static DateTime getMaxResultTime4Offering(String offering, Session session) {
         Criteria criteriaStart = session.createCriteria(Observation.class);
         Map<String, String> aliases = new HashMap<String, String>();
-        String obsConstOffObsTypeAlias = addObservationConstellationOfferingObservationTypesAliasToMap(aliases, null);
-        String offeringAlias = addOfferingAliasToMap(aliases, obsConstOffObsTypeAlias);
-        addAliasesToCriteria(criteriaStart, aliases);
-        criteriaStart.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering))
-                .add(Restrictions.eq(PARAMETER_DELETED, false));
+        String offAlias = addOfferingsAliasToMap(aliases, null);
+//      String offeringAlias = addOfferingAliasToMap(aliases, offAlias);
+      addAliasesToCriteria(criteriaStart, aliases);
+      criteriaStart.add(getEqualRestriction(getIdentifierParameter(offAlias), offering)).add(
+              getEqualRestriction(PARAMETER_DELETED, false));
         Object maxStart = criteriaStart.setProjection(Projections.max(PARAMETER_RESULT_TIME)).uniqueResult();
         if (maxStart == null) {
             return null;
@@ -473,7 +465,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
      * @param objectClass
      * @return Result objects
      */
-    
 
     /**
      * Get temporal filter restrictions
@@ -482,9 +473,10 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
      *            Temporal filters
      * @param criterions
      * @return filter restrictions
-
-     *
-     * @throws OwsExceptionReport     *             If the temporal filter is not supported
+     * 
+     * 
+     * @throws OwsExceptionReport
+     *             * If the temporal filter is not supported
      */
     public static Criterion getCriterionForTemporalFilters(List<TemporalFilter> eventTime) throws OwsExceptionReport {
         Disjunction disjunction = Restrictions.disjunction();
@@ -501,9 +493,10 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
      *            Temporal filer
      * @param criterions
      * @return filter restriction
-
-     *
-     * @throws OwsExceptionReport     *             If the temporal filter is not supported
+     * 
+     * 
+     * @throws OwsExceptionReport
+     *             * If the temporal filter is not supported
      */
     private static Criterion getCriterionForTemporalFilter(TemporalFilter temporalFilter) throws OwsExceptionReport {
         String valueReference = temporalFilter.getValueReference();
@@ -569,8 +562,8 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
             // return null;
             // case TM_Overlaps:
             // return null;
-            default:
-                throw new NoApplicableCodeException();
+        default:
+            throw new NoApplicableCodeException();
         }
     }
 
@@ -582,13 +575,13 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
      * @param resultSpatialFilter
      *            Spatial filter
      * @return filter restriction
-
-     *
-     * @throws OwsExceptionReport     *             If the spatial filter is not supported
+     * 
+     * 
+     * @throws OwsExceptionReport
+     *             * If the spatial filter is not supported
      */
     public static Criterion getCriterionForSpatialFilter(String propertyName, SpatialOperator operator,
-            Geometry geometry)
-            throws OwsExceptionReport {
+            Geometry geometry) throws OwsExceptionReport {
         switch (operator) {
         case BBOX:
             return SpatialRestrictions.within(propertyName, geometry);
@@ -622,7 +615,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
             // return SpatialRestrictions.within(propertyName,
             // resultSpatialFilter.getGeometry());
         default:
-                throw new NoApplicableCodeException();
+            throw new NoApplicableCodeException();
         }
     }
 
@@ -636,6 +629,19 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
      * @return filter restriction
      */
     public static Criterion getDisjunctionCriterionForStringList(String propertyName, Collection<String> list) {
+        return Restrictions.disjunction().add(Restrictions.in(propertyName, list));
+    }
+
+    /**
+     * Get restriction for a value list
+     * 
+     * @param propertyName
+     *            column name
+     * @param list
+     *            restricted values
+     * @return filter restriction
+     */
+    public static Criterion getDisjunctionCriterionForCollection(String propertyName, Collection<?> list) {
         return Restrictions.disjunction().add(Restrictions.in(propertyName, list));
     }
 
@@ -701,6 +707,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return alias;
     }
 
+    @Deprecated
     public static String addObservationConstellationOfferingObservationTypeAliasToMap(Map<String, String> aliases,
             String prefix) {
         String alias = "ocoot";
@@ -709,6 +716,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return alias;
     }
 
+    @Deprecated
     public static String addObservationConstellationOfferingObservationTypesAliasToMap(Map<String, String> aliases,
             String prefix) {
         String alias = "ocoots";
@@ -810,7 +818,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return alias;
     }
 
-    private static String addOfferingsAliasToMap(Map<String, String> aliases, String prefix) {
+    public static String addOfferingsAliasToMap(Map<String, String> aliases, String prefix) {
         String alias = "offs";
         String parameter = PARAMETER_OFFERINGS;
         addAliasToMap(aliases, prefix, parameter, alias);
@@ -860,8 +868,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     public static List<String> getProceduresForFeatureOfInterest(Session session, FeatureOfInterest featureOfInterest) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
-        String obsConstsAlias = addObservationConstallationAliasToMap(aliases, null);
-        String procedureAlias = addProcedureAliasToMap(aliases, obsConstsAlias);
+        String procedureAlias = addProcedureAliasToMap(aliases, null);
         String foiAlias = addFeatureOfInterestAliasToMap(aliases, null);
         queryObject.setAliases(aliases);
         queryObject.addCriterion(eq(getIdentifierParameter(foiAlias), featureOfInterest.getIdentifier()));
@@ -901,8 +908,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     @SuppressWarnings("unchecked")
     public static List<String> getFeatureOfInterestIdentifier(HibernateQueryObject queryObject, Session session) {
 
-        String foiAliases =
-                addFeatureOfInterestAliasToMap(queryObject.getAliases(), null);
+        String foiAliases = addFeatureOfInterestAliasToMap(queryObject.getAliases(), null);
         queryObject.addProjection(getDistinctProjection(getIdentifierParameter(foiAliases)));
         // queryObject.addProjection(getDistinctProjectionForIdentifier());
         return (List<String>) getObjectList(queryObject, session, Observation.class);
@@ -923,10 +929,9 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     public static List<FeatureOfInterest> getFeatureOfInterestObjectsForOffering(String offeringID, Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
-        String obsConstOffObsTypeAlias = addObservationConstellationOfferingObservationTypesAliasToMap(aliases, null);
-        String offeringAlias = addOfferingAliasToMap(aliases, obsConstOffObsTypeAlias);
+        String offAlias = addOfferingsAliasToMap(aliases, null);
         queryObject.setAliases(aliases);
-        queryObject.addCriterion(getEqualRestriction(getIdentifierParameter(offeringAlias), offeringID));
+        queryObject.addCriterion(getEqualRestriction(getIdentifierParameter(offAlias), offeringID));
         return (List<FeatureOfInterest>) getObjectList(queryObject, session, Observation.class);
     }
 
@@ -943,11 +948,10 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     public static List<String> getFeatureOfInterestIdentifiersForOffering(String offeringID, Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
-        String obsConstOffObsTypeAlias = addObservationConstellationOfferingObservationTypesAliasToMap(aliases, null);
-        String offeringAlias = addOfferingAliasToMap(aliases, obsConstOffObsTypeAlias);
+        String offAlias = addOfferingsAliasToMap(aliases, null);
         String foiAlias = addFeatureOfInterestAliasToMap(aliases, null);
         queryObject.setAliases(aliases);
-        queryObject.addCriterion(getEqualRestriction(getIdentifierParameter(offeringAlias), offeringID));
+        queryObject.addCriterion(getEqualRestriction(getIdentifierParameter(offAlias), offeringID));
         queryObject.addCriterion(getEqualRestriction(PARAMETER_DELETED, false));
         queryObject.addProjection(distinct(property(getIdentifierParameter(foiAlias))));
         return (List<String>) getObjectList(queryObject, session, Observation.class);
@@ -960,8 +964,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         Map<String, String> aliases = new HashMap<String, String>();
         String foiAlias = addFeatureOfInterestAliasToMap(aliases, null);
         queryObject.setAliases(aliases);
-        queryObject.addCriterion(getEqualRestriction(PARAMETER_OBSERVATION_CONSTELLATIONS,
-                observationConstellation));
+        queryObject.addCriterion(getEqualRestriction(PARAMETER_OBSERVATION_CONSTELLATIONS, observationConstellation));
         queryObject.addCriterion(getEqualRestriction(PARAMETER_DELETED, false));
         queryObject.addProjection(distinct(property(getIdentifierParameter(foiAlias))));
         return (List<String>) getObjectList(queryObject, session, Observation.class);
@@ -969,7 +972,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
 
     @SuppressWarnings("unchecked")
     public static List<FeatureOfInterestType> getFeatureOfInterestTypeObjects(List<String> featureOfInterestType,
-                                                                              Session session) {
+            Session session) {
         Criteria criteria = session.createCriteria(FeatureOfInterestType.class);
         criteria.add(in(PARAMETER_FEATURE_OF_INTEREST_TYPE, featureOfInterestType));
         return criteria.list();
@@ -1046,8 +1049,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     @SuppressWarnings("unchecked")
     public static List<RelatedFeatureRole> getRelatedFeatureRole(String role, Session session) {
         Criteria criteria = session.createCriteria(RelatedFeatureRole.class);
-        criteria.add(getEqualRestriction(
-                PARAMETER_RELATED_FEATURE_ROLE, role));
+        criteria.add(getEqualRestriction(PARAMETER_RELATED_FEATURE_ROLE, role));
         return (List<RelatedFeatureRole>) criteria.list();
     }
 
@@ -1057,8 +1059,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         Map<String, String> aliases = new HashMap<String, String>();
         String foiAlias = addFeatureOfInterestAliasToMap(aliases, null);
         addAliasesToCriteria(criteria, aliases);
-        criteria.add(getEqualRestriction(getIdentifierParameter(foiAlias),
-                targetIdentifier));
+        criteria.add(getEqualRestriction(getIdentifierParameter(foiAlias), targetIdentifier));
         return (List<RelatedFeature>) criteria.list();
     }
 
@@ -1200,18 +1201,15 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     }
 
     @SuppressWarnings("unchecked")
-	public static List<ResultTemplate> getResultTemplateObjects(Session session) {
+    public static List<ResultTemplate> getResultTemplateObjects(Session session) {
         Map<String, String> aliases = new HashMap<String, String>();
-        String obsConstOffObsTypAlias = addObservationConstellationOfferingObservationTypeAliasToMap(aliases, null);
-        
+        String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
+
         HibernateQueryObject query = new HibernateQueryObject();
         query.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		query.setAliases(aliases);
-		query.addCriterion(
-				getEqualRestriction(
-						getParameterWithPrefix(PARAMETER_DELETED, obsConstOffObsTypAlias),
-						false));
-        
+        query.setAliases(aliases);
+        query.addCriterion(getEqualRestriction(getParameterWithPrefix(PARAMETER_DELETED, obsConstAlias), false));
+
         return (List<ResultTemplate>) getObjectList(query, session, ResultTemplate.class);
     }
 
@@ -1220,11 +1218,8 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
             ObservationConstellation observationConstellation, Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>(1);
-        String obsConstOffObsTypAlias = addObservationConstellationOfferingObservationTypeAliasToMap(aliases, null);
-        queryObject
-                .addCriterion(getEqualRestriction(
-                        getParameterWithPrefix(PARAMETER_OBSERVATION_CONSTELLATION,
-                                obsConstOffObsTypAlias), observationConstellation));
+        queryObject.addCriterion(getEqualRestriction(
+                getParameterWithPrefix(PARAMETER_OBSERVATION_CONSTELLATION, null), observationConstellation));
         queryObject.setAliases(aliases);
         return (List<ResultTemplate>) getObjectList(queryObject, session, ResultTemplate.class);
     }
@@ -1233,9 +1228,8 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     public static ResultTemplate getResultTemplateObject(String offering, String observedProperty, Session session) {
         // Criteria criteria = session.createCriteria(SosResultTemplate.class);
         Map<String, String> aliases = new HashMap<String, String>();
-        String obsConstOffObsTypeAlias = addObservationConstellationOfferingObservationTypeAliasToMap(aliases, null);
-        String obsConstAlias = addObservationConstallationAliasToMap(aliases, obsConstOffObsTypeAlias);
-        String offeringAlias = addOfferingAliasToMap(aliases, obsConstOffObsTypeAlias);
+        String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
+        String offeringAlias = addOfferingAliasToMap(aliases, obsConstAlias);
         String obsPropAlias = addObservablePropertyAliasToMap(aliases, obsConstAlias);
         HibernateQueryObject queryObject = new HibernateQueryObject();
         queryObject.setAliases(aliases);
@@ -1255,12 +1249,11 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
 
     @SuppressWarnings("unchecked")
     public static List<ResultTemplate> getResultTemplateObject(String offering, String observedProperty,
-                                                               Collection<String> featureOfInterest, Session session) {
-        // Criteria criteria = session.createCriteria(SosResultTemplate.class);
+            Collection<String> featureOfInterest, Session session) {
+// Criteria criteria = session.createCriteria(SosResultTemplate.class);
         Map<String, String> aliases = new HashMap<String, String>();
-        String obsConstOffObsTypeAlias = addObservationConstellationOfferingObservationTypeAliasToMap(aliases, null);
-        String offeringAlias = addOfferingAliasToMap(aliases, obsConstOffObsTypeAlias);
-        String obsConstAlias = addObservationConstallationAliasToMap(aliases, obsConstOffObsTypeAlias);
+        String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
+        String offeringAlias = addOfferingAliasToMap(aliases, obsConstAlias);
         String obsPropAlias = addObservablePropertyAliasToMap(aliases, obsConstAlias);
         HibernateQueryObject queryObject = new HibernateQueryObject();
         queryObject.addCriterion(getEqualRestriction(getIdentifierParameter(offeringAlias), offering));
@@ -1283,7 +1276,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
 
     @SuppressWarnings("unchecked")
     public static List<ObservationConstellation> getObservationConstellations(HibernateQueryObject queryObject,
-                                                                              Session session) {
+            Session session) {
         return (List<ObservationConstellation>) getObjectList(queryObject, session, ObservationConstellation.class);
     }
 
@@ -1296,12 +1289,14 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    public static List<ObservationConstellationOfferingObservationType> getObservationConstellationOfferingObservationType(
-            HibernateQueryObject queryObject, Session session) {
-        return (List<ObservationConstellationOfferingObservationType>) getObjectList(queryObject, session,
-                ObservationConstellationOfferingObservationType.class);
-    }
+    // @SuppressWarnings("unchecked")
+    // public static List<ObservationConstellationOfferingObservationType>
+    // getObservationConstellationOfferingObservationType(
+    // HibernateQueryObject queryObject, Session session) {
+    // return (List<ObservationConstellationOfferingObservationType>)
+    // getObjectList(queryObject, session,
+    // ObservationConstellationOfferingObservationType.class);
+    // }
 
     public static List<?> getDataAvailabilityValues(HibernateQueryObject queryObject, Session session) {
         return getObjectList(queryObject, session, Observation.class);

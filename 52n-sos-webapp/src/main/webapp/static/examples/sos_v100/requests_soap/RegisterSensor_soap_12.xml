@@ -26,7 +26,7 @@ xmlns:ows="http://www.opengis.net/ows/1.1">
 								<sml:IdentifierList>
 									<sml:identifier>
 										<sml:Term definition="urn:ogc:def:identifier:OGC:uniqueID">
-											<sml:value>http://www.example.org/sensors/106
+											<sml:value>http://www.52north.org/test/procedure/106
 											</sml:value>
 										</sml:Term>
 									</sml:identifier>
@@ -92,7 +92,7 @@ xmlns:ows="http://www.opengis.net/ows/1.1">
 								<sml:InputList>
 									<sml:input name="waterlevel">
 										<swe:ObservableProperty
-											definition="test_observable_property_6" />
+											definition="http://www.52north.org/test/observableProperty/6" />
 									</sml:input>
 								</sml:InputList>
 							</sml:inputs>
@@ -105,13 +105,7 @@ xmlns:ows="http://www.opengis.net/ows/1.1">
 							<sml:outputs>
 								<sml:OutputList>
 									<sml:output name="waterlevel">
-										<swe:Quantity definition="test_observable_property_6">
-											<gml:metaDataProperty>
-												<offering>
-													<id>test_offering_6</id>
-													<name>gauge height in Muenster</name>
-												</offering>
-											</gml:metaDataProperty>
+										<swe:Quantity definition="http://www.52north.org/test/observableProperty/6">
 											<swe:uom code="cm" />
 										</swe:Quantity>
 									</sml:output>
@@ -129,7 +123,7 @@ xmlns:ows="http://www.opengis.net/ows/1.1">
 												<sml:IdentifierList>
 													<sml:identifier>
 														<sml:Term definition="urn:ogc:def:identifier:OGC:uniqueID">
-															<sml:value>urn:ogc:object:feature:Sensor:water_level_sensor
+															<sml:value>http://www.52north.org/test/procedure/water_level_sensor
 															</sml:value>
 														</sml:Term>
 													</sml:identifier>
@@ -139,7 +133,7 @@ xmlns:ows="http://www.opengis.net/ows/1.1">
 												<sml:InputList>
 													<sml:input name="gaugeHeight">
 														<swe:ObservableProperty
-															definition="test_observable_property_6" />
+															definition="http://www.52north.org/test/observableProperty/6" />
 													</sml:input>
 												</sml:InputList>
 											</sml:inputs>
@@ -147,7 +141,7 @@ xmlns:ows="http://www.opengis.net/ows/1.1">
 												<sml:OutputList>
 													<sml:output name="gaugeHeight">
 														<swe:Quantity
-															definition="test_observable_property_6">
+															definition="http://www.52north.org/test/observableProperty/6">
 															<swe:uom code="cm" />
 														</swe:Quantity>
 													</sml:output>

@@ -30,7 +30,6 @@ import org.hibernate.Session;
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ds.FeatureQueryHandler;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.Action;
@@ -72,10 +71,7 @@ public abstract class CacheUpdate implements Action {
     protected Set<String> getAllOfferingIdentifiersFrom(Set<ObservationConstellation> observationConstellations) {
         Set<String> offerings = new HashSet<String>(observationConstellations.size());
         for (ObservationConstellation oc : observationConstellations) {
-            for (ObservationConstellationOfferingObservationType ocoot : oc
-                    .getObservationConstellationOfferingObservationTypes()) {
-                offerings.add(ocoot.getOffering().getIdentifier());
-            }
+            offerings.add(oc.getOffering().getIdentifier());
         }
         return offerings;
     }
