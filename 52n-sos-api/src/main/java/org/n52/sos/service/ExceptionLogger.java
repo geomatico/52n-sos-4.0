@@ -56,6 +56,7 @@ public class ExceptionLogger implements SosEventListener {
 	public void handle(final SosEvent event) {
 		final ExceptionEvent ee = (ExceptionEvent) event;
 
+		// TODO review logging of exceptions. Stacktrace only on debug level?
 		if (ee.getException() instanceof OwsExceptionReport)
 		{
 			final OwsExceptionReport owse = (OwsExceptionReport) ee.getException();
