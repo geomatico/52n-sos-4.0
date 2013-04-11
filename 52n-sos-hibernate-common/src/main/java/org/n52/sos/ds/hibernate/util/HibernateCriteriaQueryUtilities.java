@@ -295,7 +295,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         Criteria criteria = session.createCriteria(Observation.class);
         Map<String, String> aliases = new HashMap<String, String>();
         String offAlias = addOfferingsAliasToMap(aliases, null);
-//        String offeringAlias = addOfferingAliasToMap(aliases, offAlias);
         addAliasesToCriteria(criteria, aliases);
         criteria.add(getEqualRestriction(getIdentifierParameter(offAlias), offering)).add(
                 getEqualRestriction(PARAMETER_DELETED, false));
@@ -320,7 +319,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         Criteria criteria = session.createCriteria(Observation.class);
         Map<String, String> aliases = new HashMap<String, String>();
         String offAlias = addOfferingsAliasToMap(aliases, null);
-//      String offeringAlias = addOfferingAliasToMap(aliases, offAlias);
       addAliasesToCriteria(criteria, aliases);
       criteria.add(getEqualRestriction(getIdentifierParameter(offAlias), offering)).add(
               getEqualRestriction(PARAMETER_DELETED, false));
@@ -344,7 +342,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         Criteria criteriaStart = session.createCriteria(Observation.class);
         Map<String, String> aliases = new HashMap<String, String>();
         String offAlias = addOfferingsAliasToMap(aliases, null);
-//      String offeringAlias = addOfferingAliasToMap(aliases, offAlias);
       addAliasesToCriteria(criteriaStart, aliases);
       criteriaStart.add(getEqualRestriction(getIdentifierParameter(offAlias), offering)).add(
               getEqualRestriction(PARAMETER_DELETED, false));
@@ -386,7 +383,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         Criteria criteriaStart = session.createCriteria(Observation.class);
         Map<String, String> aliases = new HashMap<String, String>();
         String offAlias = addOfferingsAliasToMap(aliases, null);
-//      String offeringAlias = addOfferingAliasToMap(aliases, offAlias);
       addAliasesToCriteria(criteriaStart, aliases);
       criteriaStart.add(getEqualRestriction(getIdentifierParameter(offAlias), offering)).add(
               getEqualRestriction(PARAMETER_DELETED, false));
@@ -910,7 +906,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
 
         String foiAliases = addFeatureOfInterestAliasToMap(queryObject.getAliases(), null);
         queryObject.addProjection(getDistinctProjection(getIdentifierParameter(foiAliases)));
-        // queryObject.addProjection(getDistinctProjectionForIdentifier());
         return (List<String>) getObjectList(queryObject, session, Observation.class);
     }
 
@@ -1235,12 +1230,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         queryObject.setAliases(aliases);
         queryObject.addCriterion(getEqualRestriction(getIdentifierParameter(offeringAlias), offering));
         queryObject.addCriterion(getEqualRestriction(getIdentifierParameter(obsPropAlias), observedProperty));
-        // criteria.add(getEqualRestriction(getIdentifierParameter(offeringAlias),
-        // offering));
-        // criteria.add(getEqualRestriction(getIdentifierParameter(obsPropAlias),
-        // observedProperty));
-        // addAliasesToCriteria(criteria, aliases);
-        // criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         /* there can be multiple but equal result templates... */
         List<ResultTemplate> templates =
                 (List<ResultTemplate>) getObjectList(queryObject, session, ResultTemplate.class);
@@ -1250,7 +1239,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     @SuppressWarnings("unchecked")
     public static List<ResultTemplate> getResultTemplateObject(String offering, String observedProperty,
             Collection<String> featureOfInterest, Session session) {
-// Criteria criteria = session.createCriteria(SosResultTemplate.class);
         Map<String, String> aliases = new HashMap<String, String>();
         String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
         String offeringAlias = addOfferingAliasToMap(aliases, obsConstAlias);
@@ -1258,19 +1246,12 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         HibernateQueryObject queryObject = new HibernateQueryObject();
         queryObject.addCriterion(getEqualRestriction(getIdentifierParameter(offeringAlias), offering));
         queryObject.addCriterion(getEqualRestriction(getIdentifierParameter(obsPropAlias), observedProperty));
-        // criteria.add(getEqualRestriction(getIdentifierParameter(offeringAlias),
-        // offering));
-        // criteria.add(getEqualRestriction(getIdentifierParameter(obsPropAlias),
-        // observedProperty));
         if (featureOfInterest != null && !featureOfInterest.isEmpty()) {
             String foiAlias = addFeatureOfInterestAliasToMap(aliases, null);
             queryObject.addCriterion(Restrictions.in(getIdentifierParameter(foiAlias), new ArrayList<String>(
                     featureOfInterest)));
-            // criteria.add(Restrictions.in(getIdentifierParameter(foiAlias),
-            // new ArrayList<String>(featureOfInterest)));
         }
         queryObject.setAliases(aliases);
-        // addAliasesToCriteria(criteria, aliases);
         return (List<ResultTemplate>) getObjectList(queryObject, session, ResultTemplate.class);
     }
 
@@ -1288,15 +1269,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         }
         return null;
     }
-
-    // @SuppressWarnings("unchecked")
-    // public static List<ObservationConstellationOfferingObservationType>
-    // getObservationConstellationOfferingObservationType(
-    // HibernateQueryObject queryObject, Session session) {
-    // return (List<ObservationConstellationOfferingObservationType>)
-    // getObjectList(queryObject, session,
-    // ObservationConstellationOfferingObservationType.class);
-    // }
 
     public static List<?> getDataAvailabilityValues(HibernateQueryObject queryObject, Session session) {
         return getObjectList(queryObject, session, Observation.class);

@@ -110,7 +110,6 @@ public class DeleteSensorDAO extends AbstractDeleteSensorDAO {
     private void setObservationsAsDeletedForProcedure(String procedureIdentifier, Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>(0);
-//        String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
         String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, null);
         queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), procedureIdentifier));

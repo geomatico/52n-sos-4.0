@@ -180,24 +180,6 @@ public class HibernateObservationUtilities {
                 // check remaining heap size and throw exception if minimum is
                 // reached
                 SosHelper.checkFreeMemory();
-
-                // Set<ObservationConstellationOfferingObservationType>
-                // observationConstellationOfferingObservationTypes =
-                // hObservation.getObservationConstellationOfferingObservationTypes();
-                // Iterator<ObservationConstellationOfferingObservationType>
-                // iterator =
-                // observationConstellationOfferingObservationTypes.iterator();
-                // ObservationConstellationOfferingObservationType
-                // hObservationConstellationOfferingObservationType =
-                // null;
-                // while (iterator.hasNext()) {
-                // hObservationConstellationOfferingObservationType =
-                // iterator.next();
-                // break;
-                // }
-
-                // ObservationConstellation hObservationConstellation =
-                // hObservation.getObservationConstellation();
                 FeatureOfInterest hFeatureOfInterest = hObservation.getFeatureOfInterest();
 
                 // TODO get full description
@@ -229,14 +211,6 @@ public class HibernateObservationUtilities {
                 if (!obsProps.containsKey(phenID)) {
                     obsProps.put(phenID, new SosObservableProperty(phenID, description, null, null));
                 }
-                // TODO: remove or add comment why it is here
-                // if (!version.equals(Sos2Constants.SERVICEVERSION)
-                // && Configurator.getInstance().isSetFoiLocationDynamically()
-                // &&
-                // phenID.equals(Configurator.getInstance().getSpatialObsProp4DynymicLocation()))
-                // {
-                // featureTimeForDynamicPosition.put(foiID, timeDateTime);
-                // }
 
                 // TODO: add offering ids to response if needed later.
                 // String offeringID =
@@ -333,15 +307,6 @@ public class HibernateObservationUtilities {
             String procID = observationConstellation.getProcedure().getIdentifier();
             SensorML procedure = new SensorML();
             procedure.setIdentifier(procID);
-            // TODO remove unused code
-            // SosSMLIdentifier identifier =
-            // new SosSMLIdentifier("uniqueID",
-            // "urn:ogc:def:identifier:OGC:uniqueID", procID);
-            // List<SosSMLIdentifier> identifiers = new
-            // ArrayList<SosSMLIdentifier>(1);
-            // identifiers.add(identifier);
-            // procedure.setIdentifications(identifiers);
-
             // phenomenon
             String phenID = observationConstellation.getObservableProperty().getIdentifier();
             String description = observationConstellation.getObservableProperty().getDescription();
@@ -455,103 +420,8 @@ public class HibernateObservationUtilities {
             return new UnknownValue(((BlobObservation) hObservation).getValue().getValue());
         }
         return null;
-
-        // if (hObservation.getBooleanValues() != null &&
-        // !hObservation.getBooleanValues().isEmpty()) {
-        // return new org.n52.sos.ogc.om.values.BooleanValue(
-        // getValueFromBooleanValueTable(hObservation.getBooleanValues()));
-        // } else if (hObservation.getCategoryValues() != null &&
-        // !hObservation.getCategoryValues().isEmpty()) {
-        // return new org.n52.sos.ogc.om.values.CategoryValue(
-        // getValueFromCategoryValueTable(hObservation.getCategoryValues()));
-        // } else if (hObservation.getCountValues() != null &&
-        // !hObservation.getCountValues().isEmpty()) {
-        // return new
-        // org.n52.sos.ogc.om.values.CountValue(getValueFromCountValueTable(hObservation.getCountValues()));
-        // } else if (hObservation.getNumericValues() != null &&
-        // !hObservation.getNumericValues().isEmpty()) {
-        // return new
-        // QuantityValue(getValueFromNumericValueTable(hObservation.getNumericValues()));
-        // } else if (hObservation.getTextValues() != null &&
-        // !hObservation.getTextValues().isEmpty()) {
-        // return new
-        // org.n52.sos.ogc.om.values.TextValue(getValueFromTextValueTable(hObservation.getTextValues()));
-        // } else if (hObservation.getGeometryValues() != null &&
-        // !hObservation.getGeometryValues().isEmpty()) {
-        // return new org.n52.sos.ogc.om.values.GeometryValue(
-        // getValueFromGeometryValueTable(hObservation.getGeometryValues()));
-        // }
-        // return null;
     }
 
-    // /**
-    // * Get observation value from numeric table
-    // *
-    // * @param numericValues
-    // * Numeric values
-    // * @return Numeric value
-    // */
-    // private static Double getValueFromNumericValueTable(Set<NumericValue>
-    // numericValues) {
-    // for (NumericValue numericValue : numericValues) {
-    // return new Double(numericValue.getValue());
-    // }
-    // return Double.NaN;
-    // }
-    //
-    // private static Boolean getValueFromBooleanValueTable(Set<BooleanValue>
-    // booleanValues) {
-    // for (BooleanValue booleanValue : booleanValues) {
-    // return Boolean.valueOf(booleanValue.getValue());
-    // }
-    // return null;
-    // }
-    //
-    // private static Integer getValueFromCountValueTable(Set<CountValue>
-    // countValues) {
-    // for (CountValue countValue : countValues) {
-    // return Integer.valueOf(countValue.getValue());
-    // }
-    // return Integer.MIN_VALUE;
-    // }
-    //
-    // /**
-    // * Get observation value from text table
-    // *
-    // * @param textValues
-    // * Text values
-    // * @return Text value
-    // */
-    // private static String getValueFromTextValueTable(Set<TextValue>
-    // textValues) {
-    // for (TextValue textValue : textValues) {
-    // return textValue.getValue();
-    // }
-    // return "";
-    // }
-    //
-    // private static String getValueFromCategoryValueTable(Set<CategoryValue>
-    // categoryValues) {
-    // for (CategoryValue categoryValue : categoryValues) {
-    // return categoryValue.getValue();
-    // }
-    // return "";
-    // }
-    //
-    // /**
-    // * Get observation value from spatial table
-    // *
-    // * @param geometryValues
-    // * Spatial values
-    // * @return Spatial value
-    // */
-    // private static Geometry getValueFromGeometryValueTable(Set<GeometryValue>
-    // geometryValues) {
-    // for (GeometryValue geometryValue : geometryValues) {
-    // return geometryValue.getValue();
-    // }
-    // return null;
-    // }
 
     public static List<SosObservation> unfoldObservation(SosObservation multiObservation) throws OwsExceptionReport {
         if (multiObservation.getValue() instanceof SosSingleObservationValue) {

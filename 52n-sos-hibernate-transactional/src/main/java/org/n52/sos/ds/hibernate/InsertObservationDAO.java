@@ -89,9 +89,6 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
                     ObservationConstellation hObservationConstellation = null;
                     try {
                         hObservationConstellation =
-                        // HibernateUtilities.checkObservationConstellationForObservation(sosObsConst,
-                        // offeringID, session,
-                        // Sos2Constants.InsertObservationParams.observationType.name());
                         HibernateUtilities.checkObservationConstellation(
                                 sosObsConst, offeringID, session,
                                 Sos2Constants.InsertObservationParams.observationType.name());

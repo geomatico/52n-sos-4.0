@@ -177,11 +177,6 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
     private SosProcedureDescription createProcedure(Procedure hProcedure) {
         SensorML procedure = new SensorML();
         procedure.setIdentifier(hProcedure.getIdentifier());
-     // TODO remove unused code
-//        SosSMLIdentifier identifier = new SosSMLIdentifier("uniqueID", "urn:ogc:def:identifier:OGC:uniqueID", hProcedure.getIdentifier());
-//        List<SosSMLIdentifier> identifiers = new ArrayList<SosSMLIdentifier>(1);
-//        identifiers.add(identifier);
-//        procedure.setIdentifications(identifiers);
         return procedure;
     }
 

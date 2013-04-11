@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Criteria;
+import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Criterion;
@@ -45,44 +46,50 @@ public class DefaultHibernateCriteriaQueryUtilities {
 
     public static List<?> getObjectList(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
         long start = System.currentTimeMillis();
-        Criteria criteria = session.createCriteria(objectClass);
-        if (queryObject.isSetAliases()) {
-            addAliasesToCriteria(criteria, queryObject.getAliases());
-        }
-        if (queryObject.isSetCriterions()) {
-            Conjunction conjunction = Restrictions.conjunction();
-            for (Criterion criterion : queryObject.getCriterions()) {
-                conjunction.add(criterion);
-            }
-            criteria.add(conjunction);
-        }
-        if (queryObject.isSetProjections()) {
-            ProjectionList projectionList = Projections.projectionList();
-            for (Projection projection : queryObject.getProjections()) {
-                projectionList.add(projection);
-            }
-            criteria.setProjection(projectionList);
-        }
-        if (queryObject.isSetOrder()) {
-            for (Order order : queryObject.getOrder()) {
-                criteria.addOrder(order);
-            }
-        }
-        if (queryObject.isSetMaxResults()) {
-            criteria.setMaxResults(queryObject.getMaxResult());
-        }
+//        Criteria criteria = session.createCriteria(objectClass);
+//        if (queryObject.isSetAliases()) {
+//            addAliasesToCriteria(criteria, queryObject.getAliases());
+//        }
+//        if (queryObject.isSetCriterions()) {
+//            Conjunction conjunction = Restrictions.conjunction();
+//            for (Criterion criterion : queryObject.getCriterions()) {
+//                conjunction.add(criterion);
+//            }
+//            criteria.add(conjunction);
+//        }
+//        if (queryObject.isSetProjections()) {
+//            ProjectionList projectionList = Projections.projectionList();
+//            for (Projection projection : queryObject.getProjections()) {
+//                projectionList.add(projection);
+//            }
+//            criteria.setProjection(projectionList);
+//        }
+//        if (queryObject.isSetOrder()) {
+//            for (Order order : queryObject.getOrder()) {
+//                criteria.addOrder(order);
+//            }
+//        }
+//        if (queryObject.isSetMaxResults()) {
+//            criteria.setMaxResults(queryObject.getMaxResult());
+//        }
+        Criteria criteria = createCriteria(queryObject, session, objectClass);
         if (queryObject.isSetResultTransformer()) {
             criteria.setResultTransformer(queryObject.getResultTransformer());
         } else {
             criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         }
          List<?> list = criteria.list();
+         LOGGER.info("SIZE OF OBJECT-LIST QUERIED FROM DB: {} !", list.size());
          LOGGER.debug("Time to query database entity {} in {} ms!", objectClass.getSimpleName(), (System.currentTimeMillis()-start));
          return list;
     }
     
-    protected static Object getObject(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
-        long start = System.currentTimeMillis();
+    public static ScrollableResults getScrollableObjects(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
+        Criteria criteria = createCriteria(queryObject, session, objectClass);
+        return criteria.scroll();
+    }
+    
+    private static Criteria createCriteria(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
         Criteria criteria = session.createCriteria(objectClass);
         if (queryObject.isSetAliases()) {
             addAliasesToCriteria(criteria, queryObject.getAliases());
@@ -109,6 +116,38 @@ public class DefaultHibernateCriteriaQueryUtilities {
         if (queryObject.isSetMaxResults()) {
             criteria.setMaxResults(queryObject.getMaxResult());
         }
+        return criteria;
+    }
+    
+    protected static Object getObject(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
+        long start = System.currentTimeMillis();
+//        Criteria criteria = session.createCriteria(objectClass);
+//        if (queryObject.isSetAliases()) {
+//            addAliasesToCriteria(criteria, queryObject.getAliases());
+//        }
+//        if (queryObject.isSetCriterions()) {
+//            Conjunction conjunction = Restrictions.conjunction();
+//            for (Criterion criterion : queryObject.getCriterions()) {
+//                conjunction.add(criterion);
+//            }
+//            criteria.add(conjunction);
+//        }
+//        if (queryObject.isSetProjections()) {
+//            ProjectionList projectionList = Projections.projectionList();
+//            for (Projection projection : queryObject.getProjections()) {
+//                projectionList.add(projection);
+//            }
+//            criteria.setProjection(projectionList);
+//        }
+//        if (queryObject.isSetOrder()) {
+//            for (Order order : queryObject.getOrder()) {
+//                criteria.addOrder(order);
+//            }
+//        }
+//        if (queryObject.isSetMaxResults()) {
+//            criteria.setMaxResults(queryObject.getMaxResult());
+//        }
+        Criteria criteria = createCriteria(queryObject, session, objectClass);
         criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         Object uniqueResult = criteria.uniqueResult();
         LOGGER.debug("Time to query database entity {} in {} ms!", objectClass.getSimpleName(), (System.currentTimeMillis()-start));

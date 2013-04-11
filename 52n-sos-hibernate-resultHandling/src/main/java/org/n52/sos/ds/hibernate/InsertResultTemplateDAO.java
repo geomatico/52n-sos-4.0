@@ -67,8 +67,6 @@ public class InsertResultTemplateDAO extends AbstractInsertResultTemplateDAO {
             ObservationConstellation obsConst = null;
             for (String offeringID : sosObsConst.getOfferings()) {
                 obsConst =
-//                        HibernateUtilities.checkObservationConstellationForObservation(sosObsConst, offeringID,
-//                                session, Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
                 HibernateUtilities.checkObservationConstellation(sosObsConst, offeringID,
                         session, Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
                 if (obsConst != null) {

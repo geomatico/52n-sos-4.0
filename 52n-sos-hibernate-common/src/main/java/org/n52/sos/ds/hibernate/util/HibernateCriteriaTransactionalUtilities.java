@@ -465,9 +465,6 @@ public class HibernateCriteriaTransactionalUtilities {
         parentFeature.getFeatureOfInterestsForChildFeatureId().add(childFeature);
         session.saveOrUpdate(parentFeature);
         session.flush();
-        // childFeature.getFeatureOfInterestsForParentFeatureId().add(parentFeature);
-        // session.saveOrUpdate(childFeature);
-        // session.flush();
     }
 
     public static void checkOrInsertResultTemplate(InsertResultTemplateRequest request,

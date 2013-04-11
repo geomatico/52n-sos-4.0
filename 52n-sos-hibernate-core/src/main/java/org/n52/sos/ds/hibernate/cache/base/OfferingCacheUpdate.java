@@ -103,12 +103,13 @@ public class OfferingCacheUpdate extends CacheUpdate {
         }
     }
 
-//    protected boolean containsDeletedProcedure(Collection<ObservationConstellation> set) {
-//        for (ObservationConstellation obsConst : set) {
-//            return obsConst.getProcedure().isDeleted();
-//        }
-//        return true;
-//    }
+    @Deprecated
+    protected boolean containsDeletedProcedure(Collection<ObservationConstellation> set) {
+        for (ObservationConstellation obsConst : set) {
+            return obsConst.getProcedure().isDeleted();
+        }
+        return true;
+    }
 
     protected void queueTasks(List<Offering> hOfferings) {
         for (Offering offering : hOfferings) {
@@ -122,7 +123,6 @@ public class OfferingCacheUpdate extends CacheUpdate {
         queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(PARAMETER_DELETED, false));
         List<ObservationConstellation> observationConstellation =
                 HibernateCriteriaQueryUtilities.getObservationConstellations(queryObject, getSession());
-//        !containsDeletedProcedure(observationConstellation)
         if (observationConstellation != null && !observationConstellation.isEmpty()) {
             // create runnable for offeringId
             Runnable task =
