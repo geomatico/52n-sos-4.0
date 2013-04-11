@@ -78,7 +78,7 @@ public class KvpBinding extends Binding {
 	public ServiceResponse doGetOperation(final HttpServletRequest req) throws OwsExceptionReportEncodingFailedException {
 		LOGGER.debug("KVP-REQUEST: {}", req.getQueryString());
 		ServiceResponse response = null;
-		AbstractServiceRequest sosRequest = null;
+		AbstractServiceRequest serviceRequest = null;
 		try {
 			if ((req.getParameterMap() == null) || ((req.getParameterMap() != null) && req.getParameterMap().isEmpty())) {
 				throw new MissingRequestParameterException();
@@ -98,30 +98,30 @@ public class KvpBinding extends Binding {
 			final Decoder<AbstractServiceRequest, Map<String, String>> decoder = getDecoder(k);
 
 			if (decoder != null) {
-				sosRequest = decoder.decode(parameterValueMap);
+				serviceRequest = decoder.decode(parameterValueMap);
 			} else {
 				throw new NoDecoderForKeyException(k);
 			}
 
-			for (final ServiceOperatorKeyType serviceVersionIdentifier : sosRequest.getServiceOperatorKeyType()) {
+			for (final ServiceOperatorKeyType serviceVersionIdentifier : serviceRequest.getServiceOperatorKeyType()) {
 				final ServiceOperator serviceOperator = getServiceOperatorRepository()
 						.getServiceOperator(serviceVersionIdentifier);
 				if (serviceOperator != null) {
-					response = serviceOperator.receiveRequest(sosRequest);
-					LOGGER.debug("{} operation executed successfully!", sosRequest.getOperationName());
+					response = serviceOperator.receiveRequest(serviceRequest);
+					LOGGER.debug("{} operation executed successfully!", serviceRequest.getOperationName());
 					break;
 				}
 			}
 			if (response == null) {
-				if (sosRequest instanceof GetCapabilitiesRequest) {
-					final GetCapabilitiesRequest gcr = (GetCapabilitiesRequest) sosRequest;
+				if (serviceRequest instanceof GetCapabilitiesRequest) {
+					final GetCapabilitiesRequest gcr = (GetCapabilitiesRequest) serviceRequest;
 					throw new InvalidAcceptVersionsParameterException(gcr.getAcceptVersions());
 				} else {
-					throw new InvalidServiceOrVersionException(sosRequest.getService(), sosRequest.getVersion());
+					throw new InvalidServiceOrVersionException(serviceRequest.getService(), serviceRequest.getVersion());
 				}
 			}
 		} catch (final OwsExceptionReport oer) {
-			oer.setVersion(sosRequest != null ? sosRequest.getVersion() : null);
+			oer.setVersion(serviceRequest != null ? serviceRequest.getVersion() : null);
 			return encodeOwsExceptionReport(oer, false);
 		}
 		return response;
