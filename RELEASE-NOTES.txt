@@ -5,30 +5,79 @@ RELEASE NOTES
  in Observation&Measurement), information about the sensor itself (encoded in a 
  SensorML instance document), and information about the sensor mounting platform 
  (SensorML as well). 
-
-Changes since last release
+ 
+ Changes since last release
 ===========================
 
 --- New features ---
 
-   * Dynamic WSDL generation, query via http://[HOST]:[PORT]/[WEBAPP_NAME]/wsdl, e.g. http://localhost:8080/52n-sos-webapp-4.0.0-SNAPSHOT/wsdl
-   * InsertSensor: 
-       * for more than one offering
-       * again for another offering
-       * again for the same offering if the procedure was deleted before, observations inserted before deletion are not provided
+   * 
 
 --- Changes ---
 
-  * Database model has changed: observation are not inserted twice if they relate to a different 
-        offering but same procedure, observedProperty and featureOfInterest
+   * 
 
 --- Fixed bugs ---
   
-   * Insert an observation again without an error.
-   * [Bug 847] Useless error message when sending POX to SOAP endpoint
-
+   * 
 
  
+Release 52n-sos-webapp-4.0.0-Beta2
+===================================
+
+
+--- New features ---
+
+	* Dynamic WSDL generation, query via http://[HOST]:[PORT]/[WEBAPP_NAME]/wsdl, e.g. http://localhost:8080/52n-sos-webapp-4.0.0-SNAPSHOT/wsdl
+	* InsertSensor: 
+		* for more than one offering
+		* again for another offering
+		* again for the same offering if the procedure was deleted before, observations inserted before deletion are not provided
+	* Serialization of cache: serialize cache to file after updates and during shutdown, load cache from file during startup if exist (fast startup)
+	* Adminstrator: 
+		* GUI to en-/disable single operations
+		* GUI to en-/disable single encodings
+		* GUI to en-/disable single bindings
+		* Clear database, insert test data, remove testdata, reload cache
+	* Sort elements in GetCapabilities response by A-Z, 0-9,...
+	* Storing codespace of gml:identifier for featureOfInterest and observation in DB
+	* RESTful Binding
+	* POX Binding
+	* DeleteObservation operation
+	* SOS 1.0.0 support:
+		* GetCapabilities
+		* DescribeSensor
+		* GetObservation
+		* GetFeatureOfInterest
+	* WaterML 2.0 Encoding
+	* GetDataAvailability operation, de-/encoding
+
+--- Changes ---
+
+	* Database model has changed:
+		* observation are not inserted twice if they relate to a different offering but same procedure, observedProperty and featureOfInterest
+		* store procedure- and observableProperty-id in observation table
+	* Change coordinate order handling from de-/encoder to DAOs
+	* Exception and Response Code handling
+	* SosEventBus: fire and listen for events, currently used by cache updates after transactions
+	* Cache:
+		* switch from database updates to in memory updates
+		* update cache after transactional operation directly
+	* The settings are saved in a separate, independent database
+	* Database queries for Observation returning specialized types depending on stored value
+
+--- Fixed bugs ---
+  
+	* Insert an observation again without an error.
+	* [Bug 800] Missing operation metadata parameter for operation InsertResultTemplate and InsertResult
+	* [Bug 805] InsertSensor request is not parsed correct: InsertSensorRequest.getProcedureDescription().getOfferingIdentifiers() returns empty list
+	* [Bug 811] ClassCastException when inserting observation with TimePeriod phenomenonTime and referenced resultTime
+	* [Bug 834] Administrator: Reset using reset_admin.sql does not work
+	* [Bug 843] Check hasCode() implementations for resetting hash
+	* [Bug 847] Useless error message when sending POX to SOAP endpoint
+	* [Bug 883] When single observation with resultTime are merged, the returned resultTime is not the latest
+
+
 Release 52n-sos-webapp-4.0.0-Beta1
 ===================================
 
