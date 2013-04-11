@@ -209,20 +209,6 @@ public interface HibernateRelations {
         void setValue(T value);
     }
 
-    interface HasObservationConstellationOfferingObservationType {
-        String OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPE = "observationConstellationOfferingObservationType";
-        ObservationConstellationOfferingObservationType getObservationConstellationOfferingObservationType();
-        void setObservationConstellationOfferingObservationType(
-                ObservationConstellationOfferingObservationType observationConstellationOfferingObservationType);
-    }
-
-    interface HasObservationConstellationOfferingObservationTypes {
-        String OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPES = "observationConstellationOfferingObservationTypes";
-        Set<ObservationConstellationOfferingObservationType> getObservationConstellationOfferingObservationTypes();
-        void setObservationConstellationOfferingObservationTypes(
-                Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes);
-    }
-
     interface HasOfferings {
         String OFFERINGS = "offerings";
         Set<Offering> getOfferings();
