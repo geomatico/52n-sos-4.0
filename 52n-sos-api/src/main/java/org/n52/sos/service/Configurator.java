@@ -69,7 +69,7 @@ import org.slf4j.LoggerFactory;
 public class Configurator implements Cleanupable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Configurator.class);
     /**
-     * instance attribut, due to the singleton pattern.
+     * instance attribute, due to the singleton pattern.
      */
     private static Configurator instance = null;
     private static final Lock initLock = new ReentrantLock();
@@ -96,7 +96,7 @@ public class Configurator implements Cleanupable {
      *
      * @throws ConfigurationException if the initialization failed
      */
-    public static Configurator createInstance(Properties connectionProviderConfig, String basepath)
+    public static Configurator createInstance(final Properties connectionProviderConfig, final String basepath)
             throws ConfigurationException {
         if (instance == null) {
             boolean initialize = false;
@@ -106,9 +106,9 @@ public class Configurator implements Cleanupable {
                     try {
                         instance = new Configurator(connectionProviderConfig, basepath);
                         initialize = true;
-                    } catch (RuntimeException t) {
+                    } catch (final RuntimeException t) {
                         cleanUpAndThrow(t);
-                    } catch (ConfigurationException t) {
+                    } catch (final ConfigurationException t) {
                         cleanUpAndThrow(t);
                     }
                 }
@@ -118,9 +118,9 @@ public class Configurator implements Cleanupable {
             if (initialize) {
                 try {
                     instance.initialize();
-                } catch (RuntimeException t) {
+                } catch (final RuntimeException t) {
                     cleanUpAndThrow(t);
-                } catch (ConfigurationException t) {
+                } catch (final ConfigurationException t) {
                     cleanUpAndThrow(t);
                 }
             }
@@ -128,7 +128,7 @@ public class Configurator implements Cleanupable {
         return instance;
     }
 
-    private static void cleanUpAndThrow(ConfigurationException t) throws ConfigurationException {
+    private static void cleanUpAndThrow(final ConfigurationException t) throws ConfigurationException {
         if (instance != null) {
             instance.cleanup();
             instance = null;
@@ -136,7 +136,7 @@ public class Configurator implements Cleanupable {
         throw t;
     }
 
-    private static void cleanUpAndThrow(RuntimeException t) {
+    private static void cleanUpAndThrow(final RuntimeException t) {
         if (instance != null) {
             instance.cleanup();
             instance = null;
@@ -144,25 +144,25 @@ public class Configurator implements Cleanupable {
         throw t;
     }
 
-    private static void cleanup(Producer<? extends Cleanupable> p) {
+    private static void cleanup(final Producer<? extends Cleanupable> p) {
         if (p != null) {
-            Cleanupable c = p.get();
+            final Cleanupable c = p.get();
             if (c != null) {
                 c.cleanup();
             }
         }
     }
 
-    private static void cleanup(Cleanupable c) {
+    private static void cleanup(final Cleanupable c) {
         if (c != null) {
             c.cleanup();
         }
     }
 
-    protected static <T> T get(Producer<T> factory) throws OwsExceptionReport {
+    protected static <T> T get(final Producer<T> factory) throws OwsExceptionReport {
         try {
             return factory.get();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             if (e instanceof OwsExceptionReport) {
                 throw (OwsExceptionReport) e;
             } else if (e.getCause() != null && e.getCause() instanceof OwsExceptionReport) {
@@ -176,9 +176,9 @@ public class Configurator implements Cleanupable {
     /**
      * base path for configuration files.
      */
-    private String basepath;
+    private final String basepath;
     private ServiceConfiguration configuration;
-    private Properties dataConnectionProviderProperties;
+    private final Properties dataConnectionProviderProperties;
     private Properties featureConnectionProviderProperties;
     private FeatureQueryHandler featureQueryHandler;
     private ConnectionProvider dataConnectionProvider;
@@ -208,22 +208,22 @@ public class Configurator implements Cleanupable {
      * @throws OwsExceptionReport if the
      * @throws IOException
      */
-    private Configurator(Properties connectionProviderConfig, String basepath) throws ConfigurationException {
+    private Configurator(final Properties connectionProviderConfig, final String basepath) throws ConfigurationException {
         if (basepath == null) {
-            String message = "No basepath available!";
+            final String message = "No basepath available!";
             LOGGER.info(message);
             throw new ConfigurationException(message);
         }
         if (connectionProviderConfig == null) {
-            String message = "No connection provider configuration available!";
+            final String message = "No connection provider configuration available!";
             LOGGER.info(message);
             throw new ConfigurationException(message);
         }
 
         this.basepath = basepath;
-        this.dataConnectionProviderProperties = connectionProviderConfig;
+        dataConnectionProviderProperties = connectionProviderConfig;
         LOGGER.info("Configurator initialized: [basepath={}]",
-                    this.basepath, this.dataConnectionProviderProperties);
+                    this.basepath, dataConnectionProviderProperties);
     }
 
    
@@ -622,7 +622,7 @@ public class Configurator implements Cleanupable {
     }
 
     public ServiceConfiguration getServiceConfiguration() {
-        return this.configuration;
+        return configuration;
     }
 
     protected void initializeConnectionProviders() throws ConfigurationException {
