@@ -85,6 +85,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
+import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
@@ -189,10 +190,16 @@ public class HibernateObservationUtilities {
                 if (procedures.containsKey(procedureIdentifier)) {
                     procedure = procedures.get(procedureIdentifier);
                 } else {
-                    procedure =
-                            HibernateProcedureUtilities.createSosProcedureDescription(hProcedure, hProcedure
-                                    .getIdentifier(), hProcedure.getProcedureDescriptionFormat()
-                                    .getProcedureDescriptionFormat());
+                    if (getConfiguration().getActiveProfile().isEncodeProcedureInObservation()) {
+                        procedure =
+                                HibernateProcedureUtilities.createSosProcedureDescription(hProcedure,
+                                        procedureIdentifier, hProcedure.getProcedureDescriptionFormat()
+                                                .getProcedureDescriptionFormat());
+                    } else {
+                        procedure =
+                                new SosProcedureDescriptionUnknowType(procedureIdentifier, hProcedure
+                                        .getProcedureDescriptionFormat().getProcedureDescriptionFormat(), null);
+                    }
                     procedures.put(procedureIdentifier, procedure);
                 }
 
@@ -271,10 +278,12 @@ public class HibernateObservationUtilities {
                                             && !hResultTemplate.getIdentifier().isEmpty()) {
                                         org.n52.sos.ogc.sos.SosResultTemplate sosResultTemplate;
                                         if (sosResultTemplates.containsKey(hResultTemplate.getIdentifier())) {
-                                            sosResultTemplate = sosResultTemplates.get(hResultTemplate.getIdentifier());
+                                            sosResultTemplate =
+                                                    sosResultTemplates.get(hResultTemplate.getIdentifier());
                                         } else {
                                             sosResultTemplate = new org.n52.sos.ogc.sos.SosResultTemplate();
-                                            sosResultTemplate.setXmlResultStructure(hResultTemplate.getResultStructure());
+                                            sosResultTemplate.setXmlResultStructure(hResultTemplate
+                                                    .getResultStructure());
                                             sosResultTemplate.setXmResultEncoding(hResultTemplate.getResultEncoding());
                                             sosResultTemplates.put(hResultTemplate.getIdentifier(), sosResultTemplate);
                                         }
@@ -421,7 +430,6 @@ public class HibernateObservationUtilities {
         }
         return null;
     }
-
 
     public static List<SosObservation> unfoldObservation(SosObservation multiObservation) throws OwsExceptionReport {
         if (multiObservation.getValue() instanceof SosSingleObservationValue) {
