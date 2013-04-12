@@ -45,7 +45,7 @@ public class SosSMLIdentifier {
      * @param value
      *            Identifier value
      */
-    public SosSMLIdentifier(String name, String definition, String value) {
+    public SosSMLIdentifier(final String name, final String definition, final String value) {
         super();
         this.name = name;
         this.definition = definition;
@@ -63,7 +63,7 @@ public class SosSMLIdentifier {
      * @param name
      *            Identifier name
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -78,7 +78,7 @@ public class SosSMLIdentifier {
      * @param definition
      *            Identifier definition
      */
-    public void setDefinition(String definition) {
+    public void setDefinition(final String definition) {
         this.definition = definition;
     }
 
@@ -93,8 +93,13 @@ public class SosSMLIdentifier {
      * @param value
      *            Identifier value
      */
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
     }
 
+	@Override
+	public String toString()
+	{
+		return String.format("SosSMLIdentifier [name=%s, definition=%s, value=%s]", name, definition, value);
+	}
 }
