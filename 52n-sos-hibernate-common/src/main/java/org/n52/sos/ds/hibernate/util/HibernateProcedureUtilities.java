@@ -23,10 +23,13 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
+import static org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName.*;
 import static org.n52.sos.util.HTTPConstants.StatusCode.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlException;
@@ -37,14 +40,31 @@ import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.XmlDecodingException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.SosServiceProvider;
+import org.n52.sos.ogc.sensorML.ProcessModel;
+import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
+import org.n52.sos.ogc.sensorML.SmlContact;
+import org.n52.sos.ogc.sensorML.SmlResponsibleParty;
+import org.n52.sos.ogc.sensorML.System;
+import org.n52.sos.ogc.sensorML.elements.SosSMLClassifier;
+import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
+import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
+import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
+import org.n52.sos.ogc.swe.SosSweCoordinate;
+import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+// TODO Eike: move all strings to constants classes or create settings for them
 
 public class HibernateProcedureUtilities {
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateProcedureUtilities.class);
@@ -72,20 +92,21 @@ public class HibernateProcedureUtilities {
         // check whether SMLFile or Url is set
         if (filename == null && xmlDoc == null) 
         {
-        	/*
-        	 * TODO Eike: generate SensorML file from available parameters
-        	 * 
-        	 *  1 get observable properties from cache for procedure identifier
-        	 *  
-        	 *  2 try to get position from entity (which one?) HasCoordinates, HasGeometry
-        	 *  
-        	 *  2.1 if no position is available -> processModel -> own class
-        	 *  
-        	 *  2.2 if position is available -> system -> own class
-        	 */
-            throw new InvalidParameterValueException().at(SosConstants.DescribeSensorParams.procedure)
-                    .withMessage("No sensorML file was found for the requested procedure %s", procedureIdentifier)
-                    .setStatus(INTERNAL_SERVER_ERROR);
+        	final SensorML sml = new SensorML();
+        	sml.setVersion(SensorMLConstants.VERSION_V101); // TODO should this be configurable?
+        	
+        	// 2 try to get position from entity
+        	if (procedure.isSpatial())
+        	{
+        		// 2.1 if position is available -> system -> own class <- should be compliant with SWE lightweight profile
+        		sml.addMember(createSmlSystem(procedure));
+        	}
+        	else
+        	{
+        		// 2.2 if no position is available -> processModel -> own class
+        		sml.addMember(createSmlProcessModel(procedure));
+        	}
+        	sosProcedureDescription = sml;
         }
         else 
         {
@@ -99,11 +120,6 @@ public class HibernateProcedureUtilities {
                 {
                     sosProcedureDescription = createProcedureDescriptionFromXml(procedureIdentifier, outputFormat, xmlDoc);
                 }
-                if (sosProcedureDescription != null) 
-                {
-                    sosProcedureDescription.setDescriptionFormat(descriptionFormat);
-                }
-                return sosProcedureDescription;
             }
             catch (final IOException ioe)
             {
@@ -117,7 +133,231 @@ public class HibernateProcedureUtilities {
                 		.setStatus(INTERNAL_SERVER_ERROR);
             }
         }
+        if (sosProcedureDescription != null) 
+        {
+        	sosProcedureDescription.setDescriptionFormat(descriptionFormat);
+        }
+        return sosProcedureDescription;
     }
+
+	/**
+	 * 
+	 * @param procedure
+	 * @param observableProperties
+	 * @return
+	 */
+	private static ProcessModel createSmlProcessModel(final Procedure procedure)
+	{
+		// TODO Auto-generated method "createSmlProcessModel" stub generated on 10.04.2013 around 12:36:39 by eike
+		return null;
+	}
+
+	private static org.n52.sos.ogc.sensorML.System createSmlSystem(final Procedure procedure)
+	{
+		final System smlSystem = new System();
+		
+    	final String[] observableProperties = getObservablePropertiesForProcedure(procedure.getIdentifier());
+		
+		// 1 set description
+		smlSystem.setDescriptions(createDescriptions(procedure,observableProperties));
+		
+		// 2 identifier 
+		smlSystem.setIdentifier(procedure.getIdentifier());
+		
+		// 3 set identification
+		smlSystem.setIdentifications(createIdentifications(procedure.getIdentifier()));
+		
+		// 4 set keywords
+		smlSystem.setKeywords(createKeywordsList(procedure,observableProperties));
+		
+		// 5 set classification
+		if (getServiceConfig().isSmlGenerationGenerateClassification())
+		{
+			addClassifier(smlSystem);
+		}
+		
+		// 6 set contacts --> take from service information?
+		if (getServiceConfig().isSmlGenerationUseServiceContactAsSensorContact())
+		{
+			final List<SmlContact> contacts = createContactFromServiceContact();
+			if (contacts != null && !contacts.isEmpty()) 
+			{
+				smlSystem.setContact(contacts);
+			}
+		}
+		
+		// 7 set outputs --> observableProperties
+		// TODO where to get the type from
+		smlSystem.setOutputs(createOutputs(observableProperties));
+		
+		
+		// 8 set position --> from procedure
+		smlSystem.setPosition(createPosition(procedure));
+		
+		// 9 set observed area --> from features
+		
+		// TODO Eike: continue implementation here
+		return smlSystem;
+	}
+
+	private static List<SosSMLIo<?>> createOutputs(final String[] observableProperties)
+	{
+		final ArrayList<SosSMLIo<?>> outputs = new ArrayList<SosSMLIo<?>>(observableProperties.length);
+		// FIXME how to determine the type of the output from sensor id and observable property?
+		int i = 1;
+		for (final String observableProperty : observableProperties)
+		{
+			final SosSweQuantity quantity = new SosSweQuantity();
+			quantity.setDefinition(observableProperty);
+			final SosSMLIo output = new SosSMLIo(quantity);
+			output.setIoName("output#"+i++);
+			outputs.add(output);
+		}
+		return outputs;
+	}
+
+	private static SosSMLPosition createPosition(final Procedure procedure)
+	{
+		// TODO Auto-generated method "createPosition" stub generated on 12.04.2013 around 15:08:04 by eike
+		SosSMLPosition smlPosition = null;
+		// 8.1 set latlong position
+		if (procedure.isSetLongLat() && procedure.isSetSrid())
+		{
+			smlPosition = new SosSMLPosition();
+			smlPosition.setName("sensorPosition");
+			smlPosition.setReferenceFrame(getServiceConfig().getSrsNamePrefixSosV2() + procedure.getSrid());
+			smlPosition.setPosition(createCoordinatesForPosition(procedure));
+			smlPosition.setFixed(true);
+		}
+		// 8.2 set position from geometry
+		else if (procedure.isSetGeometry())
+		{
+			// TODO implement
+			
+		}
+		return smlPosition;
+	}
+	
+	private static List<SosSweCoordinate<?>> createCoordinatesForPosition(final Procedure procedure)
+	{
+		final List<SosSweCoordinate<?>> sweCoordinates = new ArrayList<SosSweCoordinate<?>>(3);
+		if (procedure.getLatitude() instanceof Double)
+		{
+			final SosSweQuantity quantity = new SosSweQuantity();
+			quantity.setValue((Double)procedure.getLatitude());
+			quantity.setAxisID("y");
+			quantity.setUom("degree"); // TODO add to mapping or setting
+			sweCoordinates.add(new SosSweCoordinate<Double>(northing,quantity));
+		}
+		if (procedure.getLongitude() instanceof Double)
+		{
+			final SosSweQuantity quantity = new SosSweQuantity();
+			quantity.setValue((Double)procedure.getLongitude());
+			quantity.setAxisID("x");
+			quantity.setUom("degree"); // TODO add to mapping or setting
+			sweCoordinates.add(new SosSweCoordinate<Double>(easting,quantity));
+		}
+		if (procedure.getAltitude() instanceof Double)
+		{
+			final SosSweQuantity quantity = new SosSweQuantity();
+			quantity.setValue((Double)procedure.getLatitude());
+			quantity.setAxisID("z");
+			quantity.setUom("m"); // TODO add to mapping or setting
+			sweCoordinates.add(new SosSweCoordinate<Double>(altitude,quantity));
+		}
+		return sweCoordinates;
+	}
+
+	private static List<SmlContact> createContactFromServiceContact()
+	{
+		final SmlResponsibleParty smlRespParty = new SmlResponsibleParty();
+		SosServiceProvider serviceProvider = null;
+		try {
+			serviceProvider = Configurator.getInstance().getServiceProvider();
+		} catch (final OwsExceptionReport e) {
+			LOGGER.error(String.format("Exception thrown: %s",
+						e.getMessage()),
+					e);
+		}
+		if (serviceProvider == null)
+		{
+			return null;
+		}
+		smlRespParty.setIndividualName(serviceProvider.getIndividualName());
+		smlRespParty.setOrganizationName(serviceProvider.getName());
+		smlRespParty.addOnlineResource(serviceProvider.getSite());
+		smlRespParty.setPositionName(serviceProvider.getPositionName());
+		smlRespParty.addDeliveryPoint(serviceProvider.getDeliveryPoint());
+		smlRespParty.addPhoneVoice(serviceProvider.getPhone());
+		smlRespParty.setCity(serviceProvider.getCity());
+		smlRespParty.setCountry(serviceProvider.getCountry());
+		smlRespParty.setPostalCode(serviceProvider.getPostalCode());
+		smlRespParty.setEmail(serviceProvider.getMailAddress());
+		return CollectionHelper.list((SmlContact)smlRespParty);
+	}
+
+	private static void addClassifier(final System smlSystem)
+	{
+		if (!getServiceConfig().getSmlGenerationClassifierIntendedApplicationValue().isEmpty())
+		{
+			smlSystem.addClassification(new SosSMLClassifier(
+					"intendedApplication",
+					getServiceConfig().getSmlGenerationClassifierIntendedApplicationDefinition(),
+					getServiceConfig().getSmlGenerationClassifierIntendedApplicationValue()));
+		}
+		if (!getServiceConfig().getSmlGenerationClassifierSensorTypeValue().isEmpty())
+		{
+			smlSystem.addClassification(new SosSMLClassifier(
+					"sensorType",
+					getServiceConfig().getSmlGenerationClassifierSensorTypeDefinition(),
+					getServiceConfig().getSmlGenerationClassifierSensorTypeValue()));
+		}
+	}
+
+	private static List<String> createDescriptions(final Procedure procedure,
+			final String[] observableProperties)
+	{
+		return CollectionHelper.list(String.format(getServiceConfig().getSmlGenerationDescriptionTemplate(), 
+				procedure.getIdentifier(), 
+				StringHelper.join(",", CollectionHelper.list(observableProperties))));
+	}
+
+	private static List<SosSMLIdentifier> createIdentifications(final String identifier)
+	{
+		// get long and short name definition from misc settings
+		final SosSMLIdentifier idShortName = new SosSMLIdentifier("shortname", getServiceConfig().getSmlGenerationIdentifierShortNameDefinition(), identifier);
+		final SosSMLIdentifier idLongName = new SosSMLIdentifier("longname", getServiceConfig().getSmlGenerationIdentifierLongNameDefinition(), identifier);
+		return CollectionHelper.list(idLongName,idShortName);
+	}
+
+	private static ServiceConfiguration getServiceConfig()
+	{
+		return Configurator.getInstance().getServiceConfiguration();
+	}
+
+	private static List<String> createKeywordsList(final Procedure procedure,
+			final String[] observableProperties)
+	{
+		final List<String> keywords = CollectionHelper.list();
+		keywords.addAll(CollectionHelper.list(observableProperties));
+		keywords.add(procedure.getIdentifier());
+		if (getServiceConfig().isSmlGenerationGenerateClassification() && 
+				!getServiceConfig().getSmlGenerationClassifierIntendedApplicationValue().isEmpty())
+		{
+			keywords.add(getServiceConfig().getSmlGenerationClassifierIntendedApplicationValue());
+		}
+		if (getServiceConfig().isSmlGenerationGenerateClassification() && 
+				!getServiceConfig().getSmlGenerationClassifierSensorTypeValue().isEmpty())
+		{
+			keywords.add(getServiceConfig().getSmlGenerationClassifierSensorTypeValue());
+		}
+		return keywords;
+	}
+
+	private static String[] getObservablePropertiesForProcedure(final String procedureIdentifier)
+	{
+		return Configurator.getInstance().getCache().getObservablePropertiesForProcedure(procedureIdentifier).toArray(new String[0]);
+	}
 
 	private static SosProcedureDescription createProcedureDescriptionFromXml(final String procedureIdentifier,
 			final String outputFormat,
