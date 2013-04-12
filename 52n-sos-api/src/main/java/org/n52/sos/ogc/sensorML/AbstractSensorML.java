@@ -52,13 +52,13 @@ public class AbstractSensorML extends SosProcedureDescription {
 
     private List<SosSMLCapabilities> capabilities = new ArrayList<SosSMLCapabilities>(0);
 
-    private String contact;
+    private List<SmlContact> contacts = new ArrayList<SmlContact>(0);
 
     private final List<AbstractSosSMLDocumentation> documentations = new ArrayList<AbstractSosSMLDocumentation>(0);
 
     private String history;
 
-    public String getProcedureIdentifierFromIdentifications() {
+    private String getProcedureIdentifierFromIdentifications() {
         if (isSetIdentifications()) {
             for (final SosSMLIdentifier identification : identifications) {
                 if (isIdentificationHoldingAnProcedureIdentifier(identification)) {
@@ -69,7 +69,23 @@ public class AbstractSensorML extends SosProcedureDescription {
         return null;
     }
 
-    public List<String> getKeywords() {
+    @Override
+	public void setIdentifier(final String identifier)
+    {
+    	super.setIdentifier(identifier);
+    	if (isSetIdentifications())
+    	{
+    		for (final SosSMLIdentifier identification : identifications) {
+                if (isIdentificationHoldingAnProcedureIdentifier(identification)) {
+                    identification.setValue(identifier);
+                    return;
+                }
+            }
+    	}
+    	identifications.add(new SosSMLIdentifier(URN_UNIQUE_IDENTIFIER_END, URN_UNIQUE_IDENTIFIER, identifier));
+	}
+
+	public List<String> getKeywords() {
         return keywords;
     }
 
@@ -82,10 +98,17 @@ public class AbstractSensorML extends SosProcedureDescription {
     }
 
     public void setIdentifications(final List<SosSMLIdentifier> identifications) {
+    	if (this.identifications.isEmpty())
+    	{
         this.identifications = identifications;
-        final String identifier = getProcedureIdentifierFromIdentifications();
+    	}
+    	else
+    	{
+    		this.identifications.addAll(identifications);
+    	}
+    	final String identifier = getProcedureIdentifierFromIdentifications();
         if (!isSetIdentifier() && identifier != null && !identifier.isEmpty()) {
-            setIdentifier(identifier);
+            super.setIdentifier(identifier);
         }
     }
 
@@ -146,12 +169,29 @@ public class AbstractSensorML extends SosProcedureDescription {
         this.capabilities.add(capabilities);
     }
 
-    public String getContact() {
-        return contact;
+    public List<SmlContact> getContact() {
+        return contacts;
     }
 
-    public void setContact(final String contact) {
-        this.contact = contact;
+    public void setContact(final List<SmlContact> contacts) {
+    	if (isSetContacts())
+    	{
+    		this.contacts.addAll(contacts);
+    	}
+    	else 
+    	{
+    		this.contacts = contacts;
+    	}
+    }
+    
+	private boolean isSetContacts()
+	{
+		return contacts != null && !contacts.isEmpty();
+	}
+
+	public void addContact(final SmlContact contact)
+    {
+		contacts.add(contact);
     }
 
     public List<AbstractSosSMLDocumentation> getDocumentation() {
@@ -235,7 +275,7 @@ public class AbstractSensorML extends SosProcedureDescription {
     }
 
     public boolean isSetContact() {
-        return contact != null && !contact.isEmpty();
+        return contacts != null && !contacts.isEmpty();
     }
 
     public boolean isSetHistory() {
