@@ -54,13 +54,13 @@ public class AbstractSensorML extends SosProcedureDescription {
 
     private String contact;
 
-    private List<AbstractSosSMLDocumentation> documentations = new ArrayList<AbstractSosSMLDocumentation>(0);
+    private final List<AbstractSosSMLDocumentation> documentations = new ArrayList<AbstractSosSMLDocumentation>(0);
 
     private String history;
 
     public String getProcedureIdentifierFromIdentifications() {
         if (isSetIdentifications()) {
-            for (SosSMLIdentifier identification : identifications) {
+            for (final SosSMLIdentifier identification : identifications) {
                 if (isIdentificationHoldingAnProcedureIdentifier(identification)) {
                     return identification.getValue();
                 }
@@ -73,7 +73,7 @@ public class AbstractSensorML extends SosProcedureDescription {
         return keywords;
     }
 
-    public void setKeywords(List<String> keywords) {
+    public void setKeywords(final List<String> keywords) {
         this.keywords = keywords;
     }
 
@@ -81,9 +81,9 @@ public class AbstractSensorML extends SosProcedureDescription {
         return identifications;
     }
 
-    public void setIdentifications(List<SosSMLIdentifier> identifications) {
+    public void setIdentifications(final List<SosSMLIdentifier> identifications) {
         this.identifications = identifications;
-        String identifier = getProcedureIdentifierFromIdentifications();
+        final String identifier = getProcedureIdentifierFromIdentifications();
         if (!isSetIdentifier() && identifier != null && !identifier.isEmpty()) {
             setIdentifier(identifier);
         }
@@ -93,15 +93,20 @@ public class AbstractSensorML extends SosProcedureDescription {
         return classifications;
     }
 
-    public void setClassifications(List<SosSMLClassifier> classifications) {
+    public void setClassifications(final List<SosSMLClassifier> classifications) {
         this.classifications = classifications;
+    }
+    
+    public void addClassification(final SosSMLClassifier classifier)
+    {
+    	classifications.add(classifier);
     }
 
     public ITime getValidTime() {
         return validTime;
     }
 
-    public void setValidTime(ITime validTime) {
+    public void setValidTime(final ITime validTime) {
         this.validTime = validTime;
     }
 
@@ -109,7 +114,7 @@ public class AbstractSensorML extends SosProcedureDescription {
         return characteristics;
     }
 
-    public void setCharacteristics(List<SosSMLCharacteristics> characteristics) {
+    public void setCharacteristics(final List<SosSMLCharacteristics> characteristics) {
         if (isSetCharacteristics()) {
             this.characteristics.addAll(characteristics);
         } else {
@@ -117,15 +122,15 @@ public class AbstractSensorML extends SosProcedureDescription {
         }
     }
 
-    public void addCharacteristic(SosSMLCharacteristics characteristic) {
-        this.characteristics.add(characteristic);
+    public void addCharacteristic(final SosSMLCharacteristics characteristic) {
+        characteristics.add(characteristic);
     }
 
     public List<SosSMLCapabilities> getCapabilities() {
         return capabilities;
     }
 
-    public void setCapabilities(List<SosSMLCapabilities> capabilities) {
+    public void setCapabilities(final List<SosSMLCapabilities> capabilities) {
         if (isSetCapabilities()) {
             this.capabilities.addAll(capabilities);
         } else {
@@ -133,7 +138,7 @@ public class AbstractSensorML extends SosProcedureDescription {
         }
     }
 
-    public void addCapabilities(SosSMLCapabilities capabilities) {
+    public void addCapabilities(final SosSMLCapabilities capabilities) {
         this.capabilities.add(capabilities);
     }
 
@@ -141,7 +146,7 @@ public class AbstractSensorML extends SosProcedureDescription {
         return contact;
     }
 
-    public void setContact(String contact) {
+    public void setContact(final String contact) {
         this.contact = contact;
     }
 
@@ -149,31 +154,31 @@ public class AbstractSensorML extends SosProcedureDescription {
         return documentations;
     }
 
-    public void setDocumentation(List<AbstractSosSMLDocumentation> documentations) {
+    public void setDocumentation(final List<AbstractSosSMLDocumentation> documentations) {
         this.documentations.addAll(documentations);
     }
 
-    public void addDocumentation(AbstractSosSMLDocumentation documentation) {
-        this.documentations.add(documentation);
+    public void addDocumentation(final AbstractSosSMLDocumentation documentation) {
+        documentations.add(documentation);
     }
 
     public String getHistory() {
         return history;
     }
 
-    public void setHistory(String history) {
+    public void setHistory(final String history) {
         this.history = history;
     }
 
-    public void addIdentifier(SosSMLIdentifier identifier) {
-        this.identifications.add(identifier);
+    public void addIdentifier(final SosSMLIdentifier identifier) {
+        identifications.add(identifier);
     }
 
     @Override
     public List<SosOffering> getOfferingIdentifiers() {
-        List<SosOffering> sosOfferings = new ArrayList<SosOffering>(0);
+        final List<SosOffering> sosOfferings = new ArrayList<SosOffering>(0);
         if (isSetIdentifications()) {
-            for (SosSMLIdentifier identification : identifications) {
+            for (final SosSMLIdentifier identification : identifications) {
                 if (isIdentificationHoldingAnOfferingId(identification)) {
                     sosOfferings.add(new SosOffering(identification.getValue(), identification.getName()));
                 }
@@ -182,7 +187,7 @@ public class AbstractSensorML extends SosProcedureDescription {
         return sosOfferings;
     }
 
-    private boolean isIdentificationHoldingAnProcedureIdentifier(SosSMLIdentifier identification) {
+    private boolean isIdentificationHoldingAnProcedureIdentifier(final SosSMLIdentifier identification) {
         return (identification.getName() != null && identification.getName().equals(URN_UNIQUE_IDENTIFIER_END))
                 || (identification.getDefinition() != null && (identification.getDefinition().equals(
                         URN_UNIQUE_IDENTIFIER)
@@ -191,7 +196,7 @@ public class AbstractSensorML extends SosProcedureDescription {
                         .contains(URN_UNIQUE_IDENTIFIER_END))));
     }
 
-    private boolean isIdentificationHoldingAnOfferingId(SosSMLIdentifier identification) {
+    private boolean isIdentificationHoldingAnOfferingId(final SosSMLIdentifier identification) {
         return identification.getDefinition() != null
                 && (identification.getDefinition().equals(URN_OFFERING_ID) || identification.getDefinition().contains(
                         ELEMENT_NAME_OFFERING));
