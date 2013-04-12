@@ -352,7 +352,7 @@
                         "service": "SOS",
                         "version": "2.0.0",
                         "request": "DescribeSensor",
-                        "procedure": "http://www.example.org/sensors/101",
+                        "procedure": "http://www.52north.org/test/procedure/101",
                         "procedureDescriptionFormat": "http://www.opengis.net/sensorML/1.0.1"
                     }
                 }
@@ -363,9 +363,9 @@
                         "service": "SOS",
                         "version": "2.0.0",
                         "request": "GetObservation",
-                        "offering": "test_offering_1",
-                        "observedProperty": "test_observable_property_1",
-                        "procedure": "http://www.example.org/sensors/101",
+                        "offering": "http://www.52north.org/test/offering/1",
+                        "observedProperty": "http://www.52north.org/test/observableProperty/1",
+                        "procedure": "http://www.52north.org/test/procedure/101",
                         "namespaces": [
                             "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
                             "xmlns(om,http://www.opengis.net/om/2.0)"
@@ -379,7 +379,7 @@
                         "service": "SOS",
                         "version": "2.0.0",
                         "request": "GetObservation",
-                        "offering": "test_offering_1"
+                        "offering": "http://www.52north.org/test/offering/1"
                     }
                 },
                 "GetObservation (offerings)": {
@@ -388,8 +388,8 @@
                         "version": "2.0.0",
                         "request": "GetObservation",
                         "offering": [
-                            "test_offering_1",
-                            "test_offering_3"
+                            "http://www.52north.org/test/offering/1",
+                            "http://www.52north.org/test/offering/3"
                         ]
                     }
                 },
@@ -398,7 +398,7 @@
                         "service": "SOS",
                         "version": "2.0.0",
                         "request": "GetObservation",
-                        "procedure": "http://www.example.org/sensors/101"
+                        "procedure": "http://www.52north.org/test/procedure/101"
                     }
                 },
                 "GetObservation (procedures)": {
@@ -407,8 +407,8 @@
                         "version": "2.0.0",
                         "request": "GetObservation",
                         "procedure": [
-                            "http://www.example.org/sensors/101",
-                            "http://www.example.org/sensors/103"
+                            "http://www.52north.org/test/procedure/101",
+                            "http://www.52north.org/test/procedure/103"
                         ]
                     }
                 },
@@ -417,7 +417,7 @@
                         "service": "SOS",
                         "version": "2.0.0",
                         "request": "GetObservation",
-                        "observedProperty": "test_observable_property_1"
+                        "observedProperty": "http://www.52north.org/test/observableProperty/1"
                     }
                 },
                 "GetObservation (observableProperties)": {
@@ -426,8 +426,8 @@
                         "version": "2.0.0",
                         "request": "GetObservation",
                         "observedProperty": [
-                            "test_observable_property_1",
-                            "test_observable_property_3"
+                            "http://www.52north.org/test/observableProperty/1",
+                            "http://www.52north.org/test/observableProperty/3"
                         ]
                     }
                 },
@@ -436,7 +436,7 @@
                         "service": "SOS",
                         "version": "2.0.0",
                         "request": "GetObservation",
-                        "featureOfInterest": "test_feature_1"
+                        "featureOfInterest": "http://www.52north.org/test/featureOfInterest/1"
                     }
                 },
                 "GetObservation (featureOfInterests)": {
@@ -445,8 +445,8 @@
                         "version": "2.0.0",
                         "request": "GetObservation",
                         "featureOfInterest": [
-                            "test_feature_1",
-                            "test_feature_3"
+                            "http://www.52north.org/test/featureOfInterest/1",
+                            "http://www.52north.org/test/featureOfInterest/3"
                         ]
                     }
                 },
@@ -506,7 +506,7 @@
                         "service": "SOS",
                         "version": "2.0.0",
                         "request": "GetFeatureOfInterest",
-                        "procedure": "http://www.example.org/sensors/101"
+                        "procedure": "http://www.52north.org/test/procedure/101"
                     }
                 },
                 "GetFeatureOfInterest (procedures)": {
@@ -515,8 +515,8 @@
                         "version": "2.0.0",
                         "request": "GetFeatureOfInterest",
                         "procedure": [
-                            "http://www.example.org/sensors/101",
-                            "http://www.example.org/sensors/102"
+                            "http://www.52north.org/test/procedure/101",
+                            "http://www.52north.org/test/procedure/102"
                         ]
                     }
                 },
@@ -525,7 +525,7 @@
                         "service": "SOS",
                         "version": "2.0.0",
                         "request": "GetFeatureOfInterest",
-                        "observedProperty": "test_observable_property_1"
+                        "observedProperty": "http://www.52north.org/test/observableProperty/1"
                     }
                 },
                 "GetFeatureOfInterest (observableProperties)": {
@@ -534,8 +534,8 @@
                         "version": "2.0.0",
                         "request": "GetFeatureOfInterest",
                         "observedProperty": [
-                            "test_observable_property_1",
-                            "test_observable_property_2"
+                            "http://www.52north.org/test/observableProperty/1",
+                            "http://www.52north.org/test/observableProperty/2"
                         ]
                     }
                 },
@@ -544,7 +544,7 @@
                         "service": "SOS",
                         "version": "2.0.0",
                         "request": "GetFeatureOfInterest",
-                        "featureOfInterest": "test_feature_1"
+                        "featureOfInterest": "http://www.52north.org/test/featureOfInterest/1"
                     }
                 },
                 "GetFeatureOfInterest (featureOfInterests)": {
@@ -553,8 +553,8 @@
                         "version": "2.0.0",
                         "request": "GetFeatureOfInterest",
                         "featureOfInterest": [
-                            "test_feature_1",
-                            "test_feature_2"
+                            "http://www.52north.org/test/featureOfInterest/1",
+                            "http://www.52north.org/test/featureOfInterest/2"
                         ]
                     }
                 },
@@ -589,7 +589,7 @@
                         "service": "SOS",
                         "version": "2.0.0",
                         "request": "DeleteSensor",
-                        "procedure": "http://www.example.org/sensors/107"
+                        "procedure": "http://www.52north.org/test/procedure/107"
                     }
                 }
             },
@@ -599,8 +599,8 @@
                         "service": "SOS",
                         "version": "2.0.0",
                         "request": "GetResult",
-                        "offering": "test_offering_7",
-                        "observedProperty": "test_observable_property_7_3"
+                        "offering": "http://www.52north.org/test/offering/7",
+                        "observedProperty": "http://www.52north.org/test/observableProperty/7_3"
                     }
                 }
             },
@@ -610,8 +610,8 @@
                         "service": "SOS",
                         "version": "2.0.0",
                         "request": "GetResult",
-                        "offering": "test_offering_7",
-                        "observedProperty": "test_observable_property_7_3"
+                        "offering": "http://www.52north.org/test/offering/7",
+                        "observedProperty": "http://www.52north.org/test/observableProperty/7_3"
                     }
                 }
             },
@@ -629,17 +629,17 @@
                         "version": "2.0.0",
                         "request": "GetDataAvailability",
                         "observedProperty": [
-                            "test_observable_property_1",
-                            "test_observable_property_3"
+                            "http://www.52north.org/test/observableProperty/1",
+                            "http://www.52north.org/test/observableProperty/3"
                         ],
                         "procedure": [
-                            "http://www.example.org/sensors/101",
-                            "http://www.example.org/sensors/103"
+                            "http://www.52north.org/test/procedure/101",
+                            "http://www.52north.org/test/procedure/103"
                         ],
                         "featureOfInterest": [
-                            "test_feature_1",
-                            "test_feature_3",
-                            "test_feature_4"
+                            "http://www.52north.org/test/featureOfInterest/1",
+                            "http://www.52north.org/test/featureOfInterest/3",
+                            "http://www.52north.org/test/featureOfInterest/4"
                         ]
                     }
                 }
