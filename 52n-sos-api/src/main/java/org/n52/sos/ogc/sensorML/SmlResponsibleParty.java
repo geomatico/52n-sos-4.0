@@ -45,7 +45,7 @@ public class SmlResponsibleParty implements SmlContact{
 	
 	private List<String> phoneFax;
 	
-	private List<String> deliveryPoint;
+	private List<String> deliveryPoints;
 	
 	private String city;
 	
@@ -72,7 +72,7 @@ public class SmlResponsibleParty implements SmlContact{
 		this.positionName = positionName;
 		this.phoneVoice = phoneVoice;
 		this.phoneFax = phoneFax;
-		this.deliveryPoint = deliveryPoint;
+		deliveryPoints = deliveryPoint;
 		this.city = city;
 		this.administrativeArea = administrativeArea;
 		this.postalCode = postalCode;
@@ -92,7 +92,7 @@ public class SmlResponsibleParty implements SmlContact{
 		return individualName;
 	}
 
-	public SmlResponsibleParty setInvidualName(final String invidualName)
+	public SmlResponsibleParty setIndividualName(final String invidualName)
 	{
 		individualName = invidualName;
 		return this;
@@ -193,17 +193,34 @@ public class SmlResponsibleParty implements SmlContact{
 	}
 	
 	public boolean isSetDeliveryPoint() {
-		return deliveryPoint != null && !deliveryPoint.isEmpty();
+		return deliveryPoints != null && !deliveryPoints.isEmpty();
 	}
 
 	public List<String> getDeliveryPoint()
 	{
-		return deliveryPoint;
+		return deliveryPoints;
 	}
 
-	public SmlResponsibleParty setDeliveryPoint(final List<String> deliveryPoint)
+	public SmlResponsibleParty setDeliveryPoint(final List<String> deliveryPoints)
 	{
-		this.deliveryPoint = deliveryPoint;
+		if (isSetDeliveryPoint())
+		{
+			this.deliveryPoints.addAll(deliveryPoints);
+		}
+		else
+		{
+			this.deliveryPoints = deliveryPoints;
+		}
+		return this;
+	}
+	
+	public SmlResponsibleParty addDeliveryPoint(final String deliveryPoint)
+	{
+		if (!isSetDeliveryPoint())
+		{
+			deliveryPoints = new ArrayList<String>();
+		}
+		deliveryPoints.add(deliveryPoint);
 		return this;
 	}
 
@@ -304,6 +321,16 @@ public class SmlResponsibleParty implements SmlContact{
 		return this;
 	}
 	
+	public SmlResponsibleParty addOnlineResource(final String onlineResource)
+	{
+		if(!isSetOnlineResources())
+		{
+			onlineResources = new ArrayList<String>();
+		}
+		onlineResources.add(onlineResource);
+		return this;
+	}
+	
 	public boolean isSetHoursOfService() {
 		return hoursOfService != null && !hoursOfService.isEmpty();
 	}
@@ -332,6 +359,18 @@ public class SmlResponsibleParty implements SmlContact{
 	{
 		this.contactInstructions = contactInstructions;
 		return this;
+	}
+	
+	public boolean isSetContactInfo() {
+		return isSetPhone() || isSetAddress() || isSetOnlineResources() || isSetHoursOfService() || isSetContactInstructions();
+	}
+	
+	public boolean isSetAddress() {
+		return isSetDeliveryPoint() || isSetCity() || isSetAdministrativeArea() || isSetPostalCode() || isSetCountry() || isSetEmail();
+	}
+	
+	public boolean isSetPhone() {
+		return isSetPhoneFax() || isSetPhoneVoice();
 	}
 
 }
