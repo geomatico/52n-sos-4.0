@@ -90,8 +90,8 @@ public interface FilterConstants {
         BegunBy,
         During,
         TEquals,
-        Contains,
-        Overlaps,
+        TContains,
+        TOverlaps,
         Meets,
         MetBy,
         OverlappedBy
