@@ -94,6 +94,10 @@ public class AbstractSensorML extends SosProcedureDescription {
     }
 
     public void setClassifications(final List<SosSMLClassifier> classifications) {
+    	if (isSetClassifications())
+    	{
+    		this.classifications.addAll(classifications);
+    	}
         this.classifications = classifications;
     }
     
