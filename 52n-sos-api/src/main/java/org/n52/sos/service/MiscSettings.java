@@ -23,7 +23,7 @@
  */
 package org.n52.sos.service;
 
-import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.*;
 
 import java.util.Collections;
 import java.util.Set;
@@ -52,6 +52,15 @@ public class MiscSettings implements SettingDefinitionProvider {
     public static final String DEFAULT_OBSERVABLEPROPERTY_PREFIX = "misc.defaultObservablePropertyPrefix";
     public static final String DEFAULT_FEATURE_PREFIX = "misc.defaultFeaturePrefix";
     public static final String HTTP_STATUS_CODE_USE_IN_KVP_POX_BINDING = "misc.httpResponseCodeUseInKvpAndPoxBinding";
+    public static final String SML_GENERATION_IDENTIFIER_LONG_NAME_DEFINITION = "misc.SML_GENERATION_IDENTIFIER_LONG_NAME_DEFINITION";
+    public static final String SML_GENERATION_IDENTIFIER_SHORT_NAME_DEFINITION = "misc.SML_GENERATION_IDENTIFIER_SHORT_NAME_DEFINITION";
+    public static final String SML_GENERATION_DESCRIPTION_TEMPLATE = "misc.SML_GENERATION_DESCRIPTION_TEMPLATE";
+    public static final String SML_GENERATION_GENERATE_CLASSIFICATION = "misc.SML_GENERATION_GENERATE_CLASSIFICATION";
+    public static final String SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_DEFINITION = "misc.SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_DEFINITION";
+    public static final String SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_VALUE = "misc.SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_VALUE";
+    public static final String SML_GENERATION_CLASSIFIER_SENSOR_TYPE_DEFINITION = "misc.SML_GENERATION_CLASSIFIER_SENSOR_TYPE_DEFINITION";
+    public static final String SML_GENERATION_CLASSIFIER_SENSOR_TYPE_VALUE = "misc.SML_GENERATION_CLASSIFIER_SENSOR_TYPE_VALUE";
+    public static final String SML_GENERATION_USE_SERVICE_CONTACT_AS_SENSOR_CONTACT = "misc.SML_GENERATION_USE_SERVICE_CONTACT_AS_SENSOR_CONTACT";
     
     /**
      * @deprecated not used by any code, check for external use or remove
@@ -164,19 +173,102 @@ public class MiscSettings implements SettingDefinitionProvider {
     		.setTitle("HTTP Status Code Usage in KVP and POX Binding")
     		.setDescription("Should the response returned by KVP and POX binding use the exception specific HTTP status code or always <tt>HTTP 200 - OK</tt>.");
     
+    public static final StringSettingDefinition SML_GENERATION_IDENTIFIER_LONG_NAME_DEFINITION_DEFINITION = new StringSettingDefinition()
+			.setGroup(GROUP)
+			.setOrder(13)
+			.setKey(SML_GENERATION_IDENTIFIER_LONG_NAME_DEFINITION)
+			.setDefaultValue("urn:ogc:def:identifier:OGC:1.0:longname")
+			.setTitle("SML Ident 'longname' definition")
+			.setDescription("The definition for the sml:identification holding the 'longname'. Used only if the sensor description is <b>generated</b>.");
+    
+    public static final StringSettingDefinition SML_GENERATION_IDENTIFIER_SHORT_NAME_DEFINITION_DEFINITION = new StringSettingDefinition()
+        	.setGroup(GROUP)
+        	.setOrder(13)
+        	.setKey(SML_GENERATION_IDENTIFIER_SHORT_NAME_DEFINITION)
+        	.setDefaultValue("urn:ogc:def:identifier:OGC:1.0:shortname")
+        	.setTitle("SML Ident 'shortname' definition")
+        	.setDescription("The definition for the sml:identification holding the 'shortname'. Used only if the sensor description is <b>generated</b>.");
+    
+    public static final StringSettingDefinition SML_GENERATION_DESCRIPTION_TEMPLATE_DEFINITION = new StringSettingDefinition()
+        	.setGroup(GROUP)
+        	.setOrder(14)
+        	.setKey(SML_GENERATION_DESCRIPTION_TEMPLATE)
+        	.setDefaultValue("The sensor system with the id '%s' observes the following properties: '%s'.")
+        	.setTitle("SML Generation: description template")
+        	.setDescription("The template used to generate a description using the sensor identifier and the observed properties " +
+			"related. The template MUST contain '%s' twice. The first one will be replaced with the sensor id and the " +
+			"second with a comma separated list of properties: e.g. <i>The sensor system with the id '%s' observes the following properties: '%s'.</i>.");
+    
+    public static final BooleanSettingDefinition SML_GENERATION_GENERATE_CLASSIFICATION_DEFINITION = new BooleanSettingDefinition()
+            .setGroup(GROUP)
+            .setOrder(15)
+            .setKey(SML_GENERATION_GENERATE_CLASSIFICATION)
+            .setDefaultValue(TRUE)
+            .setTitle("SML Generation: generate classification")
+            .setDescription("Should the classifiers for 'intendedApplication' and/or 'sensorType' be generated using the values from the next two settings?");
+	
+    public static final StringSettingDefinition SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_DEFINITION_DEFINITION = new StringSettingDefinition()
+            .setGroup(GROUP)
+            .setOrder(16)
+            .setKey(SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_DEFINITION)
+            .setDefaultValue("urn:ogc:def:classifier:OGC:1.0:application")
+            .setTitle("SML Generation: intendedApplication definition")
+            .setDescription("The definition that will be used for all procedures/sensors of this SOS instance as definition for the classifier 'intendedApllication' if the classification generation is activated.");
+
+    public static final StringSettingDefinition SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_VALUE_DEFINITION = new StringSettingDefinition()
+            .setGroup(GROUP)
+            .setOrder(17)
+            .setKey(SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_VALUE)
+            .setDefaultValue("")
+            .setTitle("SML Generation: intendedApplication Value")
+            .setDescription("The value that will be used for all procedures/sensors of this SOS instance as term for the classifier 'intendedApllication' if the classification generation is activated. In addition, if this field is <b>empty</b>, the classifier 'intendedApplication' will <b>not</b> be added.");
+    
+    public static final StringSettingDefinition SML_GENERATION_CLASSIFIER_SENSOR_TYPE_DEFINITION_DEFINITION = new StringSettingDefinition()
+            .setGroup(GROUP)
+            .setOrder(18)
+            .setKey(SML_GENERATION_CLASSIFIER_SENSOR_TYPE_DEFINITION)
+            .setDefaultValue("urn:ogc:def:classifier:OGC:1.0:sensorType")
+            .setTitle("SML Generation: sensorType definition")
+            .setDescription("The definition that will be used for all procedures/sensors of this SOS instance as definition for the classifier 'sensorType' if the classification generation is activated.");
+    
+    public static final StringSettingDefinition SML_GENERATION_CLASSIFIER_SENSOR_TYPE_VALUE_DEFINITION = new StringSettingDefinition()
+            .setGroup(GROUP)
+            .setOrder(19)
+            .setKey(SML_GENERATION_CLASSIFIER_SENSOR_TYPE_VALUE)
+            .setDefaultValue("")
+            .setTitle("SML Generation: sensorType Value")
+            .setDescription("The value that will be used for all procedures/sensors of this SOS instance as term for the classifier 'sensorType' if the classification generation is activated. In addition, if this field is <b>empty</b>, the classifier 'sensorType' will <b>not</b> be added.");
+    
+    public static final BooleanSettingDefinition SML_GENERATION_USE_SERVICE_CONTACT_AS_SENSOR_CONTACT_DEFINITION = new BooleanSettingDefinition()
+    		.setGroup(GROUP)
+    		.setOrder(20)
+    		.setKey(SML_GENERATION_USE_SERVICE_CONTACT_AS_SENSOR_CONTACT)
+    		.setDefaultValue(TRUE)
+    		.setTitle("SML Generation: use service contact as sensor contact")
+    		.setDescription("Should the service contact be encoded as sensor contact if sensor description generation is activated.");
+    
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
-            MiscSettings.TOKEN_SEPERATOR_DEFINITION,
-            MiscSettings.TUPLE_SEPERATOR_DEFINITION,
-            MiscSettings.DECIMAL_SEPARATOR_DEFINITION,
-            MiscSettings.GML_DATE_FORMAT_DEFINITION,
-            MiscSettings.SRS_NAME_PREFIX_SOS_V1_DEFINITION,
-            MiscSettings.SRS_NAME_PREFIX_SOS_V2_DEFINITION,
-            MiscSettings.DEFAULT_OFFERING_PREFIX_DEFINITION,
-            MiscSettings.DEFAULT_PROCEDURE_PREFIX_DEFINITION,
-            MiscSettings.DEFAULT_OBSERVABLEPROPERTY_PREFIX_DEFINITION,
-            MiscSettings.DEFAULT_FEATURE_PREFIX_DEFINITION,
-            MiscSettings.CHARACTER_ENCODING_DEFINITION,
-            MiscSettings.HTTP_STATUS_CODE_USE_IN_KVP_POX_BINDING_DEFINITION);
+            TOKEN_SEPERATOR_DEFINITION,
+            TUPLE_SEPERATOR_DEFINITION,
+            DECIMAL_SEPARATOR_DEFINITION,
+            GML_DATE_FORMAT_DEFINITION,
+            SRS_NAME_PREFIX_SOS_V1_DEFINITION,
+            SRS_NAME_PREFIX_SOS_V2_DEFINITION,
+            DEFAULT_OFFERING_PREFIX_DEFINITION,
+            DEFAULT_PROCEDURE_PREFIX_DEFINITION,
+            DEFAULT_OBSERVABLEPROPERTY_PREFIX_DEFINITION,
+            DEFAULT_FEATURE_PREFIX_DEFINITION,
+            CHARACTER_ENCODING_DEFINITION,
+            HTTP_STATUS_CODE_USE_IN_KVP_POX_BINDING_DEFINITION,
+            SML_GENERATION_IDENTIFIER_LONG_NAME_DEFINITION_DEFINITION,
+            SML_GENERATION_IDENTIFIER_SHORT_NAME_DEFINITION_DEFINITION,
+            SML_GENERATION_DESCRIPTION_TEMPLATE_DEFINITION,
+            SML_GENERATION_GENERATE_CLASSIFICATION_DEFINITION,
+            SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_DEFINITION_DEFINITION,
+            SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_VALUE_DEFINITION,
+            SML_GENERATION_CLASSIFIER_SENSOR_TYPE_VALUE_DEFINITION,
+            SML_GENERATION_CLASSIFIER_SENSOR_TYPE_DEFINITION_DEFINITION,
+            SML_GENERATION_USE_SERVICE_CONTACT_AS_SENSOR_CONTACT_DEFINITION);
 
     @Override
     public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
