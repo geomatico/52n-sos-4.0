@@ -46,6 +46,8 @@ public interface Profile {
 
     boolean isSetEncodeFeatureOfInterestNamespace();
 
+    boolean isEncodeProcedureInObservation();
+    
     boolean isEncodeProcedureInObservation(String namespace);
 
     boolean isReturnLatestValueIfTemporalFilterIsMissingInGetObservation();

@@ -113,6 +113,11 @@ public class DefaultProfile implements Profile {
     }
 
     @Override
+    public boolean isEncodeProcedureInObservation() {
+        return encodeProcedureInObservation != null && !encodeProcedureInObservation.isEmpty();
+    }
+
+    @Override
     public boolean isEncodeProcedureInObservation(String namespace) {
         if (encodeProcedureInObservation.get(namespace) != null) {
             return encodeProcedureInObservation.get(namespace);

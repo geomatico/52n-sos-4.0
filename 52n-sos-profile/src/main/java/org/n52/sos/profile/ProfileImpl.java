@@ -172,6 +172,11 @@ public class ProfileImpl implements Profile {
     }
 
     @Override
+    public boolean isEncodeProcedureInObservation() {
+        return encodeProcedureInObservation != null && !encodeProcedureInObservation.isEmpty();
+    }
+
+    @Override
     public boolean isEncodeProcedureInObservation(String namespace) {
         Boolean encode = encodeProcedureInObservation.get(namespace);
         if (encode != null) {
