@@ -23,13 +23,11 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.hibernate.HibernateException;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.n52.sos.ds.hibernate.HibernateQueryObject;
+import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.hibernate.entities.BlobObservation;
 import org.n52.sos.ds.hibernate.entities.BlobValue;
 import org.n52.sos.ds.hibernate.entities.BooleanObservation;
@@ -38,9 +36,11 @@ import org.n52.sos.ds.hibernate.entities.CountObservation;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.GeometryObservation;
 import org.n52.sos.ds.hibernate.entities.NumericObservation;
+import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Offering;
+import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.TextObservation;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
@@ -64,60 +64,58 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.Configurator;
 
 public class HibernateUtilities {
-    public static ObservationConstellation checkObservationConstellation(
-            SosObservationConstellation sosObservationConstellation, String offeringIdentifier, Session session,
-            String parameterName)
-            throws OwsExceptionReport, HibernateException {
-        // FIXME parameterName should not be part of the parameters
-        // check if multiple offerings.
-        HibernateQueryObject queryObject = new HibernateQueryObject();
-        Map<String, String> aliases = new HashMap<String, String>();
-        String offAlias = HibernateCriteriaQueryUtilities.addOfferingAliasToMap(aliases, null);
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                HibernateCriteriaQueryUtilities.getIdentifierParameter(offAlias), offeringIdentifier));
-        String obsPropAlias = HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, null);
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateCriteriaQueryUtilities
-                .getIdentifierParameter(obsPropAlias), sosObservationConstellation.getObservableProperty()
-                .getIdentifier()));
-        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, null);
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias),
-                sosObservationConstellation.getProcedure().getIdentifier()));
-        queryObject.setAliases(aliases);
-        List<ObservationConstellation> hObservationConstellations = HibernateCriteriaQueryUtilities
-                .getObservationConstellations(queryObject, session);
-        if (hObservationConstellations != null && !hObservationConstellations.isEmpty()) {
-            for (ObservationConstellation hObservationConstellation : hObservationConstellations) {
-                if (hObservationConstellation.getObservationType() == null
-                    || (hObservationConstellation.getObservationType() != null && (hObservationConstellation.getObservationType()
-                        .getObservationType()
-                        .equals("NOT_DEFINED") || hObservationConstellation.getObservationType().getObservationType()
-                        .isEmpty()))) {
-                    return HibernateCriteriaTransactionalUtilities
-                            .updateObservationConstellation(hObservationConstellation,
-                                                                                   sosObservationConstellation
+    public static ObservationConstellation checkObservationConstellation(SosObservationConstellation soc,
+                                                                         String offering, Session session,
+                                                                         String parameterName) throws OwsExceptionReport {
+        String observableProperty = soc.getObservableProperty().getIdentifier();
+        String procedure = soc.getProcedure().getIdentifier();
+
+        Criteria c = session.createCriteria(ObservationConstellation.class)
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
+        c.createCriteria(ObservationConstellation.OFFERING)
+                .add(Restrictions.eq(Offering.IDENTIFIER, offering));
+
+
+        c.createCriteria(ObservationConstellation.OBSERVABLE_PROPERTY)
+                .add(Restrictions.eq(ObservableProperty.IDENTIFIER, observableProperty));
+
+
+        c.createCriteria(ObservationConstellation.PROCEDURE)
+                .add(Restrictions.eq(Procedure.IDENTIFIER, procedure));
+
+        @SuppressWarnings("unchecked")
+        List<ObservationConstellation> hocs = c.list();
+
+        if (!hocs.isEmpty()) {
+            for (ObservationConstellation hoc : hocs) {
+                if (hoc.getObservationType() == null ||
+                    (hoc.getObservationType() != null &&
+                     (hoc.getObservationType().getObservationType().equals("NOT_DEFINED") ||
+                      hoc.getObservationType().getObservationType().isEmpty()))) {
+                    return HibernateCriteriaTransactionalUtilities.updateObservationConstellation(hoc, soc
                             .getObservationType(), session);
                 } else {
-                    if (hObservationConstellation.getObservationType().getObservationType()
-                            .equals(sosObservationConstellation.getObservationType())) {
-                        return hObservationConstellation;
+                    if (hoc.getObservationType().getObservationType()
+                            .equals(soc.getObservationType())) {
+                        return hoc;
                     } else {
                         throw new InvalidParameterValueException().at(parameterName)
                                 .withMessage("The requested observationType (%s) is invalid for procedure = %s, observedProperty = %s and offering = %s! The valid observationType is '%s'!",
-                                             sosObservationConstellation.getObservationType(),
-                                             sosObservationConstellation.getProcedure(),
-                                             sosObservationConstellation.getObservableProperty().getIdentifier(),
-                                             sosObservationConstellation.getOfferings(),
-                                             hObservationConstellation.getObservationType().getObservationType());
+                                             soc.getObservationType(),
+                                             procedure,
+                                             observableProperty,
+                                             soc.getOfferings(),
+                                             hoc.getObservationType().getObservationType());
                     }
                 }
             }
         } else {
             throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
                     .withMessage("The requested observation constellation (procedure=%s, observedProperty=%s and offering=%s) is invalid!",
-                                 sosObservationConstellation.getProcedure(),
-                                 sosObservationConstellation.getObservableProperty().getIdentifier(),
-                                 sosObservationConstellation.getOfferings());
+                                 procedure,
+                                 observableProperty,
+                                 soc.getOfferings());
         }
         return null;
     }
