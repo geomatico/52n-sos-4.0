@@ -23,32 +23,21 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.*;
-
-import java.util.LinkedList;
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.AbstractGetObservationByIdDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.GetObservationByIdRequest;
 import org.n52.sos.response.GetObservationByIdResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GetObservationByIdDAO extends AbstractGetObservationByIdDAO {
-
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(GetObservationByIdDAO.class);
 
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
@@ -75,23 +64,12 @@ public class GetObservationByIdDAO extends AbstractGetObservationByIdDAO {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private List<Observation> queryObservation(GetObservationByIdRequest request, Session session) {
-        HibernateQueryObject queryObject = new HibernateQueryObject();
-        List<Criterion> criterions = new LinkedList<Criterion>();
-        criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(PARAMETER_IDENTIFIER, request.getObservationIdentifier()));
-        criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(PARAMETER_SET_ID, request.getObservationIdentifier()));
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionFor(criterions));
-        return HibernateCriteriaQueryUtilities.getObservations(queryObject, session);
-    }
-    
-    @SuppressWarnings({ "unchecked", "unused" })
-    private List<Observation> queryObservationWithHibernate(GetObservationByIdRequest request, Session session) {
         return session.createCriteria(Observation.class)
-                .add(Restrictions.eq(PARAMETER_DELETED, false))
-                .add(Restrictions.or(
-                    Restrictions.in(PARAMETER_IDENTIFIER, request.getObservationIdentifier()),
-                    Restrictions.in(PARAMETER_SET_ID, request.getObservationIdentifier())))
-                .list();
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                .add(Restrictions.eq(Observation.DELETED, false))
+                .add(Restrictions.or(Restrictions.in(Observation.IDENTIFIER, request.getObservationIdentifier()),
+                                     Restrictions.in(Observation.SET_ID, request.getObservationIdentifier()))).list();
     }
-
 }
