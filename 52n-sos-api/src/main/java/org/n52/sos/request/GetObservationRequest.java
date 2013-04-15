@@ -478,13 +478,13 @@ public class GetObservationRequest extends AbstractServiceRequest {
         return false;
     }
 
-    public List<TemporalFilter> getFirstLatestTemporalFilter() {
-        List<TemporalFilter> tf = new LinkedList<TemporalFilter>();
+    public List<FirstLatest> getFirstLatestTemporalFilter() {
+        List<FirstLatest> tf = new LinkedList<FirstLatest>();
         for (TemporalFilter temporalFilter : temporalFilters) {
             if (temporalFilter.getTime() instanceof TimeInstant) {
                 TimeInstant ti = (TimeInstant) temporalFilter.getTime();
                 if (ti.isSetIndeterminateValue() && FirstLatest.contains(ti.getIndeterminateValue())) {
-                    tf.add(temporalFilter);
+                    tf.add(FirstLatest.valueOf(ti.getIndeterminateValue()));
                 }
             }
         }
