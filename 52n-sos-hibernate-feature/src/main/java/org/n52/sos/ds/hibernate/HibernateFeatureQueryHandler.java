@@ -26,6 +26,7 @@ package org.n52.sos.ds.hibernate;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,16 +37,16 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.spatial.criterion.SpatialProjections;
-import org.hibernate.spatial.criterion.SpatialRestrictions;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.FeatureQueryHandler;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
-import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
+import org.n52.sos.ds.hibernate.util.SpatialRestrictions;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
@@ -75,25 +76,19 @@ import com.vividsolutions.jts.geom.Geometry;
 @Configurable
 public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateFeatureQueryHandler.class);
-
-    private List<Range> epsgsWithReversedAxisOrder;
-
-    private int defaultEPSG;
-
     private static final int epsgWgs843D = 4329;
-
     private static final int epsgWgs84 = 4326;
-
+    private List<Range> epsgsWithReversedAxisOrder;
+    private int defaultEPSG;
     private boolean spatialDatasource;
 
     @Override
     public SosAbstractFeature getFeatureByID(String featureID, Object connection, String version, int responeSrid)
             throws OwsExceptionReport {
-        Session session = getSessionFromConnection(connection);
+        Session session = HibernateSessionHolder.getSession(connection);
         try {
-            Criteria q =
-                    session.createCriteria(FeatureOfInterest.class).add(
-                            Restrictions.eq(HibernateConstants.PARAMETER_IDENTIFIER, featureID));
+            Criteria q = session.createCriteria(FeatureOfInterest.class).add(
+                    Restrictions.eq(FeatureOfInterest.IDENTIFIER, featureID));
             return createSosAbstractFeature((FeatureOfInterest) q.uniqueResult(), version);
         } catch (HibernateException he) {
             throw new NoApplicableCodeException().causedBy(he)
@@ -103,31 +98,32 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Collection<String> getFeatureIDs(SpatialFilter filter, Object connection) throws OwsExceptionReport {
-        Session session = getSessionFromConnection(connection);
-        HibernateQueryObject queryObject = new HibernateQueryObject();
+        Session session = HibernateSessionHolder.getSession(connection);
         try {
             if (isSpatialDatasource()) {
+                Criteria c = session.createCriteria(FeatureOfInterest.class)
+                        .setProjection(Projections.distinct(Projections.property(FeatureOfInterest.IDENTIFIER)));
                 if (filter != null) {
-                    queryObject.addCriterion(HibernateCriteriaQueryUtilities.getCriterionForSpatialFilter(
-                            HibernateConstants.PARAMETER_GEOMETRY, filter.getOperator(),
-                            switchCoordinateAxisOrderIfNeeded(filter.getGeometry())));
+                    c.add(SpatialRestrictions.filter(FeatureOfInterest.GEOMETRY, filter.getOperator(),
+                                                     switchCoordinateAxisOrderIfNeeded(filter.getGeometry())));
                 }
-                return getFeatureOfInterestIdentifier(queryObject, session);
+                return c.list();
             } else {
-                List<String> featureIdentifier = new LinkedList<String>();
-                List<FeatureOfInterest> featuresOfInterest =
-                        HibernateCriteriaQueryUtilities.getFeatureOfInterestObjects(session);
+
+                List<String> identifiers = new LinkedList<String>();
+                List<FeatureOfInterest> features = session.createCriteria(FeatureOfInterest.class).list();
                 if (filter != null) {
                     Geometry envelope = getFilterForNonSpatialDatasource(filter);
-                    for (FeatureOfInterest feature : featuresOfInterest) {
+                    for (FeatureOfInterest feature : features) {
                         Geometry geom = getGeomtery(feature);
                         if (geom != null && envelope.contains(geom)) {
-                            featureIdentifier.add(feature.getIdentifier());
+                            identifiers.add(feature.getIdentifier());
                         }
                     }
                 }
-                return featureIdentifier;
+                return identifiers;
             }
         } catch (HibernateException he) {
             throw new NoApplicableCodeException().causedBy(he)
@@ -139,51 +135,12 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     public Map<String, SosAbstractFeature> getFeatures(Collection<String> featureIDs,
             List<SpatialFilter> spatialFilters, Object connection, String version, int responeSrid)
             throws OwsExceptionReport {
-        Session session = getSessionFromConnection(connection);
-        HibernateQueryObject queryObject = new HibernateQueryObject();
+        Session session = HibernateSessionHolder.getSession(connection);
         try {
             if (isSpatialDatasource()) {
-                if (featureIDs != null && !featureIDs.isEmpty()) {
-                    queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
-                            HibernateConstants.PARAMETER_IDENTIFIER, featureIDs));
-                }
-                if (spatialFilters != null && !spatialFilters.isEmpty()) {
-                    Disjunction disjunction = Restrictions.disjunction();
-                    for (SpatialFilter filter : spatialFilters) {
-                        disjunction.add(HibernateCriteriaQueryUtilities.getCriterionForSpatialFilter(
-                                HibernateConstants.PARAMETER_GEOMETRY, filter.getOperator(),
-                                switchCoordinateAxisOrderIfNeeded(filter.getGeometry())));
-                    }
-                    queryObject.addCriterion(disjunction);
-                }
-                if (queryObject.isSetCriterions()) {
-                    return createSosFeatures(getFeatureOfInterests(queryObject, session), version);
-                } else {
-                    return new HashMap<String, SosAbstractFeature>(0);
-                }
+                return getFeaturesForSpatialDatasource(featureIDs, spatialFilters, session, version);
             } else {
-                Map<String, SosAbstractFeature> featureMap = new HashMap<String, SosAbstractFeature>(0);
-                List<Geometry> envelopes = null;
-                boolean hasSpatialFilter = false;
-                if (spatialFilters != null && !spatialFilters.isEmpty()) {
-                    hasSpatialFilter = true;
-                    envelopes = new ArrayList<Geometry>(spatialFilters.size());
-                    for (SpatialFilter filter : spatialFilters) {
-                        envelopes.add(getFilterForNonSpatialDatasource(filter));
-                    }
-                }
-                List<FeatureOfInterest> featuresOfInterest = HibernateCriteriaQueryUtilities.getFeatureOfInterestObject(featureIDs, session);
-                for (FeatureOfInterest feature : featuresOfInterest) {
-                    SosSamplingFeature sosAbstractFeature = (SosSamplingFeature)createSosAbstractFeature(feature, version);
-                    if (!hasSpatialFilter) {
-                        featureMap.put(sosAbstractFeature.getIdentifier().getValue(), sosAbstractFeature);
-                    } else {
-                        if (featureIsInFilter(sosAbstractFeature.getGeometry(), envelopes)) {
-                            featureMap.put(sosAbstractFeature.getIdentifier().getValue(), sosAbstractFeature);
-                        }
-                    }
-                }
-                return featureMap;
+                return getFeaturesForNonSpatialDatasource(featureIDs, spatialFilters, session, version);
             }
         } catch (HibernateException he) {
             throw new NoApplicableCodeException().causedBy(he)
@@ -194,15 +151,13 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     @Override
     public SosEnvelope getEnvelopeForFeatureIDs(Collection<String> featureIDs, Object connection)
             throws OwsExceptionReport {
-        Session session = getSessionFromConnection(connection);
+        Session session = HibernateSessionHolder.getSession(connection);
         if (featureIDs != null && !featureIDs.isEmpty()) {
             try {
                 if (isSpatialDatasource()) {
-                    Geometry geom =
-                            (Geometry) session.createCriteria(FeatureOfInterest.class)
-                                    .add(Restrictions.in(HibernateConstants.PARAMETER_IDENTIFIER, featureIDs))
-                                    .setProjection(SpatialProjections.extent(HibernateConstants.PARAMETER_GEOMETRY))
-                                    .uniqueResult();
+                    Geometry geom = (Geometry) session.createCriteria(FeatureOfInterest.class)
+                            .add(Restrictions.in(FeatureOfInterest.IDENTIFIER, featureIDs))
+                            .setProjection(SpatialProjections.extent(FeatureOfInterest.GEOMETRY)).uniqueResult();
                     geom = switchCoordinateAxisOrderIfNeeded(geom);
                     if (geom != null) {
                         return new SosEnvelope(geom.getEnvelopeInternal(), getDefaultEPSG());
@@ -241,7 +196,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
         if (samplingFeature.getUrl() != null && !samplingFeature.getUrl().isEmpty()) {
             return samplingFeature.getUrl();
         } else {
-            Session session = getSessionFromConnection(connection);
+            Session session = HibernateSessionHolder.getSession(connection);
             String featureIdentifier;
             if (samplingFeature.isSetIdentifier()) {
                 featureIdentifier = samplingFeature.getIdentifier().getValue();
@@ -278,24 +233,6 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     }
 
     /**
-     * Checks if connection is a Hibernate Session and casts the connection
-     * <p/>
-     * @param connection connection
-     * <p/>
-     * @return Hibernate Session
-     * <p/>
-     * @throws OwsExceptionReport * If connection is not a Hibentat Sessrion
-     */
-    protected Session getSessionFromConnection(Object connection) throws OwsExceptionReport {
-        if (connection instanceof Session) {
-            return (Session) connection;
-        } else {
-            throw new NoApplicableCodeException()
-                    .withMessage("The connection is not a Hibernate Session!");
-        }
-    }
-
-    /**
      * Get FeatureOfInterest objects for the defined restrictions
      * <p/>
      * @param aliases     Aliases for query between tables
@@ -306,6 +243,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
      * @return FeatureOfInterest objects
      */
     @SuppressWarnings("unchecked")
+    @Deprecated
     protected List<FeatureOfInterest> getFeatureOfInterests(HibernateQueryObject queryObject, Session session) {
         return (List<FeatureOfInterest>) HibernateCriteriaQueryUtilities.getObjectList(queryObject, session,
                 FeatureOfInterest.class);
@@ -313,15 +251,15 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
 
     protected FeatureOfInterest getFeatureOfInterest(String identifier, Geometry geometry, Session session) throws
             OwsExceptionReport {
-        Criteria q = session.createCriteria(FeatureOfInterest.class)
-                .add(Restrictions.disjunction()
-                .add(Restrictions.eq(HibernateConstants.PARAMETER_IDENTIFIER, identifier))
-                .add(SpatialRestrictions.eq(HibernateConstants.PARAMETER_GEOMETRY,
-                                            switchCoordinateAxisOrderIfNeeded(geometry))));
-        return (FeatureOfInterest) q.uniqueResult();
+        return (FeatureOfInterest) session.createCriteria(FeatureOfInterest.class)
+                .add(Restrictions.or(Restrictions.eq(FeatureOfInterest.IDENTIFIER, identifier),
+                                     SpatialRestrictions.eq(FeatureOfInterest.GEOMETRY,
+                                                            switchCoordinateAxisOrderIfNeeded(geometry))))
+                .uniqueResult();
     }
 
     @SuppressWarnings("unchecked")
+    @Deprecated
     protected List<String> getFeatureOfInterestIdentifier(HibernateQueryObject queryObject, Session session) {
         queryObject.addProjection(HibernateCriteriaQueryUtilities
                 .getDistinctProjection(HibernateCriteriaQueryUtilities.getIdentifierParameter(null)));
@@ -563,5 +501,63 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     @Setting(FeatureQuerySettingsProvider.SPATIAL_DATASOURCE)
     public void setSpatialDatasource(boolean spatialDatasource) {
         this.spatialDatasource = spatialDatasource;
+    }
+
+    protected Map<String, SosAbstractFeature> getFeaturesForNonSpatialDatasource(Collection<String> featureIDs,
+                                                                                 List<SpatialFilter> spatialFilters,
+                                                                                 Session session, String version)
+            throws OwsExceptionReport {
+        Map<String, SosAbstractFeature> featureMap = new HashMap<String, SosAbstractFeature>(0);
+        List<Geometry> envelopes = null;
+        boolean hasSpatialFilter = false;
+        if (spatialFilters != null && !spatialFilters.isEmpty()) {
+            hasSpatialFilter = true;
+            envelopes = new ArrayList<Geometry>(spatialFilters.size());
+            for (SpatialFilter filter : spatialFilters) {
+                envelopes.add(getFilterForNonSpatialDatasource(filter));
+            }
+        }
+        List<FeatureOfInterest> featuresOfInterest = HibernateCriteriaQueryUtilities
+                .getFeatureOfInterestObject(featureIDs, session);
+        for (FeatureOfInterest feature : featuresOfInterest) {
+            SosSamplingFeature sosAbstractFeature = (SosSamplingFeature) createSosAbstractFeature(feature, version);
+            if (!hasSpatialFilter) {
+                featureMap.put(sosAbstractFeature.getIdentifier().getValue(), sosAbstractFeature);
+            } else {
+                if (featureIsInFilter(sosAbstractFeature.getGeometry(), envelopes)) {
+                    featureMap.put(sosAbstractFeature.getIdentifier().getValue(), sosAbstractFeature);
+                }
+            }
+        }
+        return featureMap;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Map<String, SosAbstractFeature> getFeaturesForSpatialDatasource(Collection<String> featureIDs,
+                                                                              List<SpatialFilter> spatialFilters,
+                                                                              Session session,
+                                                                              String version) throws OwsExceptionReport {
+        Criteria c = session.createCriteria(FeatureOfInterest.class)
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        boolean filtered = false;
+        if (featureIDs != null && !featureIDs.isEmpty()) {
+            c.add(Restrictions.in(FeatureOfInterest.IDENTIFIER, featureIDs));
+            filtered = true;
+        }
+        if (spatialFilters != null && !spatialFilters.isEmpty()) {
+            Disjunction disjunction = Restrictions.disjunction();
+            for (SpatialFilter filter : spatialFilters) {
+                disjunction.add(SpatialRestrictions.filter(FeatureOfInterest.GEOMETRY,
+                                                           filter.getOperator(),
+                                                           switchCoordinateAxisOrderIfNeeded(filter.getGeometry())));
+            }
+            c.add(disjunction);
+            filtered = true;
+        }
+        if (filtered) {
+            return createSosFeatures(c.list(), version);
+        } else {
+            return Collections.emptyMap();
+        }
     }
 }
