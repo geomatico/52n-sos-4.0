@@ -32,21 +32,21 @@ import org.slf4j.LoggerFactory;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class CompositeCacheUpdate extends CacheUpdate {
+public abstract class CompositeCacheUpdate extends AbstractDatasourceCacheUpdate {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(CompositeCacheUpdate.class);
 
-    private CompositeAction<CacheUpdate> delegatedAction;
+    private CompositeAction<AbstractDatasourceCacheUpdate> delegatedAction;
 
-    public CompositeCacheUpdate(CacheUpdate... actions) {
-        this.delegatedAction = new CompositeAction<CacheUpdate>(actions) {
-            @Override protected void pre(CacheUpdate action) {
+    public CompositeCacheUpdate(AbstractDatasourceCacheUpdate... actions) {
+        this.delegatedAction = new CompositeAction<AbstractDatasourceCacheUpdate>(actions) {
+            @Override protected void pre(AbstractDatasourceCacheUpdate action) {
                 action.setCache(getCache());
                 action.setErrors(getErrors());
                 action.setSession(getSession());
                 LOGGER.debug("Running {}.", action);
             }
-            @Override protected void post(CacheUpdate action) {
+            @Override protected void post(AbstractDatasourceCacheUpdate action) {
                 getSession().clear();
             }
         };

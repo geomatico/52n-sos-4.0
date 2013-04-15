@@ -32,7 +32,7 @@ import org.n52.sos.ds.hibernate.cache.base.OfferingCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.ProcedureCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.RelatedFeaturesCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.ResultTemplateCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.StaticCapabilitiesCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.SridCacheUpdate;
 
 /**
  *
@@ -47,7 +47,7 @@ import org.n52.sos.ds.hibernate.cache.base.StaticCapabilitiesCacheUpdate;
  * @see ProcedureCacheUpdate
  * @see RelatedFeaturesCacheUpdate
  * @see ResultTemplateCacheUpdate
- * @see StaticCapabilitiesCacheUpdate
+ * @see SridCacheUpdate
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class InitialCacheUpdate extends CompositeCacheUpdate {
@@ -59,7 +59,7 @@ public class InitialCacheUpdate extends CompositeCacheUpdate {
               new FeatureOfInterestCacheUpdate(),
               new RelatedFeaturesCacheUpdate(),
               new CompositePhenomenonCacheUpdate(),
-              new StaticCapabilitiesCacheUpdate(),
+              new SridCacheUpdate(),
               new ObservationIdentifiersCacheUpdate(),
               new ResultTemplateCacheUpdate(),
               new ObservationTimeCacheUpdate());

@@ -25,13 +25,13 @@ package org.n52.sos.ds.hibernate.cache.base;
 
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getObservationIdentifiers;
 
-import org.n52.sos.ds.hibernate.cache.CacheUpdate;
+import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
 
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class ObservationIdentifiersCacheUpdate extends CacheUpdate {
+public class ObservationIdentifiersCacheUpdate extends AbstractDatasourceCacheUpdate {
 
     @Override
     public void execute() {

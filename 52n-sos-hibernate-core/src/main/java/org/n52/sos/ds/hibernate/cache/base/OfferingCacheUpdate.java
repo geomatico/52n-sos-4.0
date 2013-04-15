@@ -23,10 +23,8 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_DELETED;
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getOfferingObjects;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -36,13 +34,10 @@ import java.util.concurrent.ThreadFactory;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.ThreadLocalSessionFactory;
-import org.n52.sos.ds.hibernate.cache.CacheUpdate;
+import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Offering;
-import org.n52.sos.ds.hibernate.util.HibernateConstants;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CollectionHelper;
@@ -54,7 +49,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class OfferingCacheUpdate extends CacheUpdate {
+public class OfferingCacheUpdate extends AbstractDatasourceCacheUpdate {
     private static final Logger LOGGER = LoggerFactory.getLogger(OfferingCacheUpdate.class);
     private static final String THREAD_GROUP_NAME = "offering-cache-update";
     private final ThreadFactory threadFactory = new GroupedAndNamedThreadFactory(THREAD_GROUP_NAME);
@@ -103,14 +98,6 @@ public class OfferingCacheUpdate extends CacheUpdate {
         }
     }
 
-    @Deprecated
-    protected boolean containsDeletedProcedure(Collection<ObservationConstellation> set) {
-        for (ObservationConstellation obsConst : set) {
-            return obsConst.getProcedure().isDeleted();
-        }
-        return true;
-    }
-
     protected void queueTasks(List<Offering> hOfferings) {
         for (Offering offering : hOfferings) {
             queueTask(offering);
@@ -118,11 +105,11 @@ public class OfferingCacheUpdate extends CacheUpdate {
     }
 
     protected void queueTask(Offering offering) {
-        HibernateQueryObject queryObject = new HibernateQueryObject();
-        queryObject.addCriterion(Restrictions.eq(HibernateConstants.PARAMETER_OFFERING, offering));
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(PARAMETER_DELETED, false));
-        List<ObservationConstellation> observationConstellation =
-                HibernateCriteriaQueryUtilities.getObservationConstellations(queryObject, getSession());
+        @SuppressWarnings("unchecked")
+        List<ObservationConstellation> observationConstellation = getSession()
+                .createCriteria(ObservationConstellation.class)
+                .add(Restrictions.eq(ObservationConstellation.DELETED, false))
+                .add(Restrictions.eq(ObservationConstellation.OFFERING, offering)).list();
         if (observationConstellation != null && !observationConstellation.isEmpty()) {
             // create runnable for offeringId
             Runnable task =

@@ -24,25 +24,24 @@
 
 package org.n52.sos.cache.ctrl.action;
 
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.cache.ContentCacheUpdate;
+import org.n52.sos.ds.CacheFeederDAO;
+import org.n52.sos.exception.ows.concrete.NoImplementationFoundException;
+import org.n52.sos.service.Configurator;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class ObservationDeletionUpdate extends DatasourceCacheUpdate {
-    private final SosObservation o;
+public abstract class CacheFeederDAOCacheUpdate extends ContentCacheUpdate {
+    private CacheFeederDAO cacheFeederDAO;
 
-    public ObservationDeletionUpdate(SosObservation o) {
-        this.o = o;
-    }
-
-    @Override
-    public void execute() {
-        try {
-            getDao().updateAfterObservationDeletion(getCache(), o);
-        } catch (OwsExceptionReport e) {
-            fail(e);
+    protected CacheFeederDAO getDao() throws NoImplementationFoundException {
+        if (this.cacheFeederDAO == null) {
+            this.cacheFeederDAO = Configurator.getInstance().getCacheFeederDAO();
+            if (this.cacheFeederDAO == null) {
+                throw new NoImplementationFoundException(CacheFeederDAO.class);
+            }
         }
+        return this.cacheFeederDAO;
     }
 }

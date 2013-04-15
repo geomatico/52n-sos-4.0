@@ -29,14 +29,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.n52.sos.ds.hibernate.cache.CacheUpdate;
+import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class RelatedFeaturesCacheUpdate extends CacheUpdate {
+public class RelatedFeaturesCacheUpdate extends AbstractDatasourceCacheUpdate {
 
     @Override
     public void execute() {

@@ -24,14 +24,14 @@
 package org.n52.sos.ds.hibernate.cache.base;
 
 
-import org.n52.sos.ds.hibernate.cache.CacheUpdate;
+import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
 import org.n52.sos.service.Configurator;
 
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class SridCacheUpdate extends CacheUpdate {
+public class SridCacheUpdate extends AbstractDatasourceCacheUpdate {
     @Override
     public void execute() {
         // TODO change if transformation is supported

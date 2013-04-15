@@ -22,26 +22,44 @@
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
 
-package org.n52.sos.cache.ctrl.action;
+package org.n52.sos.ds;
 
-import org.n52.sos.cache.ContentCacheUpdate;
-import org.n52.sos.ds.CacheFeederDAO;
-import org.n52.sos.exception.ows.concrete.NoImplementationFoundException;
+import org.n52.sos.cache.WritableContentCache;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.Action;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class DatasourceCacheUpdate extends ContentCacheUpdate {
-    private CacheFeederDAO cacheFeederDAO;
+public abstract class DatasourceCacheUpdate implements Action {
 
-    protected CacheFeederDAO getDao() throws NoImplementationFoundException {
-        if (this.cacheFeederDAO == null) {
-            this.cacheFeederDAO = Configurator.getInstance().getCacheFeederDAO();
-            if (this.cacheFeederDAO == null) {
-                throw new NoImplementationFoundException(CacheFeederDAO.class);
-            }
-        }
-        return this.cacheFeederDAO;
+    private WritableContentCache cache;
+    private CompositeOwsException errors;
+
+    protected WritableContentCache getCache() {
+        return cache;
     }
+
+    public CompositeOwsException getErrors() {
+        return errors;
+    }
+
+    protected FeatureQueryHandler getFeatureQueryHandler() {
+        return Configurator.getInstance().getFeatureQueryHandler();
+    }
+
+    public void setCache(WritableContentCache cache) {
+        this.cache = cache;
+    }
+
+    public void setErrors(CompositeOwsException errors) {
+        this.errors = errors;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
+    }
+
 }

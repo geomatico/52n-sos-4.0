@@ -25,13 +25,13 @@ package org.n52.sos.ds.hibernate.cache.base;
 
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.*;
 
-import org.n52.sos.ds.hibernate.cache.CacheUpdate;
+import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
 
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class ObservationTimeCacheUpdate extends CacheUpdate {
+public class ObservationTimeCacheUpdate extends AbstractDatasourceCacheUpdate {
 
     @Override
     public void execute() {

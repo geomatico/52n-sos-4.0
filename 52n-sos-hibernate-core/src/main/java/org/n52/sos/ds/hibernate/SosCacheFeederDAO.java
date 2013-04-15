@@ -31,15 +31,8 @@ import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.CacheFeederDAO;
-import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.cache.InitialCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.ObservationDeletionCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.ObservationInsertionCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.ResultTemplateInsertionCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.SensorDeletionCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.SensorInsertionCacheUpdate;
 import org.n52.sos.exception.ConfigurationException;
-import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.util.Validation;
@@ -73,57 +66,18 @@ public class SosCacheFeederDAO extends HibernateSessionHolder implements CacheFe
 
     @Override
     public void updateCache(WritableContentCache cache) throws OwsExceptionReport {
-        update(cache, new InitialCacheUpdate(getCacheThreadCount()));
-    }
-
-    @Override
-    @Deprecated
-    public void updateAfterSensorInsertion(WritableContentCache cache) throws OwsExceptionReport {
-        update(cache, new SensorInsertionCacheUpdate(getCacheThreadCount()));
-    }
-
-    @Override
-    @Deprecated
-    public void updateAfterSensorDeletion(WritableContentCache cache) throws OwsExceptionReport {
-        update(cache, new SensorDeletionCacheUpdate(getCacheThreadCount()));
-    }
-
-    @Override
-    @Deprecated
-    public void updateAfterObservationInsertion(WritableContentCache cache) throws OwsExceptionReport {
-        update(cache, new ObservationInsertionCacheUpdate(getCacheThreadCount()));
-    }
-
-    @Override
-    @Deprecated
-    public void updateAfterObservationDeletion(WritableContentCache cache) throws OwsExceptionReport {
-        updateCache(cache);
-    }
-
-    @Override
-    public void updateAfterObservationDeletion(WritableContentCache cache, SosObservation deletedObservation) throws
-            OwsExceptionReport {
-        update(cache, new ObservationDeletionCacheUpdate(deletedObservation));
-    }
-
-    @Override
-    @Deprecated
-    public void updateAfterResultTemplateInsertion(WritableContentCache cache) throws OwsExceptionReport {
-        update(cache, new ResultTemplateInsertionCacheUpdate());
-    }
-
-    protected void update(WritableContentCache cache, CacheUpdate action) throws OwsExceptionReport {
         if (cache == null) {
             throw new NullPointerException("cache is null");
         }
         CompositeOwsException errors = new CompositeOwsException();
         Session session = null;
         try {
+            InitialCacheUpdate update = new InitialCacheUpdate(getCacheThreadCount());
             session = getSession();
-            action.setCache(cache);
-            action.setSession(session);
-            action.setErrors(errors);
-            action.execute();
+            update.setCache(cache);
+            update.setErrors(errors);
+            update.setSession(session);
+            update.execute();
         } catch (HibernateException he) {
             LOGGER.error("Error while updating ContentCache!", he);
         } finally {

@@ -28,19 +28,17 @@ import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getO
 import java.util.HashSet;
 import java.util.Set;
 
-import org.n52.sos.ds.hibernate.HibernateQueryObject;
-import org.n52.sos.ds.hibernate.cache.CacheUpdate;
+import org.hibernate.criterion.Restrictions;
+import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
-import org.n52.sos.ds.hibernate.util.HibernateConstants;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.util.CollectionHelper;
 
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class ObservablePropertiesCacheUpdate extends CacheUpdate {
+public class ObservablePropertiesCacheUpdate extends AbstractDatasourceCacheUpdate {
     protected Set<String> getProcedureIdentifiers(Set<ObservationConstellation> set) {
         Set<String> procedures = new HashSet<String>(set.size());
         for (ObservationConstellation oc : set) {
@@ -59,9 +57,9 @@ public class ObservablePropertiesCacheUpdate extends CacheUpdate {
         }
     }
    
+    @SuppressWarnings("unchecked")
     protected Set<ObservationConstellation> getObservationConstellations(ObservableProperty observableProperty) {
-        HibernateQueryObject queryObject = new HibernateQueryObject();
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateConstants.PARAMETER_OBSERVABLE_PROPERTY, observableProperty));
-        return CollectionHelper.asSet(HibernateCriteriaQueryUtilities.getObservationConstellations(queryObject, getSession()));
+        return CollectionHelper.asSet(getSession().createCriteria(ObservationConstellation.class)
+                .add(Restrictions.eq(ObservationConstellation.OBSERVABLE_PROPERTY, observableProperty)).list());
     }
 }

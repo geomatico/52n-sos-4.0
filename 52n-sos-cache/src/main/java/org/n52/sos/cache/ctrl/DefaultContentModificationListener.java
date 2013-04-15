@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.n52.sos.cache.ContentCacheUpdate;
-import org.n52.sos.cache.ctrl.action.ObservationDeletionUpdate;
 import org.n52.sos.cache.ctrl.action.ObservationInsertionUpdate;
 import org.n52.sos.cache.ctrl.action.ResultInsertionUpdate;
 import org.n52.sos.cache.ctrl.action.ResultTemplateInsertionUpdate;
@@ -35,7 +34,6 @@ import org.n52.sos.cache.ctrl.action.SensorDeletionUpdate;
 import org.n52.sos.cache.ctrl.action.SensorInsertionUpdate;
 import org.n52.sos.event.SosEvent;
 import org.n52.sos.event.SosEventListener;
-import org.n52.sos.event.events.ObservationDeletion;
 import org.n52.sos.event.events.ObservationInsertion;
 import org.n52.sos.event.events.ResultInsertion;
 import org.n52.sos.event.events.ResultTemplateInsertion;
@@ -57,7 +55,6 @@ public class DefaultContentModificationListener implements SosEventListener {
     private static final Set<Class<? extends SosEvent>> TYPES = CollectionHelper.<Class<? extends SosEvent>>set(
             SensorInsertion.class,
             ObservationInsertion.class,
-            ObservationDeletion.class,
             ResultTemplateInsertion.class,
             SensorDeletion.class,
             ResultInsertion.class);
@@ -75,9 +72,6 @@ public class DefaultContentModificationListener implements SosEventListener {
         } else if (event instanceof ObservationInsertion) {
             ObservationInsertion e = (ObservationInsertion) event;
             handle(new ObservationInsertionUpdate(e.getRequest()));
-        } else if (event instanceof ObservationDeletion) {
-            ObservationDeletion e = (ObservationDeletion) event;
-            handle(new ObservationDeletionUpdate(e.getDeletedObservation()));
         } else if (event instanceof ResultTemplateInsertion) {
             ResultTemplateInsertion e = (ResultTemplateInsertion) event;
             handle(new ResultTemplateInsertionUpdate(e.getRequest(), e.getResponse()));

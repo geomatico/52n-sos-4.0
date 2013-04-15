@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.n52.sos.ds.hibernate.cache.CacheUpdate;
+import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
@@ -38,7 +38,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class FeatureOfInterestCacheUpdate extends CacheUpdate {
+public class FeatureOfInterestCacheUpdate extends AbstractDatasourceCacheUpdate {
     protected Set<String> getFeatureIdentifiers(Collection<FeatureOfInterest> featuresOfInterest) {
         Set<String> featureList = new HashSet<String>(featuresOfInterest.size());
         for (FeatureOfInterest featureOfInterest : featuresOfInterest) {

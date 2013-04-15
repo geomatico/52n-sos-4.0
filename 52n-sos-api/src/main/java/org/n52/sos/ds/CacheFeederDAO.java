@@ -24,7 +24,6 @@
 package org.n52.sos.ds;
 
 import org.n52.sos.cache.WritableContentCache;
-import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 /**
@@ -33,41 +32,5 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
  * 
  */
 public interface CacheFeederDAO {
-
     void updateCache(WritableContentCache capabilitiesCache) throws OwsExceptionReport;
-
-    /**
-     * @deprecated should be deleted after successful test of InMemoryCacheController 
-     */
-    @Deprecated
-    void updateAfterSensorInsertion(WritableContentCache capabilitiesCache) throws OwsExceptionReport;
-
-    /**
-     * @deprecated should be deleted after successful test of InMemoryCacheController 
-     */
-    @Deprecated
-    void updateAfterObservationInsertion(WritableContentCache capabilitiesCache) throws OwsExceptionReport;
-
-    /**
-     * @deprecated should be deleted after successful test of InMemoryCacheController 
-     */
-    @Deprecated
-    void updateAfterSensorDeletion(WritableContentCache capabilitiesCache) throws OwsExceptionReport;
-
-    /**
-     * @deprecated should be deleted after successful test of InMemoryCacheController 
-     */
-    @Deprecated
-    void updateAfterResultTemplateInsertion(WritableContentCache capabilitiesCache) throws OwsExceptionReport;
-
-    /**
-     * @deprecated use {@link #updateAfterObservationDeletion(org.n52.sos.cache.WritableContentCache,
-     * org.n52.sos.ogc.om.SosObservation)}
-     */
-    @Deprecated
-    void updateAfterObservationDeletion(WritableContentCache capabilitiesCache) throws OwsExceptionReport;
-
-    public void updateAfterObservationDeletion(WritableContentCache cache,
-                                               SosObservation deletedObservation) throws OwsExceptionReport;
-    
 }

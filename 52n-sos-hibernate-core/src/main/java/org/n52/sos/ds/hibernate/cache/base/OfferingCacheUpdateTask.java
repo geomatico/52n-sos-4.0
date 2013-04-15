@@ -32,15 +32,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.n52.sos.cache.WritableContentCache;
-import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.ThreadLocalSessionFactory;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
-import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.exception.ows.concrete.GenericThrowableWrapperException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -104,12 +104,16 @@ class OfferingCacheUpdateTask extends RunnableAction {
         getCache().addOffering(offeringId);
         getCache().setNameForOffering(offeringId, getOffering().getName());
         // Procedures
-        HibernateQueryObject queryObject = new HibernateQueryObject();
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateConstants.PARAMETER_OFFERING, offering));
-        List<ObservationConstellation> observationConstellations =
-                HibernateCriteriaQueryUtilities.getObservationConstellations(queryObject, session);
-        final Set<String> procedureIdentifiers =
-                          getProcedureIdentifierFrom(observationConstellations);
+        @SuppressWarnings("unchecked")
+        List<ObservationConstellation> observationConstellations = session
+                .createCriteria(ObservationConstellation.class)
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                .add(Restrictions.eq(ObservationConstellation.DELETED, false))
+                .add(Restrictions.eq(ObservationConstellation.OFFERING, offering))
+                .list();
+        final Set<String> procedureIdentifiers = getProcedureIdentifierFrom(observationConstellations);
+
+
         getCache().setProceduresForOffering(offeringId, procedureIdentifiers);
         // Observable properties
         getCache().setObservablePropertiesForOffering(offeringId, getObservablePropertyIdentifierFrom(observationConstellations));

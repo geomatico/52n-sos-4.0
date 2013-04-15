@@ -31,7 +31,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class CompleteCacheUpdate extends DatasourceCacheUpdate {
+public class CompleteCacheUpdate extends CacheFeederDAOCacheUpdate {
     @Override
     public void execute() {
         try {

@@ -39,12 +39,6 @@ import org.apache.commons.io.IOUtils;
 import org.n52.sos.cache.ContentCacheUpdate;
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.cache.ctrl.action.CompleteCacheUpdate;
-import org.n52.sos.cache.ctrl.action.ObservationDeletionUpdate;
-import org.n52.sos.cache.ctrl.action.ObservationInsertionUpdate;
-import org.n52.sos.cache.ctrl.action.ResultInsertionUpdate;
-import org.n52.sos.cache.ctrl.action.ResultTemplateInsertionUpdate;
-import org.n52.sos.cache.ctrl.action.SensorDeletionUpdate;
-import org.n52.sos.cache.ctrl.action.SensorInsertionUpdate;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.DeleteSensorRequest;
@@ -166,6 +160,7 @@ public class ContentCacheControllerImpl extends AbstractSchedulingContentCacheCo
         LOGGER.trace("Finished update {}", this.current);
         lock();
         try {
+            persistCache();
             CompleteUpdate u = this.current;
             this.current = null;
             u.signalWaiting();
@@ -178,6 +173,7 @@ public class ContentCacheControllerImpl extends AbstractSchedulingContentCacheCo
         update.execute(getCache());
         lock();
         try {
+            persistCache();
             if (this.current != null) {
                 this.current.addUpdate(update);
             }
@@ -248,38 +244,38 @@ public class ContentCacheControllerImpl extends AbstractSchedulingContentCacheCo
     @Override
     @Deprecated
     public void updateAfterObservationDeletion(SosObservation o) throws OwsExceptionReport {
-        update(new ObservationDeletionUpdate(o));
+        throw new UnsupportedOperationException("deprecated");
     }
 
     @Override
     @Deprecated
     public void updateAfterSensorInsertion(InsertSensorRequest req, InsertSensorResponse res) throws OwsExceptionReport {
-        update(new SensorInsertionUpdate(req, res));
+        throw new UnsupportedOperationException("deprecated");
     }
 
     @Override
     @Deprecated
     public void updateAfterObservationInsertion(InsertObservationRequest req) throws OwsExceptionReport {
-        update(new ObservationInsertionUpdate(req));
+        throw new UnsupportedOperationException("deprecated");
     }
 
     @Override
     @Deprecated
     public void updateAfterSensorDeletion(DeleteSensorRequest req) throws OwsExceptionReport {
-        update(new SensorDeletionUpdate(req));
+        throw new UnsupportedOperationException("deprecated");
     }
 
     @Override
     @Deprecated
     public void updateAfterResultTemplateInsertion(InsertResultTemplateRequest req, InsertResultTemplateResponse res)
             throws OwsExceptionReport {
-        update(new ResultTemplateInsertionUpdate(req, res));
+        throw new UnsupportedOperationException("deprecated");
     }
 
     @Override
     @Deprecated
     public void updateAfterResultInsertion(String id, SosObservation o) throws OwsExceptionReport {
-        update(new ResultInsertionUpdate(id, o));
+        throw new UnsupportedOperationException("deprecated");
     }
 
     @Override
@@ -321,6 +317,7 @@ public class ContentCacheControllerImpl extends AbstractSchedulingContentCacheCo
             getUpdate().execute();
             LOGGER.trace("Finished Update {}", getUpdate());
             if (getUpdate().failed()) {
+                LOGGER.warn("Update failed!", getUpdate().getFailureCause());
                 throw getUpdate().getFailureCause();
             }
         }
@@ -406,6 +403,7 @@ public class ContentCacheControllerImpl extends AbstractSchedulingContentCacheCo
             try {
                 if (getUpdate().failed()) {
                     setState(State.FAILED);
+                    LOGGER.warn("Update failed!", getUpdate().getFailureCause());
                     throw getUpdate().getFailureCause();
                 } else {
                     setState(State.APPLYING_UPDATES);

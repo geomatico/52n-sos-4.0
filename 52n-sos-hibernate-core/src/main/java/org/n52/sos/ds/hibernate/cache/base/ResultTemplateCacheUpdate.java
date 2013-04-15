@@ -27,7 +27,7 @@ import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getR
 
 import java.util.List;
 
-import org.n52.sos.ds.hibernate.cache.CacheUpdate;
+import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.util.Action;
 
@@ -44,7 +44,7 @@ import org.n52.sos.util.Action;
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @since 4.0.0
  */
-public class ResultTemplateCacheUpdate extends CacheUpdate {
+public class ResultTemplateCacheUpdate extends AbstractDatasourceCacheUpdate {
 
     @Override
     public void execute() {

@@ -23,27 +23,19 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static java.util.Collections.singletonList;
-import static org.hibernate.criterion.Restrictions.in;
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.*;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
-import org.n52.sos.ds.hibernate.HibernateQueryObject;
-import org.n52.sos.ds.hibernate.cache.CacheUpdate;
-import org.n52.sos.ds.hibernate.entities.ObservableProperty;
+import org.hibernate.criterion.Restrictions;
+import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
-import org.n52.sos.ds.hibernate.util.HibernateConstants;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.util.CollectionHelper;
 
 
@@ -51,7 +43,7 @@ import org.n52.sos.util.CollectionHelper;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class ProcedureCacheUpdate extends CacheUpdate {
+public class ProcedureCacheUpdate extends AbstractDatasourceCacheUpdate {
     protected Set<String> getObservableProperties(Set<ObservationConstellation> set) {
         Set<String> observableProperties = new HashSet<String>(set.size());
         for (ObservationConstellation observationConstellation : set) {
@@ -70,19 +62,12 @@ public class ProcedureCacheUpdate extends CacheUpdate {
 
     @SuppressWarnings("unchecked")
     protected Set<String> getObservationIdentifiers(Session session, String procedureIdentifier) {
-        Map<String, String> aliases = new HashMap<String, String>(2);
-        HibernateQueryObject queryObject = new HibernateQueryObject();
-        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, null);
-        queryObject.setAliases(aliases);
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), procedureIdentifier));
-        queryObject.addProjection(Projections.distinct(Projections.property(HibernateConstants.PARAMETER_IDENTIFIER)));
-        List<String> objectList = (List<String>)HibernateCriteriaQueryUtilities.getObjectList(queryObject, session, Observation.class);
-        return CollectionHelper.asSet(objectList);
-    }
-
-    protected Criterion getCriterionForProcedures(Map<String, String> aliasMap, String prefix, String procedure) {
-        String procAlias = addProcedureAliasToMap(aliasMap, prefix);
-        return in(getIdentifierParameter(procAlias), singletonList(procedure));
+        return CollectionHelper.asSet(session.createCriteria(Observation.class)
+                .setProjection(Projections.distinct(Projections.property(Observation.IDENTIFIER)))
+                .add(Restrictions.eq(Observation.DELETED, false))
+                .createCriteria(Observation.PROCEDURE)
+                .add(Restrictions.eq(Procedure.IDENTIFIER, procedureIdentifier))
+                .list());
     }
 
     @Override
@@ -101,9 +86,9 @@ public class ProcedureCacheUpdate extends CacheUpdate {
         }
     }
     
+    @SuppressWarnings("unchecked")
     protected Set<ObservationConstellation> getObservationConstellations(Procedure procedure) {
-        HibernateQueryObject queryObject = new HibernateQueryObject();
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateConstants.PARAMETER_PROCEDURE, procedure));
-        return CollectionHelper.asSet(HibernateCriteriaQueryUtilities.getObservationConstellations(queryObject, getSession()));
+        return CollectionHelper.asSet(getSession().createCriteria(ObservationConstellation.class)
+                .add(Restrictions.eq(ObservationConstellation.PROCEDURE, procedure)).list());
     }
 }

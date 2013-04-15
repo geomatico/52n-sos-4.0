@@ -21,28 +21,34 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.event.events;
+package org.n52.sos.ds.hibernate.cache;
 
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.response.AbstractServiceResponse;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.hibernate.Session;
+import org.n52.sos.ds.DatasourceCacheUpdate;
+import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
- *
- * @since 4.0.0
  */
-public class ObservationDeletion extends SosDeletionEvent<AbstractServiceRequest, AbstractServiceResponse> {
-    private SosObservation deletedObservation;
+public abstract class AbstractDatasourceCacheUpdate extends DatasourceCacheUpdate {
+    private Session session;
 
-    public ObservationDeletion(AbstractServiceRequest request,
-                               AbstractServiceResponse response,
-                               SosObservation deletedObservation) {
-        super(request, response);
-        this.deletedObservation = deletedObservation;
+    public Session getSession() {
+        return session;
     }
 
-    public SosObservation getDeletedObservation() {
-        return deletedObservation;
+    public void setSession(Session session) {
+        this.session = session;
+    }
+
+    protected Set<String> getAllOfferingIdentifiersFrom(Set<ObservationConstellation> observationConstellations) {
+        Set<String> offerings = new HashSet<String>(observationConstellations.size());
+        for (ObservationConstellation oc : observationConstellations) {
+            offerings.add(oc.getOffering().getIdentifier());
+        }
+        return offerings;
     }
 }
