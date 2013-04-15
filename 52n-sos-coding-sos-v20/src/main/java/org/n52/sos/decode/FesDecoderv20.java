@@ -47,8 +47,6 @@ import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
-import org.n52.sos.ogc.gml.time.TimeInstant;
-import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
@@ -177,10 +175,32 @@ public class FesDecoderv20 implements Decoder<Object, XmlObject> {
                             TimeOperator operator;
                             ITime time = (ITime) timeObject;
                             String localName = XmlHelper.getLocalName(xbTemporalOpsType);
-                            if (localName.equals(TimeOperator2.During.name()) && time instanceof TimePeriod) {
+                            if (localName.equals(TimeOperator2.After.name())) {
+                                operator = TimeOperator.TM_After;
+                            } else if (localName.equals(TimeOperator2.Before.name())) {
+                                operator = TimeOperator.TM_Before;
+                            } else if (localName.equals(TimeOperator2.Begins.name())) {
+                                operator = TimeOperator.TM_Begins;
+                            } else if (localName.equals(TimeOperator2.BegunBy.name())) {
+                                operator = TimeOperator.TM_BegunBy;
+                            } else if (localName.equals(TimeOperator2.TContains.name())) {
+                                operator = TimeOperator.TM_Contains;
+                            } else if (localName.equals(TimeOperator2.During.name())) {
                                 operator = TimeOperator.TM_During;
-                            } else if (localName.equals(TimeOperator2.TEquals.name()) && time instanceof TimeInstant) {
+                            } else if (localName.equals(TimeOperator2.EndedBy.name())) {
+                                operator = TimeOperator.TM_EndedBy;
+                            } else if (localName.equals(TimeOperator2.Ends.name())) {
+                                operator = TimeOperator.TM_Ends;
+                            } else if (localName.equals(TimeOperator2.TEquals.name())) {
                                 operator = TimeOperator.TM_Equals;
+                            } else if (localName.equals(TimeOperator2.Meets.name())) {
+                                operator = TimeOperator.TM_Meets;
+                            } else if (localName.equals(TimeOperator2.MetBy.name())) {
+                                operator = TimeOperator.TM_MetBy;
+                            } else if (localName.equals(TimeOperator2.TOverlaps.name())) {
+                                operator = TimeOperator.TM_Overlaps;
+                            } else if (localName.equals(TimeOperator2.OverlappedBy.name())) {
+                                operator = TimeOperator.TM_OverlappedBy;
                             } else {
                                 throw new InvalidParameterValueException()
                                         .at(Sos2Constants.GetObservationParams.temporalFilter)
