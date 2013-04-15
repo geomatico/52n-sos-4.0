@@ -23,29 +23,22 @@
  */
 package org.n52.sos.ogc.sos;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.n52.sos.ogc.om.SosOffering;
+import org.n52.sos.util.MultiMaps;
+import org.n52.sos.util.SetMultiMap;
 
 public abstract class SosProcedureDescription {
-    
     private String identifier;
-
     private String sensorDescriptionXmlString;
-
     private String descriptionFormat;
+    private SetMultiMap<String, String> featureOfInterestForProcedure = MultiMaps.newSetMultiMap();
+    private SetMultiMap<String, String> parentProcedureForProcedure = MultiMaps.newSetMultiMap();
+    private SetMultiMap<String, SosProcedureDescription> childProcedureForProcedure = MultiMaps.newSetMultiMap();
 
-    private Map<String, Set<String>> featureOfInterestForProcedure = new HashMap<String, Set<String>>(0);
-
-    private Map<String, Set<String>> parentProcedureForProcedure = new HashMap<String, Set<String>>(0);
-
-    private Map<String, Set<SosProcedureDescription>> childProcedureForProcedure =
-            new HashMap<String, Set<SosProcedureDescription>>(0);
-    
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
     }
@@ -85,25 +78,11 @@ public abstract class SosProcedureDescription {
     }
     
     public void addFeatureOfInterest(Set<String> feature, String procedureIdentifier) {
-        if (isSetFeatureOfInterest(procedureIdentifier)) {
-            Set<String> set = featureOfInterestForProcedure.get(procedureIdentifier);
-            set.addAll(feature);
-            featureOfInterestForProcedure.put(procedureIdentifier, set);
-        } else {
-            featureOfInterestForProcedure.put(procedureIdentifier, feature);
-        }
+        featureOfInterestForProcedure.addAll(procedureIdentifier, feature);
     }
-    
+
     public void addFeatureOfInterest(String featureIdentifier, String procedureIdentifier) {
-        if (isSetFeatureOfInterest(procedureIdentifier)) {
-            Set<String> set = featureOfInterestForProcedure.get(procedureIdentifier);
-            set.add(featureIdentifier);
-            featureOfInterestForProcedure.put(procedureIdentifier, set);
-        } else {
-            Set<String> set = new HashSet<String>();
-            set.add(featureIdentifier);
-            featureOfInterestForProcedure.put(procedureIdentifier, set);
-        }
+        featureOfInterestForProcedure.add(procedureIdentifier, featureIdentifier);
     }
 
     public Map<String, Set<String>> getFeatureOfInterest() {
@@ -131,25 +110,11 @@ public abstract class SosProcedureDescription {
     }
     
     public void addParentProcedures(Set<String> parentProcedures, String procedureIdentifier) {
-        if (isSetFeatureOfInterest(procedureIdentifier)) {
-            Set<String> set = parentProcedureForProcedure.get(procedureIdentifier);
-            set.addAll(parentProcedures);
-            parentProcedureForProcedure.put(procedureIdentifier, set);
-        } else {
-            parentProcedureForProcedure.put(procedureIdentifier, parentProcedures);
-        }
+        parentProcedureForProcedure.addAll(procedureIdentifier, parentProcedures);
     }
     
     public void addParentProcedures(String parentProcedureIdentifier, String procedureIdentifier) {
-        if (isSetFeatureOfInterest(procedureIdentifier)) {
-            Set<String> set = parentProcedureForProcedure.get(procedureIdentifier);
-            set.add(parentProcedureIdentifier);
-            parentProcedureForProcedure.put(procedureIdentifier, set);
-        } else {
-            Set<String> set = new HashSet<String>();
-            set.add(parentProcedureIdentifier);
-            parentProcedureForProcedure.put(procedureIdentifier, set);
-        }
+        parentProcedureForProcedure.add(procedureIdentifier, parentProcedureIdentifier);
     }
 
     public Map<String, Set<String>> getParentProcedures() {
@@ -177,25 +142,11 @@ public abstract class SosProcedureDescription {
     }
     
     public void addChildProcedures(Set<SosProcedureDescription> childProcedures, String procedureIdentifier) {
-        if (isSetFeatureOfInterest(procedureIdentifier)) {
-            Set<SosProcedureDescription> set = childProcedureForProcedure.get(procedureIdentifier);
-            set.addAll(childProcedures);
-            childProcedureForProcedure.put(procedureIdentifier, set);
-        } else {
-            childProcedureForProcedure.put(procedureIdentifier, childProcedures);
-        }
+        childProcedureForProcedure.addAll(procedureIdentifier, childProcedures);
     }
     
     public void addChildProcedures(SosProcedureDescription childProcedure, String procedureIdentifier) {
-        if (isSetFeatureOfInterest(procedureIdentifier)) {
-            Set<SosProcedureDescription> set = childProcedureForProcedure.get(procedureIdentifier);
-            set.add(childProcedure);
-            childProcedureForProcedure.put(procedureIdentifier, set);
-        } else {
-            Set<SosProcedureDescription> set = new HashSet<SosProcedureDescription>();
-            set.add(childProcedure);
-            childProcedureForProcedure.put(procedureIdentifier, set);
-        }
+        childProcedureForProcedure.add(procedureIdentifier, childProcedure);
     }
 
     public Map<String, Set<SosProcedureDescription>> getChildProcedures() {
@@ -225,4 +176,20 @@ public abstract class SosProcedureDescription {
         return hash;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SosProcedureDescription other = (SosProcedureDescription) obj;
+        if ((this.getIdentifier() == null)
+            ? (other.getIdentifier() != null)
+            : !this.getIdentifier().equals(other.getIdentifier())) {
+            return false;
+        }
+        return true;
+    }
 }
