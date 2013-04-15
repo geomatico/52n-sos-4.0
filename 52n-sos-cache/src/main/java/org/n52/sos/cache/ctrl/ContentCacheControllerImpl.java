@@ -39,14 +39,7 @@ import org.apache.commons.io.IOUtils;
 import org.n52.sos.cache.ContentCacheUpdate;
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.cache.ctrl.action.CompleteCacheUpdate;
-import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.request.DeleteSensorRequest;
-import org.n52.sos.request.InsertObservationRequest;
-import org.n52.sos.request.InsertResultTemplateRequest;
-import org.n52.sos.request.InsertSensorRequest;
-import org.n52.sos.response.InsertResultTemplateResponse;
-import org.n52.sos.response.InsertSensorResponse;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -239,43 +232,6 @@ public class ContentCacheControllerImpl extends AbstractSchedulingContentCacheCo
     @Deprecated
     public void updateCacheFromDatasource() throws OwsExceptionReport {
         update();
-    }
-
-    @Override
-    @Deprecated
-    public void updateAfterObservationDeletion(SosObservation o) throws OwsExceptionReport {
-        throw new UnsupportedOperationException("deprecated");
-    }
-
-    @Override
-    @Deprecated
-    public void updateAfterSensorInsertion(InsertSensorRequest req, InsertSensorResponse res) throws OwsExceptionReport {
-        throw new UnsupportedOperationException("deprecated");
-    }
-
-    @Override
-    @Deprecated
-    public void updateAfterObservationInsertion(InsertObservationRequest req) throws OwsExceptionReport {
-        throw new UnsupportedOperationException("deprecated");
-    }
-
-    @Override
-    @Deprecated
-    public void updateAfterSensorDeletion(DeleteSensorRequest req) throws OwsExceptionReport {
-        throw new UnsupportedOperationException("deprecated");
-    }
-
-    @Override
-    @Deprecated
-    public void updateAfterResultTemplateInsertion(InsertResultTemplateRequest req, InsertResultTemplateResponse res)
-            throws OwsExceptionReport {
-        throw new UnsupportedOperationException("deprecated");
-    }
-
-    @Override
-    @Deprecated
-    public void updateAfterResultInsertion(String id, SosObservation o) throws OwsExceptionReport {
-        throw new UnsupportedOperationException("deprecated");
     }
 
     @Override

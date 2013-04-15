@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.n52.sos.cache.ctrl.ContentCacheControllerImpl;
-import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 /**
@@ -77,11 +76,4 @@ public class TestableInMemoryCacheController extends ContentCacheControllerImpl 
     public void update() throws OwsExceptionReport {
         // noop
     }
-
-    @Override
-    @Deprecated
-    public void updateAfterObservationDeletion(SosObservation deletedObservation) throws OwsExceptionReport {
-        // noop
-    }
-
 }

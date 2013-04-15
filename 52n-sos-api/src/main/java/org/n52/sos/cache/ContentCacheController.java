@@ -23,14 +23,7 @@
  */
 package org.n52.sos.cache;
 
-import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.request.DeleteSensorRequest;
-import org.n52.sos.request.InsertObservationRequest;
-import org.n52.sos.request.InsertResultTemplateRequest;
-import org.n52.sos.request.InsertSensorRequest;
-import org.n52.sos.response.InsertResultTemplateResponse;
-import org.n52.sos.response.InsertSensorResponse;
 import org.n52.sos.util.Cleanupable;
 
 /**
@@ -41,77 +34,6 @@ public interface ContentCacheController extends Cleanupable {
      * @return the content cache
      */
     ContentCache getCache();
-
-    /**
-     * Update the cache after a observation was deleted.
-     *
-     * @param deletedObservation the deleted observation
-     *
-     * @throws OwsExceptionReport if an error occurs
-     * @deprecated use {@link #update(org.n52.sos.cache.ContentCacheUpdate)}
-     */
-    @Deprecated
-    void updateAfterObservationDeletion(SosObservation deletedObservation) throws OwsExceptionReport;
-
-    /**
-     * Update the cache after a observation was inserted.
-     *
-     * @param sosRequest the InsertObservation request
-     *
-     * @throws OwsExceptionReport if an error occurs
-     * @deprecated use {@link #update(org.n52.sos.cache.ContentCacheUpdate)}
-     */
-    @Deprecated
-    void updateAfterObservationInsertion(InsertObservationRequest sosRequest) throws OwsExceptionReport;
-
-    /**
-     * Update the cache after a result was inserted.
-     *
-     * @param templateIdentifier the identifier of the result template
-     * @param sosObservation     the observation representing the inserted values
-     *
-     * @throws OwsExceptionReport if an error occurs
-     * @deprecated use {@link #update(org.n52.sos.cache.ContentCacheUpdate)}
-     */
-    @Deprecated
-    void updateAfterResultInsertion(String templateIdentifier, SosObservation sosObservation) throws OwsExceptionReport;
-
-    /**
-     * Update the cache after a result template was inserted.
-     *
-     * @param sosRequest  the request
-     * @param sosResponse the response
-     *
-     * @throws OwsExceptionReport if an error occurs
-     * @deprecated use {@link #update(org.n52.sos.cache.ContentCacheUpdate)}
-     */
-    @Deprecated
-    void updateAfterResultTemplateInsertion(InsertResultTemplateRequest sosRequest,
-                                            InsertResultTemplateResponse sosResponse) throws OwsExceptionReport;
-
-    /**
-     * Update the cache after a sensor was deleted.
-     *
-     * @param sosRequest the DeleteSensor request
-     *
-     * @throws OwsExceptionReport if an error occurs
-     * @deprecated use {@link #update(org.n52.sos.cache.ContentCacheUpdate)}
-     */
-    @Deprecated
-    void updateAfterSensorDeletion(DeleteSensorRequest sosRequest) throws OwsExceptionReport;
-
-    /**
-     * Update the cache after a sensor was inserted.
-     *
-     * @param sosRequest  the request
-     * @param sosResponse the response
-     *
-     * @throws OwsExceptionReport if an error occurs
-     * @deprecated use {@link #update(org.n52.sos.cache.ContentCacheUpdate)}
-     */
-    @Deprecated
-    void updateAfterSensorInsertion(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse) throws
-            OwsExceptionReport;
 
     /**
      * Update the cache from the underlying datasource.
