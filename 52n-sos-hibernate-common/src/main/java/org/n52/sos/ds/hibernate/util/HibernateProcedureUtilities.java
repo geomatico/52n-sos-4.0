@@ -215,7 +215,7 @@ public class HibernateProcedureUtilities {
 		{
 			final SosSweQuantity quantity = new SosSweQuantity();
 			quantity.setDefinition(observableProperty);
-			final SosSMLIo output = new SosSMLIo(quantity);
+            final SosSMLIo<Double> output = new SosSMLIo<Double>(quantity);
 			output.setIoName("output#"+i++);
 			outputs.add(output);
 		}
