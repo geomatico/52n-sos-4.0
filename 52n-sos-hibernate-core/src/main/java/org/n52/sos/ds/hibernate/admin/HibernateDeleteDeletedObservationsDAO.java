@@ -25,14 +25,13 @@
 package org.n52.sos.ds.hibernate.admin;
 
 import org.hibernate.HibernateException;
-import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.DeleteDeletedObservationDAO;
 import org.n52.sos.ds.hibernate.HibernateSessionHolder;
 import org.n52.sos.ds.hibernate.entities.Observation;
-import org.n52.sos.ds.hibernate.util.HibernateConstants;
+import org.n52.sos.ds.hibernate.util.ScrollableIterable;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 /**
@@ -48,11 +47,16 @@ public class HibernateDeleteDeletedObservationsDAO implements DeleteDeletedObser
         try {
             session = sessionHolder.getSession();
             transaction = session.beginTransaction();
-            ScrollableResults sr = session.createCriteria(Observation.class)
-                    .add(Restrictions.eq(HibernateConstants.PARAMETER_DELETED, true)).scroll();
-            while (sr.next()) {
-                session.delete((Observation) sr.get(0));
+            ScrollableIterable<Observation> sr = ScrollableIterable.fromCriteria(session
+                    .createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, true)));
+            try {
+                for (Observation o : sr) {
+                    session.delete(o);
+                }
+            } finally {
+                sr.close();
             }
+
             session.flush();
             transaction.commit();
         } catch (HibernateException he) {
