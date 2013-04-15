@@ -244,14 +244,14 @@ public class Configurator implements Cleanupable {
         operationDaoRepository = new OperationDAORepository();
         serviceOperatorRepository = new ServiceOperatorRepository();
         codingRepository = new CodingRepository();
-        featureQueryHandler = loadAndConfigure(FeatureQueryHandler.class, true);
-        cacheFeederDAO = loadAndConfigure(CacheFeederDAO.class, true);
+        featureQueryHandler = loadAndConfigure(FeatureQueryHandler.class, false);
+        cacheFeederDAO = loadAndConfigure(CacheFeederDAO.class, false);
         converterRepository = new ConverterRepository();
         requestOperatorRepository = new RequestOperatorRepository();
         bindingRepository = new BindingRepository();
-        adminServiceOperator = loadAndConfigure(AdminServiceOperator.class, true);
+        adminServiceOperator = loadAndConfigure(AdminServiceOperator.class, false);
         adminRequestOperatorRepository = new AdminRequestOperatorRepository();
-        contentCacheController = loadAndConfigure(ContentCacheController.class, true);
+        contentCacheController = loadAndConfigure(ContentCacheController.class, false);
         tasking = new Tasking();
         profileHandler = loadAndConfigure(ProfileHandler.class, false, new DefaultProfileHandler());
 

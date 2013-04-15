@@ -190,11 +190,11 @@ public class CodingRepository {
             log.warn(text, sce);
             throw new ConfigurationException(text, sce);
         }
-        if (loadedDecoders.isEmpty()) {
-            String exceptionText = "No Decoder implementations is loaded!";
-            log.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
+//        if (loadedDecoders.isEmpty()) {
+//            String exceptionText = "No Decoder implementations is loaded!";
+//            log.error(exceptionText);
+//            throw new ConfigurationException(exceptionText);
+//        }
         return loadedDecoders;
     }
 
@@ -211,11 +211,11 @@ public class CodingRepository {
             log.warn(text, sce);
             throw new ConfigurationException(text, sce);
         }
-        if (loadedEncoders.isEmpty()) {
-            String exceptionText = "No Encoder implementations is loaded!";
-            log.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
+//        if (loadedEncoders.isEmpty()) {
+//            String exceptionText = "No Encoder implementations is loaded!";
+//            log.error(exceptionText);
+//            throw new ConfigurationException(exceptionText);
+//        }
         return loadedEncoders;
     }
 

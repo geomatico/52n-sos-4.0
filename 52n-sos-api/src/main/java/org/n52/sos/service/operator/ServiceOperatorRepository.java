@@ -58,7 +58,7 @@ public class ServiceOperatorRepository extends AbstractConfiguringServiceLoaderR
      *             If no request listener is implemented
      */
     public ServiceOperatorRepository() throws ConfigurationException {
-        super(ServiceOperator.class, true);
+        super(ServiceOperator.class, false);
 		load(false);
     }
 

@@ -30,15 +30,11 @@ import java.util.Set;
 
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class OperationDAORepository extends AbstractConfiguringServiceLoaderRepository<OperationDAO> {
-
-	private static final Logger log = LoggerFactory.getLogger(OperationDAORepository.class);
 
 	/** Implemented ISosOperationDAO */
     private final Map<String, OperationDAO> operationDaos = new HashMap<String, OperationDAO>(0);
@@ -50,13 +46,12 @@ public class OperationDAORepository extends AbstractConfiguringServiceLoaderRepo
      *             If no operation dao is implemented
      */
     public OperationDAORepository() throws ConfigurationException {
-		super(OperationDAO.class, true);
+        super(OperationDAO.class, false);
 		load(false);
     }
 
     /**
-     * Load the implemented operation dao and add them to a map with operation
-     * name as key
+     * Load the implemented operation dao and add them to a map with operation name as key.
      *
      * @throws ConfigurationException
      *             If no operation dao is implemented
