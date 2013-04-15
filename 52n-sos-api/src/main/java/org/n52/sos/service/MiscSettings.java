@@ -220,6 +220,7 @@ public class MiscSettings implements SettingDefinitionProvider {
             .setOrder(17)
             .setKey(SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_VALUE)
             .setDefaultValue("")
+            .setOptional(true)
             .setTitle("SML Generation: intendedApplication Value")
             .setDescription("The value that will be used for all procedures/sensors of this SOS instance as term for the classifier 'intendedApllication' if the classification generation is activated. In addition, if this field is <b>empty</b>, the classifier 'intendedApplication' will <b>not</b> be added.");
     
@@ -236,6 +237,7 @@ public class MiscSettings implements SettingDefinitionProvider {
             .setOrder(19)
             .setKey(SML_GENERATION_CLASSIFIER_SENSOR_TYPE_VALUE)
             .setDefaultValue("")
+            .setOptional(true)
             .setTitle("SML Generation: sensorType Value")
             .setDescription("The value that will be used for all procedures/sensors of this SOS instance as term for the classifier 'sensorType' if the classification generation is activated. In addition, if this field is <b>empty</b>, the classifier 'sensorType' will <b>not</b> be added.");
     
