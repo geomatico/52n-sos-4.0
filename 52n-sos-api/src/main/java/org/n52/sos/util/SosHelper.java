@@ -34,7 +34,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -310,13 +309,10 @@ public class SosHelper {
      */
     @Deprecated
     public static <K, V> Map<V, Set<K>> invertHierarchy(final Map<K, Set<V>> hierarchy) {
-        final Map<V, Set<K>> invertedHierarchy = new HashMap<V, Set<K>>();
+        final SetMultiMap<V, K> invertedHierarchy = MultiMaps.newSetMultiMap();
         for (final K key : hierarchy.keySet()) {
             for (final V value : hierarchy.get(key)) {
-                if (invertedHierarchy.get(value) == null) {
-                    invertedHierarchy.put(value, new HashSet<K>());
-                }
-                invertedHierarchy.get(value).add(key);
+                invertedHierarchy.add(value, key);
             }
         }
         return invertedHierarchy;
@@ -336,15 +332,16 @@ public class SosHelper {
      * @return collection of the full hierarchy
      */
     // FIXME move to ReadableCache
-    public static Set<String> getHierarchy(final Map<String, Set<String>> hierarchy, final String key, final boolean fullHierarchy,
+    public static Set<String> getHierarchy(final Map<String, Set<String>> hierarchy, final String key,
+                                           final boolean fullHierarchy,
                                            final boolean includeStartKey) {
         final Set<String> hierarchyValues = new HashSet<String>();
         if (includeStartKey) {
             hierarchyValues.add(key);
-}
+        }
 
         final Stack<String> keysToCheck = new Stack<String>();
-keysToCheck.push(key);
+        keysToCheck.push(key);
 
         while (!keysToCheck.isEmpty()) {
             final Collection<String> keyValues = hierarchy.get(keysToCheck.pop());
@@ -355,10 +352,10 @@ keysToCheck.push(key);
                     }
                 }
             }
-}
+        }
 
         return hierarchyValues;
-}
+    }
 
     /**
      * get collection of hierarchy values for a set of keys
