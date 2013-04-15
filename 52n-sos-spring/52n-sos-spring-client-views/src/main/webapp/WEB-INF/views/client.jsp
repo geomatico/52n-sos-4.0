@@ -171,7 +171,7 @@
                 $("<pre>")
                     .addClass("prettyprint")
                     .addClass("linenums")
-                    .text(vkbeautify.xml(xml, 2))
+                    .text(xml)
                     .appendTo($response);
                 prettyPrint();
                 $response.fadeIn("fast");
