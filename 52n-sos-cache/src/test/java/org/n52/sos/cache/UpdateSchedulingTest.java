@@ -38,8 +38,8 @@ import org.n52.sos.util.GroupedAndNamedThreadFactory;
  */
 public class UpdateSchedulingTest extends AbstractCacheControllerTest {
 
-    private static final long TIMEOUT = 1000 * 5;
-    private static final long PAUSE = 500;
+    private static final long TIMEOUT = 100 * 5;
+    private static final long PAUSE = 50;
 
     @Test
     public void test() throws InterruptedException {
