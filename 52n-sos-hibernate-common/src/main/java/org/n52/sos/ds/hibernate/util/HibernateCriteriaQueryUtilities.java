@@ -63,7 +63,6 @@ import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservationConste
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasOffering;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasOfferings;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasProcedure;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasRelatedFeatures;
 import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
@@ -457,21 +456,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     }
 
     /**
-     * Get restriction for getEqualRestiction filter
-     *
-     * @param temporalFilter Temporal filer
-     * @return filter restriction
-
-     *
-     * @throws OwsExceptionReport If the getEqualRestiction filter is not supported
-     * @deprecated use {@link TemporalRestrictions#filter(TemporalFilter)}
-     */
-    @Deprecated
-    private static Criterion getCriterionForTemporalFilter(TemporalFilter temporalFilter) throws OwsExceptionReport {
-        return TemporalRestrictions.filter(temporalFilter);
-    }
-
-    /**
      * Get spatial filter restrictions.
      *
      * @param propertyName column name
@@ -535,17 +519,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
             conjunction.add(criterion);
         }
         return conjunction;
-    }
-
-    /**
-     * Get a distinct projection for the identifier column
-     * 
-     * @return Distinct projection
-     */
-    @Deprecated
-    private static Projection getDistinctProjectionForIdentifier() {
-        return getDistinctProjection(getIdentifierParameter(null));
-
     }
 
     /**
@@ -655,14 +628,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return alias;
     }
 
-    @Deprecated
-    private static String addProceduresAliasToMap(Map<String, String> aliases, String prefix) {
-        String alias = "procs";
-        String parameter = HibernateConstants.PARAMETER_PROCEDURES;
-        addAliasToMap(aliases, prefix, parameter, alias);
-        return alias;
-    }
-
     /**
      * Adds a featureOfInterest alias to the aliases map
      * 
@@ -708,14 +673,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     public static String addOfferingsAliasToMap(Map<String, String> aliases, String prefix) {
         String alias = "offs";
         String parameter = HasOfferings.OFFERINGS;
-        addAliasToMap(aliases, prefix, parameter, alias);
-        return alias;
-    }
-
-    @Deprecated
-    private static String addRelatedFeaturesToAliasMap(Map<String, String> aliases, String prefix) {
-        String alias = "relFeats";
-        String parameter = HasRelatedFeatures.RELATED_FEATURES;
         addAliasToMap(aliases, prefix, parameter, alias);
         return alias;
     }
@@ -1019,13 +976,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     @SuppressWarnings("unchecked")
     public static List<ObservableProperty> getObservablePropertyObjects(Session session) {
         return session.createCriteria(ObservableProperty.class).list();
-    }
-
-    @Deprecated
-    private static List<?> getDistinctObjects(Session session, Class<?> objectClass) {
-        Criteria criteria = session.createCriteria(objectClass);
-        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        return criteria.list();
     }
 
     @SuppressWarnings("unchecked")
