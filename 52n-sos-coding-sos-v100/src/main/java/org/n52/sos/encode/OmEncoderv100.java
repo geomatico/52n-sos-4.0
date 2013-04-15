@@ -103,7 +103,7 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
             "http://www.opengis.net/spec/OMXML/1.0/conf/geometryObservation",
             "http://www.opengis.net/spec/OMXML/1.0/conf/textObservation");
 
-    private static final Map<String, Map<String, Set<String>>> supportedResponseFormats = Collections.singletonMap(
+    private static final Map<String, Map<String, Set<String>>> SUPPORTED_RESPONSE_FORMATS = Collections.singletonMap(
             SosConstants.SOS,
             Collections.singletonMap(Sos1Constants.SERVICEVERSION,
                     CollectionHelper.set(OMConstants.NS_OM, OMConstants.CONTENT_TYPE_OM)));
@@ -147,9 +147,9 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
 
     @Override
     public Set<String> getSupportedResponseFormats(String service, String version) {
-        if (supported && supportedResponseFormats.get(service) != null) {
-            if (supportedResponseFormats.get(service).get(version) != null) {
-                return supportedResponseFormats.get(service).get(version);
+        if (supported && SUPPORTED_RESPONSE_FORMATS.get(service) != null) {
+            if (SUPPORTED_RESPONSE_FORMATS.get(service).get(version) != null) {
+                return SUPPORTED_RESPONSE_FORMATS.get(service).get(version);
             }
         }
         return Collections.emptySet();
