@@ -36,6 +36,10 @@ public class DCP {
         this.url = url;
     }
 
+    public DCP(String url) {
+        this(null, url);
+    }
+
     public String getEncoding() {
         return encoding;
     }

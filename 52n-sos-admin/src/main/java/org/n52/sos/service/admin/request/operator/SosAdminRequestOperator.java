@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.encode.Encoder;
@@ -43,6 +44,7 @@ import org.n52.sos.exception.ows.concrete.EncoderResponseUnsupportedException;
 import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
 import org.n52.sos.exception.ows.concrete.NoEncoderForResponseException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
+import org.n52.sos.ogc.ows.DCP;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSOperationsMetadata;
 import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
@@ -173,10 +175,10 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
         return opsMeta;
     }
 
-    private Map<String, List<String>> getDCP() {
+    private Map<String, Set<DCP>> getDCP() {
         return Collections.singletonMap(SosConstants.HTTP_GET,
-                                        Collections
-                .singletonList(Configurator.getInstance().getServiceURL() + "/admin?"));
+                                        Collections.singleton(new DCP(Configurator.getInstance().getServiceURL() +
+                                                                      "/admin?")));
     }
 
     private ServiceResponse createServiceResponse(String string) throws OwsExceptionReport {

@@ -23,21 +23,22 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.n52.sos.binding.Binding;
 import org.n52.sos.cache.ContentCache;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.ds.OperationDAO;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.ows.DCP;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.util.ListMultiMap;
 import org.n52.sos.util.MultiMaps;
+import org.n52.sos.util.SetMultiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,7 @@ public abstract class AbstractHibernateOperationDao implements OperationDAO {
 
     @Override
     public OWSOperation getOperationsMetadata(String service, String version) throws OwsExceptionReport {
-        Map<String, List<String>> dcp =  getDCP(new OperationDecoderKey(service, version, getOperationName()));
+        Map<String, Set<DCP>> dcp = getDCP(new OperationDecoderKey(service, version, getOperationName()));
         if (dcp == null || dcp.isEmpty()) {
             LOGGER.debug("Operation {} not available due to empty DCP map.", getOperationName());
             return null;
@@ -91,23 +92,23 @@ public abstract class AbstractHibernateOperationDao implements OperationDAO {
      *
      * @throws OwsExceptionReport
      */
-    protected Map<String, List<String>> getDCP(OperationDecoderKey decoderKey) throws OwsExceptionReport {
-        ListMultiMap<String, String> dcp = MultiMaps.newListMultiMap();
+    protected Map<String, Set<DCP>> getDCP(OperationDecoderKey decoderKey) throws OwsExceptionReport {
+        SetMultiMap<String, DCP> dcp = MultiMaps.newSetMultiMap();
         String serviceURL = Configurator.getInstance().getServiceURL();
         try {
             for (Binding binding : Configurator.getInstance().getBindingRepository().getBindings().values()) {
                 String url = serviceURL + binding.getUrlPattern();
                 if (binding.checkOperationHttpGetSupported(decoderKey)) {
-                    dcp.add(SosConstants.HTTP_GET, url + "?");
+                    dcp.add(SosConstants.HTTP_GET, new DCP(binding.getEncoding(), url + "?"));
                 }
                 if (binding.checkOperationHttpPostSupported(decoderKey)) {
-                    dcp.add(SosConstants.HTTP_POST, url);
+                    dcp.add(SosConstants.HTTP_POST, new DCP(binding.getEncoding(), url));
                 }
                 if (binding.checkOperationHttpPutSupported(decoderKey)) {
-                    dcp.add(SosConstants.HTTP_PUT, url);
+                    dcp.add(SosConstants.HTTP_PUT, new DCP(binding.getEncoding(), url));
                 }
                 if (binding.checkOperationHttpDeleteSupported(decoderKey)) {
-                    dcp.add(SosConstants.HTTP_DELETE, url);
+                    dcp.add(SosConstants.HTTP_DELETE, new DCP(binding.getEncoding(), url));
                 }
             }
         } catch (Exception e) {
