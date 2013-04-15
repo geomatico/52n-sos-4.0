@@ -23,7 +23,6 @@
  */
 package org.n52.sos.service;
 
-import org.n52.sos.exception.ConfigurationException;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.util.Enumeration;
@@ -34,7 +33,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.n52.sos.config.SettingsManager;
-import org.n52.sos.util.Cleanupable;
+import org.n52.sos.exception.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

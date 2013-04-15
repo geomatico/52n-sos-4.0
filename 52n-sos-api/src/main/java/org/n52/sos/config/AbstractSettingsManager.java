@@ -27,6 +27,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -45,6 +46,7 @@ import org.n52.sos.event.events.SettingsChangeEvent;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceSettings;
 import org.n52.sos.util.HashSetMultiMap;
 import org.n52.sos.util.SetMultiMap;
 import org.slf4j.Logger;
@@ -283,6 +285,8 @@ public abstract class AbstractSettingsManager extends SettingsManager {
             } else if (def.hasDefaultValue()) {
                 log.debug("Using default value '{}' for required setting {}", def.getDefaultValue(), co.getKey());
                 saveSettingValue(val.setValue(def.getDefaultValue()));
+            } else if (def.equals(ServiceSettings.SERVICE_URL_DEFINITION)) {
+                saveSettingValue(val.setValue(URI.create("http://localhost:8080/52n-sos-webapp/sos")));
             } else {
                 throw new ConfigurationException(String
                         .format("No value found for required Setting '%s' with no default value.", co.getKey()));
