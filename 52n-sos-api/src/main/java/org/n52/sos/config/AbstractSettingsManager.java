@@ -486,7 +486,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
 
         private void logAndThrowError(Object val, Throwable t) throws ConfigurationException {
             String message = String.format("Error while setting value '%s' (%s) for property '%s' with method '%s'",
-                                           val, val.getClass(), getKey(), getMethod());
+                                           val, val == null ? null : val.getClass(), getKey(), getMethod());
             log.error(message);
             throw new ConfigurationException(message, t);
         }
