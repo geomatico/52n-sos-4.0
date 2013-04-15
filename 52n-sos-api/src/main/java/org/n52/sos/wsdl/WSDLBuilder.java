@@ -605,49 +605,27 @@ public class WSDLBuilder {
     }
 
     public static void main(String[] args) throws WSDLException, ParserConfigurationException {
-        System.out.println(new WSDLBuilder()
+        WSDLBuilder b = new WSDLBuilder()
                 .setSoapEndpoint(URI.create("http://localhost:8080/52n-sos-webapp/sos/soap"))
                 .setKvpEndpoint(URI.create("http://localhost:8080/52n-sos-webapp/sos/kvp"))
-                .setPoxEndpoint(URI.create("http://localhost:8080/52n-sos-webapp/sos/pox"))
-                .addSoapOperation(Operations.DELETE_SENSOR)
-                .addSoapOperation(Operations.DESCRIBE_SENSOR)
-                .addSoapOperation(Operations.GET_CAPABILITIES)
-                .addSoapOperation(Operations.GET_FEATURE_OF_INTEREST)
-                .addSoapOperation(Operations.GET_OBSERVATION)
-                .addSoapOperation(Operations.GET_OBSERVATION_BY_ID)
-                .addSoapOperation(Operations.GET_RESULT)
-                .addSoapOperation(Operations.GET_RESULT_TEMPLATE)
-                .addSoapOperation(Operations.INSERT_OBSERVATION)
-                .addSoapOperation(Operations.INSERT_RESULT)
-                .addSoapOperation(Operations.INSERT_RESULT_TEMPLATE)
-                .addSoapOperation(Operations.INSERT_SENSOR)
-                .addSoapOperation(Operations.UPDATE_SENSOR_DESCRIPTION)
-                .addPoxOperation(Operations.DELETE_SENSOR)
-                .addPoxOperation(Operations.DESCRIBE_SENSOR)
-                .addPoxOperation(Operations.GET_CAPABILITIES)
-                .addPoxOperation(Operations.GET_FEATURE_OF_INTEREST)
-                .addPoxOperation(Operations.GET_OBSERVATION)
-                .addPoxOperation(Operations.GET_OBSERVATION_BY_ID)
-                .addPoxOperation(Operations.GET_RESULT)
-                .addPoxOperation(Operations.GET_RESULT_TEMPLATE)
-                .addPoxOperation(Operations.INSERT_OBSERVATION)
-                .addPoxOperation(Operations.INSERT_RESULT)
-                .addPoxOperation(Operations.INSERT_RESULT_TEMPLATE)
-                .addPoxOperation(Operations.INSERT_SENSOR)
-                .addPoxOperation(Operations.UPDATE_SENSOR_DESCRIPTION)
-                .addKvpOperation(Operations.DELETE_SENSOR)
-                .addKvpOperation(Operations.DESCRIBE_SENSOR)
-                .addKvpOperation(Operations.GET_CAPABILITIES)
-                .addKvpOperation(Operations.GET_FEATURE_OF_INTEREST)
-                .addKvpOperation(Operations.GET_OBSERVATION)
-                .addKvpOperation(Operations.GET_OBSERVATION_BY_ID)
-                .addKvpOperation(Operations.GET_RESULT)
-                .addKvpOperation(Operations.GET_RESULT_TEMPLATE)
-                .addKvpOperation(Operations.INSERT_OBSERVATION)
-                .addKvpOperation(Operations.INSERT_RESULT)
-                .addKvpOperation(Operations.INSERT_RESULT_TEMPLATE)
-                .addKvpOperation(Operations.INSERT_SENSOR)
-                .addKvpOperation(Operations.UPDATE_SENSOR_DESCRIPTION)
-                .build());
+                .setPoxEndpoint(URI.create("http://localhost:8080/52n-sos-webapp/sos/pox"));
+        for (WSDLOperation o : new WSDLOperation[] { Operations.DELETE_SENSOR,
+                                                     Operations.DESCRIBE_SENSOR,
+                                                     Operations.GET_CAPABILITIES,
+                                                     Operations.GET_FEATURE_OF_INTEREST,
+                                                     Operations.GET_OBSERVATION,
+                                                     Operations.GET_OBSERVATION_BY_ID,
+                                                     Operations.GET_RESULT,
+                                                     Operations.GET_RESULT_TEMPLATE,
+                                                     Operations.INSERT_OBSERVATION,
+                                                     Operations.INSERT_RESULT,
+                                                     Operations.INSERT_RESULT_TEMPLATE,
+                                                     Operations.INSERT_SENSOR,
+                                                     Operations.UPDATE_SENSOR_DESCRIPTION }) {
+            b.addPoxOperation(o);
+            b.addKvpOperation(o);
+            b.addSoapOperation(o);
+        }
+        System.out.println(b.build());
     }
 }
