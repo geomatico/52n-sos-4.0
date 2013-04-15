@@ -32,9 +32,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
-import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.entities.BlobValue;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.CategoryValue;
@@ -71,16 +72,11 @@ import org.n52.sos.ogc.sos.SosResultStructure;
 import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CollectionHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 
 public class HibernateCriteriaTransactionalUtilities {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateCriteriaTransactionalUtilities.class);
-
-    
     public static Procedure getOrInsertProcedure(String identifier, ProcedureDescriptionFormat pdf, Session session) {
         Procedure result = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(identifier, session);
         if (result == null) {
@@ -238,16 +234,16 @@ public class HibernateCriteriaTransactionalUtilities {
     }
 
     public static ObservationConstellation checkOrInsertObservationConstellation(Procedure hProcedure,
-            ObservableProperty hObservableProperty, Offering hOffering, Session session) {
-        HibernateQueryObject queryObject = new HibernateQueryObject();
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                HibernateConstants.PARAMETER_PROCEDURE, hProcedure));
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                HibernateConstants.PARAMETER_OBSERVABLE_PROPERTY, hObservableProperty));
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                HibernateConstants.PARAMETER_OFFERING, hOffering));
-        ObservationConstellation obsConst =
-                HibernateCriteriaQueryUtilities.getObservationConstellation(queryObject, session);
+                                                                                 ObservableProperty hObservableProperty,
+                                                                                 Offering hOffering,
+                                                                                 Session session) {
+        ObservationConstellation obsConst = (ObservationConstellation) session
+                .createCriteria(ObservationConstellation.class)
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                .add(Restrictions.eq(ObservationConstellation.OFFERING, hOffering))
+                .add(Restrictions.eq(ObservationConstellation.OBSERVABLE_PROPERTY, hObservableProperty))
+                .add(Restrictions.eq(ObservationConstellation.PROCEDURE, hProcedure))
+                .uniqueResult();
         if (obsConst == null) {
             obsConst = new ObservationConstellation();
             obsConst.setObservableProperty(hObservableProperty);
@@ -257,7 +253,7 @@ public class HibernateCriteriaTransactionalUtilities {
             session.save(obsConst);
             session.flush();
             session.refresh(obsConst);
-        } else if (obsConst != null && obsConst.getDeleted()){
+        } else if (obsConst.getDeleted()){
             obsConst.setDeleted(false);
             session.save(obsConst);
             session.flush();
