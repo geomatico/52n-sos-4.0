@@ -32,7 +32,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projection;
 import org.hibernate.transform.ResultTransformer;
-
+@Deprecated
 public class HibernateQueryObject implements Cloneable {
 
     private Map<String, String> aliases = new HashMap<String, String>(0);

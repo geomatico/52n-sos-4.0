@@ -40,10 +40,12 @@ import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Deprecated
 public class DefaultHibernateCriteriaQueryUtilities {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultHibernateCriteriaQueryUtilities.class);
 
+    @Deprecated
     public static List<?> getObjectList(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
         long start = System.currentTimeMillis();
 //        Criteria criteria = session.createCriteria(objectClass);
@@ -83,12 +85,13 @@ public class DefaultHibernateCriteriaQueryUtilities {
          LOGGER.debug("Time to query database entity {} in {} ms!", objectClass.getSimpleName(), (System.currentTimeMillis()-start));
          return list;
     }
-    
+    @Deprecated
     public static ScrollableResults getScrollableObjects(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
         Criteria criteria = createCriteria(queryObject, session, objectClass);
         return criteria.scroll();
     }
-    
+
+    @Deprecated
     private static Criteria createCriteria(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
         Criteria criteria = session.createCriteria(objectClass);
         if (queryObject.isSetAliases()) {
@@ -118,35 +121,10 @@ public class DefaultHibernateCriteriaQueryUtilities {
         }
         return criteria;
     }
-    
+
+    @Deprecated
     protected static Object getObject(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
         long start = System.currentTimeMillis();
-//        Criteria criteria = session.createCriteria(objectClass);
-//        if (queryObject.isSetAliases()) {
-//            addAliasesToCriteria(criteria, queryObject.getAliases());
-//        }
-//        if (queryObject.isSetCriterions()) {
-//            Conjunction conjunction = Restrictions.conjunction();
-//            for (Criterion criterion : queryObject.getCriterions()) {
-//                conjunction.add(criterion);
-//            }
-//            criteria.add(conjunction);
-//        }
-//        if (queryObject.isSetProjections()) {
-//            ProjectionList projectionList = Projections.projectionList();
-//            for (Projection projection : queryObject.getProjections()) {
-//                projectionList.add(projection);
-//            }
-//            criteria.setProjection(projectionList);
-//        }
-//        if (queryObject.isSetOrder()) {
-//            for (Order order : queryObject.getOrder()) {
-//                criteria.addOrder(order);
-//            }
-//        }
-//        if (queryObject.isSetMaxResults()) {
-//            criteria.setMaxResults(queryObject.getMaxResult());
-//        }
         Criteria criteria = createCriteria(queryObject, session, objectClass);
         criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         Object uniqueResult = criteria.uniqueResult();
@@ -162,6 +140,7 @@ public class DefaultHibernateCriteriaQueryUtilities {
      * @param aliases
      *            Aliases for query between tables
      */
+    @Deprecated
     public static void addAliasesToCriteria(Criteria criteria, Map<String, String> aliases) {
         for (String aliasKey : aliases.keySet()) {
             criteria.createAlias(aliasKey, aliases.get(aliasKey));
@@ -180,6 +159,7 @@ public class DefaultHibernateCriteriaQueryUtilities {
      * @param alias
      *            previously defined alias, can be null
      */
+    @Deprecated
     protected static void addAliasToMap(Map<String, String> aliases, String prefix, String parameter, String alias) {
         if (prefix != null && !prefix.isEmpty()) {
             aliases.put(prefix + "." + parameter, alias);
