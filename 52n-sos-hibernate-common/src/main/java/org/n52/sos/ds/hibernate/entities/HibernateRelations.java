@@ -72,7 +72,7 @@ public interface HibernateRelations {
     }
 
     interface HasFeatureOfInterestType {
-        String FEATURE_OF_INTEREST_TYPE = FeatureOfInterestType.FEATURE_OF_INTEREST_TYPE;
+        String FEATURE_OF_INTEREST_TYPE = "featureOfInterestType";
         FeatureOfInterestType getFeatureOfInterestType();
         void setFeatureOfInterestType(FeatureOfInterestType featureOfInterestType);
     }
@@ -126,7 +126,7 @@ public interface HibernateRelations {
     }
 
     interface HasObservationType {
-        String OBSERVATION_TYPE = ObservationType.OBSERVATION_TYPE;
+        String OBSERVATION_TYPE = "observationType";
         ObservationType getObservationType();
         void setObservationType(ObservationType observationType);
     }
@@ -150,7 +150,7 @@ public interface HibernateRelations {
     }
 
     interface HasProcedureDescriptionFormat {
-        String PROCEDURE_DESCRIPTION_FORMAT = ProcedureDescriptionFormat.PROCEDURE_DESCRIPTION_FORMAT;
+        String PROCEDURE_DESCRIPTION_FORMAT = "procedureDescriptionFormat";
         ProcedureDescriptionFormat getProcedureDescriptionFormat();
         void setProcedureDescriptionFormat(ProcedureDescriptionFormat procedureDescriptionFormat);
     }
@@ -186,13 +186,13 @@ public interface HibernateRelations {
     }
 
     interface HasSweType {
-        String SWE_TYPE = SweType.SWE_TYPE;
+        String SWE_TYPE = "sweType";
         SweType getSweType();
         void setSweType(SweType sweType);
     }
 
     interface HasUnit {
-        String UNIT = Unit.UNIT;
+        String UNIT = "unit";
         Unit getUnit();
         void setUnit(Unit unit);
     }
@@ -221,7 +221,7 @@ public interface HibernateRelations {
         void setObservableProperties(Set<ObservableProperty> observableProperties);
     }
 
-    public interface GeoColumnsId {
+    interface GeoColumnsId {
         String COORD_DIMENSION = "coordDimension";
         String SRID = "srid";
         String TABLE_CATALOG = "FTableCatalog";
