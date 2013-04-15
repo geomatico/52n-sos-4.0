@@ -34,8 +34,11 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.config.annotation.Configurable;
+import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.XmlDecodingException;
@@ -61,11 +64,14 @@ import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO Eike: move all strings to constants classes or create settings for them
+import com.vividsolutions.jts.geom.Coordinate;
 
+// TODO Eike: move all strings to constants classes or create settings for them
+@Configurable
 public class HibernateProcedureUtilities {
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateProcedureUtilities.class);
 
@@ -149,7 +155,7 @@ public class HibernateProcedureUtilities {
 	private static ProcessModel createSmlProcessModel(final Procedure procedure)
 	{
 		// TODO Auto-generated method "createSmlProcessModel" stub generated on 10.04.2013 around 12:36:39 by eike
-		return null;
+		return new ProcessModel();
 	}
 
 	private static org.n52.sos.ogc.sensorML.System createSmlSystem(final Procedure procedure)
@@ -220,53 +226,62 @@ public class HibernateProcedureUtilities {
 	{
 		// TODO Auto-generated method "createPosition" stub generated on 12.04.2013 around 15:08:04 by eike
 		SosSMLPosition smlPosition = null;
+		smlPosition = new SosSMLPosition();
+                smlPosition.setName("sensorPosition");
+                smlPosition.setFixed(true);
+                int srid = 4326; // TODO use default EPSG code from settings
 		// 8.1 set latlong position
-		if (procedure.isSetLongLat() && procedure.isSetSrid())
+		if (procedure.isSetLongLat())
 		{
-			smlPosition = new SosSMLPosition();
-			smlPosition.setName("sensorPosition");
-			smlPosition.setReferenceFrame(getServiceConfig().getSrsNamePrefixSosV2() + procedure.getSrid());
-			smlPosition.setPosition(createCoordinatesForPosition(procedure));
-			smlPosition.setFixed(true);
+			smlPosition.setPosition(createCoordinatesForPosition(procedure.getLongitude(), procedure.getLatitude(), procedure.getAltitude()));
+			
 		}
 		// 8.2 set position from geometry
 		else if (procedure.isSetGeometry())
 		{
+		    if (procedure.getGeom().getSRID() > 0) {
+		        srid = procedure.getGeom().getSRID();
+		    }
 			// TODO implement
-			
+		    Coordinate coordinate = procedure.getGeom().getCoordinate();
+		    smlPosition.setPosition(createCoordinatesForPosition(coordinate.y, coordinate.x, coordinate.z));
 		}
+		if (procedure.isSetSrid()) {
+		    srid = procedure.getSrid();
+		}
+ 		smlPosition.setReferenceFrame(getServiceConfig().getSrsNamePrefixSosV2() + srid);
 		return smlPosition;
 	}
 	
-	private static List<SosSweCoordinate<?>> createCoordinatesForPosition(final Procedure procedure)
-	{
-		final List<SosSweCoordinate<?>> sweCoordinates = new ArrayList<SosSweCoordinate<?>>(3);
-		if (procedure.getLatitude() instanceof Double)
-		{
-			final SosSweQuantity quantity = new SosSweQuantity();
-			quantity.setValue((Double)procedure.getLatitude());
-			quantity.setAxisID("y");
-			quantity.setUom("degree"); // TODO add to mapping or setting
-			sweCoordinates.add(new SosSweCoordinate<Double>(northing,quantity));
-		}
-		if (procedure.getLongitude() instanceof Double)
-		{
-			final SosSweQuantity quantity = new SosSweQuantity();
-			quantity.setValue((Double)procedure.getLongitude());
-			quantity.setAxisID("x");
-			quantity.setUom("degree"); // TODO add to mapping or setting
-			sweCoordinates.add(new SosSweCoordinate<Double>(easting,quantity));
-		}
-		if (procedure.getAltitude() instanceof Double)
-		{
-			final SosSweQuantity quantity = new SosSweQuantity();
-			quantity.setValue((Double)procedure.getLatitude());
-			quantity.setAxisID("z");
-			quantity.setUom("m"); // TODO add to mapping or setting
-			sweCoordinates.add(new SosSweCoordinate<Double>(altitude,quantity));
-		}
-		return sweCoordinates;
-	}
+	private static List<SosSweCoordinate<?>> createCoordinatesForPosition(Object longitude, Object latitude,
+            Object oAltitude) {
+                final List<SosSweCoordinate<?>> sweCoordinates = new ArrayList<SosSweCoordinate<?>>(3);
+                if (latitude instanceof Double)
+                {
+                        final SosSweQuantity quantity = new SosSweQuantity();
+                        quantity.setValue((Double)latitude);
+                        quantity.setAxisID("y");
+                        quantity.setUom("degree"); // TODO add to mapping or setting
+                        sweCoordinates.add(new SosSweCoordinate<Double>(northing,quantity));
+                }
+                if (longitude instanceof Double)
+                {
+                        final SosSweQuantity quantity = new SosSweQuantity();
+                        quantity.setValue((Double)longitude);
+                        quantity.setAxisID("x");
+                        quantity.setUom("degree"); // TODO add to mapping or setting
+                        sweCoordinates.add(new SosSweCoordinate<Double>(easting,quantity));
+                }
+                if (oAltitude != null && oAltitude instanceof Double)
+                {
+                        final SosSweQuantity quantity = new SosSweQuantity();
+                        quantity.setValue((Double)oAltitude);
+                        quantity.setAxisID("z");
+                        quantity.setUom("m"); // TODO add to mapping or setting
+                        sweCoordinates.add(new SosSweCoordinate<Double>(altitude,quantity));
+                }
+                return sweCoordinates;
+    }
 
 	private static List<SmlContact> createContactFromServiceContact()
 	{
@@ -420,7 +435,7 @@ public class HibernateProcedureUtilities {
         LOGGER.debug("Procedure description file name '{}'!", filename);
         return Configurator.getInstance().getClass().getResourceAsStream(builder.toString());
     }
-
+    
     private HibernateProcedureUtilities() {
     }
 }
