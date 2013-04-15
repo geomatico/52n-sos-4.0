@@ -20,7 +20,7 @@
     <packaging>pom</packaging>
     <ciManagement>
         <system>hudson</system>
-        <url>http://build.dev.52north.org:8080/job/52n-sos-dev/</url>
+        <url>http://build.dev.52north.org/jenkins/job/sos-dev/</url>
     </ciManagement>
     <modules>
         <module>52n-sos-api</module>
