@@ -23,38 +23,32 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.AbstractGetResultDAO;
+import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
+import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
+import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
-import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ds.hibernate.util.TemporalRestrictions;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosResultEncoding;
 import org.n52.sos.ogc.sos.SosResultStructure;
 import org.n52.sos.request.GetResultRequest;
 import org.n52.sos.response.GetResultResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GetResultDAO extends AbstractGetResultDAO {
 
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(GetResultDAO.class);
-    
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
     @Override
@@ -106,42 +100,36 @@ public class GetResultDAO extends AbstractGetResultDAO {
      * @return List of Observation objects
 
      *
-     * @throws OwsExceptionReport     *             If an error occurs.
+     * @throws OwsExceptionReport If an error occurs.
      */
+    @SuppressWarnings("unchecked")
     protected List<Observation> queryObservation(GetResultRequest request, Set<String> featureIdentifier,
                                                  Session session) throws OwsExceptionReport {
-        HibernateQueryObject queryObject = new HibernateQueryObject();
-        Map<String, String> aliases = new HashMap<String, String>();
-        // offering
-        String offsAlias = HibernateCriteriaQueryUtilities.addOfferingsAliasToMap(aliases, null);
-//        String offeringAlias =HibernateCriteriaQueryUtilities.addOfferingAliasToMap(aliases, offsAlias);
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                HibernateCriteriaQueryUtilities.getIdentifierParameter(offsAlias), request.getOffering()));
-        // observableProperties
-        String obsPropAlias = HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, null);
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                HibernateCriteriaQueryUtilities.getIdentifierParameter(obsPropAlias), request.getObservedProperty()));
-        // deleted
-        // XXX DeleteObservation Extension
-        queryObject.addCriterion(Restrictions.eq(HibernateConstants.PARAMETER_DELETED, false));
-        // feature identifier
         if (featureIdentifier != null && featureIdentifier.isEmpty()) {
             return null;
-        } else if (featureIdentifier != null && !featureIdentifier.isEmpty()) {
-            String foiAlias = HibernateCriteriaQueryUtilities.addFeatureOfInterestAliasToMap(aliases, null);
-            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
-                    HibernateCriteriaQueryUtilities.getIdentifierParameter(foiAlias), new ArrayList<String>(
-                            featureIdentifier)));
         }
-        // temporal filters
-        if (request.hasTemporalFilter()) {
-            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(request.getTemporalFilter()));
+
+        Criteria c = session.createCriteria(Observation.class)
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                .add(Restrictions.eq(Observation.DELETED, false));
+
+        if (featureIdentifier != null) {
+            c.createCriteria(Observation.FEATURE_OF_INTEREST)
+                    .add(Restrictions.in(FeatureOfInterest.IDENTIFIER, featureIdentifier));
         }
-        queryObject.setAliases(aliases);
-        // ...
-        List<Observation> observations =
-                HibernateCriteriaQueryUtilities.getObservations(queryObject, session);
-        return observations;
+        if (request.getObservedProperty() != null) {
+            c.createCriteria(Observation.OBSERVABLE_PROPERTY)
+                    .add(Restrictions.eq(ObservableProperty.IDENTIFIER, request.getObservedProperty()));
+        }
+        if (request.getOffering() != null) {
+            c.createCriteria(Observation.OFFERINGS)
+                    .add(Restrictions.eq(Offering.IDENTIFIER, request.getOffering()));
+
+        }
+        if (request.getTemporalFilter() != null && !request.getTemporalFilter().isEmpty()) {
+            c.add(TemporalRestrictions.filter(request.getTemporalFilter()));
+        }
+        return c.list();
 
     }
 }
