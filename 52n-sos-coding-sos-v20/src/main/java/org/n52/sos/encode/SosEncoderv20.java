@@ -532,8 +532,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
                 TimePeriod tp = (TimePeriod) offering.getResultTime();
                 tp.setGmlId(String.format("%s_%d", Sos2Constants.EN_RESULT_TIME, offeringCounter));
                 if (!tp.isEmpty()) {
-                    XmlObject xmlObject = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, offering
-                            .getResultTime());
+                    XmlObject xmlObject = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, tp);
                     xbObsOff.addNewResultTime().addNewTimePeriod().set(xmlObject);
                     xbObsOff.getResultTime().substitute(
                             new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_RESULT_TIME,
