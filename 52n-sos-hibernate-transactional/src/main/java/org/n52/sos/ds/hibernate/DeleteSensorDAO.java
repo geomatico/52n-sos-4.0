@@ -25,27 +25,24 @@ package org.n52.sos.ds.hibernate;
 
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities.setValidProcedureDescriptionEndTime;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.AbstractDeleteSensorDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
+import org.n52.sos.ds.hibernate.util.ScrollableIterable;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.response.DeleteSensorResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DeleteSensorDAO extends AbstractDeleteSensorDAO {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DeleteSensorDAO.class);
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
     @Override
@@ -60,7 +57,6 @@ public class DeleteSensorDAO extends AbstractDeleteSensorDAO {
             transaction = session.beginTransaction();
             setDeleteSensorFlag(request.getProcedureIdentifier(), true, session);
             setValidProcedureDescriptionEndTime(request.getProcedureIdentifier(), session);
-            // FIXME set all obs to deleted
             transaction.commit();
             response.setDeletedProcedure(request.getProcedureIdentifier());
         } catch (HibernateException he) {
@@ -89,17 +85,13 @@ public class DeleteSensorDAO extends AbstractDeleteSensorDAO {
         }
     }
 
-    private void setObservationConstellationOfferingObservationTypeAsDeletedForProcedure(
-            String procedureIdentifier, Session session) {
-        HibernateQueryObject queryObject = new HibernateQueryObject();
-        Map<String, String> aliases = new HashMap<String, String>(0);
-        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, null);
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), procedureIdentifier));
-        queryObject.setAliases(aliases);
-        List<ObservationConstellation> hObservationConstellations =
-                                                              HibernateCriteriaQueryUtilities
-                .getObservationConstellations(queryObject,session);
+    private void setObservationConstellationOfferingObservationTypeAsDeletedForProcedure(String procedure,
+                                                                                         Session session) {
+        @SuppressWarnings("unchecked")
+        List<ObservationConstellation> hObservationConstellations = session
+                .createCriteria(ObservationConstellation.class)
+                .createCriteria(ObservationConstellation.PROCEDURE)
+                .add(Restrictions.eq(Procedure.IDENTIFIER, procedure)).list();
         for (ObservationConstellation hObservationConstellation : hObservationConstellations) {
             hObservationConstellation.setDeleted(true);
             session.saveOrUpdate(hObservationConstellation);
@@ -107,18 +99,20 @@ public class DeleteSensorDAO extends AbstractDeleteSensorDAO {
         }
     }
 
-    private void setObservationsAsDeletedForProcedure(String procedureIdentifier, Session session) {
-        HibernateQueryObject queryObject = new HibernateQueryObject();
-        Map<String, String> aliases = new HashMap<String, String>(0);
-        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, null);
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), procedureIdentifier));
-        queryObject.setAliases(aliases);
-        List<Observation> observations = HibernateCriteriaQueryUtilities.getObservations(queryObject, session);
-        for (Observation observation : observations) {
-            observation.setDeleted(true);
-            session.saveOrUpdate(observation);
-            session.flush();
+    private void setObservationsAsDeletedForProcedure(String procedure, Session session) {
+        ScrollableIterable<Observation> scroll = ScrollableIterable.fromCriteria(session
+                .createCriteria(Observation.class)
+                .add(Restrictions.eq(Observation.DELETED, false))
+                .createCriteria(Observation.PROCEDURE)
+                .add(Restrictions.eq(Procedure.IDENTIFIER, procedure)));
+        try {
+            for (Observation o : scroll) {
+                o.setDeleted(true);
+                session.update(o);
+                session.flush();
+            }
+        } finally {
+            scroll.close();
         }
     }
 }
