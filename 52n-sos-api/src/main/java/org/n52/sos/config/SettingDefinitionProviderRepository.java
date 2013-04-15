@@ -31,6 +31,8 @@ import java.util.Set;
 
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.util.AbstractServiceLoaderRepository;
+import org.n52.sos.util.MultiMaps;
+import org.n52.sos.util.SetMultiMap;
 import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +47,8 @@ public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRe
     private static final Logger log = LoggerFactory.getLogger(SettingDefinitionProviderRepository.class);
     private Map<String, SettingDefinition<?, ?>> definitionsByKey = Collections.emptyMap();
     private Set<SettingDefinition<?, ?>> settingDefinitions = Collections.emptySet();
-    private Map<SettingDefinition<?, ?>, Set<SettingDefinitionProvider>> providersByDefinition = Collections
-            .emptyMap();
+    private SetMultiMap<SettingDefinition<?, ?>, SettingDefinitionProvider> providersByDefinition = MultiMaps
+            .newSetMultiMap();
 
     /**
      * Constructs a new repository.
@@ -95,7 +97,7 @@ public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRe
     @Override
     protected void processImplementations(Set<SettingDefinitionProvider> implementations) throws ConfigurationException {
         this.settingDefinitions = new HashSet<SettingDefinition<?, ?>>();
-        this.providersByDefinition = new HashMap<SettingDefinition<?, ?>, Set<SettingDefinitionProvider>>();
+        this.providersByDefinition = MultiMaps.newSetMultiMap();
         this.definitionsByKey = new HashMap<String, SettingDefinition<?, ?>>();
 
         for (SettingDefinitionProvider provider : implementations) {
@@ -109,14 +111,13 @@ public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRe
                     this.providersByDefinition.remove(prev);
                 }
                 log.debug("Found Setting definition for key '{}'", definition.getKey());
+                if (!definition.isOptional() && !definition.hasDefaultValue()) {
+                    log.warn("No default value for optional setting {}", definition.getKey());
+                }
             }
             this.settingDefinitions.addAll(requiredSettings);
             for (SettingDefinition<?, ?> setting : requiredSettings) {
-                Set<SettingDefinitionProvider> wanters = this.providersByDefinition.get(setting);
-                if (wanters == null) {
-                    this.providersByDefinition.put(setting, wanters = new HashSet<SettingDefinitionProvider>());
-                }
-                wanters.add(provider);
+                this.providersByDefinition.add(setting, provider);
             }
         }
     }
