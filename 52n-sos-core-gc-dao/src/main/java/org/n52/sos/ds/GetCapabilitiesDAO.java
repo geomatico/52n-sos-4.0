@@ -24,10 +24,8 @@
 package org.n52.sos.ds;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -40,6 +38,9 @@ import javax.xml.namespace.QName;
 import org.n52.sos.binding.Binding;
 import org.n52.sos.decode.Decoder;
 import org.n52.sos.encode.Encoder;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.VersionNegotiationFailedException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.filter.FilterCapabilities;
 import org.n52.sos.ogc.filter.FilterConstants.ComparisonOperator;
@@ -58,9 +59,6 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.ows.SwesExtension;
-import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.exception.ows.VersionNegotiationFailedException;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -69,8 +67,9 @@ import org.n52.sos.ogc.sos.SosOfferingsForContents;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.response.GetCapabilitiesResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.MultiMaps;
+import org.n52.sos.util.SetMultiMap;
 
 /**
  * Implementation of the interface IGetCapabilitiesDAO
@@ -78,21 +77,14 @@ import org.slf4j.LoggerFactory;
  */
 public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GetCapabilitiesDAO.class);
-
     /* section flags (values are powers of 2) */
     private static final int SERVICE_IDENTIFICATION = 0x01;
-
     private static final int SERVICE_PROVIDER = 0x02;
-
     private static final int OPERATIONS_METADATA = 0x04;
-
     private static final int FILTER_CAPABILITIES = 0x08;
-
     private static final int CONTENTS = 0x10;
-
-    private static final int ALL = 0x20 | SERVICE_IDENTIFICATION | SERVICE_PROVIDER | OPERATIONS_METADATA
-            | FILTER_CAPABILITIES | CONTENTS;
+    private static final int ALL = 0x20 | SERVICE_IDENTIFICATION | SERVICE_PROVIDER | OPERATIONS_METADATA |
+                                   FILTER_CAPABILITIES | CONTENTS;
 
     @Override
     public GetCapabilitiesResponse getCapabilities(GetCapabilitiesRequest request) throws OwsExceptionReport {
@@ -112,47 +104,39 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
     	return response;
     }
 
-	private void addSectionSpecificContent(GetCapabilitiesResponse response,
-			Set<String> requestedExtensionSections,
-			int sections,
-                                           SosCapabilities sosCapabilities) throws OwsExceptionReport	{
-		if (isServiceIdentificationSectionRequested(sections)) 
-    	{
-    		sosCapabilities.setServiceIdentification(getServiceIdentification(response.getVersion()));
-    	}
-    	if (isServiceProviderSectionRequested(sections))
-    	{
-    		sosCapabilities.setServiceProvider(getConfigurator().getServiceProvider());
-    	}
-    	if (isOperationsMetadataSectionRequested(sections))
-    	{
-    		sosCapabilities.setOperationsMetadata(getOperationsMetadataForOperations(response.getService(),
-    				response.getVersion()));
-    	}
-    	if (isFilterCapabilitiesSectionRequested(sections))
-    	{
-    		sosCapabilities.setFilterCapabilities(getFilterCapabilities(response.getVersion()));
-    	}
-    	if (isContentsSectionRequested(sections))
-    	{
-    		if (isVersionSos2(response))
-    		{
-    			sosCapabilities.setContents(getContentsForSosV2(response.getVersion()));
-    		}
-    		else
-    		{
-    			sosCapabilities.setContents(getContents());
-    		}
-    	}
+    private void addSectionSpecificContent(GetCapabilitiesResponse response,
+                                           Set<String> requestedExtensionSections,
+                                           int sections,
+                                           SosCapabilities sosCapabilities) throws OwsExceptionReport {
+        if (isServiceIdentificationSectionRequested(sections)) {
+            sosCapabilities.setServiceIdentification(getServiceIdentification(response.getVersion()));
+        }
+        if (isServiceProviderSectionRequested(sections)) {
+            sosCapabilities.setServiceProvider(getConfigurator().getServiceProvider());
+        }
+        if (isOperationsMetadataSectionRequested(sections)) {
+            sosCapabilities.setOperationsMetadata(getOperationsMetadataForOperations(response.getService(),
+                                                                                     response.getVersion()));
+        }
+        if (isFilterCapabilitiesSectionRequested(sections)) {
+            sosCapabilities.setFilterCapabilities(getFilterCapabilities(response.getVersion()));
+        }
+        if (isContentsSectionRequested(sections)) {
+            if (isVersionSos2(response)) {
+                sosCapabilities.setContents(getContentsForSosV2(response.getVersion()));
+            } else {
+                sosCapabilities.setContents(getContents());
+            }
+        }
 
-    	if (isVersionSos2(response)) {
-    		if (sections == ALL) {
-    			sosCapabilities.setExensions(getAndMergeExtensions());
-    		} else if (!requestedExtensionSections.isEmpty()) {
-    			sosCapabilities.setExensions(getExtensions(requestedExtensionSections));
-    		}
-    	}
-	}
+        if (isVersionSos2(response)) {
+            if (sections == ALL) {
+                sosCapabilities.setExensions(getAndMergeExtensions());
+            } else if (!requestedExtensionSections.isEmpty()) {
+                sosCapabilities.setExensions(getExtensions(requestedExtensionSections));
+            }
+        }
+    }
 
 	private int identifyRequestedSections(GetCapabilitiesRequest request,
 			GetCapabilitiesResponse response,
@@ -228,8 +212,8 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         return serviceIdentification;
     }
 
-    private List<String> getProfiles() {
-        Set<String> profiles = new HashSet<String>();
+    private Set<String> getProfiles() {
+        List<String> profiles = new LinkedList<String>();
         for (Binding bindig : getConfigurator().getBindingRepository().getBindings().values()) {
             profiles.addAll(bindig.getConformanceClasses());
         }
@@ -244,7 +228,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         for (Encoder<?,?> encoder : getConfigurator().getCodingRepository().getEncoders()) {
             profiles.addAll(encoder.getConformanceClasses());
         }
-        return new ArrayList<String>(profiles);
+        return CollectionHelper.asSet(profiles);
     }
 
     /**
@@ -361,10 +345,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
                 sosOffering.setPhens4CompPhens(phens4CompPhens);
 
                 // set up time
-                sosOffering.setPhenomenonTime(new TimePeriod(getCache().getMinPhenomenonTimeForOffering(offering),
-                                                             getCache().getMaxPhenomenonTimeForOffering(offering)));
-                sosOffering.setResultTime(new TimePeriod(getCache().getMinResultTimeForOffering(offering),
-                                                         getCache().getMaxResultTimeForOffering(offering)));
+                setUpTimeForOffering(offering, sosOffering);
 
                 // add feature of interests
                 if (getConfigurator().getProfileHandler().getActiveProfile().isListFeatureOfInterestsInOfferings()) {
@@ -468,10 +449,11 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
     private void getSpatialFilterCapabilities(FilterCapabilities filterCapabilities, String version) {
 
         // set GeometryOperands
-        List<QName> operands = new ArrayList<QName>(4);
-        operands.add(GMLConstants.QN_ENVELOPE);
-        // additional spatial operands for SOS 1.0
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
+        List<QName> operands = new LinkedList<QName>();
+        if (version.equals(Sos2Constants.SERVICEVERSION)) {
+            operands.add(GMLConstants.QN_ENVELOPE_32);
+        } else if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            operands.add(GMLConstants.QN_ENVELOPE);
             operands.add(GMLConstants.QN_POINT);
             operands.add(GMLConstants.QN_LINESTRING);
             operands.add(GMLConstants.QN_POLYGON);
@@ -480,34 +462,26 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         filterCapabilities.setSpatialOperands(operands);
 
         // set SpatialOperators
-        Map<SpatialOperator, List<QName>> spatialOperators =
-                new EnumMap<SpatialOperator, List<QName>>(SpatialOperator.class);
-        // set BBOX
-        spatialOperators.put(SpatialOperator.BBOX, Collections.singletonList(GMLConstants.QN_ENVELOPE));
-
-        // additional spatial operators for SOS 1.0
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
+        SetMultiMap<SpatialOperator, QName> ops = MultiMaps.newSetMultiMap(SpatialOperator.class);
+        if (version.equals(Sos2Constants.SERVICEVERSION)) {
+            ops.add(SpatialOperator.BBOX, GMLConstants.QN_ENVELOPE_32);
+        } else if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            ops.add(SpatialOperator.BBOX, GMLConstants.QN_ENVELOPE);
             // set Contains
-            List<QName> operands4Contains = new ArrayList<QName>(3);
-            operands4Contains.add(GMLConstants.QN_POINT);
-            operands4Contains.add(GMLConstants.QN_LINESTRING);
-            operands4Contains.add(GMLConstants.QN_POLYGON);
-            spatialOperators.put(SpatialOperator.Contains, operands4Contains);
+            ops.add(SpatialOperator.Contains, GMLConstants.QN_POINT);
+            ops.add(SpatialOperator.Contains, GMLConstants.QN_LINESTRING);
+            ops.add(SpatialOperator.Contains, GMLConstants.QN_POLYGON);
             // set Intersects
-            List<QName> operands4Intersects = new ArrayList<QName>(3);
-            operands4Intersects.add(GMLConstants.QN_POINT);
-            operands4Intersects.add(GMLConstants.QN_LINESTRING);
-            operands4Intersects.add(GMLConstants.QN_POLYGON);
-            spatialOperators.put(SpatialOperator.Intersects, operands4Intersects);
+            ops.add(SpatialOperator.Intersects, GMLConstants.QN_POINT);
+            ops.add(SpatialOperator.Intersects, GMLConstants.QN_LINESTRING);
+            ops.add(SpatialOperator.Intersects, GMLConstants.QN_POLYGON);
             // set Overlaps
-            List<QName> operands4Overlaps = new ArrayList<QName>(3);
-            operands4Overlaps.add(GMLConstants.QN_POINT);
-            operands4Overlaps.add(GMLConstants.QN_LINESTRING);
-            operands4Overlaps.add(GMLConstants.QN_POLYGON);
-            spatialOperators.put(SpatialOperator.Overlaps, operands4Overlaps);
+            ops.add(SpatialOperator.Overlaps, GMLConstants.QN_POINT);
+            ops.add(SpatialOperator.Overlaps, GMLConstants.QN_LINESTRING);
+            ops.add(SpatialOperator.Overlaps, GMLConstants.QN_POLYGON);
         }
 
-        filterCapabilities.setSpatialOperators(spatialOperators);
+        filterCapabilities.setSpatialOperators(ops);
     }
 
     /**
@@ -522,34 +496,30 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
 
         // set TemporalOperands
         List<QName> operands = new ArrayList<QName>(2);
-        operands.add(GMLConstants.QN_TIME_PERIOD);
-        operands.add(GMLConstants.QN_TIME_INSTANT);
+        if (version.equals(Sos2Constants.SERVICEVERSION)) {
+            operands.add(GMLConstants.QN_TIME_PERIOD_32);
+            operands.add(GMLConstants.QN_TIME_INSTANT_32);
+        } else if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            operands.add(GMLConstants.QN_TIME_PERIOD);
+            operands.add(GMLConstants.QN_TIME_INSTANT);
+        }
 
         filterCapabilities.setTemporalOperands(operands);
 
         // set TemporalOperators
-        Map<TimeOperator, List<QName>> temporalOperators = new EnumMap<TimeOperator, List<QName>>(TimeOperator.class);
-        // set TM_During
-        List<QName> operands4During = new ArrayList<QName>(1);
-        operands4During.add(GMLConstants.QN_TIME_PERIOD);
-        temporalOperators.put(TimeOperator.TM_During, operands4During);
-        // set TM_Equals
-        List<QName> operands4Equals = new ArrayList<QName>(1);
-        operands4Equals.add(GMLConstants.QN_TIME_INSTANT);
-        temporalOperators.put(TimeOperator.TM_Equals, operands4Equals);
-        // additional temporal operators for SOS 1.0
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            // set TM_After
-            List<QName> operands4After = new ArrayList<QName>(1);
-            operands4After.add(GMLConstants.QN_TIME_INSTANT);
-            temporalOperators.put(TimeOperator.TM_After, operands4After);
-            // set TM_Before
-            List<QName> operands4Before = new ArrayList<QName>(1);
-            operands4Before.add(GMLConstants.QN_TIME_INSTANT);
-            temporalOperators.put(TimeOperator.TM_Before, operands4Before);
+        SetMultiMap<TimeOperator, QName> ops = MultiMaps.newSetMultiMap(TimeOperator.class);
+        if (version.equals(Sos2Constants.SERVICEVERSION)) {
+            for (TimeOperator op : TimeOperator.values()) {
+                ops.add(op, GMLConstants.QN_TIME_INSTANT_32);
+                ops.add(op, GMLConstants.QN_TIME_PERIOD_32);
+            }
+        } else if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            for (TimeOperator op : TimeOperator.values()) {
+                ops.add(op, GMLConstants.QN_TIME_INSTANT);
+                ops.add(op, GMLConstants.QN_TIME_PERIOD);
+            }
         }
-
-        filterCapabilities.setTempporalOperators(temporalOperators);
+        filterCapabilities.setTempporalOperators(ops);
     }
 
     /**
@@ -763,7 +733,6 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
                                                      getCache().getMaxPhenomenonTimeForOffering(offering)));
         sosOffering.setResultTime(new TimePeriod(getCache().getMinResultTimeForOffering(offering),
                                                  getCache().getMaxResultTimeForOffering(offering)));
-
     }
 
     // if no foi contained, set allowed foitypes
@@ -799,34 +768,28 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         }
         return procedures;
     }
-    
-    private boolean isVersionSos2(GetCapabilitiesResponse response)
-	{
-		return response.getVersion().equals(Sos2Constants.SERVICEVERSION);
-	}
 
-	private boolean isContentsSectionRequested(int sections)
-	{
-		return (sections & CONTENTS) != 0;
-	}
+    private boolean isVersionSos2(GetCapabilitiesResponse response) {
+        return response.getVersion().equals(Sos2Constants.SERVICEVERSION);
+    }
 
-	private boolean isFilterCapabilitiesSectionRequested(int sections)
-	{
-		return (sections & FILTER_CAPABILITIES) != 0;
-	}
+    private boolean isContentsSectionRequested(int sections) {
+        return (sections & CONTENTS) != 0;
+    }
 
-	private boolean isOperationsMetadataSectionRequested(int sections)
-	{
-		return (sections & OPERATIONS_METADATA) != 0;
-	}
+    private boolean isFilterCapabilitiesSectionRequested(int sections) {
+        return (sections & FILTER_CAPABILITIES) != 0;
+    }
 
-	private boolean isServiceProviderSectionRequested(int sections)
-	{
-		return (sections & SERVICE_PROVIDER) != 0;
-	}
+    private boolean isOperationsMetadataSectionRequested(int sections) {
+        return (sections & OPERATIONS_METADATA) != 0;
+    }
 
-	private boolean isServiceIdentificationSectionRequested(int sections)
-	{
-		return (sections & SERVICE_IDENTIFICATION) != 0;
-	}
+    private boolean isServiceProviderSectionRequested(int sections) {
+        return (sections & SERVICE_PROVIDER) != 0;
+    }
+
+    private boolean isServiceIdentificationSectionRequested(int sections) {
+        return (sections & SERVICE_IDENTIFICATION) != 0;
+    }
 }
