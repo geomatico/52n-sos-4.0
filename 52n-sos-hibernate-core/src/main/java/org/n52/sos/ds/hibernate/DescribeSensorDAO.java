@@ -23,22 +23,23 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.AbstractDescribeSensorDAO;
+import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
+import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateProcedureUtilities;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.response.DescribeSensorResponse;
@@ -99,21 +100,15 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
        
     }
 
-    private Collection<String> getFeatureOfInterestIDsForProcedure(String procedureIdentifier, String version,
+    @SuppressWarnings("unchecked")
+    private Collection<String> getFeatureOfInterestIDsForProcedure(String procedure, String version,
                                                                    Session session) throws OwsExceptionReport {
-        HibernateQueryObject queryObject = new HibernateQueryObject();
-        Map<String, String> aliases = new HashMap<String, String>(3);
-        // procedures
-        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, null);
-        queryObject.setAliases(aliases);
-        List<String> list = new ArrayList<String>(1);
-        list.add(procedureIdentifier);
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
-                HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), list));
+        Criteria c = session.createCriteria(Observation.class);
+        c.createCriteria(Observation.PROCEDURE).add(Restrictions.eq(Procedure.IDENTIFIER, procedure));
+        c.createCriteria(Observation.FEATURE_OF_INTEREST)
+                .setProjection(Projections.distinct(Projections.property(FeatureOfInterest.IDENTIFIER)));
         // FIXME: checks for generated IDs and remove them for SOS 2.0
-        return
-                SosHelper.getFeatureIDs(
-                        HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(queryObject, session), version);
+        return SosHelper.getFeatureIDs(c.list(), version);
     }
 
     /**

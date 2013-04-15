@@ -24,16 +24,21 @@
 package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.AbstractGetFeatureOfInterestDAO;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
+import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
+import org.n52.sos.ds.hibernate.entities.ObservableProperty;
+import org.n52.sos.ds.hibernate.entities.Observation;
+import org.n52.sos.ds.hibernate.entities.Procedure;
+import org.n52.sos.ds.hibernate.util.TemporalRestrictions;
 import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.om.features.SosFeatureCollection;
@@ -99,43 +104,35 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
         }
     }
 
-    private List<String> queryFeatureIdentifiersForParameter(GetFeatureOfInterestRequest sosRequest, Session session)
+    @SuppressWarnings("unchecked")
+    private List<String> queryFeatureIdentifiersForParameter(GetFeatureOfInterestRequest req, Session session)
             throws OwsExceptionReport {
         // TODO get foi ids from foi table. Else only fois returned which
+        Criteria c = session.createCriteria(Observation.class);
+        Criteria fc = c.createCriteria(Observation.FEATURE_OF_INTEREST);
+
+        fc.setProjection(Projections.distinct(Projections.property(FeatureOfInterest.IDENTIFIER)));
+
         // relates to observations.
-        HibernateQueryObject queryObject = new HibernateQueryObject();
-        Map<String, String> aliases = new HashMap<String, String>();
-        // String obsAlias =
-        // HibernateCriteriaQueryUtilities.addObservationAliasToMap(aliases,
-        // null);
-        // featureOfInterest identifiers
-        if (sosRequest.isSetFeatureOfInterestIdentifiers()) {
-            Set<String> featureIdentifiers = checkFeatureIdentifiersForRelatedFeatures(sosRequest.getFeatureIdentifiers());
-            String foiAlias = HibernateCriteriaQueryUtilities.addFeatureOfInterestAliasToMap(aliases, null);
-            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
-                    HibernateCriteriaQueryUtilities.getIdentifierParameter(foiAlias),
-                    featureIdentifiers));
+        if (req.isSetFeatureOfInterestIdentifiers()) {
+            fc.add(Restrictions.in(FeatureOfInterest.IDENTIFIER,
+                                   checkFeatureIdentifiersForRelatedFeatures(req.getFeatureIdentifiers())));
         }
         // observableProperties
-        if (sosRequest.isSetObservableProperties()) {
-            String obsPropAlias =
-                    HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, null);
-            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
-                    HibernateCriteriaQueryUtilities.getIdentifierParameter(obsPropAlias),
-                    sosRequest.getObservedProperties()));
+        if (req.isSetObservableProperties()) {
+            c.createCriteria(Observation.OBSERVABLE_PROPERTY)
+                    .add(Restrictions.in(ObservableProperty.IDENTIFIER, req.getObservedProperties()));
         }
         // procedures
-        if (sosRequest.isSetProcedures()) {
-            String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, null);
-            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
-                    HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), sosRequest.getProcedures()));
+        if (req.isSetProcedures()) {
+            c.createCriteria(Observation.PROCEDURE)
+                    .add(Restrictions.in(Procedure.IDENTIFIER, req.getProcedures()));
         }
         // temporal filters
-        if (sosRequest.isSetTemporalFilters()) {
-            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(sosRequest
-                    .getTemporalFilters()));
+        if (req.isSetTemporalFilters()) {
+            c.add(TemporalRestrictions.filter(req.getTemporalFilters()));
         }
-        queryObject.setAliases(aliases);
-        return HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(queryObject, session);
+
+        return c.list();
     }
 }
