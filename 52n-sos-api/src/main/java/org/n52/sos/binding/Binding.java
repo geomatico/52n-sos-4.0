@@ -229,6 +229,13 @@ public abstract class Binding implements ConformanceClass {
         return false;
     }
 
+    /**
+     * @return the message encoding used as a contraint for the DCP
+     */
+    public String getEncoding() {
+        return null;
+    }
+
     protected void checkServiceOperatorKeyTypes(final AbstractServiceRequest request) throws OwsExceptionReport {
         final CompositeOwsException exceptions = new CompositeOwsException();
         for (final ServiceOperatorKeyType sokt : request.getServiceOperatorKeyType()) {

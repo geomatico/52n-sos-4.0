@@ -50,7 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PoxBinding extends Binding {
-
+    private static final String ENCODING = "pox";
     private static final Logger LOGGER = LoggerFactory.getLogger(PoxBinding.class);
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_POX_BINDING);
     private static final String URL_PATTERN = "/pox";
@@ -108,5 +108,10 @@ public class PoxBinding extends Binding {
     @Override
     public boolean checkOperationHttpPostSupported(final OperationDecoderKey k) throws HTTPException{
         return getDecoder(new XmlOperationDecoderKey(k)) != null;
+    }
+
+    @Override
+    public String getEncoding() {
+        return ENCODING;
     }
 }

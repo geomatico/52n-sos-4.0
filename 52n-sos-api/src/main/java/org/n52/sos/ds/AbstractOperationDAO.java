@@ -23,20 +23,21 @@
  */
 package org.n52.sos.ds;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.n52.sos.binding.Binding;
 import org.n52.sos.cache.ContentCache;
 import org.n52.sos.decode.OperationDecoderKey;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.ows.DCP;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SwesExtension;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.MultiMaps;
+import org.n52.sos.util.SetMultiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,7 @@ public abstract class AbstractOperationDAO implements OperationDAO {
 
     @Override
     public OWSOperation getOperationsMetadata(String service, String version) throws OwsExceptionReport {
-        Map<String, List<String>> dcp =  getDCP(new OperationDecoderKey(service, version, getOperationName()));
+        Map<String, Set<DCP>> dcp = getDCP(new OperationDecoderKey(service, version, getOperationName()));
         if (dcp == null || dcp.isEmpty()) {
             LOGGER.debug("Operation {} not available due to empty DCP map.", getOperationName());
             return null;
@@ -82,7 +83,7 @@ public abstract class AbstractOperationDAO implements OperationDAO {
         return Configurator.getInstance();
     }
 
-        /**
+    /**
      * Get the HTTP DCPs for a operation
      *
      * @param decoderKey the decoderKey
@@ -90,58 +91,36 @@ public abstract class AbstractOperationDAO implements OperationDAO {
      *
      * @throws OwsExceptionReport
      */
-    protected Map<String, List<String>> getDCP(OperationDecoderKey decoderKey) throws OwsExceptionReport {
-        List<String> httpGetUrls = new LinkedList<String>();
-        List<String> httpPostUrls = new LinkedList<String>();
-        List<String> httpPutUrls = new LinkedList<String>();
-        List<String> httpDeleteUrls = new LinkedList<String>();
+    protected Map<String, Set<DCP>> getDCP(OperationDecoderKey decoderKey) throws OwsExceptionReport {
+        SetMultiMap<String, DCP> dcps = MultiMaps.newSetMultiMap();
         String serviceURL = Configurator.getInstance().getServiceURL();
         try {
             for (Binding binding : Configurator.getInstance().getBindingRepository().getBindings().values()) {
-                // HTTP-Get
-                if (binding.checkOperationHttpGetSupported( decoderKey)) {
-                    httpGetUrls.add(serviceURL + binding.getUrlPattern() + "?");
+                String url = serviceURL + binding.getUrlPattern();
+                if (binding.checkOperationHttpGetSupported(decoderKey)) {
+                    dcps.add(SosConstants.HTTP_GET, new DCP(binding.getEncoding(), url + "?"));
                 }
-                // HTTP-Post
                 if (binding.checkOperationHttpPostSupported(decoderKey)) {
-                    httpPostUrls.add(serviceURL + binding.getUrlPattern());
+                    dcps.add(SosConstants.HTTP_POST, new DCP(binding.getEncoding(), url));
                 }
-                // HTTP-PUT
                 if (binding.checkOperationHttpPutSupported(decoderKey)) {
-                    httpPutUrls.add(serviceURL + binding.getUrlPattern());
+                    dcps.add(SosConstants.HTTP_PUT, new DCP(binding.getEncoding(), url));
                 }
-                // HTTP-DELETE
                 if (binding.checkOperationHttpDeleteSupported(decoderKey)) {
-                    httpDeleteUrls.add(serviceURL + binding.getUrlPattern());
+                    dcps.add(SosConstants.HTTP_DELETE, new DCP(binding.getEncoding(), url));
                 }
-
             }
         } catch (Exception e) {
             if (e instanceof OwsExceptionReport) {
                 throw (OwsExceptionReport) e;
             }
-
             // FIXME valid exception
             throw new NoApplicableCodeException().causedBy(e);
         }
 
-        Map<String, List<String>> dcp = new HashMap<String, List<String>>(4);
-        if (!httpGetUrls.isEmpty()) {
-            dcp.put(SosConstants.HTTP_GET, httpGetUrls);
-        }
-        if (!httpPostUrls.isEmpty()) {
-            dcp.put(SosConstants.HTTP_POST, httpPostUrls);
-        }
-        if (!httpPutUrls.isEmpty()) {
-            dcp.put(SosConstants.HTTP_PUT, httpPutUrls);
-        }
-        if (!httpDeleteUrls.isEmpty()) {
-            dcp.put(SosConstants.HTTP_DELETE, httpDeleteUrls);
-        }
-        return dcp;
+        return dcps;
     }
 
     protected abstract void setOperationsMetadata(OWSOperation operation, String service, String version) throws
             OwsExceptionReport;
-
 }

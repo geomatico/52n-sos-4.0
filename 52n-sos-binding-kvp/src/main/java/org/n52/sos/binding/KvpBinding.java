@@ -62,7 +62,8 @@ public class KvpBinding extends Binding {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(KvpBinding.class);
 	private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_KVP_CORE_BINDING);
-	private static final String URL_PATTERN = "/kvp";
+    private static final String URL_PATTERN = "/kvp";
+    private static final String ENCODING = "kvp";
 
 	@Override
 	public Set<String> getConformanceClasses() {
@@ -171,4 +172,9 @@ public class KvpBinding extends Binding {
 	public boolean checkOperationHttpGetSupported(final OperationDecoderKey k) throws HTTPException{
 		return getDecoder(new KvpOperationDecoderKey(k)) != null;
 	}
+
+    @Override
+    public String getEncoding() {
+        return ENCODING;
+    }
 }

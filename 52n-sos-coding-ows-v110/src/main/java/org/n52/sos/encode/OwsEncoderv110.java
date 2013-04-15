@@ -34,7 +34,7 @@ import java.util.Set;
 import net.opengis.ows.x11.AddressType;
 import net.opengis.ows.x11.AllowedValuesDocument.AllowedValues;
 import net.opengis.ows.x11.ContactType;
-import net.opengis.ows.x11.DCPDocument.DCP;
+import net.opengis.ows.x11.DCPDocument;
 import net.opengis.ows.x11.DomainType;
 import net.opengis.ows.x11.ExceptionDocument;
 import net.opengis.ows.x11.ExceptionReportDocument;
@@ -45,6 +45,7 @@ import net.opengis.ows.x11.KeywordsType;
 import net.opengis.ows.x11.OperationDocument.Operation;
 import net.opengis.ows.x11.OperationsMetadataDocument.OperationsMetadata;
 import net.opengis.ows.x11.RangeType;
+import net.opengis.ows.x11.RequestMethodType;
 import net.opengis.ows.x11.ResponsiblePartySubsetType;
 import net.opengis.ows.x11.ServiceIdentificationDocument;
 import net.opengis.ows.x11.ServiceIdentificationDocument.ServiceIdentification;
@@ -59,6 +60,8 @@ import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.OwsExceptionCode;
 import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
+import org.n52.sos.ogc.ows.CompositeOwsException;
+import org.n52.sos.ogc.ows.DCP;
 import org.n52.sos.ogc.ows.IOWSParameterValue;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
@@ -88,6 +91,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
                                                                                             SosServiceProvider.class,
                                                                                             OWSOperationsMetadata.class,
                                                                                             OwsExceptionReport.class);
+    public static final String ENCODING_CONTRAINT = "encoding";
     private boolean includeStackTraceInExceptionReport = false;
 
     public OwsEncoderv110() {
@@ -350,16 +354,28 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
      * @param dcp The operation.
      * @param get Add GET.
      */
-    private void encodeDCP(DCP dcp, Map<String, ? extends Collection<String>> supportedDcp) {
+    private void encodeDCP(DCPDocument.DCP dcp, Map<String, ? extends Collection<DCP>> supportedDcp) {
         HTTP http = dcp.addNewHTTP();
         if (supportedDcp.containsKey(SosConstants.HTTP_GET)) {
-            for (String dcpGet : supportedDcp.get(SosConstants.HTTP_GET)) {
-                http.addNewGet().setHref(dcpGet);
+            for (DCP dcpGet : supportedDcp.get(SosConstants.HTTP_GET)) {
+                RequestMethodType get = http.addNewGet();
+                if (dcpGet.getEncoding() != null) {
+                    DomainType contraint = get.addNewConstraint();
+                    contraint.setName(ENCODING_CONTRAINT);
+                    contraint.addNewAllowedValues().addNewValue().setStringValue(dcpGet.getEncoding());
+                }
+                get.setHref(dcpGet.getUrl());
             }
         }
         if (supportedDcp.containsKey(SosConstants.HTTP_POST)) {
-            for (String dcpPost : supportedDcp.get(SosConstants.HTTP_POST)) {
-                http.addNewPost().setHref(dcpPost);
+            for (DCP dcpPost : supportedDcp.get(SosConstants.HTTP_POST)) {
+                RequestMethodType post = http.addNewPost();
+                if (dcpPost.getEncoding() != null) {
+                    DomainType contraint = post.addNewConstraint();
+                    contraint.setName(ENCODING_CONTRAINT);
+                    contraint.addNewAllowedValues().addNewValue().setStringValue(dcpPost.getEncoding());
+                }
+                post.setHref(dcpPost.getUrl());
             }
         }
         // TODO add if ows supports more than get and post

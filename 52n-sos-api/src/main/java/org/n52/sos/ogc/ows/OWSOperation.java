@@ -25,14 +25,14 @@ package org.n52.sos.ogc.ows;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.n52.sos.util.MinMax;
 
@@ -51,7 +51,7 @@ public class OWSOperation implements Comparable<OWSOperation> {
     /**
      * Supported DCPs
      */
-    private SortedMap<String, SortedSet<String>> dcp = new TreeMap<String, SortedSet<String>>();
+    private SortedMap<String, Set<DCP>> dcp = new TreeMap<String, Set<DCP>>();
 
     /**
      * Map with names and allowed values for the parameter.
@@ -82,7 +82,7 @@ public class OWSOperation implements Comparable<OWSOperation> {
      * 
      * @return DCP map
      */
-    public SortedMap<String, SortedSet<String>> getDcp() {
+    public SortedMap<String, Set<DCP>> getDcp() {
         return Collections.unmodifiableSortedMap(this.dcp);
     }
 
@@ -92,9 +92,9 @@ public class OWSOperation implements Comparable<OWSOperation> {
      * @param dcp
      *            DCP map
      */
-    public void setDcp(Map<String, List<String>> dcp) {
+    public void setDcp(Map<String, ? extends Collection<DCP>> dcp) {
         this.dcp.clear();
-        for (Entry<String, List<String>> e : dcp.entrySet()) {
+        for (Entry<String, ? extends Collection<DCP>> e : dcp.entrySet()) {
             addDcp(e.getKey(), e.getValue());
         }
     }
@@ -107,8 +107,8 @@ public class OWSOperation implements Comparable<OWSOperation> {
      * @param values
      *            DCP values
      */
-    public void addDcp(String operation, Collection<String> values) {
-        this.dcp.put(operation, new TreeSet<String>(values));
+    public void addDcp(String operation, Collection<DCP> values) {
+        this.dcp.put(operation, new HashSet<DCP>(values));
     }
 
     /**

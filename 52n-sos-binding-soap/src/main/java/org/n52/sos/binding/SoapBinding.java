@@ -57,7 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SoapBinding extends Binding {
-
+    private static final String ENCODING = "soap";
 	private static final Logger LOGGER = LoggerFactory.getLogger(SoapBinding.class);
 	private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_SOAP_BINDING);
 	private static final String urlPattern = "/soap";
@@ -192,4 +192,9 @@ public class SoapBinding extends Binding {
 	public Set<String> getConformanceClasses() {
 		return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
 	}
+
+    @Override
+    public String getEncoding() {
+        return ENCODING;
+    }
 }
