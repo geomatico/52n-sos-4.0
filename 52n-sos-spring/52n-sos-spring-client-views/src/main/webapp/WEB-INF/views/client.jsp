@@ -160,6 +160,27 @@
 		}
 
 		function onSend() {
+            function showResponse(data) {
+                var xml = xml2string(data);
+                var $response = $("#response");
+                $response.fadeOut("fast");
+                $response.children().remove();
+                $("<h3>")
+                    .text("Response")
+                    .appendTo($response);
+                $("<pre>")
+                    .addClass("prettyprint")
+                    .addClass("linenums")
+                    .text(vkbeautify.xml(xml, 2))
+                    .appendTo($response);
+                prettyPrint();
+                $response.fadeIn("fast");
+                $("html, body").animate({
+                    scrollTop: $("#response").offset().top
+                }, "slow");
+
+            }
+
 			var request = $.trim(editor.getValue());
 			if (sendInline()) {
 				$send.attr("disabled", true);
@@ -170,26 +191,13 @@
 					"data": request
 				}).fail(function(error) {
 					showError("Request failed: " + error.status + " " + error.statusText);
+                    if(error.responseText && error.responseText.indexOf("OwsExceptionReport") < 0) {
+                        showResponse(error.responseText);
+                    }
 					$send.attr("disabled", false);
 				}).done(function(data) {
-					var xml = xml2string(data);
-					var $response = $("#response");
-					$response.fadeOut("fast");
-					$response.children().remove();
-					$("<h3>")
-						.text("Response")
-						.appendTo($response);
-					$("<pre>")
-						.addClass("prettyprint")
-						.addClass("linenums")
-						.text(vkbeautify.xml(xml, 2))
-						.appendTo($response);
-					prettyPrint();
-					$response.fadeIn("fast");
-					$("html, body").animate({
-						scrollTop: $("#response").offset().top
-					}, "slow");
-					$send.removeAttr("disabled");
+					showResponse(data);
+                    $send.removeAttr("disabled");
 				});
 			} else {
 				if (request) {
