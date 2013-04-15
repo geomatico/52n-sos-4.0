@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<!-- Remove the parent in the case of 52North repos are not available -->
 	<parent>
 		<groupId>org.n52</groupId>
@@ -33,6 +32,7 @@
 		<module>52n-sos-hibernate-dialect</module>
 		<module>52n-sos-hibernate-feature</module>
 		<module>52n-sos-hibernate-core</module>
+		<module>52n-sos-hibernate-h2</module>
 		<module>52n-sos-cache</module>
 		<module>52n-sos-core-v20</module>
 		<module>52n-sos-core-gc-dao</module>
@@ -42,7 +42,7 @@
 		<module>52n-sos-profile</module>
 		<module>52n-sos-spring</module>
 		<module>52n-sos-webapp</module>
-	</modules>
+  </modules>
 	<licenses>
 		<license>
 			<name>GPLv2</name>
@@ -159,7 +159,13 @@
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-hibernate-dialect</artifactId>
 				<version>${sos.version}</version>
-			</dependency>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>52n-sos-hibernate-h2</artifactId>
+                <version>${sos.version}</version>
+                <scope>test</scope>
+            </dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-hibernate-core</artifactId>
@@ -378,10 +384,19 @@
 					<exclusion>
 						<groupId>org.slf4j</groupId>
 						<artifactId>slf4j-api</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>c3p0</groupId>
+                        <artifactId>c3p0</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>c3p0</groupId>
+                <artifactId>c3p0</artifactId>
+                <version>0.9.1.2</version>
+            </dependency>
+            <dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-spatial</artifactId>
 				<version>${hibernate.spatial.version}</version>
@@ -564,7 +579,17 @@
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-binding-rest-xml-binding</artifactId>
 				<version>${rest-binding.version}</version>
-			</dependency>
+            </dependency>
+            <dependency>
+                <groupId>org.opengeo</groupId>
+                <artifactId>geodb</artifactId>
+                <version>0.7</version>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>1.3.171</version>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 	<build>
@@ -839,12 +864,20 @@
 			<id>Hibernate Spatial repo</id>
 			<url>http://www.hibernatespatial.org/repository</url>
 			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-	<profiles>
-		<profile>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>opengeo</id>
+            <name>OpenGeo repository</name>
+            <url>http://repo.opengeo.org</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <profiles>
+        <profile>
 			<id>test</id>
 			<modules>
 				<module>52n-sos-test</module>
