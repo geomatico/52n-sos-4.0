@@ -285,11 +285,9 @@ public class HibernateCriteriaTransactionalUtilities {
             session.save(feature);
             session.flush();
         } else if (feature.getUrl() != null && !feature.getUrl().isEmpty() && url != null && !url.isEmpty()) {
-            if (!url.isEmpty()) {
-                feature.setUrl(url);
-                session.saveOrUpdate(feature);
-                session.flush();
-            }
+            feature.setUrl(url);
+            session.saveOrUpdate(feature);
+            session.flush();
         }
         return feature;
     }

@@ -30,9 +30,8 @@ import javax.servlet.http.HttpSession;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingDefinition;
-import org.n52.sos.config.SettingsManager;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
 import org.slf4j.Logger;
@@ -51,7 +50,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @RequestMapping(ControllerConstants.Paths.INSTALL_LOAD_CONFIGURATION)
 public class InstallLoadSettingsController extends AbstractController {
 
-    private static final Logger log = LoggerFactory.getLogger(InstallLoadSettingsController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(InstallLoadSettingsController.class);
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -65,7 +64,7 @@ public class InstallLoadSettingsController extends AbstractController {
             String value = settings.getString(key);
             SettingDefinition<?, ?> def = getSettingsManager().getDefinitionByKey(key);
             if (def == null) {
-                log.warn("No definition for setting with key {}", key);
+                LOG.warn("No definition for setting with key {}", key);
                 continue;
             }
             c.setSetting(def, getSettingsManager().getSettingFactory().newSettingValue(def, value));

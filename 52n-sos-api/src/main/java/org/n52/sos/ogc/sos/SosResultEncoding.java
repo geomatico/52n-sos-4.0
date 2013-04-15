@@ -31,16 +31,9 @@ import org.n52.sos.exception.ows.concrete.XmlDecodingException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.util.CodingHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SosResultEncoding {
     
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SosResultEncoding.class);
-
     private String xml;
 
     private SosSweAbstractEncoding encoding;

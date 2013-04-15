@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SingletonServiceLoader<T> implements Producer<T> {
 
-    private static final Logger log = LoggerFactory.getLogger(SingletonServiceLoader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SingletonServiceLoader.class);
     private final Class<? extends T> clazz;
     private final boolean failIfNotFound;
     private final ServiceLoader<? extends T> serviceLoader;
@@ -68,7 +68,7 @@ public class SingletonServiceLoader<T> implements Producer<T> {
                 try {
                     implementation = iter.next();
                 } catch (ServiceConfigurationError sce) {
-                    log.warn(String.format("Implementation for %s could be loaded!", clazz), sce);
+                    LOG.warn(String.format("Implementation for %s could be loaded!", clazz), sce);
                 }
             }
             if (implementation == null && defaultImplementation != null) {
@@ -79,11 +79,11 @@ public class SingletonServiceLoader<T> implements Producer<T> {
                 if (failIfNotFound) {
                     throw new ConfigurationException(message);
                 } else {
-                    log.warn(message);
+                    LOG.warn(message);
                 }
             } else {
                 processImplementation(implementation);
-                log.info("Implementation for {} successfully loaded: {}", clazz, implementation);
+                LOG.info("Implementation for {} successfully loaded: {}", clazz, implementation);
             }
         }
 

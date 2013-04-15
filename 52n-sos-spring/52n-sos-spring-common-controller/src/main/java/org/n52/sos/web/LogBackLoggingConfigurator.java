@@ -86,7 +86,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
     private static final String LOG_FILE_NOT_FOUND_ERROR_MESSAGE = "Log file could not be found";
     private static final int WRITE_DELAY = 4000;
     private static final Pattern PROPERTY_MATCHER = Pattern.compile("\\$\\{([^}]+)\\}");
-    private static final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
     private Document cache = null;
     private File configuration = null;
     private DelayedWriteThread delayedWriteThread = null;
@@ -120,8 +120,8 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
         }
 
         void write() {
-            lock.writeLock().lock();
-            log.debug("Writing LogBack configuration file!");
+            LOCK.writeLock().lock();
+            LOG.debug("Writing LogBack configuration file!");
             try {
                 FileOutputStream out = null;
                 try {
@@ -131,20 +131,20 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                     OutputStreamWriter writer = new OutputStreamWriter(out);
                     trans.transform(new DOMSource(doc), new StreamResult(writer));
                 } catch (TransformerException ex) {
-                    log.error(UNWRITABLE_ERROR_MESSAGE, ex);
+                    LOG.error(UNWRITABLE_ERROR_MESSAGE, ex);
                 } catch (IOException ex) {
-                    log.error(UNWRITABLE_ERROR_MESSAGE, ex);
+                    LOG.error(UNWRITABLE_ERROR_MESSAGE, ex);
                 } finally {
                     if (out != null) {
                         try {
                             out.close();
                         } catch (IOException e) {
-                            log.error(UNWRITABLE_ERROR_MESSAGE, e);
+                            LOG.error(UNWRITABLE_ERROR_MESSAGE, e);
                         }
                     }
                 }
             } finally {
-                lock.writeLock().unlock();
+                LOCK.writeLock().unlock();
             }
         }
     }
@@ -166,7 +166,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
         try {
             return new File(url.toURI());
         } catch (Exception ex) {
-            log.error(NOT_FOUND_ERROR_MESSAGE, ex);
+            LOG.error(NOT_FOUND_ERROR_MESSAGE, ex);
             throw new ConfigurationException(NOT_FOUND_ERROR_MESSAGE, ex);
         }
     }
@@ -174,14 +174,14 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
     public LogBackLoggingConfigurator(File file) throws ConfigurationException {
         configuration = file;
         if (configuration == null || !configuration.exists()) {
-            log.error(NOT_FOUND_ERROR_MESSAGE);
+            LOG.error(NOT_FOUND_ERROR_MESSAGE);
             throw new ConfigurationException(NOT_FOUND_ERROR_MESSAGE);
         }
-        log.info("Using Logback Config File: {}", configuration.getAbsolutePath());
+        LOG.info("Using Logback Config File: {}", configuration.getAbsolutePath());
     }
 
     private Document read() throws ConfigurationException {
-        lock.readLock().lock();
+        LOCK.readLock().lock();
         try {
             try {
                 if (cache == null) {
@@ -189,22 +189,22 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                 }
                 return cache;
             } catch (ParserConfigurationException ex) {
-                log.error(UNPARSABLE_ERROR_MESSAGE, ex);
+                LOG.error(UNPARSABLE_ERROR_MESSAGE, ex);
                 throw new ConfigurationException(UNPARSABLE_ERROR_MESSAGE, ex);
             } catch (SAXException ex) {
-                log.error(UNPARSABLE_ERROR_MESSAGE, ex);
+                LOG.error(UNPARSABLE_ERROR_MESSAGE, ex);
                 throw new ConfigurationException(UNPARSABLE_ERROR_MESSAGE, ex);
             } catch (IOException ex) {
-                log.error(UNPARSABLE_ERROR_MESSAGE, ex);
+                LOG.error(UNPARSABLE_ERROR_MESSAGE, ex);
                 throw new ConfigurationException(UNPARSABLE_ERROR_MESSAGE, ex);
             }
         } finally {
-            lock.readLock().unlock();
+            LOCK.readLock().unlock();
         }
     }
 
     private void write() {
-        lock.writeLock().lock();
+        LOCK.writeLock().lock();
         try {
             /* delay the actual writing to aggregate changes to one IO task */
             if (this.delayedWriteThread != null) {
@@ -214,14 +214,14 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
             this.delayedWriteThread = new DelayedWriteThread(this.cache);
             this.delayedWriteThread.start();
         } finally {
-            lock.writeLock().unlock();
+            LOCK.writeLock().unlock();
         }
 
     }
 
     @Override
     public boolean setMaxHistory(int days) {
-        lock.writeLock().lock();
+        LOCK.writeLock().lock();
         try {
             Document doc = read();
             List<Element> appender = getChildren(doc.getDocumentElement(), EN_APPENDER);
@@ -235,24 +235,24 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                     } catch (NumberFormatException e) {
                     }
                     if (before != days) {
-                        log.debug("Setting max logging history to {} days.", days);
+                        LOG.debug("Setting max logging history to {} days.", days);
                         maxHistory.setTextContent(String.valueOf(days));
                     }
                 }
             }
             write();
         } catch (ConfigurationException e) {
-            log.error(UNPARSABLE_ERROR_MESSAGE, e);
+            LOG.error(UNPARSABLE_ERROR_MESSAGE, e);
             return false;
         } finally {
-            lock.writeLock().unlock();
+            LOCK.writeLock().unlock();
         }
         return true;
     }
 
     @Override
     public Set<Appender> getEnabledAppender() {
-        lock.readLock().lock();
+        LOCK.readLock().lock();
         Set<Appender> appender = new HashSet<Appender>(Appender.values().length);
         try {
             List<Element> refs = getChildren(getRoot(read().getDocumentElement()), EN_APPENDER_REF);
@@ -260,27 +260,27 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                 appender.add(Appender.byName(getAttribute(ref, AN_REF).getValue()));
             }
         } catch (ConfigurationException e) {
-            log.error(UNPARSABLE_ERROR_MESSAGE, e);
+            LOG.error(UNPARSABLE_ERROR_MESSAGE, e);
             return Collections.emptySet();
         } finally {
-            lock.readLock().unlock();
+            LOCK.readLock().unlock();
         }
         return appender;
     }
 
     @Override
     public boolean isEnabled(Appender a) {
-        lock.readLock().lock();
+        LOCK.readLock().lock();
         try {
             return getEnabledAppender().contains(a);
         } finally {
-            lock.readLock().unlock();
+            LOCK.readLock().unlock();
         }
     }
 
     @Override
     public boolean enableAppender(Appender a, boolean enable) {
-        lock.writeLock().lock();
+        LOCK.writeLock().lock();
         try {
             Document doc = read();
             Element root = getRoot(doc.getDocumentElement());
@@ -293,22 +293,22 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                 }
             }
             if (enable && refNode == null) {
-                log.debug("Enabling {} logging appender", a.getName());
+                LOG.debug("Enabling {} logging appender", a.getName());
                 refNode = doc.createElement(EN_APPENDER_REF);
                 refNode.setAttribute(AN_REF, a.getName());
                 root.appendChild(refNode);
                 write();
             } else if (!enable && refNode != null) {
-                log.debug("Disabling {} logging appender", a.getName());
+                LOG.debug("Disabling {} logging appender", a.getName());
                 root.removeChild(refNode);
                 write();
             }
             return true;
         } catch (ConfigurationException e) {
-            log.error(UNPARSABLE_ERROR_MESSAGE, e);
+            LOG.error(UNPARSABLE_ERROR_MESSAGE, e);
             return false;
         } finally {
-            lock.writeLock().unlock();
+            LOCK.writeLock().unlock();
         }
     }
 
@@ -339,7 +339,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
 
     @Override
     public boolean setRootLogLevel(Level level) {
-        lock.writeLock().lock();
+        LOCK.writeLock().lock();
         try {
             try {
                 Document doc = read();
@@ -348,16 +348,16 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                 if (Level.valueOf(currentLevel) == level) {
                     return true;
                 }
-                log.debug("Setting root logging level to {}", level);
+                LOG.debug("Setting root logging level to {}", level);
                 root.setAttribute(AN_LEVEL, level.toString());
                 write();
             } catch (ConfigurationException e) {
-                log.error(UNPARSABLE_ERROR_MESSAGE, e);
+                LOG.error(UNPARSABLE_ERROR_MESSAGE, e);
                 return false;
             }
             return true;
         } finally {
-            lock.writeLock().unlock();
+            LOCK.writeLock().unlock();
         }
     }
 
@@ -374,7 +374,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
 
     @Override
     public boolean setLoggerLevel(String id, Level level) {
-        lock.writeLock().lock();
+        LOCK.writeLock().lock();
         try {
             if (id.equals(Logger.ROOT_LOGGER_NAME)) {
                 return setRootLogLevel(level);
@@ -389,7 +389,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                 }
             }
             if (l == null) {
-                log.debug("Setting logging level of {} to {}.", id, level);
+                LOG.debug("Setting logging level of {} to {}.", id, level);
                 l = doc.createElement(EN_LOGGER);
                 l.setAttribute(AN_NAME, id);
                 l.setAttribute(AN_LEVEL, level.name());
@@ -398,23 +398,23 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
             } else {
                 String oldLevel = l.getAttribute(AN_LEVEL);
                 if (!oldLevel.equals(level.name())) {
-                    log.debug("Setting logging level of {} to {}.", id, level);
+                    LOG.debug("Setting logging level of {} to {}.", id, level);
                     l.setAttribute(AN_LEVEL, level.name());
                     write();
                 }
             }
             return true;
         } catch (ConfigurationException e) {
-            log.error(UNPARSABLE_ERROR_MESSAGE, e);
+            LOG.error(UNPARSABLE_ERROR_MESSAGE, e);
             return false;
         } finally {
-            lock.writeLock().unlock();
+            LOCK.writeLock().unlock();
         }
     }
     
     @Override
     public boolean setLoggerLevel(Map<String, Level> levels) {
-        lock.writeLock().lock();
+        LOCK.writeLock().lock();
         try {
             Document doc = read();
             Element conf = doc.getDocumentElement();
@@ -428,7 +428,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
             /* remove obsolete loggers */
             for (String logger : currentLoggers.keySet()) {
                 if (levels.get(logger) == null) {
-                    log.debug("Removing logger {}", logger);
+                    LOG.debug("Removing logger {}", logger);
                     conf.removeChild(currentLoggers.get(logger));
                     write = true;
                 }
@@ -440,7 +440,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                 } else {
                     Element l = currentLoggers.get(logger);
                     if (l == null) {
-                        log.debug("Setting logging level of {} to {}.", logger, levels.get(logger));
+                        LOG.debug("Setting logging level of {} to {}.", logger, levels.get(logger));
                         l = doc.createElement(EN_LOGGER);
                         l.setAttribute(AN_NAME, logger);
                         l.setAttribute(AN_LEVEL, levels.get(logger).name());
@@ -449,7 +449,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                     } else {
                         String oldLevel = l.getAttribute(AN_LEVEL);
                         if (!oldLevel.equals(levels.get(logger).name())) {
-                            log.debug("Setting logging level of {} to {}.", logger, levels.get(logger));
+                            LOG.debug("Setting logging level of {} to {}.", logger, levels.get(logger));
                             l.setAttribute(AN_LEVEL, levels.get(logger).name());
                             write = true;
                         }
@@ -461,16 +461,16 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
             }
             return true;
         } catch (ConfigurationException e) {
-            log.error(UNPARSABLE_ERROR_MESSAGE, e);
+            LOG.error(UNPARSABLE_ERROR_MESSAGE, e);
             return false;
         } finally {
-            lock.writeLock().unlock();
+            LOCK.writeLock().unlock();
         }
     }
 
     @Override
     public Level getRootLogLevel() {
-        lock.readLock().lock();
+        LOCK.readLock().lock();
         try {
             Level level = null;
             try {
@@ -479,17 +479,17 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                 String currentLevel = getAttribute(root, AN_LEVEL).getValue();
                 level = Level.valueOf(currentLevel);
             } catch (ConfigurationException e) {
-                log.error(UNPARSABLE_ERROR_MESSAGE, e);
+                LOG.error(UNPARSABLE_ERROR_MESSAGE, e);
             }
             return level;
         } finally {
-            lock.readLock().unlock();
+            LOCK.readLock().unlock();
         }
     }
 
     @Override
     public Map<String, Level> getLoggerLevels() {
-        lock.readLock().lock();
+        LOCK.readLock().lock();
         try {
             Map<String, Level> levels = new HashMap<String, Level>();
             try {
@@ -499,30 +499,30 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                             Level.valueOf(getAttribute(logger, AN_LEVEL).getValue()));
                 }
             } catch (ConfigurationException e) {
-                log.error(UNPARSABLE_ERROR_MESSAGE, e);
+                LOG.error(UNPARSABLE_ERROR_MESSAGE, e);
             }
             return levels;
         } finally {
-            lock.readLock().unlock();
+            LOCK.readLock().unlock();
         }
     }
 
     @Override
     public Level getLoggerLevel(String id) {
-        lock.readLock().lock();
+        LOCK.readLock().lock();
         try {
             if (id.equals(Logger.ROOT_LOGGER_NAME)) {
                 return getRootLogLevel();
             }
             return getLoggerLevels().get(id);
         } finally {
-            lock.readLock().unlock();
+            LOCK.readLock().unlock();
         }
     }
 
     @Override
     public int getMaxHistory() {
-        lock.readLock().lock();
+        LOCK.readLock().lock();
         try {
             int max = -1;
             try {
@@ -539,17 +539,17 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                     }
                 }
             } catch (ConfigurationException e) {
-                log.error(UNPARSABLE_ERROR_MESSAGE, e);
+                LOG.error(UNPARSABLE_ERROR_MESSAGE, e);
             }
             return max;
         } finally {
-            lock.readLock().unlock();
+            LOCK.readLock().unlock();
         }
     }
 
     @Override
     public String getMaxFileSize() {
-        lock.readLock().lock();
+        LOCK.readLock().lock();
         try {
             String maxFileSize = null;
             try {
@@ -564,11 +564,11 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                     }
                 }
             } catch (ConfigurationException e) {
-                log.error(UNPARSABLE_ERROR_MESSAGE, e);
+                LOG.error(UNPARSABLE_ERROR_MESSAGE, e);
             }
             return maxFileSize;
         } finally {
-            lock.readLock().unlock();
+            LOCK.readLock().unlock();
         }
     }
 
@@ -577,7 +577,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
         if (size == null) {
             return false;
         }
-        lock.writeLock().lock();
+        LOCK.writeLock().lock();
         try {
             Document doc = read();
             List<Element> appender = getChildren(doc.getDocumentElement(), EN_APPENDER);
@@ -589,17 +589,17 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                                     EN_MAX_FILE_SIZE);
                     String before = maxFileSize.getTextContent().trim();
                     if (!before.equals(size.trim())) {
-                        log.debug("Setting max logging file size to {}.", size);
+                        LOG.debug("Setting max logging file size to {}.", size);
                         maxFileSize.setTextContent(size.trim());
                     }
                 }
             }
             write();
         } catch (ConfigurationException e) {
-            log.error(UNPARSABLE_ERROR_MESSAGE, e);
+            LOG.error(UNPARSABLE_ERROR_MESSAGE, e);
             return false;
         } finally {
-            lock.writeLock().unlock();
+            LOCK.writeLock().unlock();
         }
         return true;
     }
@@ -611,7 +611,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
             try {
                 return FileIOHelper.tail(f, maxSize);
             } catch (IOException ex) {
-                log.error("Could not read log file", ex);
+                LOG.error("Could not read log file", ex);
             }
         }
         return Collections.emptyList();
@@ -619,7 +619,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
 
     private File getLogFile1() {
         String file = null;
-        lock.readLock().lock();
+        LOCK.readLock().lock();
         try {
             Element doc = read().getDocumentElement();
             for (Element a : getChildren(doc, EN_APPENDER)) {
@@ -634,7 +634,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
             }
 
             if (file == null) {
-                log.error(LOG_FILE_NOT_FOUND_ERROR_MESSAGE);
+                LOG.error(LOG_FILE_NOT_FOUND_ERROR_MESSAGE);
                 return null;
             }
 
@@ -647,24 +647,24 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                 }
                     
                 if (value == null) {
-                    log.error("Could not replace property {} in file name string {}", key, file);
+                    LOG.error("Could not replace property {} in file name string {}", key, file);
                     return null;
                 }
                 file = file.replace(matcher.group(), value);
                 matcher = PROPERTY_MATCHER.matcher(file);
             }
-            log.debug("Logfile: {}", file);
+            LOG.debug("Logfile: {}", file);
             File f = new File(file);
             if (!f.exists()) {
-                log.error("Can not find log file {}", f.getAbsolutePath());
+                LOG.error("Can not find log file {}", f.getAbsolutePath());
                 return null;
             }
             return f;
         } catch (ConfigurationException ex) {
-            log.error(UNPARSABLE_ERROR_MESSAGE, ex);
+            LOG.error(UNPARSABLE_ERROR_MESSAGE, ex);
             return null;
         } finally {
-            lock.readLock().unlock();
+            LOCK.readLock().unlock();
         }
     }
 
@@ -675,7 +675,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
             try {
                 return FileIOHelper.loadInputStreamFromFile(f);
             } catch (OwsExceptionReport ex) {
-                log.error("Could not read log file", ex);
+                LOG.error("Could not read log file", ex);
             }
         }
         return null;

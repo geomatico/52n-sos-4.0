@@ -61,7 +61,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @RequestMapping(ControllerConstants.Paths.INSTALL_FINISH)
 public class InstallFinishController extends AbstractProcessingInstallationController {
-    private static final Logger log = LoggerFactory.getLogger(InstallFinishController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(InstallFinishController.class);
     @Autowired
     private UserService userService;
 
@@ -151,7 +151,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
     protected void instantiateConfigurator(Properties properties, InstallationConfiguration c) throws
             InstallationSettingsError {
         if (Configurator.getInstance() == null) {
-            log.info("Instantiating Configurator...");
+            LOG.info("Instantiating Configurator...");
             try {
                 Configurator.createInstance(properties, getBasePath());
             } catch (ConfigurationException ex) {
@@ -159,7 +159,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
                         .getMessage()), ex);
             }
         } else {
-            log.error("Configurator seems to be already instantiated...");
+            LOG.error("Configurator seems to be already instantiated...");
         }
     }
 
@@ -182,7 +182,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
                                       f.print(new DateTime()));
         } catch (ConfigurationException ex) {
             /* don't fail on this one */
-            log.error("Error saveing installation date", ex);
+            LOG.error("Error saveing installation date", ex);
         }
     }
 
@@ -190,7 +190,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         boolean createTables = c.getBooleanDatabaseSetting(InstallConstants.CREATE_TABLES_PARAMETER);
         if (createTables) {
             try {
-                log.debug("Creating tables");
+                LOG.debug("Creating tables");
                 SQLHelper.executeSQLFile(con, new File(getContext()
                         .getRealPath(ControllerConstants.CREATE_DATAMODEL_SQL_FILE)));
             } catch (Exception e) {
@@ -205,7 +205,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         Boolean createTestData = (Boolean) c.getDatabaseSetting(InstallConstants.CREATE_TEST_DATA_PARAMETER);
         if (createTestData.booleanValue()) {
             try {
-                log.debug("Inserting test data");
+                LOG.debug("Inserting test data");
                 SQLHelper.executeSQLFile(con,
                                         new File(getContext().getRealPath(
                         ControllerConstants.INSERT_TEST_DATA_SQL_FILE)));
@@ -228,7 +228,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
 //                      getMetaDataHandler().get(MetaDataHandler.Metadata.VERSION));
 //            } catch (ConfigurationException ex) {
 //                /* don't fail on this one... */
-//                log.error("Could not load SOS version", ex);
+//                LOG.error("Could not load SOS version", ex);
 //            }
 
         } catch (ConfigurationException e) {
@@ -285,7 +285,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         boolean overwriteTables = c.getBooleanDatabaseSetting(InstallConstants.OVERWRITE_TABLES_PARAMETER);
         if (overwriteTables) {
             try {
-                log.debug("Dropping tables");
+                LOG.debug("Dropping tables");
                 SQLHelper.executeSQLFile(con, new File(getContext()
                         .getRealPath(ControllerConstants.DROP_DATAMODEL_SQL_FILE)));
             } catch (Exception e) {

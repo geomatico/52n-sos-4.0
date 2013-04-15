@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping(ControllerConstants.Paths.INSTALL_SETTINGS)
 public class InstallSettingsController extends AbstractProcessingInstallationController {
-    private static final Logger log = LoggerFactory.getLogger(InstallSettingsController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(InstallSettingsController.class);
 
     @Override
     protected Step getStep() {
@@ -58,14 +58,14 @@ public class InstallSettingsController extends AbstractProcessingInstallationCon
     }
 
     protected void logSettings(Map<String, String> parameters) {
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("Processing parameters:\n").append("{\n");
             for (Map.Entry<String, String> e : parameters.entrySet()) {
                 sb.append("\t").append(e.getKey()).append(": ").append(e.getValue()).append("\n");
             }
             sb.append("}");
-            log.debug(sb.toString());
+            LOG.debug(sb.toString());
         }
     }
 

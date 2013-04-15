@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Tasking implements Cleanupable {
 
-	private static final Logger log = LoggerFactory.getLogger(Tasking.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Tasking.class);
 	private final ServiceLoader<ASosTasking> serviceLoader = ServiceLoader.load(ASosTasking.class);
 	private Timer taskingExecutor;
 
@@ -63,12 +63,12 @@ public class Tasking implements Cleanupable {
 					this.taskingExecutor.scheduleAtFixedRate(aSosTasking, delayCounter,
 							(aSosTasking.getExecutionIntervall() * 60000));
 					delayCounter += 60000;
-					log.debug("The task '{}' is started!", aSosTasking.getName());
+					LOG.debug("The task '{}' is started!", aSosTasking.getName());
 				} catch (Exception e) {
-					log.error("Error while starting task", e);
+					LOG.error("Error while starting task", e);
 				}
 			}
-			log.info("\n******\n Task(s) loaded and started successfully!\n******\n");
+			LOG.info("\n******\n Task(s) loaded and started successfully!\n******\n");
 		}
 	}
 }

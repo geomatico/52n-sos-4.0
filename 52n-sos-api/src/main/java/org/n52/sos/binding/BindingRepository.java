@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class BindingRepository extends AbstractConfiguringServiceLoaderRepository<Binding> {
-	private static final Logger log = LoggerFactory.getLogger(BindingRepository.class);
+	private static final Logger LOG = LoggerFactory.getLogger(BindingRepository.class);
     private final Map<String, Activatable<Binding>> bindings = new HashMap<String, Activatable<Binding>>(0);
 
     /**
@@ -71,7 +71,7 @@ public class BindingRepository extends AbstractConfiguringServiceLoaderRepositor
             exceptionText.append("No Binding implementation could be loaded! ");
             exceptionText.append("If the SOS is not used as webapp, this has no effect! ");
             exceptionText.append("Else add a Binding implementation!");
-            log.warn(exceptionText.toString());
+            LOG.warn(exceptionText.toString());
         }
     }
 

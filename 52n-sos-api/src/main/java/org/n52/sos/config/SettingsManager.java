@@ -64,7 +64,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class SettingsManager {
 
-    private static final Logger log = LoggerFactory.getLogger(SettingsManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SettingsManager.class);
     private static ReentrantLock creationLock = new ReentrantLock();
     private static SettingsManager instance;
 
@@ -103,7 +103,7 @@ public abstract class SettingsManager {
             try {
                 return i.next();
             } catch (ServiceConfigurationError e) {
-                log.error("Could not instantiate SettingsManager", e);
+                LOG.error("Could not instantiate SettingsManager", e);
             }
         }
         throw new ConfigurationException("No SettingsManager implementation loaded");

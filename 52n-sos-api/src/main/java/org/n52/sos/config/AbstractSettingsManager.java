@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  */
 public abstract class AbstractSettingsManager extends SettingsManager {
-    private static final Logger log = LoggerFactory.getLogger(AbstractSettingsManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractSettingsManager.class);
     private final SettingDefinitionProviderRepository settingDefinitionRepository;
     private final SetMultiMap<String, ConfigurableObject> configurableObjects =
                                                           new HashSetMultiMap<String, ConfigurableObject>();
@@ -166,13 +166,13 @@ public abstract class AbstractSettingsManager extends SettingsManager {
                     }
                 }
                 if (e != null) {
-                    log.debug("Reverting setting...");
+                    LOG.debug("Reverting setting...");
                     for (ConfigurableObject co : changed) {
                         try {
                             co.configure(oldValue.getValue());
                         } catch (ConfigurationException ce) {
                             /* there is nothing we can do... */
-                            log.error("Error reverting setting!", ce);
+                            LOG.error("Error reverting setting!", ce);
                         }
                     }
                     throw e;
@@ -198,7 +198,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         for (SettingValue<?> value : values) {
             final SettingDefinition<?, ?> definition = getSettingDefinitionRepository().getDefinition(value.getKey());
             if (definition == null) {
-                log.warn("No definition for '{}' found.", value.getKey());
+                LOG.warn("No definition for '{}' found.", value.getKey());
             } else {
                 settingsByDefinition.put(definition, value);
             }
@@ -218,7 +218,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
 
     @Override
     public void configure(Object object) throws ConfigurationException {
-        log.debug("Configuring {}", object);
+        LOG.debug("Configuring {}", object);
         Class<?> clazz = object.getClass();
         Configurable configurable = clazz.getAnnotation(Configurable.class);
         if (configurable == null) {
@@ -250,7 +250,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     }
 
     private void configure(ConfigurableObject co) throws ConfigurationException {
-        log.debug("Configuring {}", co);
+        LOG.debug("Configuring {}", co);
         configurableObjectsLock.writeLock().lock();
         try {
             configurableObjects.add(co.getKey(), co);
@@ -280,10 +280,10 @@ public abstract class AbstractSettingsManager extends SettingsManager {
             }
             val = (SettingValue<Object>) getSettingFactory().newSettingValue(def, null);
             if (def.isOptional()) {
-                log.debug("No value found for optional setting {}", co.getKey());
+                LOG.debug("No value found for optional setting {}", co.getKey());
                 saveSettingValue(val);
             } else if (def.hasDefaultValue()) {
-                log.debug("Using default value '{}' for required setting {}", def.getDefaultValue(), co.getKey());
+                LOG.debug("Using default value '{}' for required setting {}", def.getDefaultValue(), co.getKey());
                 saveSettingValue(val.setValue(def.getDefaultValue()));
             } else if (def.equals(ServiceSettings.SERVICE_URL_DEFINITION)) {
                 saveSettingValue(val.setValue(URI.create("http://localhost:8080/52n-sos-webapp/sos")));
@@ -297,7 +297,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
 
     @Override
     public void setActive(RequestOperatorKeyType rokt, boolean active) throws ConnectionProviderException {
-        log.debug("Setting status of {} to {}", rokt, active);
+        LOG.debug("Setting status of {} to {}", rokt, active);
         setOperationStatus(rokt, active);
         if (Configurator.getInstance() != null) {
             Configurator.getInstance().getRequestOperatorRepository().setActive(rokt, active);
@@ -306,7 +306,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
 
     @Override
     public void setActive(ResponseFormatKeyType rfkt, boolean active) throws ConnectionProviderException {
-        log.debug("Setting status of {} to {}", rfkt, active);
+        LOG.debug("Setting status of {} to {}", rfkt, active);
         setResponseFormatStatus(rfkt, active);
         if (Configurator.getInstance() != null) {
             Configurator.getInstance().getCodingRepository().setActive(rfkt, active);
@@ -315,7 +315,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
 
     @Override
     public void setActive(String pdf, boolean active) throws ConnectionProviderException {
-        log.debug("Setting status of {} to {}", pdf, active);
+        LOG.debug("Setting status of {} to {}", pdf, active);
         setProcedureDescriptionFormatStatus(pdf, active);
         if (Configurator.getInstance() != null) {
             Configurator.getInstance().getCodingRepository().setActive(pdf, active);
@@ -324,7 +324,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
 
     @Override
     public void setActive(BindingKey bk, boolean active) throws ConnectionProviderException {
-        log.debug("Setting status of {} to {}", bk, active);
+        LOG.debug("Setting status of {} to {}", bk, active);
         setBindingStatus(bk, active);
         if (Configurator.getInstance() != null) {
             Configurator.getInstance().getBindingRepository().setActive(bk, active);
@@ -476,7 +476,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
 
             try {
                 if (getTarget().get() != null) {
-                    log.debug("Setting value '{}' for {}", val, this);
+                    LOG.debug("Setting value '{}' for {}", val, this);
                     getMethod().invoke(getTarget().get(), val);
                 }
             } catch (IllegalAccessException ex) {
@@ -491,7 +491,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         private void logAndThrowError(Object val, Throwable t) throws ConfigurationException {
             String message = String.format("Error while setting value '%s' (%s) for property '%s' with method '%s'",
                                            val, val == null ? null : val.getClass(), getKey(), getMethod());
-            log.error(message);
+            LOG.error(message);
             throw new ConfigurationException(message, t);
         }
 

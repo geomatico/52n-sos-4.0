@@ -52,14 +52,11 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SosDeleteSensorOperatorV20 extends AbstractV2RequestOperator<AbstractDeleteSensorDAO, DeleteSensorRequest> {
 
     private static final String OPERATION_NAME = Sos2Constants.Operations.DeleteSensor.name();
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_SENSOR_DELETION);
-    private static final Logger LOGGER = LoggerFactory.getLogger(SosDeleteSensorOperatorV20.class);
 
     public SosDeleteSensorOperatorV20() {
         super(OPERATION_NAME, DeleteSensorRequest.class);

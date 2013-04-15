@@ -40,13 +40,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Controller
 @RequestMapping(ControllerConstants.Paths.ADMIN_DATABASE_CLEAR)
 public class AdminDatabaseClearController extends AbstractAdminController {
-    private static final Logger log = LoggerFactory.getLogger(AdminDatabaseClearController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AdminDatabaseClearController.class);
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(method = RequestMethod.POST)
     public void createTestData() throws SQLException, OwsExceptionReport, FileNotFoundException,
                                         ConnectionProviderException {
-        log.info("Clearing database contents.");
+        LOG.info("Clearing database contents.");
         executeSqlFile(ControllerConstants.CLEAR_DATABASE_SQL_FILE);
         updateCache();
     }

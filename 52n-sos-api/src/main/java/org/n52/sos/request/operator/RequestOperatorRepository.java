@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class RequestOperatorRepository extends AbstractConfiguringServiceLoaderRepository<RequestOperator> {
-    private static final Logger log = LoggerFactory.getLogger(RequestOperatorRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RequestOperatorRepository.class);
     private final Map<RequestOperatorKeyType, Activatable<RequestOperator>> requestOperators =
                                                                             new HashMap<RequestOperatorKeyType, Activatable<RequestOperator>>(0);
 
@@ -57,7 +57,7 @@ public class RequestOperatorRepository extends AbstractConfiguringServiceLoaderR
         this.requestOperators.clear();
         for (RequestOperator op : requestOperators) {
             try {
-                log.info("Registered IRequestOperator for {}", op.getRequestOperatorKeyType());
+                LOG.info("Registered IRequestOperator for {}", op.getRequestOperatorKeyType());
                 boolean active = SettingsManager.getInstance().isActive(op.getRequestOperatorKeyType());
                 this.requestOperators.put(op.getRequestOperatorKeyType(), new Activatable<RequestOperator>(op, active));
             } catch (ConnectionProviderException cpe) {

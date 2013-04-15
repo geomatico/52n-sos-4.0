@@ -25,7 +25,7 @@ package org.n52.sos.util;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.n52.sos.event.SosEventBus;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ClassHelper {
     
-    private static final Logger log = LoggerFactory.getLogger(ClassHelper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ClassHelper.class);
     
     /**
      * Calculates class similarity based on hierarchy depth.
@@ -59,13 +59,11 @@ public class ClassHelper {
             if (clazz.getSuperclass() != null) {
                 difference = getSimiliarity1(superClass, clazz.getSuperclass(), -1);
             }
-            if (difference != 0) {
-                if (superClass.isInterface()) {
-                    for (Class<?> i : clazz.getInterfaces()) {
-                        difference = getSimiliarity1(superClass, i, difference);
-                        if (difference == 0) {
-                            break;
-                        }
+            if (difference != 0 && superClass.isInterface()) {
+                for (Class<?> i : clazz.getInterfaces()) {
+                    difference = getSimiliarity1(superClass, i, difference);
+                    if (difference == 0) {
+                        break;
                     }
                 }
             }
@@ -106,7 +104,7 @@ public class ClassHelper {
 
     public static <T> Set<Class<? extends T>> flattenPartialHierachy(Class<T> limitingClass, Class<? extends T> actualClass) {
         Set<Class<? extends T>> classes = flattenPartialHierachy(new HashSet<Class<? extends T>>(), limitingClass, actualClass);
-        log.debug("Flatten class hierarchy for {} extending/implementing {}; Found: {}", actualClass, limitingClass, StringHelper.join(", ", classes));
+        LOG.debug("Flatten class hierarchy for {} extending/implementing {}; Found: {}", actualClass, limitingClass, StringHelper.join(", ", classes));
         return classes;
     }
 

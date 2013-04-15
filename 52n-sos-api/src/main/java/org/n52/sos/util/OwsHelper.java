@@ -26,15 +26,8 @@ package org.n52.sos.util;
 import javax.xml.namespace.QName;
 
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class OwsHelper {
-
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(OwsHelper.class);
 
     /**
      * Sets the first character to UpperCase.

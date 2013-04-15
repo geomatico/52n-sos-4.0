@@ -68,8 +68,6 @@ import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
-import org.n52.sos.request.operator.AbstractRequestOperator;
-import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -266,13 +264,10 @@ public class SosHelper {
      *            SOS version
      * @return True if the FOI identifier was generated
      */
-    public static boolean checkFeatureOfInterestIdentifierForSosV2(final String featureOfInterestIdentifier, final String version) {
-        if (version.equals(Sos2Constants.SERVICEVERSION)) {
-            if (featureOfInterestIdentifier.startsWith(SosConstants.GENERATED_IDENTIFIER_PREFIX)) {
-                return false;
-            }
-        }
-        return true;
+    public static boolean checkFeatureOfInterestIdentifierForSosV2(final String featureOfInterestIdentifier,
+                                                                   final String version) {
+        return !(version.equals(Sos2Constants.SERVICEVERSION) &&
+                 featureOfInterestIdentifier.startsWith(SosConstants.GENERATED_IDENTIFIER_PREFIX));
     }
 
     /**
@@ -286,10 +281,7 @@ public class SosHelper {
                     return binding.getUrlPattern();
                 }
             }
-        } catch (final Exception e) {
-            if (e instanceof OwsExceptionReport) {
-                throw (OwsExceptionReport) e;
-            }
+        } catch (Exception e) {
             // FIXME valid exception
             throw new NoApplicableCodeException();
         }
@@ -650,10 +642,8 @@ public static Collection<String> getSupportedResponseFormats(final String servic
         for (final TemporalFilter temporalFilter : temporalFilters) {
             if ((temporalFilter.getTime() != null) && (temporalFilter.getTime() instanceof TimeInstant)) {
                 final TimeInstant ti = (TimeInstant) temporalFilter.getTime();
-                if (ti.isSetIndeterminateValue()) {
-                    if (FirstLatest.contains(ti.getIndeterminateValue())) {
-                        return true;
-                    }
+                if (ti.isSetIndeterminateValue() && FirstLatest.contains(ti.getIndeterminateValue())) {
+                    return true;
                 }
             }
         }
@@ -669,10 +659,8 @@ public static Collection<String> getSupportedResponseFormats(final String servic
         for (final TemporalFilter temporalFilter : temporalFilters) {
             if ((temporalFilter.getTime() != null) && (temporalFilter.getTime() instanceof TimeInstant)) {
                 final TimeInstant ti = (TimeInstant) temporalFilter.getTime();
-                if (ti.isSetIndeterminateValue()) {
-                    if (FirstLatest.contains(ti.getIndeterminateValue())) {
-                        filters.add(FirstLatest.getEnumForString(ti.getIndeterminateValue()));
-                    }
+                if (ti.isSetIndeterminateValue() && FirstLatest.contains(ti.getIndeterminateValue())) {
+                    filters.add(FirstLatest.getEnumForString(ti.getIndeterminateValue()));
                 }
             }
         }

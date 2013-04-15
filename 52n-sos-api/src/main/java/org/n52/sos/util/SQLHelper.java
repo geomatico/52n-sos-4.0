@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 
 public class SQLHelper {
 
-    private static final Logger log = LoggerFactory.getLogger(SQLHelper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SQLHelper.class);
 
     /*
      * TODO find a working library function that can parse and execute a SQL file...
@@ -56,7 +56,7 @@ public class SQLHelper {
             boolean stringLiteral = false;
             String strLine;
             StringBuilder sql = new StringBuilder();
-            log.debug("Executing SQL file {}", path);
+            LOG.debug("Executing SQL file {}", path);
             while ((strLine = br.readLine()) != null) {
                 strLine = strLine.trim();
                 if ((strLine.length() > 0) && (!strLine.contains("--"))) {
@@ -82,7 +82,7 @@ public class SQLHelper {
             try {
                 closeable.close();
             } catch (IOException t) {
-                log.error(String.format("Error closing %s!", closeable.getClass()), t);
+                LOG.error(String.format("Error closing %s!", closeable.getClass()), t);
             }
         }
     }
@@ -92,7 +92,7 @@ public class SQLHelper {
             try {
                 closable.close();
             } catch (SQLException ex) {
-                log.error("Error closing ResultSet!", ex);
+                LOG.error("Error closing ResultSet!", ex);
             }
         }
     }
@@ -102,7 +102,7 @@ public class SQLHelper {
             try {
                 closable.close();
             } catch (SQLException ex) {
-                log.error("Error closing Statement!", ex);
+                LOG.error("Error closing Statement!", ex);
             }
         }
     }
@@ -112,7 +112,7 @@ public class SQLHelper {
             try {
                 closable.close();
             } catch (SQLException ex) {
-                log.error("Error closing Connection!", ex);
+                LOG.error("Error closing Connection!", ex);
             }
         }
     }

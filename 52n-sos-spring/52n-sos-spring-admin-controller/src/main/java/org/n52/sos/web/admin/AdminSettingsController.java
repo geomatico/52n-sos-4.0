@@ -26,7 +26,6 @@ package org.n52.sos.web.admin;
 import java.io.File;
 import java.net.URI;
 import java.security.Principal;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,7 +61,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class AdminSettingsController extends AbstractController {
-    private static final Logger log = LoggerFactory.getLogger(AdminSettingsController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AdminSettingsController.class);
     @Autowired
     private UserService userService;
 
@@ -92,15 +91,12 @@ public class AdminSettingsController extends AbstractController {
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_SETTINGS_UPDATE, method = RequestMethod.POST)
     public void updateSettings(HttpServletRequest request, HttpServletResponse response, Principal user) throws
             AuthenticationException, ConfigurationException {
-        log.info("Updating Settings");
+        LOG.info("Updating Settings");
         try {
             updateAdminUser(request, user);
             updateSettings(request);
-        } catch (SQLException e) {
-            log.error("Error saving settings", e);
-            throw new RuntimeException(e.getMessage());
         } catch (ConnectionProviderException e1) {
-            log.error("Error saving settings", e1);
+            LOG.error("Error saving settings", e1);
             throw new RuntimeException(e1.getMessage());
         }
     }
@@ -112,7 +108,7 @@ public class AdminSettingsController extends AbstractController {
         try {
             return new JSONObject(getData()).toString(4);
         } catch (Exception ex) {
-            log.error("Could not load settings", ex);
+            LOG.error("Could not load settings", ex);
             throw new RuntimeException(ex);
         }
     }
@@ -121,7 +117,7 @@ public class AdminSettingsController extends AbstractController {
         try {
             return toSimpleMap(getSettingsManager().getSettings());
         } catch (Exception ex) {
-            log.error("Error reading settings", ex);
+            LOG.error("Error reading settings", ex);
             throw new RuntimeException(ex);
         }
     }
@@ -155,15 +151,14 @@ public class AdminSettingsController extends AbstractController {
     }
 
     private void logSettings(Collection<SettingValue<?>> values) {
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             for (SettingValue<?> value : values) {
-                log.info("Saving Setting: ('{}'({}) => '{}')", value.getKey(), value.getType(), value.getValue());
+                LOG.info("Saving Setting: ('{}'({}) => '{}')", value.getKey(), value.getType(), value.getValue());
             }
         }
     }
 
-    private void updateSettings(HttpServletRequest request) throws RuntimeException, SQLException,
-                                                                   ConfigurationException, ConnectionProviderException {
+    private void updateSettings(HttpServletRequest request) throws ConnectionProviderException {
         Map<SettingDefinition<?, ?>, SettingValue<?>> changedSettings =
                                                       new HashMap<SettingDefinition<?, ?>, SettingValue<?>>();
         for (SettingDefinition<?, ?> def : getSettingsManager().getSettingDefinitions()) {

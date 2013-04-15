@@ -38,7 +38,7 @@ public abstract class AdminServiceOperator {
     /**
      * URL pattern for the administration interface
      */
-    private static final String urlPattern = "/admin";
+    private static final String URL_PATTERN = "/admin";
 
     /**
      * HTTP-Get request handling method
@@ -59,7 +59,7 @@ public abstract class AdminServiceOperator {
      * @return URL pattern
      */
     public String getUrlPattern() {
-        return urlPattern;
+        return URL_PATTERN;
     }
 
 }

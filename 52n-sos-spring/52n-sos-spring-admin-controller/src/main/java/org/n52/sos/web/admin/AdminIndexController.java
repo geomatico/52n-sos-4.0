@@ -40,7 +40,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @RequestMapping({ ControllerConstants.Paths.ADMIN_INDEX, ControllerConstants.Paths.ADMIN_ROOT })
 public class AdminIndexController extends AbstractController {
-    private static final Logger log = LoggerFactory.getLogger(AdminIndexController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AdminIndexController.class);
 
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView get() {
@@ -50,7 +50,7 @@ public class AdminIndexController extends AbstractController {
                 model.put(m.name(), getMetaDataHandler().get(m));
             }
         } catch (ConfigurationException ex) {
-            log.error("Error reading metadata properties", ex);
+            LOG.error("Error reading metadata properties", ex);
         }
         return new ModelAndView(ControllerConstants.Views.ADMIN_INDEX, model);
     }

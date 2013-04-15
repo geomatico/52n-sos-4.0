@@ -309,10 +309,8 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
         // Fix for problem with XmlBeans: namespace is not set in child elements
         // when defined in root of request (SOAP)
         XmlCursor cursor = insertObservationDoc.newCursor();
-        if (cursor.toFirstChild()) {
-            if (cursor.namespaceForPrefix(W3CConstants.NS_XS_PREFIX) == null) {
-                cursor.prefixForNamespace(W3CConstants.NS_XS);
-            }
+        if (cursor.toFirstChild() && cursor.namespaceForPrefix(W3CConstants.NS_XS_PREFIX) == null) {
+            cursor.prefixForNamespace(W3CConstants.NS_XS);
         }
         cursor.dispose();
         InsertObservationRequest insertObservationRequest = new InsertObservationRequest();

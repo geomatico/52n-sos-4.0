@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class HibernateGeneralQueryDAO implements GeneralQueryDAO {
-    private static final Logger log = LoggerFactory.getLogger(HibernateGeneralQueryDAO.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HibernateGeneralQueryDAO.class);
     private static final String[] MODIFY_COMMANDS = { "alter ", "create ", "drop ", "truncate ", "rename " };
     private static final String[] UPDATE_COMMANDS = { "update ", "insert ", "delete " };
 
@@ -119,7 +119,7 @@ public class HibernateGeneralQueryDAO implements GeneralQueryDAO {
     private class ErrorResult extends QueryResult {
         ErrorResult(Exception e) {
             super(String.format("Unable to execute the query. Cause: %s", e.getMessage()), true);
-            log.error("Unable to execute the query.", e);
+            LOG.error("Unable to execute the query.", e);
         }
     }
 

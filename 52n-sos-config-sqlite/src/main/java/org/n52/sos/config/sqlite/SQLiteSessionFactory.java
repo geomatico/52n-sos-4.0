@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SQLiteSessionFactory implements ConnectionProvider {
 
-    private static final Logger log = LoggerFactory.getLogger(SQLiteSessionFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SQLiteSessionFactory.class);
     
     public static final String HIBERNATE_DIALECT = "hibernate.dialect";
     public static final String HIBERNATE_CONNECTION_URL = "hibernate.connection.url";
@@ -87,19 +87,7 @@ public class SQLiteSessionFactory implements ConnectionProvider {
     private static final Properties DEFAULT_PROPERTIES = new Properties() {
         private static final long serialVersionUID = 3109256773218160485L;
         {
-            String path = null;
-            try {
-                path = SosContextListener.getPath();
-            } catch(Throwable t) {}
-            if (path == null) {
-                path = System.getProperty("user.dir");
-                log.warn("Context path is not set; using {} instead", path);
-            } else {
-                path = new File(path).getAbsolutePath();
-            }
-            path = path + File.separator + DEFAULT_DATABASE_NAME;
-            
-            put(HIBERNATE_CONNECTION_URL, String.format(CONNECTION_URL_TEMPLATE, path));
+            put(HIBERNATE_CONNECTION_URL, getFilename());
             put(HIBERNATE_UPDATE_SCHEMA, UPDATE_SCHEMA_VALUE);
             put(HIBERNATE_DIALECT, SQLITE_HIBERNATE_DIALECT);
             put(HIBERNATE_CONNECTION_DRIVER_CLASS, SQLITE_JDBC_DRIVER);
@@ -110,6 +98,22 @@ public class SQLiteSessionFactory implements ConnectionProvider {
             put(HIBERNATE_CURRENT_SESSION_CONTEXT, THREAD_LOCAL_SESSION_CONTEXT);
         }
     };
+
+    protected static String getFilename() {
+        String path = null;
+        try {
+            path = SosContextListener.getPath();
+        } catch (Throwable t) {
+        }
+        if (path == null) {
+            path = System.getProperty("user.dir");
+            LOG.warn("Context path is not set; using {} instead", path);
+        } else {
+            path = new File(path).getAbsolutePath();
+        }
+        path = path + File.separator + DEFAULT_DATABASE_NAME;
+        return String.format(CONNECTION_URL_TEMPLATE, path);
+    }
 
     private final ReentrantLock lock = new ReentrantLock();
     private SessionFactory sessionFactory;
@@ -175,9 +179,9 @@ public class SQLiteSessionFactory implements ConnectionProvider {
             if (this.sessionFactory != null) {
                 try {
                     this.sessionFactory.close();
-                    log.info("Connection provider closed successfully!");
+                    LOG.info("Connection provider closed successfully!");
                 } catch (HibernateException he) {
-                    log.error("Error while closing connection provider!", he);
+                    LOG.error("Error while closing connection provider!", he);
                 }
             }
         } finally {

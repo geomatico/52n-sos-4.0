@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping(value = ControllerConstants.Paths.ADMIN_LOGGING_FILE_DOWNLOAD)
 public class AdminLogFileDownloadController {
     
-    private static final Logger log = LoggerFactory.getLogger(AdminLogFileDownloadController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AdminLogFileDownloadController.class);
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
     public void downloadFile(HttpServletResponse response) throws IOException {
@@ -58,7 +58,7 @@ public class AdminLogFileDownloadController {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    log.error("Can not close InputStream", e);
+                    LOG.error("Can not close InputStream", e);
                 }
             }
         }

@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  */
 public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRepository<SettingDefinitionProvider> {
-    private static final Logger log = LoggerFactory.getLogger(SettingDefinitionProviderRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SettingDefinitionProviderRepository.class);
     private Map<String, SettingDefinition<?, ?>> definitionsByKey = Collections.emptyMap();
     private Set<SettingDefinition<?, ?>> settingDefinitions = Collections.emptySet();
     private SetMultiMap<SettingDefinition<?, ?>, SettingDefinitionProvider> providersByDefinition = MultiMaps
@@ -101,18 +101,18 @@ public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRe
         this.definitionsByKey = new HashMap<String, SettingDefinition<?, ?>>();
 
         for (SettingDefinitionProvider provider : implementations) {
-            log.debug("Processing IDefinitionProvider {}", provider);
+            LOG.debug("Processing IDefinitionProvider {}", provider);
             Set<SettingDefinition<?, ?>> requiredSettings = provider.getSettingDefinitions();
             for (SettingDefinition<?, ?> definition : requiredSettings) {
                 SettingDefinition<?, ?> prev = definitionsByKey.put(definition.getKey(), definition);
                 if (prev != null && !prev.equals(definition)) {
-                    log.warn("{} overwrites {} requested by [{}]", definition, prev,
+                    LOG.warn("{} overwrites {} requested by [{}]", definition, prev,
                              StringHelper.join(", ", this.providersByDefinition.get(prev)));
                     this.providersByDefinition.remove(prev);
                 }
-                log.debug("Found Setting definition for key '{}'", definition.getKey());
+                LOG.debug("Found Setting definition for key '{}'", definition.getKey());
                 if (!definition.isOptional() && !definition.hasDefaultValue()) {
-                    log.warn("No default value for optional setting {}", definition.getKey());
+                    LOG.warn("No default value for optional setting {}", definition.getKey());
                 }
             }
             this.settingDefinitions.addAll(requiredSettings);

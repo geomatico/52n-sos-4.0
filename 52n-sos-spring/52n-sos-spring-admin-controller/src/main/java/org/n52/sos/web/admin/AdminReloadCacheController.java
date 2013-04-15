@@ -42,12 +42,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Controller
 @RequestMapping(ControllerConstants.Paths.ADMIN_RELOAD_CAPABILITIES_CACHE)
 public class AdminReloadCacheController extends AbstractAdminController {
-    private static final Logger log = LoggerFactory.getLogger(AdminReloadCacheController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AdminReloadCacheController.class);
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void reload() throws OwsExceptionReport, UnavailableException {
-        log.debug("Reloading Capabilitities Cache");
+        LOG.debug("Reloading Capabilitities Cache");
         if (Configurator.getInstance() != null) {
             updateCache();
         } else {

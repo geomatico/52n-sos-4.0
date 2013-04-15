@@ -47,9 +47,6 @@ import org.slf4j.LoggerFactory;
  */
 public class SessionFactoryProvider implements DataConnectionProvider {
 
-    /**
-     * logger
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SessionFactoryProvider.class);
 
     /**
@@ -95,13 +92,11 @@ public class SessionFactoryProvider implements DataConnectionProvider {
     @Override
     public void returnConnection(Object connection) {
         try {
-            if (connection != null) {
-                if (connection instanceof Session) {
-                    Session session = (Session) connection;
-                    if (session.isOpen()) {
-                        session.clear();
-                        session.close();
-                    }
+            if (connection instanceof Session) {
+                Session session = (Session) connection;
+                if (session.isOpen()) {
+                    session.clear();
+                    session.close();
                 }
             }
         } catch (HibernateException he) {

@@ -44,15 +44,14 @@ import org.slf4j.LoggerFactory;
  */
 public class XmlOptionsHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlOptionsHelper.class);
-    private static final XmlOptionsHelper instance = new XmlOptionsHelper();
 
     /**
-     * Get instance from class with default character encoding UTF-8
+     * Get INSTANCE from class with default character encoding UTF-8
      *
-     * @return instance
+     * @return INSTANCE
      */
     public static XmlOptionsHelper getInstance() {
-        return instance;
+        return LazyHolder.INSTANCE;
     }
     private final ReentrantLock lock = new ReentrantLock();
     private XmlOptions xmlOptions;
@@ -156,4 +155,7 @@ public class XmlOptionsHelper {
         }
     }
 
+    private static class LazyHolder {
+        private static final XmlOptionsHelper INSTANCE = new XmlOptionsHelper();
+    }
 }

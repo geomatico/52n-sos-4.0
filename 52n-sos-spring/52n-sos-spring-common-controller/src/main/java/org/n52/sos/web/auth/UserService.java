@@ -43,7 +43,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class UserService implements AuthenticationProvider, Serializable {
     private static final long serialVersionUID = -3207103212342510378L;
-    private static final Logger log = LoggerFactory.getLogger(UserService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
     
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -68,7 +68,7 @@ public class UserService implements AuthenticationProvider, Serializable {
         try {
             user = getSettingsManager().getAdminUser(username);
         } catch (Exception ex) {
-            log.error("Error querying admin", ex);
+            LOG.error("Error querying admin", ex);
             throw new BadCredentialsException("Bad Credentials");
         }
         
@@ -92,7 +92,7 @@ public class UserService implements AuthenticationProvider, Serializable {
         try {
             return getSettingsManager().createAdminUser(username, getPasswordEncoder().encode(password));
         } catch (Exception ex) {
-            log.error("Error saving admin", ex);
+            LOG.error("Error saving admin", ex);
             throw new RuntimeException(ex);
         }
     }
@@ -101,7 +101,7 @@ public class UserService implements AuthenticationProvider, Serializable {
         try {
             getSettingsManager().saveAdminUser(user.setUsername(name));
         } catch (Exception ex) {
-            log.error("Error saving admin", ex);
+            LOG.error("Error saving admin", ex);
             throw new RuntimeException(ex);
         }
     }
@@ -110,7 +110,7 @@ public class UserService implements AuthenticationProvider, Serializable {
         try {
             getSettingsManager().saveAdminUser(user.setPassword(getPasswordEncoder().encode(password)));
         } catch (Exception ex) {
-            log.error("Error saving admin", ex);
+            LOG.error("Error saving admin", ex);
             throw new RuntimeException(ex);
         }
     }

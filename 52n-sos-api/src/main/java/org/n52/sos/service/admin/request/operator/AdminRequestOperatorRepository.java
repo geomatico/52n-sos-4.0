@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AdminRequestOperatorRepository extends AbstractConfiguringServiceLoaderRepository<AdminRequestOperator> {
 
-	private static final Logger log = LoggerFactory.getLogger(AdminRequestOperatorRepository.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AdminRequestOperatorRepository.class);
 	private Map<String, AdminRequestOperator> operators = new HashMap<String, AdminRequestOperator>(0);
 
 	public AdminRequestOperatorRepository() throws ConfigurationException {
@@ -65,7 +65,7 @@ public class AdminRequestOperatorRepository extends AbstractConfiguringServiceLo
 			exceptionText.append("No IAdminRequestOperator implementation could be loaded!");
 			exceptionText.append(" If the SOS is not used as webapp, this has no effect!");
 			exceptionText.append(" Else add a IAdminRequestOperator implementation!");
-			log.warn(exceptionText.toString());
+			LOG.warn(exceptionText.toString());
 		}
 	}
 }

@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractOperationDAO implements OperationDAO {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOperationDAO.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractOperationDAO.class);
     private final String operationName;
 
     public AbstractOperationDAO(String operationName) {
@@ -59,7 +59,7 @@ public abstract class AbstractOperationDAO implements OperationDAO {
     public OWSOperation getOperationsMetadata(String service, String version) throws OwsExceptionReport {
         Map<String, Set<DCP>> dcp = getDCP(new OperationDecoderKey(service, version, getOperationName()));
         if (dcp == null || dcp.isEmpty()) {
-            LOGGER.debug("Operation {} not available due to empty DCP map.", getOperationName());
+            LOG.debug("Operation {} not available due to empty DCP map.", getOperationName());
             return null;
         }
         OWSOperation operation = new OWSOperation();
@@ -111,9 +111,6 @@ public abstract class AbstractOperationDAO implements OperationDAO {
                 }
             }
         } catch (Exception e) {
-            if (e instanceof OwsExceptionReport) {
-                throw (OwsExceptionReport) e;
-            }
             // FIXME valid exception
             throw new NoApplicableCodeException().causedBy(e);
         }

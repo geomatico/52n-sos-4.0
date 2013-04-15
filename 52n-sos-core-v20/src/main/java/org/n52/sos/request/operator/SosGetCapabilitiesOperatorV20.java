@@ -48,12 +48,9 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SosGetCapabilitiesOperatorV20 extends AbstractV2RequestOperator<AbstractGetCapabilitiesDAO, GetCapabilitiesRequest> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SosGetCapabilitiesOperatorV20.class);
     private static final String OPERATION_NAME = SosConstants.Operations.GetCapabilities.name();
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_CORE_PROFILE);
 

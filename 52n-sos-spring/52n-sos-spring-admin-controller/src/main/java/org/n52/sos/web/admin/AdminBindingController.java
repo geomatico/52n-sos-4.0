@@ -35,8 +35,6 @@ import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.JSONConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -51,7 +49,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @Controller
 public class AdminBindingController extends AbstractAdminController {
-    private static final Logger log = LoggerFactory.getLogger(AdminBindingController.class);
 
     @ResponseBody
     @ExceptionHandler(JSONException.class)

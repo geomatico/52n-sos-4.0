@@ -69,7 +69,7 @@ import org.slf4j.LoggerFactory;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class SQLiteSettingsManagerTest {
-    private static final Logger log = LoggerFactory.getLogger(SQLiteSettingsManagerTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SQLiteSettingsManagerTest.class);
     private static final String OPERATION_NAME = SosConstants.Operations.GetCapabilities.name();
     private static final String USERNAME = "admin";
     private static final String PASSWORD = "password";
@@ -92,7 +92,7 @@ public class SQLiteSettingsManagerTest {
                        String.format("jdbc:sqlite:%s", databaseFile.getAbsolutePath()));
         connectionProvider = new SQLiteSessionFactory();
         connectionProvider.initialize(properties);
-        log.info("using database file: {}", databaseFile.getAbsolutePath());
+        LOG.info("using database file: {}", databaseFile.getAbsolutePath());
     }
 
     @AfterClass

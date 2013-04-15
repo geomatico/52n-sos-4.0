@@ -65,7 +65,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SQLiteSettingsManager extends AbstractSettingsManager {
-    private static final Logger log = LoggerFactory.getLogger(SQLiteSettingsManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SQLiteSettingsManager.class);
     private static final Pattern SETTINGS_TYPE_CHANGED = Pattern.compile(
             ".*Abort due to constraint violation \\(column .* is not unique\\)");
     public static final SettingValueFactory SQLITE_SETTING_FACTORY = new SqliteSettingFactory();
@@ -140,12 +140,12 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
 
     @Override
     public void saveSettingValue(final SettingValue<?> setting) throws HibernateException, ConnectionProviderException {
-        log.debug("Saving Setting {}", setting);
+        LOG.debug("Saving Setting {}", setting);
         try {
             execute(new SaveSettingValueAction(setting));
         } catch (HibernateException e) {
             if (isSettingsTypeChangeException(e)) {
-                log.warn("Type of setting {} changed!", setting.getKey());
+                LOG.warn("Type of setting {} changed!", setting.getKey());
                 execute(new DeleteAndSaveValueAction(setting));
             } else {
                 throw e;
@@ -398,7 +398,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
 
         @Override
         protected void run(Session session) {
-            log.debug("Updating AdministratorUser {}", user);
+            LOG.debug("Updating AdministratorUser {}", user);
             session.update(user);
         }
     }
@@ -415,7 +415,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
         @Override
         protected AdminUser call(Session session) {
             AdminUser user = new AdminUser().setUsername(username).setPassword(password);
-            log.debug("Creating AdministratorUser {}", user);
+            LOG.debug("Creating AdministratorUser {}", user);
             session.save(user);
             return user;
         }
@@ -433,7 +433,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
             AbstractSettingValue<?> hSetting = (AbstractSettingValue<?>) session.get(
                     AbstractSettingValue.class, setting);
             if (hSetting != null) {
-                log.debug("Deleting Setting {}", hSetting);
+                LOG.debug("Deleting Setting {}", hSetting);
                 session.delete(hSetting);
             }
         }
@@ -491,10 +491,10 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
             AbstractSettingValue<?> hSetting = (AbstractSettingValue<?>) session.get(AbstractSettingValue.class, setting
                     .getKey());
             if (hSetting != null) {
-                log.debug("Deleting Setting {}", hSetting);
+                LOG.debug("Deleting Setting {}", hSetting);
                 session.delete(hSetting);
             }
-            log.debug("Saving Setting {}", setting);
+            LOG.debug("Saving Setting {}", setting);
             session.save(setting);
         }
     }

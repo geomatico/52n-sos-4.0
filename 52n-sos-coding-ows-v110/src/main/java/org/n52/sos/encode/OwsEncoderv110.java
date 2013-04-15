@@ -194,12 +194,12 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
         }
         // set keywords if they're not already in the service identification
         // doc
-        if (sosServiceIdentification.getKeywords() != null && !sosServiceIdentification.getKeywords().isEmpty()) {
-            if (serviceIdent.getKeywordsArray().length == 0) {
-                KeywordsType keywordsType = serviceIdent.addNewKeywords();
-                for (String keyword : sosServiceIdentification.getKeywords()) {
-                    keywordsType.addNewKeyword().setStringValue(keyword.trim());
-                }
+        if (sosServiceIdentification.getKeywords() != null &&
+            !sosServiceIdentification.getKeywords().isEmpty() &&
+            serviceIdent.getKeywordsArray().length == 0) {
+            KeywordsType keywordsType = serviceIdent.addNewKeywords();
+            for (String keyword : sosServiceIdentification.getKeywords()) {
+                keywordsType.addNewKeyword().setStringValue(keyword.trim());
             }
         }
 

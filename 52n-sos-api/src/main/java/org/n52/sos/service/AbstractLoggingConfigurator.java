@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractLoggingConfigurator {
-    protected static final Logger log = LoggerFactory.getLogger(AbstractLoggingConfigurator.class);
+    protected static final Logger LOG = LoggerFactory.getLogger(AbstractLoggingConfigurator.class);
     
     private static AbstractLoggingConfigurator instance = null;;
     
@@ -44,9 +44,9 @@ public abstract class AbstractLoggingConfigurator {
             Iterator<AbstractLoggingConfigurator> i = serviceLoader.iterator();
             if (i.hasNext()) {
                 instance = i.next();
-                log.debug("Using LoggingConfigurator: {}", instance.getClass());
+                LOG.debug("Using LoggingConfigurator: {}", instance.getClass());
             } else {
-                log.error("No implementation class found!");
+                LOG.error("No implementation class found!");
             }
         }
         return instance;

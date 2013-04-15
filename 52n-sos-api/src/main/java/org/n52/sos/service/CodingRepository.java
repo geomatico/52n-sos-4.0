@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class CodingRepository {
-    private static final Logger log = LoggerFactory.getLogger(CodingRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CodingRepository.class);
     @SuppressWarnings("rawtypes")
     private final ServiceLoader<Decoder> serviceLoaderDecoder;
     @SuppressWarnings("rawtypes")
@@ -91,13 +91,13 @@ public class CodingRepository {
 
     private <F, T> Decoder<F, T> processDecoderMatches(Set<Decoder<?, ?>> matches, DecoderKey key) {
         if (matches == null || matches.isEmpty()) {
-            log.debug("No Decoder implementation for {}", key);
+            LOG.debug("No Decoder implementation for {}", key);
             return null;
         } else if (matches.size() > 1) {
             List<Decoder<?, ?>> list = new ArrayList<Decoder<?, ?>>(matches);
             Collections.sort(list, new DecoderComparator(key));
             Decoder<?, ?> dec = list.iterator().next();
-            log.warn("Requested ambiguous Decoder implementations for {}: Found {}; Choosing {}.",
+            LOG.warn("Requested ambiguous Decoder implementations for {}: Found {}; Choosing {}.",
                      key, StringHelper.join(", ", matches), dec);
             return unsafeCast(dec);
         } else {
@@ -107,13 +107,13 @@ public class CodingRepository {
 
     private <F, T> Encoder<F, T> processEncoderMatches(Set<Encoder<?, ?>> matches, EncoderKey key) {
         if (matches.isEmpty()) {
-            log.debug("No Encoder for {}", key);
+            LOG.debug("No Encoder for {}", key);
             return null;
         } else if (matches.size() > 1) {
             List<Encoder<?, ?>> list = new ArrayList<Encoder<?, ?>>(matches);
             Collections.sort(list, new EncoderComparator(key));
             Encoder<?, ?> enc = list.iterator().next();
-            log.warn("Requested ambiguous Encoder implementations for {}: Found {}; Choosing {}.",
+            LOG.warn("Requested ambiguous Encoder implementations for {}: Found {}; Choosing {}.",
                      key, StringHelper.join(", ", matches), enc);
             return unsafeCast(enc);
         } else {
@@ -122,22 +122,22 @@ public class CodingRepository {
     }
 
     public void updateDecoders() {
-        log.debug("Reloading Decoder implementations");
+        LOG.debug("Reloading Decoder implementations");
         this.decoders.clear();
         this.decoders.addAll(loadDecoders());
         initDecoderMap();
         generateTypeMap();
-        log.debug("Reloaded Decoder implementations");
+        LOG.debug("Reloaded Decoder implementations");
     }
 
     public void updateEncoders() {
-        log.debug("Reloading Encoder implementations");
+        LOG.debug("Reloading Encoder implementations");
         this.encoders.clear();
         this.encoders.addAll(loadEncoders());
         initEncoderMap();
         generateTypeMap();
         generateResponseFormatMaps();
-        log.debug("Reloaded Encoder implementations");
+        LOG.debug("Reloaded Encoder implementations");
     }
 
     private void generateResponseFormatMaps() {
@@ -187,12 +187,12 @@ public class CodingRepository {
             }
         } catch (ServiceConfigurationError sce) {
             String text = "An Decoder implementation could not be loaded!";
-            log.warn(text, sce);
+            LOG.warn(text, sce);
             throw new ConfigurationException(text, sce);
         }
 //        if (loadedDecoders.isEmpty()) {
 //            String exceptionText = "No Decoder implementations is loaded!";
-//            log.error(exceptionText);
+//            LOG.error(exceptionText);
 //            throw new ConfigurationException(exceptionText);
 //        }
         return loadedDecoders;
@@ -208,12 +208,12 @@ public class CodingRepository {
             }
         } catch (ServiceConfigurationError sce) {
             String text = "An Encoder implementation could not be loaded!";
-            log.warn(text, sce);
+            LOG.warn(text, sce);
             throw new ConfigurationException(text, sce);
         }
 //        if (loadedEncoders.isEmpty()) {
 //            String exceptionText = "No Encoder implementations is loaded!";
-//            log.error(exceptionText);
+//            LOG.error(exceptionText);
 //            throw new ConfigurationException(exceptionText);
 //        }
         return loadedEncoders;
@@ -369,7 +369,7 @@ public class CodingRepository {
                     encoderByKey.add(ck, encoder);
                 }
             }
-            log.debug("Found {} Encoders for CompositeKey: {}", encoderByKey.get(ck).size(),
+            LOG.debug("Found {} Encoders for CompositeKey: {}", encoderByKey.get(ck).size(),
                       StringHelper.join(", ", encoderByKey.get(ck)));
         }
         return encoderByKey.get(ck);
@@ -383,7 +383,7 @@ public class CodingRepository {
                     decoderByKey.add(ck, decoder);
                 }
             }
-            log.debug("Found {} Decoders for CompositeKey: {}", decoderByKey.get(ck).size(),
+            LOG.debug("Found {} Decoders for CompositeKey: {}", decoderByKey.get(ck).size(),
                       StringHelper.join(", ", decoderByKey.get(ck)));
         }
         return decoderByKey.get(ck);

@@ -42,7 +42,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @RequestMapping(ControllerConstants.Paths.GET_INVOLVED)
 public class GetInvolvedController extends AbstractController {
-    private static final Logger log = LoggerFactory.getLogger(GetInvolvedController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GetInvolvedController.class);
     public static final String SERVICE_URL_MODEL_ATTRIBUTE = "serviceUrl";
 
     @RequestMapping(method = RequestMethod.GET)
@@ -51,9 +51,9 @@ public class GetInvolvedController extends AbstractController {
         try {
             setting = getSettingsManager().getSetting(ServiceSettings.SERVICE_URL_DEFINITION);
         } catch (ConfigurationException ex) {
-            log.error("Could not load service url", ex);
+            LOG.error("Could not load service url", ex);
         } catch (ConnectionProviderException ex) {
-            log.error("Could not load service url", ex);
+            LOG.error("Could not load service url", ex);
         }
 
         return new ModelAndView(ControllerConstants.Views.GET_INVOLVED, SERVICE_URL_MODEL_ATTRIBUTE,

@@ -47,7 +47,7 @@ import org.springframework.web.servlet.view.RedirectView;
 @Controller
 @RequestMapping(value = ControllerConstants.Paths.ADMIN_LOGGING)
 public class AdminLoggingController extends AbstractController {
-    private static final Logger log = LoggerFactory.getLogger(AdminLoggingController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AdminLoggingController.class);
     private static final int LOG_MESSAGES = 15;
     private static final String LOG_MESSAGES_MODEL_ATTRIBUTE = "logMessages";
     private static final String IS_CONSOLE_ENABLED_MODEL_ATTRIBUTE = "isConsoleEnabled";
@@ -116,7 +116,7 @@ public class AdminLoggingController extends AbstractController {
     public ModelAndView error(Throwable t) {
         ModelAndView mav = view();
         mav.addObject(ERROR_MODEL_ATTRIBUTE, t.getMessage());
-        log.error("Error updating the logging configuration.", t);
+        LOG.error("Error updating the logging configuration.", t);
         return mav;
     }
 }

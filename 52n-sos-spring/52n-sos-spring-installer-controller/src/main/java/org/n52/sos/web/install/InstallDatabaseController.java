@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping(ControllerConstants.Paths.INSTALL_DATABASE)
 public class InstallDatabaseController extends AbstractProcessingInstallationController {
-    private static final Logger log = LoggerFactory.getLogger(InstallDatabaseController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(InstallDatabaseController.class);
 
     @Override
     protected Step getStep() {
@@ -218,7 +218,7 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
 //                version = rs.getString(1);
 //            }
 //        } catch (SQLException e) {
-//            log.error("Could not determine version of installed database schema.", e);
+//            LOG.error("Could not determine version of installed database schema.", e);
 //        } finally {
 //            SQLHelper.close(rs);
 //        }
@@ -226,12 +226,12 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
 //        try {
 //            currentVersion = getMetaDataHandler().get(MetaDataHandler.Metadata.VERSION);
 //        } catch (ConfigurationException e) {
-//            log.error("Can not load version metadata property", e);
+//            LOG.error("Can not load version metadata property", e);
 //        }
 //
 //        if (currentVersion != null && !currentVersion.equals(version)) {
 //            /* TODO do some conversion? */
-//            log.warn("Installed database schema ({}) is not the current one ({}).", version, currentVersion);
+//            LOG.warn("Installed database schema ({}) is not the current one ({}).", version, currentVersion);
 //        }
 //    }
 
@@ -294,7 +294,7 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
                 command = String.format("SELECT true FROM pg_tables WHERE tablename = '%s';", table);
             }
 
-            log.debug("Testing table existence: {}", command);
+            LOG.debug("Testing table existence: {}", command);
             rs = st.executeQuery(command);
             return rs.next();
         } catch (SQLException e) {

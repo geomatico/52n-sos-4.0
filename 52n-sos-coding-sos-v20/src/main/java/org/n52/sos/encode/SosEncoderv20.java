@@ -507,11 +507,11 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
             }
 
             // set observed area [0..1]
-            if (offering.getObservedArea() != null) {
-                if (offering.getObservedArea().getEnvelope() != null && offering.getObservedArea().getSrid() != -1) {
-                    XmlObject encodeObjectToXml = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, offering.getObservedArea());
-                    xbObsOff.addNewObservedArea().addNewEnvelope().set(encodeObjectToXml);
-                }
+            if (offering.getObservedArea() != null &&
+                offering.getObservedArea().getEnvelope() != null &&
+                offering.getObservedArea().getSrid() != -1) {
+                XmlObject encodeObjectToXml = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, offering.getObservedArea());
+                xbObsOff.addNewObservedArea().addNewEnvelope().set(encodeObjectToXml);
             }
 
             // set up phenomenon time [0..1]

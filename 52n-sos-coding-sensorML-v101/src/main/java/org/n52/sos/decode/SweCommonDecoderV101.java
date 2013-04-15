@@ -441,13 +441,11 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         if (position.isSetReferenceFrame()) {
             sosSMLPosition.setReferenceFrame(position.getReferenceFrame());
         }
-        if (position.isSetLocation()) {
-            if (position.getLocation().isSetVector()) {
-                if (position.getLocation().getVector().isSetReferenceFrame()) {
-                    sosSMLPosition.setReferenceFrame(position.getLocation().getVector().getReferenceFrame());
-                }
-                sosSMLPosition.setPosition(parseCoordinates(position.getLocation().getVector().getCoordinateArray()));
+        if (position.isSetLocation() && position.getLocation().isSetVector()) {
+            if (position.getLocation().getVector().isSetReferenceFrame()) {
+                sosSMLPosition.setReferenceFrame(position.getLocation().getVector().getReferenceFrame());
             }
+            sosSMLPosition.setPosition(parseCoordinates(position.getLocation().getVector().getCoordinateArray()));
         }
         return sosSMLPosition;
     }

@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 public class SosContextListener implements ServletContextListener {
 
-    private static final Logger log = LoggerFactory.getLogger(SosContextListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SosContextListener.class);
     private static String path = null;
 
     public static String getPath() {
@@ -60,7 +60,7 @@ public class SosContextListener implements ServletContextListener {
         if (Configurator.getInstance() == null) {
             instantiateConfigurator(sce.getServletContext());
         } else {
-            log.error("Configurator already instantiated.");
+            LOG.error("Configurator already instantiated.");
         }
     }
 
@@ -77,9 +77,9 @@ public class SosContextListener implements ServletContextListener {
             Driver driver = drivers.nextElement();
             try {
                 DriverManager.deregisterDriver(driver);
-                log.info("Deregistering jdbc driver: {}", driver);
+                LOG.info("Deregistering jdbc driver: {}", driver);
             } catch (Exception e) {
-                log.error("Error deregistering driver " + driver, e);
+                LOG.error("Error deregistering driver " + driver, e);
             }
         }
     }
@@ -90,7 +90,7 @@ public class SosContextListener implements ServletContextListener {
                 SettingsManager.getInstance().cleanup();
             }
         } catch (Throwable ex) {
-            log.error("Error while SettingsManager clean up", ex);
+            LOG.error("Error while SettingsManager clean up", ex);
         }
     }
 
@@ -100,21 +100,21 @@ public class SosContextListener implements ServletContextListener {
                 Configurator.getInstance().cleanup();
             }
         } catch (Throwable ex) {
-            log.error("Error while Configurator clean up", ex);
+            LOG.error("Error while Configurator clean up", ex);
         }
     }
 
     protected void instantiateConfigurator(ServletContext context) throws RuntimeException {
         DatabaseSettingsHandler dbsh = DatabaseSettingsHandler.getInstance(context);
         if (dbsh.exists()) {
-            log.debug("Initialising Configurator ({},{})", dbsh.getPath(), getPath());
+            LOG.debug("Initialising Configurator ({},{})", dbsh.getPath(), getPath());
             try {
                 instantiateConfigurator(dbsh.getAll());
             } catch (ConfigurationException ex) {
-                log.error("Error reading database properties", ex);
+                LOG.error("Error reading database properties", ex);
             }
         } else {
-            log.warn("Can not initialize Configurator; config file is not present: {}", dbsh.getPath());
+            LOG.warn("Can not initialize Configurator; config file is not present: {}", dbsh.getPath());
         }
     }
 
@@ -123,7 +123,7 @@ public class SosContextListener implements ServletContextListener {
             Configurator.createInstance(p, getPath());
         } catch (ConfigurationException ce) {
             String message = "Configurator initialization failed!";
-            log.error(message, ce);
+            LOG.error(message, ce);
             throw new RuntimeException(message, ce);
         }
     }

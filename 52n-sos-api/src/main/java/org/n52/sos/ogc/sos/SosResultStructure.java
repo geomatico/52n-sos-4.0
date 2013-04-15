@@ -26,20 +26,13 @@ package org.n52.sos.ogc.sos;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject.Factory;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.concrete.DecoderResponseUnsupportedException;
 import org.n52.sos.exception.ows.concrete.XmlDecodingException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.util.CodingHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SosResultStructure {
-    
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SosResultStructure.class);
     
     private SosSweAbstractDataComponent resultStructure;
     

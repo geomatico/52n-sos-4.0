@@ -47,7 +47,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
 public abstract class AbstractInstallController extends AbstractController {
-    private static final Logger log = LoggerFactory.getLogger(AbstractInstallController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractInstallController.class);
     private static final String INSTALLATION_CONFIGURATION = "installation_configuration";
 
     public static InstallationConfiguration getSettings(HttpSession s) {
@@ -119,9 +119,9 @@ public abstract class AbstractInstallController extends AbstractController {
     @ExceptionHandler(InstallationSettingsError.class)
     public ModelAndView onError(HttpSession session, InstallationSettingsError e) {
         if (e.getCause() != null) {
-            log.error(e.getMessage(), e.getCause());
+            LOG.error(e.getMessage(), e.getCause());
         } else {
-            log.error(e.getMessage());
+            LOG.error(e.getMessage());
         }
         setSettings(session, e.getSettings());
         Map<String, Object> model = toModel(e.getSettings());
@@ -156,7 +156,7 @@ public abstract class AbstractInstallController extends AbstractController {
                 } else {
                     command = String.format("SET search_path TO '$user', '%s', public;", catalog);
                 }
-                log.debug("Setting catalog: {}", command);
+                LOG.debug("Setting catalog: {}", command);
                 st.execute(command);
             } catch (SQLException e) {
                 throw new InstallationSettingsError(settings, String.format(ErrorMessages.COULD_NOT_SET_CATALOG, e

@@ -44,7 +44,7 @@ import org.n52.sos.util.HTTPConstants;
 public abstract class OwsExceptionReport extends Exception {
 
 	private static final long serialVersionUID = 52L;
-	private static final String namespace = OWSConstants.NS_OWS;
+	private static final String NAMESPACE = OWSConstants.NS_OWS;
 	private HTTPConstants.StatusCode status;
 	private String version;
 
@@ -82,7 +82,7 @@ public abstract class OwsExceptionReport extends Exception {
 	}
 
 	public String getNamespace() {
-		return namespace;
+		return NAMESPACE;
 	}
 
 	@Override

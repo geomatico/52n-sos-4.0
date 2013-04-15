@@ -179,10 +179,8 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
             } else {
                 if (additionalValues.containsKey(HelperValues.ENCODE) && additionalValues.get(HelperValues.ENCODE).equals("false") || !samplingFeature.isEncode()) {
                     featurePropertyType.setHref(feature.getIdentifier().getValue());
-                    if (feature instanceof SosSamplingFeature) {
-                        if (samplingFeature.isSetNames()) {
-                            featurePropertyType.setTitle(samplingFeature.getFirstName().getValue());
-                        }
+                    if (feature instanceof SosSamplingFeature && samplingFeature.isSetNames()) {
+                        featurePropertyType.setTitle(samplingFeature.getFirstName().getValue());
                     } 
                 }
                 if (!samplingFeature.isSetGeometry()) {

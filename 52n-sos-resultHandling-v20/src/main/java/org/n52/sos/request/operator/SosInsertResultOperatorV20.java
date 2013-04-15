@@ -50,13 +50,10 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SosInsertResultOperatorV20 extends AbstractV2RequestOperator<AbstractInsertResultDAO, InsertResultRequest> {
 
     private static final String OPERATION_NAME = Sos2Constants.Operations.InsertResult.name();
-    private static final Logger LOGGER = LoggerFactory.getLogger(SosInsertResultOperatorV20.class);
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_RESULT_INSERTION);
 
     public SosInsertResultOperatorV20() {

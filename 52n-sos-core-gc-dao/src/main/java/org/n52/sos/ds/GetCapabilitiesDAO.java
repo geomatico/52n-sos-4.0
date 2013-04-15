@@ -669,10 +669,9 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         List<SwesExtension> extensions = getAndMergeExtensions();
         List<SwesExtension> filtered = new ArrayList<SwesExtension>(requestedExtensionSections.size());
         for (SwesExtension e : extensions) {
-            if (e instanceof CapabilitiesExtension) {
-                if (requestedExtensionSections.contains(((CapabilitiesExtension) e).getSectionName())) {
-                    filtered.add(e);
-                }
+            if (e instanceof CapabilitiesExtension && requestedExtensionSections.contains(((CapabilitiesExtension) e)
+                    .getSectionName())) {
+                filtered.add(e);
             }
         }
         return filtered;

@@ -38,7 +38,7 @@ import org.springframework.web.servlet.view.RedirectView;
 @Controller
 @RequestMapping(ControllerConstants.Paths.ADMIN_RESET)
 public class AdminResetController extends AbstractAdminController {
-    private static final Logger log = LoggerFactory.getLogger(AdminResetController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AdminResetController.class);
 
     @RequestMapping(method = RequestMethod.GET)
     public String get() {
@@ -47,9 +47,9 @@ public class AdminResetController extends AbstractAdminController {
 
     @RequestMapping(method = RequestMethod.POST)
     public View post() throws ConfigurationException, ConnectionProviderException {
-        log.debug("Resetting Service.");
+        LOG.debug("Resetting Service.");
         if (Configurator.getInstance() != null) {
-            log.debug("Resetting configurator.");
+            LOG.debug("Resetting configurator.");
             Configurator.getInstance().cleanup();
         }
         getDatabaseSettingsHandler().delete();

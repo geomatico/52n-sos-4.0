@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 public class AbstractPropertyFileHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(AbstractPropertyFileHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractPropertyFileHandler.class);
     private final File propertiesFile;
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private Properties cache;
@@ -71,7 +71,7 @@ public class AbstractPropertyFileHandler {
                     try {
                         is.close();
                     } catch (IOException e) {
-                        log.error("Error closing input stream", e);
+                        LOG.error("Error closing input stream", e);
                     }
                 }
             }
@@ -91,7 +91,7 @@ public class AbstractPropertyFileHandler {
                 try {
                     os.close();
                 } catch (IOException e) {
-                    log.error("Error closing output stream", e);
+                    LOG.error("Error closing output stream", e);
                 }
             }
         }
@@ -184,7 +184,7 @@ public class AbstractPropertyFileHandler {
     public boolean delete() {
         try {
             cache = null;
-            log.debug("Removing properties file: {}.", getFile(false));
+            LOG.debug("Removing properties file: {}.", getFile(false));
             return exists() ? getFile(false).delete() : true;
         } catch (IOException ex) {
             return false;

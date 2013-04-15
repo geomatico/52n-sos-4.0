@@ -149,10 +149,9 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
 
     @Override
     public Set<String> getSupportedResponseFormats(String service, String version) {
-        if (supported && SUPPORTED_RESPONSE_FORMATS.get(service) != null) {
-            if (SUPPORTED_RESPONSE_FORMATS.get(service).get(version) != null) {
-                return SUPPORTED_RESPONSE_FORMATS.get(service).get(version);
-            }
+        if (supported && SUPPORTED_RESPONSE_FORMATS.get(service) != null &&
+                 SUPPORTED_RESPONSE_FORMATS.get(service).get(version) != null) {
+            return SUPPORTED_RESPONSE_FORMATS.get(service).get(version);
         }
         return new HashSet<String>(0);
     }

@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class SosEventBus {
-    private static final Logger log = LoggerFactory.getLogger(SosEventBus.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SosEventBus.class);
     private static final boolean ASYNCHRONOUS_EXECUTION = false;
     private static final int THREAD_POOL_SIZE = 3;
     private static final String THREAD_GROUP_NAME = "SosEventBus-Worker";
@@ -62,7 +62,7 @@ public class SosEventBus {
 
     private static boolean checkEvent(SosEvent event) {
         if (event == null) {
-            log.warn("Submitted event is null!");
+            LOG.warn("Submitted event is null!");
             return false;
 		}
         return true;
@@ -70,11 +70,11 @@ public class SosEventBus {
 
     private static boolean checkListener(SosEventListener listener) {
         if (listener == null) {
-            log.warn("Tried to unregister SosEventListener null");
+            LOG.warn("Tried to unregister SosEventListener null");
             return false;
         }
         if (listener.getTypes() == null || listener.getTypes().isEmpty()) {
-            log.warn("Listener {} has no EventTypes", listener);
+            LOG.warn("Listener {} has no EventTypes", listener);
             return false;
         }
         return true;
@@ -97,7 +97,7 @@ public class SosEventBus {
             try {
                 register(iter.next());
             } catch (ServiceConfigurationError e) {
-                log.error("Could not load Listener implementation", e);
+                LOG.error("Could not load Listener implementation", e);
             }
         }
     }
@@ -110,11 +110,11 @@ public class SosEventBus {
                 Set<SosEventListener> listenersForClass = this.listeners.get(eventType);
                 
                 if (listenersForClass != null) {
-                    log.trace("Adding {} Listeners for event {} (eventType={})",
+                    LOG.trace("Adding {} Listeners for event {} (eventType={})",
                               listenersForClass.size(), event, eventType);
                     result.addAll(listenersForClass);
                 } else {
-                    log.trace("Adding 0 Listeners for event {} (eventType={})", event, eventType);
+                    LOG.trace("Adding 0 Listeners for event {} (eventType={})", event, eventType);
                 }
                 
             }
@@ -133,7 +133,7 @@ public class SosEventBus {
         try {
             for (SosEventListener listener : getListenersForEvent(event)) {
                 submittedEvent = true;
-                log.debug("Queueing Event {} for Listener {}", event, listener);
+                LOG.debug("Queueing Event {} for Listener {}", event, listener);
                 this.queue.offer(new HandlerExecution(event, listener));
             }
         } finally {
@@ -148,7 +148,7 @@ public class SosEventBus {
             }
         }
         if (!submittedEvent) {
-            log.info("No Listeners for SosEvent {}", event);
+            LOG.info("No Listeners for SosEvent {}", event);
         }
     }
 
@@ -159,7 +159,7 @@ public class SosEventBus {
         this.lock.writeLock().lock();
         try {
             for (Class<? extends SosEvent> eventType : listener.getTypes()) {
-                log.debug("Subscibing Listener {} to EventType {}", listener, eventType);
+                LOG.debug("Subscibing Listener {} to EventType {}", listener, eventType);
                 this.listeners.add(eventType, listener);
             }
         } finally {
@@ -176,10 +176,10 @@ public class SosEventBus {
             for (Class<? extends SosEvent> eventType : listener.getTypes()) {
                 Set<SosEventListener> listenersForKey = this.listeners.get(eventType);
                 if (listenersForKey.contains(listener)) {
-                    log.debug("Unsubscibing Listener {} from EventType {}", listener, eventType);
+                    LOG.debug("Unsubscibing Listener {} from EventType {}", listener, eventType);
                     listenersForKey.remove(listener);
                 } else {
-                    log.warn("Listener {} was not registered for SosEvent Type {}", listener, eventType);
+                    LOG.warn("Listener {} was not registered for SosEvent Type {}", listener, eventType);
                 }
             }
         } finally {
@@ -232,10 +232,10 @@ public class SosEventBus {
 
 		@Override public void run() {
 			try {
-				log.debug("Submitting Event {} to Listener {}", event, listener);
+				LOG.debug("Submitting Event {} to Listener {}", event, listener);
 				listener.handle(event);
 			} catch (Throwable t) {
-				log.error(String.format("Error handling event %s by handler %s", event, listener), t);
+				LOG.error(String.format("Error handling event %s by handler %s", event, listener), t);
 			}
 		}
 	}

@@ -49,7 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class HibernateTestCase {
-    private static final Logger log = LoggerFactory.getLogger(HibernateTestCase.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HibernateTestCase.class);
     private static final String HIBERNATE_CONNECTION_URL = SQLiteSessionFactory.HIBERNATE_CONNECTION_URL;
     private static final String HIBERNATE_CONNECTION_DRIVER_CLASS =
                                 SQLiteSessionFactory.HIBERNATE_CONNECTION_DRIVER_CLASS;
@@ -124,12 +124,12 @@ public abstract class HibernateTestCase {
             conn = DriverManager.getConnection(H2_CONNECTION_URL);
             stmt = conn.createStatement();
             String cmd = "create domain geometry as blob";
-            log.debug("Executing {}", cmd);
+            LOG.debug("Executing {}", cmd);
             stmt.execute(cmd);
             Configuration configuration = new Configuration().configure("/sos-hibernate.cfg.xml");
             String[] ddl = configuration.generateSchemaCreationScript(new GeoDBDialect());
             for (String s : ddl) {
-                log.debug("Executing {}", s);
+                LOG.debug("Executing {}", s);
                 stmt.execute(s);
             }
         } catch (ClassNotFoundException ex) {

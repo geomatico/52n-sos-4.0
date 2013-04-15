@@ -48,7 +48,7 @@ public class InstallFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
             ServletException {
         if (dbsh.exists()) {
-            ((HttpServletResponse) response).sendError(404);
+            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
             chain.doFilter(request, response);
         }

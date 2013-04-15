@@ -44,8 +44,6 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.MinMax;
 import org.n52.sos.util.SosHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * interface for getting observations for a passed getObservation request from
@@ -53,8 +51,6 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractGetObservationDAO.class);
 
     public AbstractGetObservationDAO() {
         super(SosConstants.Operations.GetObservation.name());

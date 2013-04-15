@@ -50,7 +50,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class AdminDatabaseController extends AbstractAdminController {
-    private static final Logger log = LoggerFactory.getLogger(AdminDatabaseController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AdminDatabaseController.class);
     private static final String TEST_OFFERING_PREFIX = "test_offering";
     private static final String ROWS = "rows";
     private static final String NAMES = "names";
@@ -80,7 +80,7 @@ public class AdminDatabaseController extends AbstractAdminController {
     public String processQuery(@RequestBody String querySQL) {
         try {
             String q = URLDecoder.decode(querySQL, "UTF-8");
-            log.info("Query: {}", q);
+            LOG.info("Query: {}", q);
             GeneralQueryDAO dao = daoServiceLoader.iterator().next();
             GeneralQueryDAO.QueryResult rs = dao.query(q);
 
@@ -98,10 +98,10 @@ public class AdminDatabaseController extends AbstractAdminController {
 
             return new JSONObject().put(ROWS, rows).put(NAMES, names).toString();
         } catch (UnsupportedEncodingException ex) {
-            log.error("Could not decode String", ex);
+            LOG.error("Could not decode String", ex);
             return "Could not decode String: " + ex.getMessage();
         } catch (Exception ex) {
-            log.error("Query unsuccesfull.", ex);
+            LOG.error("Query unsuccesfull.", ex);
             return "Query unsuccesfull. Cause: " + ex.getMessage();
         }
     }
@@ -110,7 +110,7 @@ public class AdminDatabaseController extends AbstractAdminController {
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE_REMOVE_TEST_DATA, method = RequestMethod.POST)
     public void removeTestData() throws SQLException, OwsExceptionReport, FileNotFoundException,
                                         ConnectionProviderException {
-        log.info("Removing test data set.");
+        LOG.info("Removing test data set.");
         executeSqlFile(ControllerConstants.REMOVE_TEST_DATA_SQL_FILE);
         updateCache();
     }
@@ -119,7 +119,7 @@ public class AdminDatabaseController extends AbstractAdminController {
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE_CREATE_TEST_DATA, method = RequestMethod.POST)
     public void createTestData() throws SQLException, OwsExceptionReport, FileNotFoundException,
                                         ConnectionProviderException {
-        log.info("Inserting test data set.");
+        LOG.info("Inserting test data set.");
         executeSqlFile(ControllerConstants.INSERT_TEST_DATA_SQL_FILE);
         updateCache();
     }

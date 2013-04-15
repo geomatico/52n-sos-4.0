@@ -35,10 +35,8 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.config.annotation.Configurable;
-import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.XmlDecodingException;
@@ -64,7 +62,6 @@ import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -272,7 +269,7 @@ public class HibernateProcedureUtilities {
                         quantity.setUom("degree"); // TODO add to mapping or setting
                         sweCoordinates.add(new SosSweCoordinate<Double>(easting,quantity));
                 }
-                if (oAltitude != null && oAltitude instanceof Double)
+                if (oAltitude instanceof Double)
                 {
                         final SosSweQuantity quantity = new SosSweQuantity();
                         quantity.setValue((Double)oAltitude);

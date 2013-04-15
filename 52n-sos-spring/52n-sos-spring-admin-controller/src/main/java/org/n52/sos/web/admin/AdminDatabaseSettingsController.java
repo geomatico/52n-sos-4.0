@@ -49,7 +49,7 @@ import org.springframework.web.servlet.view.RedirectView;
 @Controller
 @RequestMapping(ControllerConstants.Paths.ADMIN_DATABASE_SETTINGS)
 public class AdminDatabaseSettingsController extends AbstractController {
-    private static final Logger log = LoggerFactory.getLogger(AdminDatabaseSettingsController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AdminDatabaseSettingsController.class);
 
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView view() {
@@ -58,7 +58,7 @@ public class AdminDatabaseSettingsController extends AbstractController {
             return new ModelAndView(ControllerConstants.Views.ADMIN_DATABASE_SETTINGS,
                                     ControllerConstants.JDBC_PARAMETER, new JdbcUrl(p));
         } catch (Exception ex) {
-            log.error("Error reading database settings", ex);
+            LOG.error("Error reading database settings", ex);
             return new ModelAndView(ControllerConstants.Views.ADMIN_DATABASE_SETTINGS,
                                     ControllerConstants.ERROR_MODEL_ATTRIBUTE, ex.getMessage());
         }
@@ -66,7 +66,7 @@ public class AdminDatabaseSettingsController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ModelAndView save(@RequestParam(ControllerConstants.JDBC_PARAMETER) String jdbc) {
-        log.debug("JDBCURI: {}", jdbc);
+        LOG.debug("JDBCURI: {}", jdbc);
         try {
             JdbcUrl jdbcUrl = new JdbcUrl(jdbc);
             String error = jdbcUrl.isValid();
@@ -90,7 +90,7 @@ public class AdminDatabaseSettingsController extends AbstractController {
                     try {
                         con.close();
                     } catch (SQLException e) {
-                        log.warn("Can not close connection.", e);
+                        LOG.warn("Can not close connection.", e);
                     }
 
                 }
@@ -119,7 +119,7 @@ public class AdminDatabaseSettingsController extends AbstractController {
         if (uri != null) {
             model.put(ControllerConstants.JDBC_PARAMETER, uri);
         }
-        log.error("Error saving database settings: " + message, e);
+        LOG.error("Error saving database settings: " + message, e);
         return new ModelAndView(ControllerConstants.Views.ADMIN_DATABASE_SETTINGS, model);
     }
 }

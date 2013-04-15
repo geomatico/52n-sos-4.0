@@ -462,35 +462,31 @@ public class HibernateObservationUtilities {
                     if (fieldForToken instanceof SosSweTime) {
                         try {
                             phenomenonTime = new TimeInstant(DateTimeHelper.parseIsoString2DateTime(token));
+                        } catch (OwsExceptionReport e) {
+                            throw e;
                         } catch (Exception e) {
-                            if (e instanceof OwsExceptionReport) {
-                                throw (OwsExceptionReport) e;
-                            } else {
-                                /*
-                                 * FIXME what is the valid exception code if the
-                                 * result is not correct?
-                                 */
-                                throw new NoApplicableCodeException().causedBy(e).withMessage(
-                                        "Error while parse time String to DateTime!");
-                            }
+                            /*
+                             * FIXME what is the valid exception code if the
+                             * result is not correct?
+                             */
+                            throw new NoApplicableCodeException().causedBy(e).withMessage(
+                                    "Error while parse time String to DateTime!");
                         }
                     } else if (fieldForToken instanceof SosSweTimeRange) {
                         try {
                             String[] subTokens = token.split("/");
                             phenomenonTime =
                                     new TimePeriod(DateTimeHelper.parseIsoString2DateTime(subTokens[0]),
-                                            DateTimeHelper.parseIsoString2DateTime(subTokens[1]));
+                                           DateTimeHelper.parseIsoString2DateTime(subTokens[1]));
+                        } catch (OwsExceptionReport e) {
+                            throw e;
                         } catch (Exception e) {
-                            if (e instanceof OwsExceptionReport) {
-                                throw (OwsExceptionReport) e;
-                            } else {
-                                /*
-                                 * FIXME what is the valid exception code if the
-                                 * result is not correct?
-                                 */
-                                throw new NoApplicableCodeException().causedBy(e).withMessage(
-                                        "Error while parse time String to DateTime!");
-                            }
+                            /*
+                             * FIXME what is the valid exception code if the
+                             * result is not correct?
+                             */
+                            throw new NoApplicableCodeException().causedBy(e).withMessage(
+                                    "Error while parse time String to DateTime!");
                         }
                     }
                     /*

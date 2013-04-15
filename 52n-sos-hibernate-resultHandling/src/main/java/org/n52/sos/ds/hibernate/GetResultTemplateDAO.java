@@ -34,14 +34,8 @@ import org.n52.sos.exception.sos.concrete.NoSweCommonEncodingForOfferingObservab
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.GetResultTemplateRequest;
 import org.n52.sos.response.GetResultTemplateResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GetResultTemplateDAO extends AbstractGetResultTemplateDAO {
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(InsertResultDAO.class);
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
     @Override
