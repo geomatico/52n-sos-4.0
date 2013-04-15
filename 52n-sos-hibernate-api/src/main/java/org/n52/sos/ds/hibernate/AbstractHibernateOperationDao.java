@@ -23,8 +23,6 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +36,8 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.ListMultiMap;
+import org.n52.sos.util.MultiMaps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,51 +92,27 @@ public abstract class AbstractHibernateOperationDao implements OperationDAO {
      * @throws OwsExceptionReport
      */
     protected Map<String, List<String>> getDCP(OperationDecoderKey decoderKey) throws OwsExceptionReport {
-        List<String> httpGetUrls = new LinkedList<String>();
-        List<String> httpPostUrls = new LinkedList<String>();
-        List<String> httpPutUrls = new LinkedList<String>();
-        List<String> httpDeleteUrls = new LinkedList<String>();
+        ListMultiMap<String, String> dcp = MultiMaps.newListMultiMap();
         String serviceURL = Configurator.getInstance().getServiceURL();
         try {
             for (Binding binding : Configurator.getInstance().getBindingRepository().getBindings().values()) {
-                // HTTP-Get
-                if (binding.checkOperationHttpGetSupported( decoderKey)) {
-                    httpGetUrls.add(serviceURL + binding.getUrlPattern() + "?");
+                String url = serviceURL + binding.getUrlPattern();
+                if (binding.checkOperationHttpGetSupported(decoderKey)) {
+                    dcp.add(SosConstants.HTTP_GET, url + "?");
                 }
-                // HTTP-Post
                 if (binding.checkOperationHttpPostSupported(decoderKey)) {
-                    httpPostUrls.add(serviceURL + binding.getUrlPattern());
+                    dcp.add(SosConstants.HTTP_POST, url);
                 }
-                // HTTP-PUT
                 if (binding.checkOperationHttpPutSupported(decoderKey)) {
-                    httpPutUrls.add(serviceURL + binding.getUrlPattern());
+                    dcp.add(SosConstants.HTTP_PUT, url);
                 }
-                // HTTP-DELETE
                 if (binding.checkOperationHttpDeleteSupported(decoderKey)) {
-                    httpDeleteUrls.add(serviceURL + binding.getUrlPattern());
+                    dcp.add(SosConstants.HTTP_DELETE, url);
                 }
-
             }
         } catch (Exception e) {
-            if (e instanceof OwsExceptionReport) {
-                throw (OwsExceptionReport) e;
-            }
             // FIXME valid exception
-            throw new NoApplicableCodeException();
-        }
-
-        Map<String, List<String>> dcp = new HashMap<String, List<String>>(4);
-        if (!httpGetUrls.isEmpty()) {
-            dcp.put(SosConstants.HTTP_GET, httpGetUrls);
-        }
-        if (!httpPostUrls.isEmpty()) {
-            dcp.put(SosConstants.HTTP_POST, httpPostUrls);
-        }
-        if (!httpPutUrls.isEmpty()) {
-            dcp.put(SosConstants.HTTP_PUT, httpPutUrls);
-        }
-        if (!httpDeleteUrls.isEmpty()) {
-            dcp.put(SosConstants.HTTP_DELETE, httpDeleteUrls);
+            throw new NoApplicableCodeException().causedBy(e);
         }
         return dcp;
     }
