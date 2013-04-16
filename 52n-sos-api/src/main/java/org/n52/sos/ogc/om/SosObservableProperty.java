@@ -105,4 +105,8 @@ public class SosObservableProperty extends AbstractSosPhenomenon {
     public void setValueType(String valueType) {
         this.valueType = valueType;
     }
+
+    public boolean isSetUnit() {
+        return unit != null && !unit.isEmpty();
+    }
 }
