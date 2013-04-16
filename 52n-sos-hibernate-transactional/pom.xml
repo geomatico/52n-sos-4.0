@@ -1,35 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<parent>
-		<artifactId>52n-sos</artifactId>
-		<groupId>org.n52.sensorweb.sos</groupId>
-		<version>4.0.0-SNAPSHOT</version>
-	</parent>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>52n-sos-hibernate-transactional</artifactId>
-	<packaging>jar</packaging>
-	<name>52North SOS Transactional Hibernate DAOs</name>
-	<description>52North Sensor Observation Service Transactional Profile Hibernate DAOs module</description>
-	<dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>52n-sos-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>52n-sos-hibernate-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>52n-sos-hibernate-common</artifactId>
-		</dependency>
-		<!-- TODO remove after changing from document to type saving in resultTemplate -->
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>52n-sos-coding-sos-v20</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
-	
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>52n-sos</artifactId>
+        <groupId>org.n52.sensorweb.sos</groupId>
+        <version>4.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>52n-sos-hibernate-transactional</artifactId>
+    <packaging>jar</packaging>
+    <name>52North SOS Transactional Hibernate DAOs</name>
+    <description>52North Sensor Observation Service Transactional Profile Hibernate DAOs module</description>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>52n-sos-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>52n-sos-hibernate-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>52n-sos-hibernate-common</artifactId>
+        </dependency>
+        <!-- TODO remove after changing from document to type saving in resultTemplate -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>52n-sos-coding-sos-v20</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>

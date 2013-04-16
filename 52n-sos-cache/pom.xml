@@ -28,7 +28,7 @@
             <artifactId>52n-sos-api</artifactId>
         </dependency>
         <dependency>
-			<groupId>${project.groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>52n-sos-test</artifactId>
             <scope>test</scope>
         </dependency>

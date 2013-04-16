@@ -28,5 +28,5 @@
             <artifactId>52n-sos-test</artifactId>
             <scope>test</scope>
         </dependency>
-   </dependencies>
+    </dependencies>
 </project>
