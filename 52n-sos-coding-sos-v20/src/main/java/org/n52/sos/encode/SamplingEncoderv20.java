@@ -48,6 +48,7 @@ import org.n52.sos.ogc.om.NamedValue;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.features.SosFeatureCollection;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
@@ -177,11 +178,22 @@ public class SamplingEncoderv20 implements Encoder<XmlObject, SosAbstractFeature
                 // set sampledFeatures
                 // TODO: CHECK
                 if (sampFeat.getSampledFeatures() != null && !sampFeat.getSampledFeatures().isEmpty()) {
-                    for (SosAbstractFeature sampledFeature : sampFeat.getSampledFeatures()) {
+                    if (sampFeat.getSampledFeatures().size() == 1) {
                         XmlObject encodeObjectToXml = CodingHelper
-                                .encodeObjectToXml(GMLConstants.NS_GML_32, sampledFeature);
+                                .encodeObjectToXml(GMLConstants.NS_GML_32, sampFeat.getSampledFeatures().get(0));
+                        xbSampFeature.addNewSampledFeature().set(encodeObjectToXml);
+                    } else {
+                        SosFeatureCollection featureCollection = new SosFeatureCollection();
+                        featureCollection.setGmlId("sampledFeatures_" + absFeature.getGmlId());
+                        for (SosAbstractFeature sampledFeature : sampFeat.getSampledFeatures()) {
+                            featureCollection.addMember(sampledFeature);
+                        }
+                        XmlObject encodeObjectToXml = CodingHelper
+                                .encodeObjectToXml(GMLConstants.NS_GML_32, featureCollection);
                         xbSampFeature.addNewSampledFeature().set(encodeObjectToXml);
                     }
+                    
+                   
                 } else {
                     xbSampFeature.addNewSampledFeature().setHref(GMLConstants.NIL_UNKNOWN);
                 }
