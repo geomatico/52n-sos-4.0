@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ogc.om.features;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.n52.sos.ogc.gml.CodeWithAuthority;
@@ -36,8 +37,12 @@ public class SosFeatureCollection extends SosAbstractFeature {
     /**
      * members of this feature collection
      */
-    private Map<String, SosAbstractFeature> members;
-
+    private Map<String, SosAbstractFeature> members = new HashMap<String, SosAbstractFeature>(0);
+    
+    public SosFeatureCollection() {
+        super(new CodeWithAuthority("gml:FeatureCollection"));
+    }
+    
     /**
      * constructor
      * 
@@ -65,6 +70,14 @@ public class SosFeatureCollection extends SosAbstractFeature {
      *            the members to set
      */
     public void setMembers(Map<String, SosAbstractFeature> members) {
-        this.members = members;
+        this.members.putAll(members);
+    }
+    
+    public void addMember(SosAbstractFeature member) {
+        members.put(member.getIdentifier().getValue(), member);
+    }
+    
+    public boolean isSetMembers() {
+        return members != null && !members.isEmpty();
     }
 }
