@@ -25,6 +25,7 @@ package org.n52.sos.encode;
 
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,8 @@ import net.opengis.gml.x32.CodeWithAuthorityType;
 import net.opengis.gml.x32.DirectPositionListType;
 import net.opengis.gml.x32.DirectPositionType;
 import net.opengis.gml.x32.EnvelopeType;
+import net.opengis.gml.x32.FeatureCollectionDocument;
+import net.opengis.gml.x32.FeatureCollectionType;
 import net.opengis.gml.x32.FeaturePropertyType;
 import net.opengis.gml.x32.LineStringType;
 import net.opengis.gml.x32.LinearRingType;
@@ -61,6 +64,7 @@ import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.features.SosFeatureCollection;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
@@ -78,6 +82,7 @@ import org.n52.sos.util.MinMax;
 import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,7 +108,8 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
             org.n52.sos.ogc.gml.CodeWithAuthority.class,
             org.n52.sos.ogc.gml.CodeType.class,
             SosSamplingFeature.class,
-            SosEnvelope.class
+            SosEnvelope.class,
+            SosFeatureCollection.class
             );
 
     public GmlEncoderv321() {
@@ -167,6 +173,34 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
 
     private XmlObject createFeaturePropertyType(SosAbstractFeature feature, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
+        if (feature instanceof SosFeatureCollection) {
+             return createFeatureCollection((SosFeatureCollection)feature, additionalValues);
+        } else if (feature instanceof SosSamplingFeature) {
+             return createFeature((SosSamplingFeature)feature, additionalValues);
+        } else {
+            throw new UnsupportedEncoderInputException(this, feature);
+        }
+    }
+
+    private XmlObject createFeatureCollection(SosFeatureCollection element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+        FeatureCollectionDocument featureCollectionDoc = FeatureCollectionDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        FeatureCollectionType featureCollection = featureCollectionDoc.addNewFeatureCollection();
+        featureCollection.setId(element.getGmlId());
+        if (element.isSetMembers()) {
+            for (SosAbstractFeature abstractFeature : element.getMembers().values()) {
+                featureCollection.addNewFeatureMember().set(createFeaturePropertyType(abstractFeature, new HashMap<HelperValues, String>(0)));
+            }
+        } 
+        if (additionalValues.containsKey(HelperValues.DOCUMENT)) {
+           return featureCollectionDoc;
+        }
+        FeaturePropertyType featurePropertyType = FeaturePropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        featurePropertyType.addNewAbstractFeature().set(featureCollection);
+        return XmlHelper.substituteElement(featurePropertyType.getAbstractFeature(), featurePropertyType);
+//        return featureCollection;
+    }
+
+    private XmlObject createFeature(SosAbstractFeature feature, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         FeaturePropertyType featurePropertyType = FeaturePropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (!(feature instanceof SosSamplingFeature)) {
             featurePropertyType.setHref(feature.getIdentifier().getValue());
