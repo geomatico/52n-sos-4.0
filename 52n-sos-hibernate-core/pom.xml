@@ -23,6 +23,16 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-hibernate-common</artifactId>
-		</dependency>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>52n-sos-hibernate-h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>52n-sos-test</artifactId>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 </project>

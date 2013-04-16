@@ -13,33 +13,40 @@
     <name>52North Sensor Observation Service</name>
     <description>52North Sensor Observation Service - Parent POM for defining dependency versions</description>
     <inceptionYear>2012</inceptionYear>
+    <packaging>pom</packaging>
     <issueManagement>
         <system>Bugzilla</system>
         <url>https://bugzilla.52north.org/</url>
     </issueManagement>
-    <packaging>pom</packaging>
     <ciManagement>
         <system>hudson</system>
         <url>http://build.dev.52north.org/jenkins/job/sos-dev/</url>
     </ciManagement>
     <modules>
         <module>52n-sos-api</module>
-        <module>52n-sos-config-sqlite</module>
-        <module>52n-sos-admin</module>
-        <module>52n-sos-hibernate-api</module>
-        <module>52n-sos-hibernate-common</module>
-        <module>52n-sos-hibernate-mappings</module>
-        <module>52n-sos-hibernate-dialect</module>
-        <module>52n-sos-hibernate-feature</module>
-        <module>52n-sos-hibernate-core</module>
-        <module>52n-sos-hibernate-h2</module>
-        <module>52n-sos-cache</module>
-        <module>52n-sos-core-v20</module>
-        <module>52n-sos-core-gc-dao</module>
+        <module>52n-sos-binding-kvp</module>
+        <module>52n-sos-binding-pox</module>
+        <module>52n-sos-binding-soap</module>
         <module>52n-sos-coding-ows-v110</module>
         <module>52n-sos-coding-sensorML-v101</module>
+        <module>52n-sos-coding-sos-v100</module>
         <module>52n-sos-coding-sos-v20</module>
-        <module>52n-sos-profile</module>
+        <module>52n-sos-coding-wml-v20</module>
+        <module>52n-sos-config-sqlite</module>
+        <module>52n-sos-core-v100</module>
+        <module>52n-sos-core-v20</module>
+        <module>52n-sos-enhanced-v20</module>
+        <module>52n-sos-hibernate-common</module>
+        <module>52n-sos-hibernate-core</module>
+        <module>52n-sos-hibernate-dialect</module>
+        <module>52n-sos-hibernate-enhanced</module>
+        <module>52n-sos-hibernate-feature</module>
+        <module>52n-sos-hibernate-resultHandling</module>
+        <module>52n-sos-hibernate-h2</module>
+        <module>52n-sos-hibernate-transactional</module>
+        <module>52n-sos-resultHandling-v20</module>
+        <module>52n-sos-test</module>
+        <module>52n-sos-transactional-v20</module>
         <module>52n-sos-spring</module>
         <module>52n-sos-webapp</module>
     </modules>
@@ -62,6 +69,8 @@
         <config.logger.fileappender.filepath>${catalina.base}/logs</config.logger.fileappender.filepath>
         <config.logger.fileappender.filename>${conf.sos.name}</config.logger.fileappender.filename>
         <config.logger.level>INFO</config.logger.level>
+        <config.logger.level.test.n52>INFO</config.logger.level.test.n52>
+        <config.logger.level.test.global>WARN</config.logger.level.test.global>
         <config.logger.history.max>30</config.logger.history.max>
         <config.logger.maxFileSize>10MB</config.logger.maxFileSize>
 
@@ -263,6 +272,12 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>52n-sos-spring-client-controller</artifactId>
                 <version>${sos.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>52n-sos-test</artifactId>
+                <version>${sos.version}</version>
+				<scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -505,6 +520,11 @@
                 <scope>runtime</scope>
             </dependency>
             <dependency>
+                <groupId>wsdl4j</groupId>
+                <artifactId>wsdl4j</artifactId>
+                <version>1.6.2</version>
+            </dependency>
+            <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>52n-sos-coding-wml-v20</artifactId>
                 <version>${sos.version}</version>
@@ -585,15 +605,6 @@
     </dependencyManagement>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <compilerVersion>1.6</compilerVersion>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
             <plugin>
                 <!-- execute "install" goal during release:prepare (instead of "integration-test") -->
                 <groupId>org.apache.maven.plugins</groupId>
@@ -695,33 +706,21 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>xmlbeans-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>main</id>
-                        <goals>
-                            <goal>xmlbeans</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <!-- xmlbeans plugin only used to generate the classes not for compiling
-                    or jar generation. -->
-                    <noJavac>true</noJavac>
-                    <memoryInitialSize>256</memoryInitialSize>
-                    <memoryMaximumSize>256</memoryMaximumSize>
-                    <download>false</download>
-                </configuration>
-            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
-                <plugin>
+				<plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>xmlbeans-maven-plugin</artifactId>
                     <version>2.3.3</version>
+                    <configuration>
+                        <!-- xmlbeans plugin only used to generate the classes not for compiling
+                        or jar generation. -->
+                        <noJavac>true</noJavac>
+                        <memoryInitialSize>256</memoryInitialSize>
+                        <memoryMaximumSize>256</memoryMaximumSize>
+                        <download>false</download>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -807,7 +806,6 @@
             </plugins>
         </pluginManagement>
     </build>
-    <!-- SVN connection -->
     <scm>
         <developerConnection>scm:svn:https://52north.org/svn/swe/main/SOS/Service/branches/52n-sos-400-refactored</developerConnection>
         <url>https://52north.org/svn/swe/main/SOS/Service/branches/52n-sos-400-refactored</url>
@@ -869,149 +867,40 @@
     </repositories>
     <profiles>
         <profile>
-            <id>test</id>
-            <modules>
-                <module>52n-sos-test</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>both</id>
-            <modules>
-                <module>52n-sos-binding-kvp</module>
-                <module>52n-sos-binding-soap</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>kvp</id>
-            <modules>
-                <module>52n-sos-binding-kvp</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>soap</id>
-            <modules>
-                <module>52n-sos-binding-soap</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>default</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>52n-sos-binding-kvp</module>
-                <module>52n-sos-binding-soap</module>
-                <module>52n-sos-enhanced-v20</module>
-                <module>52n-sos-hibernate-enhanced</module>
-                <module>52n-sos-transactional-v20</module>
-                <module>52n-sos-hibernate-transactional</module>
-                <module>52n-sos-resultHandling-v20</module>
-                <module>52n-sos-hibernate-resultHandling</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>develop</id>
-            <modules>
-                <module>52n-sos-binding-kvp</module>
-                <module>52n-sos-binding-pox</module>
-                <module>52n-sos-binding-soap</module>
-                <module>52n-sos-enhanced-v20</module>
-                <module>52n-sos-hibernate-enhanced</module>
-                <module>52n-sos-transactional-v20</module>
-                <module>52n-sos-hibernate-transactional</module>
-                <module>52n-sos-resultHandling-v20</module>
-                <module>52n-sos-hibernate-resultHandling</module>
-                <module>52n-sos-core-v100</module>
-                <module>52n-sos-coding-sos-v100</module>
-                <module>52n-sos-coding-wml-v20</module>
-                <module>52n-sos-gda</module>
-                <module>52n-sos-binding-rest</module>
-                <module>52n-sos-ext-do</module>
-            </modules>
-            <properties>
-                <config.logger.level>TRACE</config.logger.level>
-            </properties>
-        </profile>
-        <profile>
-            <id>autermann</id>
-            <modules>
-                <module>52n-sos-api</module>
-                <module>52n-sos-config-sqlite</module>
-                <module>52n-sos-binding-kvp</module>
-                <module>52n-sos-binding-pox</module>
-                <module>52n-sos-binding-soap</module>
-                <module>52n-sos-coding-ows-v110</module>
-                <module>52n-sos-coding-sensorML-v101</module>
-                <module>52n-sos-coding-sos-v100</module>
-                <module>52n-sos-coding-sos-v20</module>
-                <module>52n-sos-coding-wml-v20</module>
-                <module>52n-sos-core-v100</module>
-                <module>52n-sos-core-v20</module>
-                <module>52n-sos-enhanced-v20</module>
-                <module>52n-sos-gda</module>
-                <module>52n-sos-hibernate-common</module>
-                <module>52n-sos-hibernate-core</module>
-                <module>52n-sos-hibernate-dialect</module>
-                <module>52n-sos-hibernate-enhanced</module>
-                <module>52n-sos-hibernate-feature</module>
-                <module>52n-sos-hibernate-resultHandling</module>
-                <module>52n-sos-hibernate-transactional</module>
-                <module>52n-sos-resultHandling-v20</module>
-                <module>52n-sos-transactional-v20</module>
-                <module>52n-sos-webapp</module>
-                <module>52n-sos-ext-do</module>
-                <module>52n-sos-binding-rest</module>
-                <!--<module>52n-sos-test</module> -->
-            </modules>
-            <properties>
-                <config.logger.level>TRACE</config.logger.level>
-            </properties>
-        </profile>
-        <profile>
-            <id>sosV100</id>
-            <modules>
-                <module>52n-sos-core-v100</module>
-                <module>52n-sos-coding-sos-v100</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>enhancedV20</id>
-            <modules>
-                <module>52n-sos-enhanced-v20</module>
-                <module>52n-sos-hibernate-enhanced</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>transactionalV20</id>
-            <modules>
-                <module>52n-sos-transactional-v20</module>
-                <module>52n-sos-hibernate-transactional</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>resultHandlingV20</id>
-            <modules>
-                <module>52n-sos-resultHandling-v20</module>
-                <module>52n-sos-hibernate-resultHandling</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>pox</id>
-            <modules>
-                <module>52n-sos-binding-pox</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>wml</id>
-            <modules>
-                <module>52n-sos-coding-wml-v20</module>
-            </modules>
-        </profile>
-        <profile>
+            <!-- Requires svn:externals definition for 52n-sos-gda -->
             <id>gda</id>
             <modules>
                 <module>52n-sos-gda</module>
             </modules>
+        </profile>
+        <profile>
+            <!-- Requires svn:externals definition for 52n-sos-ext-do -->
+            <id>do</id>
+            <modules>
+                <module>52n-sos-ext-do</module>
+            </modules>
+        </profile>
+        <profile>
+            <!-- Requires svn:externals definition for 52n-sos-ext-do and 52n-sos-binding-rest -->
+            <id>restful</id>
+            <modules>
+                <module>52n-sos-binding-rest</module>
+                <module>52n-sos-ext-do</module>
+            </modules>
+        </profile>
+        <profile>
+            <!-- Requires svn:externals definition for 52n-sos-ext-do, 52n-sos-binding-rest and 52n-sos-gda -->
+            <id>develop</id>
+            <modules>
+                <module>52n-sos-gda</module>
+                <module>52n-sos-binding-rest</module>
+                <module>52n-sos-ext-do</module>
+            </modules>
+            <properties>
+                <config.logger.level.test.global>WARN</config.logger.level.test.global>
+                <config.logger.level.test.n52>WARN</config.logger.level.test.n52>
+                <config.logger.level>TRACE</config.logger.level>
+            </properties>
         </profile>
         <profile>
             <id>diagram</id>
@@ -1026,27 +915,9 @@
             </modules>
         </profile>
         <profile>
-            <id>restful</id>
-            <!-- Requires svn:externals definition for 52n-sos-ext-do and 52n-sos-binding-rest -->
-            <modules>
-                <module>52n-sos-binding-rest</module>
-                <module>52n-sos-ext-do</module>
-            </modules>
-        </profile>
-        <profile>
             <id>release</id>
             <!-- a profile which shall be activated if a release is performed, it
             is also automatic activated in the ci environment. -->
-            <modules>
-                <module>52n-sos-binding-kvp</module>
-                <module>52n-sos-binding-soap</module>
-                <module>52n-sos-enhanced-v20</module>
-                <module>52n-sos-hibernate-enhanced</module>
-                <module>52n-sos-transactional-v20</module>
-                <module>52n-sos-hibernate-transactional</module>
-                <module>52n-sos-resultHandling-v20</module>
-                <module>52n-sos-hibernate-resultHandling</module>
-            </modules>
             <activation>
                 <property>
                     <name>env</name>
@@ -1080,13 +951,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>do</id>
-            <!-- Requires svn:externals definition for 52n-sos-ext-do -->
-            <modules>
-                <module>52n-sos-ext-do</module>
-            </modules>
         </profile>
     </profiles>
 </project>

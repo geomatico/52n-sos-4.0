@@ -38,7 +38,6 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projection;
-import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
@@ -194,20 +193,18 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
      * Select max of max_end and max_start for final result
      */
     /**
-     * @return a Map containing the getEqualRestiction bounding box for each offering
+     * @return a Map containing the bounding box for each offering
      */
     public static Map<String, TimePeriod> getTemporalBoundingBoxesForOfferings(Session session) {
         if (session != null) {
-            //FIXME
-            ProjectionList projections = Projections.projectionList()
+            Criteria criteria = session.createCriteria(Observation.class)
+                    .add(Restrictions.eq(Observation.DELETED, false));
+            criteria.createAlias(Observation.OFFERINGS, "off");
+            criteria.setProjection(Projections.projectionList()
                     .add(Projections.min(Observation.PHENOMENON_TIME_START))
                     .add(Projections.max(Observation.PHENOMENON_TIME_START))
                     .add(Projections.max(Observation.PHENOMENON_TIME_END))
-                    .add(Projections.groupProperty(Observation.OFFERINGS));
-            Criteria criteria = session.createCriteria(Observation.class)
-                    .add(Restrictions.eq(Observation.DELETED, false))
-                    .setProjection(projections)
-                    .addOrder(Order.asc(Observation.OFFERINGS));
+                    .add(Projections.groupProperty("off." + Offering.IDENTIFIER)));
 
             List<?> temporalBoundingBoxes = criteria.list();
             if (!temporalBoundingBoxes.isEmpty()) {
@@ -216,11 +213,10 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
                 for (Object recordObj : temporalBoundingBoxes) {
                     if (recordObj instanceof Object[]) {
                         Object[] record = (Object[]) recordObj;
-                        String key = ((Offering) record[3]).getIdentifier();
                         TimePeriod value = createTimePeriod((Timestamp) record[0],
                                                             (Timestamp) record[1],
                                                             (Timestamp) record[2]);
-                        temporalBBoxMap.put(key, value);
+                        temporalBBoxMap.put((String) record[3], value);
                     }
                 }
                 LOGGER.debug(temporalBoundingBoxes.toString());

@@ -89,9 +89,7 @@ public abstract class TemporalRestriction {
      *
      * @return the criterion for the temporal relation (or <tt>null</tt> if not applicable)
      */
-    protected Criterion filterPeriodWithPeriod(String selfBegin, String selfEnd, Date otherBegin, Date otherEnd) {
-        return null;
-    }
+    protected abstract Criterion filterPeriodWithPeriod(String selfBegin, String selfEnd, Date otherBegin, Date otherEnd);
 
     /**
      * Applies this restriction to the specified time instance and time period.

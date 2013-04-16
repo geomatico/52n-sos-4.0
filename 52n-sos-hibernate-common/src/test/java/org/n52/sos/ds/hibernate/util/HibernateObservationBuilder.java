@@ -29,7 +29,6 @@ import java.util.Date;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
-import org.n52.sos.ds.hibernate.HibernateTestCase;
 import org.n52.sos.ds.hibernate.entities.BooleanObservation;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.Codespace;
@@ -43,14 +42,16 @@ import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat;
 import org.n52.sos.ds.hibernate.entities.Unit;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
+import org.n52.sos.util.CollectionHelper;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class HibernateObservationBuilder extends HibernateTestCase {
+public class HibernateObservationBuilder {
     public static final String CODESPACE = "Codespace";
     public static final String UNIT = "Unit";
-    public static final String OFFERING = "Offering";
+    public static final String OFFERING_1 = "Offering1";
+    public static final String OFFERING_2 = "Offering2";
     public static final String FEATURE_OF_INTEREST = "FeatureOfInterest";
     public static final String OBSERVABLE_PROPERTY = "ObservableProperty";
     public static final String PROCEDURE_DESCRIPTION_FORMAT = "ProcedureDescriptionFormat";
@@ -75,7 +76,7 @@ public class HibernateObservationBuilder extends HibernateTestCase {
         observation.setValidTimeStart(validTimeStart);
         observation.setValidTimeEnd(validTimeEnd);
         observation.setObservableProperty(getObservableProperty());
-        observation.setOfferings(Collections.singleton(getOffering()));
+        observation.setOfferings(CollectionHelper.set(getOffering1(), getOffering2()));
         observation.setUnit(getUnit());
         observation.setCodespace(getCodespace());
         observation.setValue(getBooleanValue());
@@ -160,16 +161,34 @@ public class HibernateObservationBuilder extends HibernateTestCase {
         return observableProperty;
     }
 
-    protected Offering getOffering() {
+    protected Offering getOffering1() {
         Offering offering = (Offering) session
                 .createCriteria(Offering.class)
-                .add(Restrictions.eq(Offering.IDENTIFIER, OFFERING))
+                .add(Restrictions.eq(Offering.IDENTIFIER, OFFERING_1))
                 .uniqueResult();
         if (offering == null) {
             offering = new Offering();
             offering.setFeatureOfInterestTypes(Collections.singleton(getFeatureOfInterestType()));
-            offering.setIdentifier(OFFERING);
-            offering.setName(OFFERING);
+            offering.setIdentifier(OFFERING_1);
+            offering.setName(OFFERING_1);
+            offering.setObservationTypes(Collections.singleton(getObservationType()));
+            offering.setRelatedFeatures(null);
+            session.save(offering);
+            session.flush();
+        }
+        return offering;
+    }
+
+    protected Offering getOffering2() {
+        Offering offering = (Offering) session
+                .createCriteria(Offering.class)
+                .add(Restrictions.eq(Offering.IDENTIFIER, OFFERING_2))
+                .uniqueResult();
+        if (offering == null) {
+            offering = new Offering();
+            offering.setFeatureOfInterestTypes(Collections.singleton(getFeatureOfInterestType()));
+            offering.setIdentifier(OFFERING_2);
+            offering.setName(OFFERING_2);
             offering.setObservationTypes(Collections.singleton(getObservationType()));
             offering.setRelatedFeatures(null);
             session.save(offering);
