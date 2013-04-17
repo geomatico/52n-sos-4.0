@@ -23,6 +23,8 @@
  */
 package org.n52.sos.exception.ows.concrete;
 
+import java.util.List;
+
 import org.n52.sos.exception.ows.VersionNegotiationFailedException;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.util.StringHelper;
@@ -36,5 +38,10 @@ public class InvalidAcceptVersionsParameterException extends VersionNegotiationF
     public InvalidAcceptVersionsParameterException(String... acceptVersions) {
         withMessage("The requested %s values (%s) are not supported by this service!", SosConstants.GetCapabilitiesParams.AcceptVersions, StringHelper
                 .join(", ", (Object[]) acceptVersions));
+    }
+    
+    public InvalidAcceptVersionsParameterException(List<String> acceptVersions) {
+        withMessage("The requested %s values (%s) are not supported by this service!", SosConstants.GetCapabilitiesParams.AcceptVersions, StringHelper
+                .join(", ", acceptVersions));
     }
 }
