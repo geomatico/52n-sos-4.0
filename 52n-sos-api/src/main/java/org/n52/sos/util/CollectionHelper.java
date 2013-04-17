@@ -94,6 +94,21 @@ public class CollectionHelper {
             }
         };
     }
+    
+    public static <T> List<T> asList(final Iterable<? extends T> iterable) {
+        return (iterable instanceof Collection)
+               ? new LinkedList<T>((Collection<? extends T>) iterable)
+               : new LinkedList<T>() {
+            private static final long serialVersionUID = 3109256773218160485L;
+            {
+                if (iterable != null) {
+                    for (T t : iterable) {
+                        add(t);
+                    }
+                }
+            }
+        };
+    }
 
     public static <T> Set<T> unmodifiableSet(Set<? extends T> s) {
         return (s == null) ? Collections.<T>emptySet() : Collections.unmodifiableSet(s);
