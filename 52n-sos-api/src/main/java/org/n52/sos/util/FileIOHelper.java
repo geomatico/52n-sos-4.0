@@ -39,7 +39,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 /**
  * Utility class for file handling
  */
-public class FileIOHelper {
+public final class FileIOHelper {
 
     private static final byte LINE_FEED = (byte) '\n';
     private static final byte CARRIAGE_RETURN = (byte) '\r';

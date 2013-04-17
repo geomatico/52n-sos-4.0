@@ -37,7 +37,7 @@ import java.util.Set;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class CollectionHelper {
+public final class CollectionHelper {
     public static <T> Set<T> set(final T... elements) {
         HashSet<T> set = new HashSet<T>(elements.length);
         Collections.addAll(set, elements);

@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class GmlHelper {
+public final class GmlHelper {
     
     
     public static  QName getQnameForGeometry(Geometry geom) {

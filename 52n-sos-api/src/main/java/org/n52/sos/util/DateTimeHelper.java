@@ -31,12 +31,13 @@ import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.ISOPeriodFormat;
+import org.n52.sos.exception.ows.concrete.DateTimeException;
+import org.n52.sos.exception.ows.concrete.DateTimeFormatException;
+import org.n52.sos.exception.ows.concrete.DateTimeParseException;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.ITime.TimeFormat;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.exception.ows.concrete.DateTimeFormatException;
-import org.n52.sos.exception.ows.concrete.DateTimeParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * Utility class for Time formatting and parsing. Uses Joda Time.
  * 
  */
-public class DateTimeHelper {
+public final class DateTimeHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DateTimeHelper.class);
 

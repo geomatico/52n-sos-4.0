@@ -44,7 +44,7 @@ import org.n52.sos.ogc.swe.SWEConstants;
  * Utility class for 52N
  * 
  */
-public class N52XmlHelper {
+public final class N52XmlHelper {
 
     /**
      * Sets the schema location to a XmlObject

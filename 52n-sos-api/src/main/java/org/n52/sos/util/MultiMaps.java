@@ -26,7 +26,7 @@ package org.n52.sos.util;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class MultiMaps {
+public final class MultiMaps {
     public static <K, V> SetMultiMap<K, V> newSetMultiMap() {
         return new HashSetMultiMap<K, V>();
     }

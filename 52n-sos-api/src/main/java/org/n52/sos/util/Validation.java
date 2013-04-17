@@ -29,7 +29,7 @@ import org.n52.sos.exception.ConfigurationException;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class Validation {
+public final class Validation {
 
     public static void notNull(String name, Object val) throws ConfigurationException {
         if (val == null) {

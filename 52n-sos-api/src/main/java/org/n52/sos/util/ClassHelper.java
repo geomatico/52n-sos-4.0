@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class ClassHelper {
+public final class ClassHelper {
     
     private static final Logger LOG = LoggerFactory.getLogger(ClassHelper.class);
     

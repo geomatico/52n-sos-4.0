@@ -41,7 +41,7 @@ import org.n52.sos.ogc.sos.SosConstants;
  * Utility class for Key-Value-Pair (KVP) requests
  * 
  */
-public class KvpHelper {
+public final class KvpHelper {
 
     public static Map<String, String> getKvpParameterValueMap(HttpServletRequest req) {
         Map<String, String> kvp = new HashMap<String, String>();

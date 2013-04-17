@@ -40,7 +40,8 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 /**
  * class offers util methods for Exceptions used in this SOS
  */
-public class Util4Exceptions {
+@Deprecated
+public final class Util4Exceptions {
     @Deprecated
     public static OwsExceptionReport createMissingMandatoryParameterException(String parameterName) {
         return createMissingParameterValueException(parameterName);

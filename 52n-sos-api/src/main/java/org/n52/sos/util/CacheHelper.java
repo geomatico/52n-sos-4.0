@@ -25,7 +25,7 @@ package org.n52.sos.util;
 
 import org.n52.sos.service.Configurator;
 
-public class CacheHelper {
+public final class CacheHelper {
 
     protected static Configurator getConfigurator() {
         return Configurator.getInstance();

@@ -41,7 +41,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class W3cHelper {
+public final class W3cHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(W3cHelper.class);
 

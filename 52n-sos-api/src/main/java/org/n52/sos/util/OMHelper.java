@@ -37,7 +37,7 @@ import org.n52.sos.ogc.om.values.TextValue;
  * Utility class for Observation and Measurement
  * 
  */
-public class OMHelper {
+public final class OMHelper {
 
     public static String getNamespaceForFeatureType(String featureType) {
         if (featureType.equals(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_POINT)

@@ -26,7 +26,7 @@ package org.n52.sos.util;
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class StringHelper {
+public final class StringHelper {
 
     public static StringBuffer join(CharSequence sep, StringBuffer buff, Iterable<?> src) {
         Iterator<?> it = src.iterator();

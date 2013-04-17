@@ -47,7 +47,7 @@ import org.n52.sos.service.Configurator;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class CodingHelper {
+public final class CodingHelper {
     
     public static Object decodeXmlElement(XmlObject x) throws OwsExceptionReport {
         return decodeXmlObject(x);

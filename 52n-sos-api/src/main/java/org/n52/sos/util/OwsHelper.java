@@ -27,7 +27,7 @@ import javax.xml.namespace.QName;
 
 import org.n52.sos.ogc.ows.OWSConstants;
 
-public class OwsHelper {
+public final class OwsHelper {
 
     /**
      * Sets the first character to UpperCase.

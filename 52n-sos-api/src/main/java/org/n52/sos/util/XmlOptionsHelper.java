@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * SOS XML utility class
  * 
  */
-public class XmlOptionsHelper {
+public final class XmlOptionsHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlOptionsHelper.class);
 
     /**

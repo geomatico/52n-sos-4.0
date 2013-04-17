@@ -61,7 +61,7 @@ import org.w3c.dom.NodeList;
 /**
  * XML utility class TODO add javadoc to public methods.
  */
-public class XmlHelper {
+public final class XmlHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlHelper.class);
 

@@ -38,7 +38,7 @@ import java.sql.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SQLHelper {
+public final class SQLHelper {
 
     private static final Logger LOG = LoggerFactory.getLogger(SQLHelper.class);
 

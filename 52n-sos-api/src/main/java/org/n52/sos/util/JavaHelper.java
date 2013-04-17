@@ -31,7 +31,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JavaHelper {
+public final class JavaHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaHelper.class);
 

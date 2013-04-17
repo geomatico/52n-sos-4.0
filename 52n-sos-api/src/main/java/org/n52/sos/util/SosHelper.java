@@ -68,6 +68,8 @@ import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.request.operator.AbstractRequestOperator;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
