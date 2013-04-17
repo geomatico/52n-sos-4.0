@@ -23,16 +23,25 @@
  */
 package org.n52.sos.ogc.swes;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  */
 @SuppressWarnings("rawtypes")
 public class SwesExtensions {
 
-    private SwesExtension[] extensions;
+    private Set<SwesExtension> extensions = new HashSet<SwesExtension>(0);
 
+    @Deprecated
     public SwesExtensions(SwesExtension[] extensions) {
-        this.extensions = extensions;
+        for (SwesExtension swesExtension : extensions) {
+            addSwesExtension(swesExtension);
+        }
+    }
+    
+    public SwesExtensions() {
     }
 
     /**
@@ -52,6 +61,10 @@ public class SwesExtensions {
             }
         }
         return false;
+    }
+
+    public void addSwesExtension(SwesExtension<?> extension) {
+        extensions.add(extension);
     }
     
 }
