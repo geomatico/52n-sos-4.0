@@ -31,8 +31,13 @@ import org.n52.sos.exception.ows.concrete.XmlDecodingException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.SosHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SosResultEncoding {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(SosHelper.class);
     
     private String xml;
 
@@ -99,6 +104,16 @@ public class SosResultEncoding {
             return false;
         }
         return true;
+    }
+    
+    @Override
+    public int hashCode() {
+        try {
+            return getEncoding().hashCode();
+        } catch (OwsExceptionReport e) {
+            LOGGER.error("Error while parsing resultStructure", e);
+        }
+        return super.hashCode();
     }
 
 }
