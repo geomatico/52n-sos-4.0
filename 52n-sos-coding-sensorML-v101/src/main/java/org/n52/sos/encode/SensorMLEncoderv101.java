@@ -273,15 +273,15 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
     private XmlObject createSensorMLDescription(final SensorML smlSensorDesc) throws OwsExceptionReport {
         final SensorMLDocument sensorMLDoc =
                 SensorMLDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        final net.opengis.sensorML.x101.SensorMLDocument.SensorML xb_sensorML = sensorMLDoc.addNewSensorML();
-        xb_sensorML.setVersion(SensorMLConstants.VERSION_V101);
+        final net.opengis.sensorML.x101.SensorMLDocument.SensorML xbSensorML = sensorMLDoc.addNewSensorML();
+        xbSensorML.setVersion(SensorMLConstants.VERSION_V101);
         // TODO: Eike: set all other elements
         if (smlSensorDesc.isSetMembers()) {
             for (final AbstractProcess sml : smlSensorDesc.getMembers()) {
                 if (sml instanceof System) {
                     // TODO create a method for each type
-                    final SystemType xb_system =
-                            (SystemType) xb_sensorML
+                    final SystemType xbSystem =
+                            (SystemType) xbSensorML
                                     .addNewMember()
                                     .addNewProcess()
                                     .substitute(new QName(SensorMLConstants.NS_SML, SensorMLConstants.EN_SYSTEM),
@@ -289,15 +289,15 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                     final System smlSystem = (System) sml;
                     // TODO howTo without explicit setting
                     smlSystem.setFeatureOfInterest(smlSensorDesc.getFeatureOfInterest());
-                    addAbstractProcessValues(xb_system, smlSystem);
-                    addSystemValues(xb_system, smlSystem);
+                    addAbstractProcessValues(xbSystem, smlSystem);
+                    addSystemValues(xbSystem, smlSystem);
                     // set position
                     if (smlSystem.isSetPosition()) {
-                        xb_system.setPosition(createPosition(smlSystem.getPosition()));
+                        xbSystem.setPosition(createPosition(smlSystem.getPosition()));
                     }
                     // set outputs
                     if (smlSystem.isSetOutputs()) {
-                        xb_system.setOutputs(createOutputs(smlSystem.getOutputs()));
+                        xbSystem.setOutputs(createOutputs(smlSystem.getOutputs()));
                     }
                 }
             }
@@ -307,105 +307,105 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
     }
 
     private ContactList createContactList(final List<SmlContact> contacts) {
-        final ContactList xb_contacts = ContactList.Factory.newInstance();
+        final ContactList xbContacts = ContactList.Factory.newInstance();
         for (final SmlContact smlContact : contacts) {
             if (smlContact instanceof SmlPerson) {
-                xb_contacts.addNewMember().addNewPerson().set(createPerson((SmlPerson) smlContact));
+                xbContacts.addNewMember().addNewPerson().set(createPerson((SmlPerson) smlContact));
             } else if (smlContact instanceof SmlResponsibleParty) {
-                xb_contacts.addNewMember().addNewResponsibleParty()
+                xbContacts.addNewMember().addNewResponsibleParty()
                         .set(createResponsibleParty((SmlResponsibleParty) smlContact));
             }
         }
-        return xb_contacts;
+        return xbContacts;
     }
 
     private XmlObject createResponsibleParty(final SmlResponsibleParty smlRespParty) {
-        final ResponsibleParty xb_respParty = ResponsibleParty.Factory.newInstance();
+        final ResponsibleParty xbRespParty = ResponsibleParty.Factory.newInstance();
         if (smlRespParty.isSetIndividualName()) {
-            xb_respParty.setIndividualName(smlRespParty.getInvidualName());
+            xbRespParty.setIndividualName(smlRespParty.getInvidualName());
         }
         if (smlRespParty.isSetOrganizationName()) {
-            xb_respParty.setOrganizationName(smlRespParty.getOrganizationName());
+            xbRespParty.setOrganizationName(smlRespParty.getOrganizationName());
         }
         if (smlRespParty.isSetPositionName()) {
-            xb_respParty.setPositionName(smlRespParty.getPositionName());
+            xbRespParty.setPositionName(smlRespParty.getPositionName());
         }
         if (smlRespParty.isSetContactInfo()) {
-            xb_respParty.setContactInfo(createContactInfo(smlRespParty));
+            xbRespParty.setContactInfo(createContactInfo(smlRespParty));
         }
-        return xb_respParty;
+        return xbRespParty;
     }
 
     private ContactInfo createContactInfo(final SmlResponsibleParty smlRespParty) {
-        final ContactInfo xb_contactInfo = ContactInfo.Factory.newInstance();
+        final ContactInfo xbContactInfo = ContactInfo.Factory.newInstance();
         if (smlRespParty.isSetHoursOfService()) {
-            xb_contactInfo.setHoursOfService(smlRespParty.getHoursOfService());
+            xbContactInfo.setHoursOfService(smlRespParty.getHoursOfService());
         }
         if (smlRespParty.isSetContactInstructions()) {
-            xb_contactInfo.setHoursOfService(smlRespParty.getContactInstructions());
+            xbContactInfo.setHoursOfService(smlRespParty.getContactInstructions());
         }
         if (smlRespParty.isSetOnlineResources()) {
             for (final String onlineResouce : smlRespParty.getOnlineResources()) {
-                xb_contactInfo.addNewOnlineResource().setHref(onlineResouce);
+                xbContactInfo.addNewOnlineResource().setHref(onlineResouce);
             }
         }
         if (smlRespParty.isSetPhone()) {
-            final Phone xb_phone = xb_contactInfo.addNewPhone();
+            final Phone xbPhone = xbContactInfo.addNewPhone();
             if (smlRespParty.isSetPhoneFax()) {
                 for (final String fax : smlRespParty.getPhoneFax()) {
-                    xb_phone.addFacsimile(fax);
+                    xbPhone.addFacsimile(fax);
                 }
             }
             if (smlRespParty.isSetPhoneVoice()) {
                 for (final String voice : smlRespParty.getPhoneVoice()) {
-                    xb_phone.addVoice(voice);
+                    xbPhone.addVoice(voice);
                 }
             }
         }
         if (smlRespParty.isSetAddress()) {
-            final Address xb_address = xb_contactInfo.addNewAddress();
+            final Address xbAddress = xbContactInfo.addNewAddress();
             if (smlRespParty.isSetDeliveryPoint()) {
                 for (final String deliveryPoint : smlRespParty.getDeliveryPoint()) {
-                    xb_address.addDeliveryPoint(deliveryPoint);
+                    xbAddress.addDeliveryPoint(deliveryPoint);
                 }
             }
             if (smlRespParty.isSetCity()) {
-                xb_address.setCity(smlRespParty.getCity());
+                xbAddress.setCity(smlRespParty.getCity());
             }
             if (smlRespParty.isSetAdministrativeArea()) {
-                xb_address.setAdministrativeArea(smlRespParty.getAdministrativeArea());
+                xbAddress.setAdministrativeArea(smlRespParty.getAdministrativeArea());
             }
             if (smlRespParty.isSetPostalCode()) {
-                xb_address.setPostalCode(smlRespParty.getPostalCode());
+                xbAddress.setPostalCode(smlRespParty.getPostalCode());
             }
             if (smlRespParty.isSetCountry()) {
-                xb_address.setCountry(smlRespParty.getCountry());
+                xbAddress.setCountry(smlRespParty.getCountry());
             }
         }
-        return xb_contactInfo;
+        return xbContactInfo;
     }
 
     private Person createPerson(final SmlPerson smlPerson) {
-        final Person xb_person = Person.Factory.newInstance();
+        final Person xbPerson = Person.Factory.newInstance();
         if (smlPerson.isSetAffiliation()) {
-            xb_person.setAffiliation(smlPerson.getAffiliation());
+            xbPerson.setAffiliation(smlPerson.getAffiliation());
         }
         if (smlPerson.isSetEmail()) {
-            xb_person.setEmail(smlPerson.getEmail());
+            xbPerson.setEmail(smlPerson.getEmail());
         }
         if (smlPerson.isSetName()) {
-            xb_person.setName(smlPerson.getName());
+            xbPerson.setName(smlPerson.getName());
         }
         if (smlPerson.isSetPhoneNumber()) {
-            xb_person.setPhoneNumber(smlPerson.getPhoneNumber());
+            xbPerson.setPhoneNumber(smlPerson.getPhoneNumber());
         }
         if (smlPerson.isSetSurname()) {
-            xb_person.setSurname(smlPerson.getSurname());
+            xbPerson.setSurname(smlPerson.getSurname());
         }
         if (smlPerson.isSetUserID()) {
-            xb_person.setUserID(smlPerson.getUserID());
+            xbPerson.setUserID(smlPerson.getUserID());
         }
-        return xb_person;
+        return xbPerson;
     }
 
     private String createDescription(final List<String> descriptions) {
@@ -420,17 +420,17 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
     }
 
     private Classifier[] createClassifierArray(final List<SosSMLClassifier> classifications) {
-        final Classifier[] xb_classifier = new Classifier[classifications.size()];
-        for (int i = 0; i < xb_classifier.length; i++) {
+        final Classifier[] xbClassifier = new Classifier[classifications.size()];
+        for (int i = 0; i < xbClassifier.length; i++) {
             if (classifications.get(i) != null) {
-                xb_classifier[i] = Classifier.Factory.newInstance();
-                xb_classifier[i].setName(classifications.get(i).getName());
-                final Term term = xb_classifier[i].addNewTerm();
+                xbClassifier[i] = Classifier.Factory.newInstance();
+                xbClassifier[i].setName(classifications.get(i).getName());
+                final Term term = xbClassifier[i].addNewTerm();
                 term.setDefinition(classifications.get(i).getDefinition());
                 term.setValue(classifications.get(i).getValue());
             }
         }
-        return xb_classifier;
+        return xbClassifier;
     }
 
     private XmlObject createProcessDescription(final AbstractProcess sensorDesc) throws OwsExceptionReport {

@@ -257,7 +257,7 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
         if (timeInstant.isSetGmlId()) {
             timeInstantType.setId(timeInstant.getGmlId());
         }
-        TimePositionType xb_posType = timeInstantType.addNewTimePosition();
+        TimePositionType xbPosType = timeInstantType.addNewTimePosition();
 
         String timeString = OGCConstants.UNKNOWN;
         if(timeInstant.isSetValue()) {
@@ -272,7 +272,7 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
         } else if (timeInstant.isSetIndeterminateValue()) {
             timeString = timeInstant.getIndeterminateValue();
         }
-        xb_posType.setStringValue(timeString);
+        xbPosType.setStringValue(timeString);
         return timeInstantType;
     }
 

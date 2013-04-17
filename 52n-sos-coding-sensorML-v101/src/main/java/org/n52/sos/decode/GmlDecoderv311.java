@@ -105,12 +105,12 @@ public class GmlDecoderv311 implements Decoder<Object, XmlObject> {
         }
     }
 
-    private Geometry getGeometry4BBOX(EnvelopeDocument xb_bbox) throws OwsExceptionReport {
-        EnvelopeType xb_envelope = xb_bbox.getEnvelope();
+    private Geometry getGeometry4BBOX(EnvelopeDocument xbBbox) throws OwsExceptionReport {
+        EnvelopeType xbEnvelope = xbBbox.getEnvelope();
         // parse srid; if not set, throw exception!
-        int srid = SosHelper.parseSrsName(xb_envelope.getSrsName());
-        String lower = xb_envelope.getLowerCorner().getStringValue();
-        String upper = xb_envelope.getUpperCorner().getStringValue();
+        int srid = SosHelper.parseSrsName(xbEnvelope.getSrsName());
+        String lower = xbEnvelope.getLowerCorner().getStringValue();
+        String upper = xbEnvelope.getUpperCorner().getStringValue();
         String geomWKT = String.format("MULTIPOINT(%s, %s)", lower, upper);
         return JTSHelper.createGeometryFromWKT(geomWKT, srid).getEnvelope();
     }

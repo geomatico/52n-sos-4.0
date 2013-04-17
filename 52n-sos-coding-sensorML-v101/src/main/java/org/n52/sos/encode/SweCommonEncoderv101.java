@@ -475,13 +475,13 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
 //                                new QName(SWEConstants.NS_SWE, SWEConstants.EN_TEXT_ENCODING,
 //                                        SWEConstants.NS_SWE_PREFIX), TextBlock.type);
             }
-            DataValuePropertyType xb_values = xbDataArray.addNewValues();
+            DataValuePropertyType xbValues = xbDataArray.addNewValues();
 //            if (absObs.getObservationTemplateIDs() == null
 //                    || (absObs.getObservationTemplateIDs() != null && absObs.getObservationTemplateIDs().isEmpty())) {
-//                xb_values.newCursor().setTextValue(createResultString(phenComponents, absObs));
+//                xbValues.newCursor().setTextValue(createResultString(phenComponents, absObs));
 //            }
             if (sosDataArray.isSetValues()) {
-            	xb_values.set(createValues(sosDataArray.getValues(), sosDataArray.getEncoding()));
+            	xbValues.set(createValues(sosDataArray.getValues(), sosDataArray.getEncoding()));
             }
             return xbDataArrayDoc;
         }
