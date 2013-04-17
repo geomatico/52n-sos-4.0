@@ -82,4 +82,8 @@ public class SosSMLIo<T> {
     public void setIoValue(SosSweAbstractSimpleType<T> ioValue) {
         this.ioValue = ioValue;
     }
+
+    public boolean isSetName() {
+        return ioName != null && !ioName.isEmpty();
+    }
 }

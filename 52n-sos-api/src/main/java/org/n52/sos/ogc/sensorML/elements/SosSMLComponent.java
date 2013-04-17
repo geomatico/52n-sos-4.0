@@ -103,4 +103,8 @@ public class SosSMLComponent {
         return process;
     }
 
+    public boolean isSetProcess() {
+        return process != null;
+    }
+
 }
