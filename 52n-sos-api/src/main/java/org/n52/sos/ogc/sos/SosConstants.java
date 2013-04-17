@@ -51,6 +51,7 @@ public interface SosConstants {
     Set<String> ACCEPT_FORMATS = unmodifiableSet(set(CONTENT_TYPE_XML, CONTENT_TYPE_ZIP));
     /**
      * name of System capabilities containing parent procedures for RegisterSensor and DescribeSensor
+     * @deprecated Use {@link SensorMLConstants#ELEMENT_NAME_PARENT_PROCEDURES} instead
      */
     String SYS_CAP_PARENT_PROCEDURES_NAME = "parentProcedures";
     /**
