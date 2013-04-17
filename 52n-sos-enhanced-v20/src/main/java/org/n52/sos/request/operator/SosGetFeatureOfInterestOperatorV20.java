@@ -117,6 +117,9 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
         try {
             checkProcedureIDs(sosRequest.getProcedures(),
                     Sos2Constants.GetFeatureOfInterestParams.procedure.name());
+            if (sosRequest.isSetProcedures()) {
+                sosRequest.setProcedures(addChildProcedures(sosRequest.getProcedures()));
+            }
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }

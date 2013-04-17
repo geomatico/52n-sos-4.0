@@ -174,6 +174,10 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
         }
         try {
             checkProcedureIDs(sosRequest.getProcedures(), SosConstants.GetObservationParams.procedure.name());
+            // add child procedures to request
+            if (sosRequest.isSetProcedure()) {
+                sosRequest.setProcedures(addChildProcedures(sosRequest.getProcedures()));
+            }
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
