@@ -135,7 +135,7 @@ public class XmlHelper {
      * 
      * @throws OwsExceptionReport * if the Document is not valid
      */
-    public static void validateDocument(XmlObject doc) throws OwsExceptionReport {
+    public static boolean validateDocument(XmlObject doc) throws OwsExceptionReport {
         // Create an XmlOptions instance and set the error listener.
         LinkedList<XmlError> validationErrors = new LinkedList<XmlError>();
         XmlOptions validationOptions = new XmlOptions();
@@ -291,6 +291,7 @@ public class XmlHelper {
             }
             exceptions.throwIfNotEmpty();
         }
+        return isValid;
     }
 
     /**
