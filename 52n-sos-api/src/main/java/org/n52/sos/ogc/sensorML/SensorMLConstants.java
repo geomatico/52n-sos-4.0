@@ -51,7 +51,7 @@ public interface SensorMLConstants {
     String EN_COMPONENT = "Component";
 
     String EN_ABSTRACT_PROCESS = "AbstractProcess";
-
+    
     QName SYSTEM_QNAME = new QName(NS_SML, EN_SYSTEM, NS_SML_PREFIX);
 
     QName PROCESS_MODEL_QNAME = new QName(NS_SML, EN_PROCESS_MODEL, NS_SML_PREFIX);
@@ -66,5 +66,30 @@ public interface SensorMLConstants {
 	 * Name of a SensorML element describing the offering, a procedure/sensor is related to, or should be inserted into
 	 */
     String ELEMENT_NAME_OFFERING = "offering";
+    
+    /**
+     * name of System capabilities containing parent procedures
+     */
+    String ELEMENT_NAME_PARENT_PROCEDURES = "parentProcedures";
+    
+    // FIXME use a proper URI/URN for this, e.g. from settings
+    String PARENT_PROCEDURES_FIELD_DEFINITION = "http://www.opengis.net/def/procedure/identifier";
+    
+    String PARENT_PROCEDURES_FIELD_NAME = "ParentProcedureID";
+    
+    /**
+     * name of System capabilities containing featureOfInterest
+     */
+    String ELEMENT_NAME_FEATURE_OF_INTEREST = "featureOfInterest";
+    
+    /**
+     * name of System components containing child procedures
+     */
+    String ELEMENT_NAME_CHILD_PROCEDURES = "childProcedure";
+    
+    // FIXME use a proper URI/URN for this, e.g. from settings
+    String FEATURE_OF_INTEREST_FIELD_DEFINITION = "http://www.opengis.net/def/featureOfInterest/identifier";
+
+    String FEATURE_OF_INTEREST_FIELD_NAME = "FeatureOfInterestID";
 
 }
