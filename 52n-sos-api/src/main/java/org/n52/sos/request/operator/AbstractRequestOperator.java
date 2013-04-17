@@ -25,6 +25,7 @@ package org.n52.sos.request.operator;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -51,9 +52,11 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -422,6 +425,15 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
         } else if (!getCache().hasResultTemplate(resultTemplate)) {
             throw new InvalidParameterValueException(parameterName, resultTemplate);
         }
+    }
+    
+    protected List<String> addChildProcedures(Collection<String> procedures) {
+        Set<String> allProcedures = new HashSet<String>();
+        for (String procedure : procedures) {
+            allProcedures.add(procedure);
+            allProcedures.addAll(getCache().getChildProcedures(procedure, false, false));
+        }
+        return CollectionHelper.asList(allProcedures);
     }
 
     public void checkObservationType(String observationType, String parameterName) throws OwsExceptionReport {
