@@ -104,9 +104,9 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
             SensorMLDocument.class, SystemType.class, ProcessModelType.class);
     private static final Set<String> SUPPORTED_PROCEDURE_DESCRIPTION_FORMATS = 
             Collections.singleton(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
-    private static final Set<String> REMOVABLE_CAPABILITIES_NAMES = CollectionHelper.set("parentProcedures", "featureOfInterest");
-    private static final Set<String> REMOVABLE_COMPONENTS_ROLES = Collections.singleton("childProcedure");
-    private static final Set<String> REMOVABLE_IDENTIFIERS = Collections.singleton("offerings");
+    private static final Set<String> REMOVABLE_CAPABILITIES_NAMES = CollectionHelper.set(SensorMLConstants.ELEMENT_NAME_PARENT_PROCEDURES, SensorMLConstants.ELEMENT_NAME_FEATURE_OF_INTEREST);
+    private static final Set<String> REMOVABLE_COMPONENTS_ROLES = Collections.singleton(SensorMLConstants.ELEMENT_NAME_CHILD_PROCEDURES);
+    private static final Set<String> REMOVABLE_IDENTIFIERS = Collections.singleton(SensorMLConstants.ELEMENT_NAME_OFFERING);
 
     public SensorMLDecoderV101() {
         LOGGER.debug("Decoder for the following keys initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));
