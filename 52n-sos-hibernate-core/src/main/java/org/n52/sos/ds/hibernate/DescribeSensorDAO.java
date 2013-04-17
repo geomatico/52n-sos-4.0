@@ -124,32 +124,6 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
      */
     private Set<String> getParentProcedures(String procID, String version) throws OwsExceptionReport {
         return getCache().getParentProcedures(procID, false, false);
-        // if (parentProcedureIds != null && !parentProcedureIds.isEmpty()) {
-        // SosSMLCapabilities capabilities = new SosSMLCapabilities();
-        // capabilities.setName(SosConstants.SYS_CAP_PARENT_PROCEDURES_NAME);
-        // String urlPattern =
-        // SosHelper.getUrlPatternForHttpGetMethod(new
-        // OperationDecoderKey(SosConstants.SOS, version,
-        // SosConstants.Operations.DescribeSensor.name()));
-        // for (String parentProcID : parentProcedureIds) {
-        // SosGmlMetaDataProperty metadata = new SosGmlMetaDataProperty();
-        // metadata.setTitle(parentProcID);
-        // try {
-        // metadata.setHref(SosHelper.getDescribeSensorUrl(version,
-        // getConfigurator().getServiceURL(),
-        // parentProcID, urlPattern));
-        // } catch (UnsupportedEncodingException uee) {
-        // String exceptionText = "Error while encoding DescribeSensor URL";
-        // LOGGER.debug(exceptionText);
-        // throw Util4Exceptions.createNoApplicableCodeException(uee,
-        // exceptionText);
-        // }
-        // capabilities.addMetaDataProperties(metadata);
-        // }
-        // capabilities.setDataRecord(new SosSweSimpleDataRecord());
-        // return capabilities;
-        // }
-        // return null;
     }
 
     /**
@@ -159,7 +133,6 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
      *            System document to add child procedures to
      * @param childProcedures
      *            The child procedures to add
-
      *
      * @throws OwsExceptionReport
      */
@@ -167,37 +140,10 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
                                                             Session session) throws OwsExceptionReport {
         Set<SosProcedureDescription> childProcedures = new HashSet<SosProcedureDescription>(0);
         Collection<String> childProcedureIds = getCache().getChildProcedures(procID, false, false);
-
         if (childProcedureIds != null && !childProcedureIds.isEmpty()) {
-//            String urlPattern =
-//                    SosHelper.getUrlPatternForHttpGetMethod(new OperationDecoderKey(SosConstants.SOS, version,
-//                            SosConstants.Operations.DescribeSensor.name()));
             for (String childProcID : childProcedureIds) {
                 Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(childProcID, session);
                 childProcedures.add(HibernateProcedureUtilities.createSosProcedureDescription(procedure, childProcID, outputFormat));
-
-                // int childCount = 0;
-                // childCount++;
-                // SosSMLComponent component = new SosSMLComponent("component" +
-                // childCount);
-                // component.setTitle(childProcID);
-                // if
-                // (getConfigurator().isChildProceduresEncodedInParentsDescribeSensor())
-                // {
-                //
-                // } else {
-                // try {
-                // component.setHref(SosHelper.getDescribeSensorUrl(Sos2Constants.SERVICEVERSION,
-                // getConfigurator().getServiceURL(), childProcID, urlPattern));
-                // } catch (UnsupportedEncodingException uee) {
-                // String exceptionText =
-                // "Error while encoding DescribeSensor URL";
-                // LOGGER.debug(exceptionText);
-                // throw Util4Exceptions.createNoApplicableCodeException(uee,
-                // exceptionText);
-                // }
-                // }
-                // smlComponsents.add(component);
             }
         }
         return childProcedures;
