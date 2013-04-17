@@ -23,6 +23,7 @@
  */
 package org.n52.sos.decode.kvp.v2;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -83,7 +84,7 @@ public class GetCapabilitiesKvpDecoder extends AbstractKvpDecoder {
                 } // acceptVersions (optional)
                 else if (parameterName.equalsIgnoreCase(SosConstants.GetCapabilitiesParams.AcceptVersions.name())) {
                     if (!parameterValues.isEmpty()) {
-                        request.setAcceptVersions(parameterValues.split(","));
+                        request.setAcceptVersions(Arrays.asList(parameterValues.split(",")));
                     } else {
                         exceptions.add(new InvalidParameterValueException(parameterName, parameterValues));
                     }

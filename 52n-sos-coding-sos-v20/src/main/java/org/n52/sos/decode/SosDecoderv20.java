@@ -214,7 +214,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
         }
 
         if (getCapsType.getAcceptVersions() != null && getCapsType.getAcceptVersions().sizeOfVersionArray() != 0) {
-            request.setAcceptVersions(getCapsType.getAcceptVersions().getVersionArray());
+            request.setAcceptVersions(Arrays.asList(getCapsType.getAcceptVersions().getVersionArray()));
         }
 
         if (getCapsType.getSections() != null && getCapsType.getSections().getSectionArray().length != 0) {

@@ -182,11 +182,11 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
     private String getVersionParameter(GetCapabilitiesRequest request) throws OwsExceptionReport	{
 		if (request.getVersion() == null) {
     		if (request.getAcceptVersions() != null) {
-    			String[] acceptedVersion = request.getAcceptVersions();
-    			for (int i = 0; i < acceptedVersion.length; i++) {
+    			List<String> acceptedVersion = request.getAcceptVersions();
+    			for (int i = 0; i < acceptedVersion.size(); i++) {
     				if (getConfigurator().getServiceOperatorRepository()
-    						.isVersionSupported(acceptedVersion[i])) {
-    					return acceptedVersion[i];
+    						.isVersionSupported(acceptedVersion.get(i))) {
+    					return acceptedVersion.get(i);
     				}
     			}
     		} else {

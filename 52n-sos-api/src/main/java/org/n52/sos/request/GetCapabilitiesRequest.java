@@ -24,6 +24,7 @@
 package org.n52.sos.request;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.xmlbeans.XmlObject;
@@ -50,22 +51,22 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
     /**
      * Accept versions list
      */
-    private String[] acceptVersions;
+    private List<String> acceptVersions = new LinkedList<String>();
 
     /**
      * Sections list
      */
-    private List<String> sections;
+    private List<String> sections = new LinkedList<String>();
 
     /**
      * Accept formats list
      */
-    private List<String> acceptFormats;
+    private List<String> acceptFormats = new LinkedList<String>();
 
     /**
      * Extensions list
      */
-    private List<XmlObject> extensionArray;
+    private List<XmlObject> extensionArray = new LinkedList<XmlObject>();
 
     /**
      * constructor
@@ -103,7 +104,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
      *
      * @return accept versions
      */
-    public String[] getAcceptVersions() {
+    public List<String> getAcceptVersions() {
         return acceptVersions;
     }
 
@@ -113,8 +114,19 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
      * @param acceptVersions
      *            accept versions
      */
+    @Deprecated
     public void setAcceptVersions(String[] acceptVersions) {
-        this.acceptVersions = acceptVersions;
+        for (String acceptVersion : acceptVersions) {
+            addAcceptVersion(acceptVersion);
+        }
+    }
+
+    public void addAcceptVersion(String acceptVersion) {
+        acceptVersions.add(acceptVersion);
+    }
+    
+    public void setAcceptVersions(List<String> acceptVersions) {
+        this.acceptVersions.addAll(acceptVersions);
     }
 
     /**
@@ -182,10 +194,10 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 	@Override
     public ServiceOperatorKeyType[] getServiceOperatorKeyType() {
         if (serviceOperatorKeyTypes == null) {
-            if (acceptVersions != null && acceptVersions.length > 0) {
-                serviceOperatorKeyTypes = new ServiceOperatorKeyType[acceptVersions.length];
-                for (int i = 0; i < acceptVersions.length; i++) {
-                    serviceOperatorKeyTypes[i] = new ServiceOperatorKeyType(getService(), acceptVersions[i]);
+            if (acceptVersions != null && acceptVersions.size() > 0) {
+                serviceOperatorKeyTypes = new ServiceOperatorKeyType[acceptVersions.size()];
+                for (int i = 0; i < acceptVersions.size(); i++) {
+                    serviceOperatorKeyTypes[i] = new ServiceOperatorKeyType(getService(), acceptVersions.get(i));
                 }
             } else {
                 serviceOperatorKeyTypes = new ServiceOperatorKeyType[1];
@@ -201,7 +213,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
     }
 
     public boolean isSetAcceptVersions() {
-        return acceptVersions != null && acceptVersions.length > 0;
+        return acceptVersions != null && acceptVersions.size() > 0;
     }
 
 }
