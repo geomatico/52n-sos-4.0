@@ -60,6 +60,14 @@ public abstract class AbstractServiceCommunicationObject {
         return version;
     }
     
+    public boolean isSetService() {
+        return service != null && !service.isEmpty();
+    }
+    
+    public boolean isSetVersion() {
+        return version != null && !version.isEmpty();
+    }
+    
     @Override
 	public String toString() {
 		return String.format("%s[service=%s, version=%s]",

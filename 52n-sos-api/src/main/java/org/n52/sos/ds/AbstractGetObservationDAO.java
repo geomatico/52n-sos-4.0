@@ -79,7 +79,7 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
 
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
             // SOS 2.0 parameter
-            OWSParameterValueRange temporalFilter = new OWSParameterValueRange(getPhenomenonTime(), "om:phenomenonTime");
+            OWSParameterValueRange temporalFilter = new OWSParameterValueRange(getPhenomenonTime());
             opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.temporalFilter, temporalFilter);
             SosEnvelope envelope = null;
             if (featureIDs != null && !featureIDs.isEmpty()) {

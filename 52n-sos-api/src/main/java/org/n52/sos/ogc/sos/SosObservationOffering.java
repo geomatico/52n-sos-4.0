@@ -40,9 +40,9 @@ import org.n52.sos.util.QNameComparator;
 
 /**
  * Class which represents a ObservationOffering. Used in the SosCapabilities.
- *
+ * 
  */
-public class SosOfferingsForContents implements Comparable<SosOfferingsForContents> {
+public class SosObservationOffering implements Comparable<SosObservationOffering> {
     private static <T> void set(SortedSet<T> set, Collection<? extends T> coll) {
         if (set != null) {
             set.clear();
@@ -82,65 +82,83 @@ public class SosOfferingsForContents implements Comparable<SosOfferingsForConten
             }
         }
     }
+
     /**
      * offering identifier for this contents sub section
      */
     private String offering;
+
     /**
      * name of the offering
      */
     private String offeringName;
+
     private SosEnvelope observedArea;
+
     /**
      * All observableProperties contained in the offering
      */
     private SortedSet<String> observableProperties = new TreeSet<String>();
+
     /**
      * All compositePhenomenon contained in the offering
      */
     private SortedSet<String> compositePhenomena = new TreeSet<String>();
+
     /**
      * All phenomenon for compositePhenomenon contained in the offering
      */
     private SortedMap<String, SortedSet<String>> phens4CompPhens = new TreeMap<String, SortedSet<String>>();
+
     /**
      * TimePeriod of data in the offering
      */
     private ITime phenomenonTime;
+
     private ITime resultTime;
+
     /**
      * All featuresOfinterest contained in the offering
      */
     private SortedSet<String> featureOfInterest = new TreeSet<String>();
+
     /**
      * All related features contained in the offering
      */
     private SortedMap<String, SortedSet<String>> relatedFeatures = new TreeMap<String, SortedSet<String>>();
+
     /**
      * All procedures contained in the offering
      */
     private SortedSet<String> procedures = new TreeSet<String>();
+
     /**
      * All resultModels contained in the offering
      */
     private SortedSet<QName> resultModels = new TreeSet<QName>(new QNameComparator());
+
     /**
      * All observation types contained in the offering
      */
     private SortedSet<String> observationTypes = new TreeSet<String>();
+
     private SortedSet<String> featureOfInterestTypes = new TreeSet<String>();
+
     /**
      * All observation result types contained in the offering
      */
     private SortedMap<String, SortedSet<String>> observationResultTypes = new TreeMap<String, SortedSet<String>>();
+
     /**
      * All response formats contained in the offering
      */
     private SortedSet<String> responseFormats = new TreeSet<String>();
+
     /**
      * All response modes contained in the offering
      */
     private SortedSet<String> responseModes = new TreeSet<String>();
+
     private SortedSet<String> procedureDescriptionFormats = new TreeSet<String>();
 
     /**
@@ -214,7 +232,8 @@ public class SosOfferingsForContents implements Comparable<SosOfferingsForConten
     }
 
     /**
-     * @param phenomenonTime the phenomenon time
+     * @param phenomenonTime
+     *            the phenomenon time
      */
     public void setPhenomenonTime(ITime phenomenonTime) {
         this.phenomenonTime = phenomenonTime;
@@ -228,7 +247,8 @@ public class SosOfferingsForContents implements Comparable<SosOfferingsForConten
     }
 
     /**
-     * @param resultTime the result time
+     * @param resultTime
+     *            the result time
      */
     public void setResultTime(ITime resultTime) {
         this.resultTime = resultTime;
@@ -313,7 +333,8 @@ public class SosOfferingsForContents implements Comparable<SosOfferingsForConten
     }
 
     /**
-     * @param observationTypes the observationTypes to set
+     * @param observationTypes
+     *            the observationTypes to set
      */
     public void setObservationTypes(Collection<String> observationTypes) {
         set(this.observationTypes, observationTypes);
@@ -327,7 +348,8 @@ public class SosOfferingsForContents implements Comparable<SosOfferingsForConten
     }
 
     /**
-     * @param observationResultTypes the observationResultTypes to set
+     * @param observationResultTypes
+     *            the observationResultTypes to set
      */
     public void setObservationResultTypes(Map<String, Collection<String>> observationResultTypes) {
         set(this.observationResultTypes, observationResultTypes);
@@ -386,7 +408,92 @@ public class SosOfferingsForContents implements Comparable<SosOfferingsForConten
     }
 
     @Override
-    public int compareTo(SosOfferingsForContents o) {
+    public int compareTo(SosObservationOffering o) {
         return getOffering().compareTo(o.getOffering());
+    }
+
+    public boolean isEmpty() {
+        return !isSetOffering() && !isSetOfferingName() && !isSetObservedArea() && !isSetObservableProperties()
+                && !isSetCompositePhenomena() && !isSetPhens4CompPhens() && !isSetPhenomenonTime()
+                && !isSetResultTime() && !isSetFeatureOfInterest() && !isSetRelatedFeature() && !isSetProcedures()
+                && !isSetresultModels() && !isSetObservationTypes() && !isSetFeatureOfInterestTypes()
+                && !isSetObservationResultTypes() && !isSetResponseFormats() && !isSetResponseModes()
+                && !isSetProcedureDescriptionFormats();
+    }
+    
+    public boolean isValidObservationOffering() {
+        return isSetOffering() && isSetProcedures();
+    }
+
+    private boolean isSetOffering() {
+        return offering != null && !offering.isEmpty();
+    }
+
+    private boolean isSetOfferingName() {
+        return offeringName != null && !offeringName.isEmpty();
+    }
+
+    private boolean isSetObservedArea() {
+        return observedArea != null && observedArea.isSetEnvelope();
+    }
+
+    private boolean isSetObservableProperties() {
+        return observableProperties != null && !observableProperties.isEmpty();
+    }
+
+    private boolean isSetCompositePhenomena() {
+        return compositePhenomena != null && !compositePhenomena.isEmpty();
+    }
+
+    private boolean isSetPhens4CompPhens() {
+        return phens4CompPhens != null && !phens4CompPhens.isEmpty();
+    }
+
+    private boolean isSetPhenomenonTime() {
+        return phenomenonTime != null;
+    }
+
+    private boolean isSetResultTime() {
+        return resultTime != null;
+    }
+
+    private boolean isSetFeatureOfInterest() {
+        return featureOfInterest != null && !featureOfInterest.isEmpty();
+    }
+
+    private boolean isSetRelatedFeature() {
+        return relatedFeatures != null && !relatedFeatures.isEmpty();
+    }
+
+    private boolean isSetProcedures() {
+        return procedures != null && !procedures.isEmpty();
+    }
+
+    private boolean isSetresultModels() {
+        return responseModes != null && !resultModels.isEmpty();
+    }
+
+    private boolean isSetObservationTypes() {
+        return observationTypes != null && !observationTypes.isEmpty();
+    }
+
+    private boolean isSetFeatureOfInterestTypes() {
+        return featureOfInterestTypes != null && !featureOfInterestTypes.isEmpty();
+    }
+
+    private boolean isSetObservationResultTypes() {
+        return observationResultTypes != null && !observationResultTypes.isEmpty();
+    }
+
+    private boolean isSetResponseFormats() {
+        return responseFormats != null && !responseFormats.isEmpty();
+    }
+
+    private boolean isSetResponseModes() {
+        return responseModes != null && !responseModes.isEmpty();
+    }
+
+    private boolean isSetProcedureDescriptionFormats() {
+        return procedureDescriptionFormats != null && !procedureDescriptionFormats.isEmpty();
     }
 }

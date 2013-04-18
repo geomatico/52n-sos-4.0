@@ -46,6 +46,7 @@ public class OWSParameterValueRange implements IOWSParameterValue {
         this(mm.getMinimum(), mm.getMaximum());
     }
     
+    @Deprecated
     public OWSParameterValueRange(MinMax<String> mm, String valueRefernce) {
         this(mm.getMinimum(), mm.getMaximum(), valueRefernce);
     }
@@ -66,14 +67,15 @@ public class OWSParameterValueRange implements IOWSParameterValue {
         this.maxValue = maxValue;
     }
 
+    @Deprecated
     public String getValueReference() {
         return valueReference;
     }
-
+    @Deprecated
     public void setValueReference(String valueReference) {
         this.valueReference = valueReference;
     }
-    
+    @Deprecated
     public boolean isSetValueReference() {
         return valueReference != null && !valueReference.isEmpty();
     }

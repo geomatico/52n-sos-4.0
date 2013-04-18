@@ -72,12 +72,8 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
      * constructor
      */
     public GetCapabilitiesRequest() {
-        String notSet = SosConstants.PARAMETER_NOT_SET;
         setService(SosConstants.SOS);
-        updateSequence = notSet;
-        acceptVersions = null;
-        sections = null;
-        acceptFormats = null;
+        setUpdateSequence(SosConstants.PARAMETER_NOT_SET);
     }
 
     /**
@@ -216,4 +212,15 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
         return acceptVersions != null && acceptVersions.size() > 0;
     }
 
+    public boolean isSetSections() {
+        return sections != null && !sections.isEmpty();
+    }
+   
+    public boolean isSetUpdateSequence() {
+        return updateSequence != null && !updateSequence.isEmpty() && !updateSequence.equals(SosConstants.PARAMETER_NOT_SET);
+    }
+    
+    public boolean isSetExtensions() {
+        return extensionArray != null && !extensionArray.isEmpty();
+    }
 }

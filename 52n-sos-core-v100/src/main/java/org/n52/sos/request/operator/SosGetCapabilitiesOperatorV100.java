@@ -67,9 +67,8 @@ public class SosGetCapabilitiesOperatorV100 extends AbstractV1RequestOperator<Ab
          * whether the response format should be zip (true) or xml (false)
          */
         boolean zipCompr = false;
-        List<String> acceptFormats = sosRequest.getAcceptFormats();
-        if (acceptFormats != null) {
-            zipCompr = checkAcceptFormats(acceptFormats);
+        if (sosRequest.isSetAcceptFormats()) {
+            zipCompr = checkAcceptFormats(sosRequest.getAcceptFormats());
         }
 
         GetCapabilitiesResponse response = getDao().getCapabilities(sosRequest);

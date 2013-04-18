@@ -32,7 +32,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.n52.sos.ogc.filter.FilterCapabilities;
-import org.n52.sos.ogc.sos.SosOfferingsForContents;
+import org.n52.sos.ogc.sos.SosObservationOffering;
 
 /**
  * Class which represents the Capabilities.
@@ -63,7 +63,7 @@ public class SosCapabilities {
     /**
      * All ObservationOfferings provided by this SOS.
      */
-    private SortedSet<SosOfferingsForContents> contents = new TreeSet<SosOfferingsForContents>();
+    private SortedSet<SosObservationOffering> contents = new TreeSet<SosObservationOffering>();
 
     /**
      * extensions
@@ -153,7 +153,7 @@ public class SosCapabilities {
      * 
      * @return contents data
      */
-    public SortedSet<SosOfferingsForContents> getContents() {
+    public SortedSet<SosObservationOffering> getContents() {
         return Collections.unmodifiableSortedSet(contents);
     }
 
@@ -163,8 +163,8 @@ public class SosCapabilities {
      * @param contents
      *            contents data
      */
-    public void setContents(Collection<SosOfferingsForContents> contents) {
-        this.contents = new TreeSet<SosOfferingsForContents>(contents);
+    public void setContents(Collection<SosObservationOffering> contents) {
+        this.contents = new TreeSet<SosObservationOffering>(contents);
     }
 
     /**
@@ -185,5 +185,9 @@ public class SosCapabilities {
      */
     public List<SwesExtension> getExtensions() {
         return Collections.unmodifiableList(this.extensions);
+    }
+
+    public boolean isSetContents() {
+        return contents != null && !contents.isEmpty();
     }
 }
