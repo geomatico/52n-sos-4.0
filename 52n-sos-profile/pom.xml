@@ -8,30 +8,11 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>52n-sos-profile</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <name>52North SOS Profile module</name>
     <description>52North SOS profile module</description>
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.xmlbeans</groupId>
-            <artifactId>xmlbeans</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-api</artifactId>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>xmlbeans-maven-plugin</artifactId>
-                <configuration>
-                    <sourceSchemas>
-                        <sourceSchema>sos-profile.xsd</sourceSchema>
-                    </sourceSchemas>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <modules>
+    	<module>52n-sos-profile-xml</module>
+    	<module>52n-sos-profile-coding</module>
+    </modules>
 </project>
