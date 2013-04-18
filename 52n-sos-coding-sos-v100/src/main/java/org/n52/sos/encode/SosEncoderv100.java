@@ -97,7 +97,7 @@ import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
-import org.n52.sos.ogc.sos.SosOfferingsForContents;
+import org.n52.sos.ogc.sos.SosObservationOffering;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.AbstractServiceResponse;
 import org.n52.sos.response.DescribeSensorResponse;
@@ -528,12 +528,12 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
      *
      * @throws OwsExceptionReport     *             if an error occurs.
      */
-    private void setContents(Contents xbContents, Collection<SosOfferingsForContents> offerings, String version)
+    private void setContents(Contents xbContents, Collection<SosObservationOffering> offerings, String version)
             throws OwsExceptionReport {
         // Contents xbContType = xbContents.addNewContents();
     	ObservationOfferingList xb_ooList = xbContents.addNewObservationOfferingList();
 
-        for (SosOfferingsForContents offering : offerings) {
+        for (SosObservationOffering offering : offerings) {
 
             ObservationOfferingType xb_oo = xb_ooList.addNewObservationOffering();
             // TDO check NAme or ID
