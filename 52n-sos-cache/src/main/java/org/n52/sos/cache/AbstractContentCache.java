@@ -305,6 +305,7 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
     private SetMultiMap<String, String> proceduresForFeaturesOfInterest = newSynchronizedSetMultiMap();
     private SetMultiMap<String, String> proceduresForObservableProperties = newSynchronizedSetMultiMap();
     private SetMultiMap<String, String> proceduresForOfferings = newSynchronizedSetMultiMap();
+    private SetMultiMap<String, String> hiddenChildProceduresForOfferings = newSynchronizedSetMultiMap();
     private SetMultiMap<String, String> relatedFeaturesForOfferings = newSynchronizedSetMultiMap();
     private SetMultiMap<String, String> resultTemplatesForOfferings = newSynchronizedSetMultiMap();
     private SetMultiMap<String, String> rolesForRelatedFeatures = newSynchronizedSetMultiMap();
@@ -458,6 +459,13 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
      */
     protected SetMultiMap<String, String> getProceduresForOfferingsMap() {
         return this.proceduresForOfferings;
+    }
+    
+    /**
+     * @return the relating offering -> procedure
+     */
+    protected SetMultiMap<String, String> getHiddenChildProceduresForOfferingsMap() {
+        return this.hiddenChildProceduresForOfferings;
     }
 
     /**
@@ -628,6 +636,7 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
                     proceduresForFeaturesOfInterest,
                     proceduresForObservableProperties,
                     proceduresForOfferings,
+                    hiddenChildProceduresForOfferings,
                     relatedFeaturesForOfferings,
                     resultTemplatesForOfferings,
                     rolesForRelatedFeatures,
@@ -720,6 +729,9 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
             return false;
         }
         if (!eq(this.proceduresForOfferings, other.proceduresForOfferings)) {
+            return false;
+        }
+        if (!eq(this.hiddenChildProceduresForOfferings, other.hiddenChildProceduresForOfferings)) {
             return false;
         }
         if (!eq(this.relatedFeaturesForOfferings, other.relatedFeaturesForOfferings)) {

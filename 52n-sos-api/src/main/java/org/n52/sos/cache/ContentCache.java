@@ -380,6 +380,15 @@ public interface ContentCache extends Serializable {
      * @return the procedures
      */
     Set<String> getProceduresForOffering(String offering);
+    
+    /**
+     * Get the hidden child procedures associated with the specified offering.
+     *
+     * @param offering the offering
+     *
+     * @return the hidden child procedures
+     */
+    Set<String> getHiddenChildProceduresForOffering(String offering);
 
     /**
      * @return all related features

@@ -259,6 +259,14 @@ public interface WritableContentCache extends ContentCache {
      * @param procedure the procedure
      */
     void addProcedureForOffering(String offering, String procedure);
+    
+    /**
+     * Associate the specified hidden child procedure with the specified offering.
+     *
+     * @param offering  the offering
+     * @param procedure the procedure
+     */
+    void addHiddenChildProcedureForOffering(String offering, String procedure);
 
     /**
      * Add the specified procedures.
@@ -607,6 +615,14 @@ public interface WritableContentCache extends ContentCache {
      * @param procedure the procedure
      */
     void removeProcedureForOffering(String offering, String procedure);
+    
+    /**
+     * Dissociate the specified procedure with the specified offering.
+     *
+     * @param offering  the offering
+     * @param procedure the procedure
+     */
+    void removeHiddenChildProcedureForOffering(String offering, String procedure);
 
     /**
      * Remove the specified procedure.
@@ -1020,6 +1036,15 @@ public interface WritableContentCache extends ContentCache {
     void setProceduresForOffering(String offering, Collection<String> procedures);
 
     /**
+     * Sets the hidden child procedures for the specified offering.
+     * To create a sensor system for SOS 2.0.
+     * 
+     * @param offering   the offering
+     * @param procedures the procedures
+     */
+    void setHiddenChildProceduresForOffering(String offering, Collection<String> procedures);
+
+    /**
      * Sets the related features for the specified offering.
      *
      * @param offering        the offering
@@ -1067,6 +1092,11 @@ public interface WritableContentCache extends ContentCache {
      * Reset the offering to procedures relation.
      */
     void clearProceduresForOfferings();
+    
+    /**
+     * Reset the offering to hidden child procedures relation.
+     */
+    void clearHiddenChildProceduresForOfferings();
 
     /**
      * Reset the offering to offering name relation.

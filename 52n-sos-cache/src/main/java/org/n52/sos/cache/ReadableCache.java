@@ -110,6 +110,11 @@ public class ReadableCache extends AbstractContentCache {
     public Set<String> getProceduresForOffering(String offering) {
         return copyOf(getProceduresForOfferingsMap().get(offering));
     }
+    
+    @Override
+    public Set<String> getHiddenChildProceduresForOffering(String offering) {
+        return copyOf(getHiddenChildProceduresForOfferingsMap().get(offering));
+    }
 
     @Override
     public Set<String> getRelatedFeaturesForOffering(String offering) {

@@ -23,9 +23,6 @@
  */
 package org.n52.sos.cache;
 
-import static org.n52.sos.cache.AbstractContentCache.newSynchronizedSet;
-import static org.n52.sos.cache.AbstractContentCache.notNullOrEmpty;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -1351,5 +1348,34 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         for (String offering : offerings) {
             removeOffering(offering);
         }
+    }
+
+    @Override
+    public void addHiddenChildProcedureForOffering(String offering, String procedure) {
+        notNullOrEmpty("offering", offering);
+        notNullOrEmpty("procedure", procedure);
+        LOG.trace("Adding hidden child procedure {} to offering {}", procedure, offering);
+        getHiddenChildProceduresForOfferingsMap().add(offering, procedure);
+    }
+
+    @Override
+    public void removeHiddenChildProcedureForOffering(String offering, String procedure) {
+        notNullOrEmpty("offering", offering);
+        notNullOrEmpty("procedure", procedure);
+        LOG.trace("Removing hidden chil procedure {} from offering {}", procedure, offering);
+        getHiddenChildProceduresForOfferingsMap().removeWithKey(offering, procedure);
+    }
+
+    @Override
+    public void setHiddenChildProceduresForOffering(String offering, Collection<String> procedures) {
+        final Set<String> newValue = newSynchronizedSet(procedures);
+        LOG.trace("Setting hidden child Procedures for Offering {} to {}", offering, newValue);
+        getHiddenChildProceduresForOfferingsMap().put(offering, newValue);
+    }
+
+    @Override
+    public void clearHiddenChildProceduresForOfferings() {
+        LOG.trace("Clearing hidden child procedures for offerings");
+        getHiddenChildProceduresForOfferingsMap().clear();
     }
 }
