@@ -22,7 +22,10 @@
             <column name="offering_id" not-null="true" />
         </many-to-one>
         <property name="deleted" type="boolean">
-            <column name="deleted" not-null="true" default="true"/>
+            <column name="deleted" not-null="true" default="false"/>
+        </property>
+        <property name="hiddenChild" type="boolean">
+            <column name="hidden_child" not-null="true" default="false"/>
         </property>
     </class>
 </hibernate-mapping>

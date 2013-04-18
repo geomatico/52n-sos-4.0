@@ -48,6 +48,7 @@
         <module>52n-sos-hibernate-resultHandling</module>
         <module>52n-sos-hibernate-h2</module>
         <module>52n-sos-hibernate-transactional</module>
+        <module>52n-sos-hibernate-mappings</module>
         <module>52n-sos-profile</module>
         <module>52n-sos-resultHandling-v20</module>
         <module>52n-sos-test</module>

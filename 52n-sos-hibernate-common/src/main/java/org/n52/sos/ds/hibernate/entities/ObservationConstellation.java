@@ -40,7 +40,8 @@ public static final String ID = "observationConstellationId";
     private ObservationType observationType;
     private Offering offering;
     private Boolean deleted;
-
+    private Boolean hiddenChild;
+    
     public ObservationConstellation() {
     }
 
@@ -104,5 +105,13 @@ public static final String ID = "observationConstellationId";
     @Override
     public boolean isDeleted() {
         return deleted;
+    }
+    
+    public void setHiddenChild(boolean hiddenChild) {
+        this.hiddenChild = hiddenChild;
+    }
+    
+    public boolean isHiddenChild() {
+        return hiddenChild;
     }
 }
