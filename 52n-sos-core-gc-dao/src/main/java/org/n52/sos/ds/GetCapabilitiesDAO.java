@@ -128,7 +128,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
             if (isVersionSos2(response)) {
                 sosCapabilities.setContents(getContentsForSosV2(response.getVersion()));
             } else {
-                sosCapabilities.setContents(getContents());
+                sosCapabilities.setContents(getContents(response.getVersion()));
             }
         }
 
@@ -302,11 +302,11 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
      * @throws OwsExceptionReport
      *             * If an error occurs
      */
-    private List<SosObservationOffering> getContents() throws OwsExceptionReport {
+    private List<SosObservationOffering> getContents(String version) throws OwsExceptionReport {
         Collection<String> offerings = getCache().getOfferings();
         List<SosObservationOffering> sosOfferings = new ArrayList<SosObservationOffering>(offerings.size());
         for (String offering : offerings) {
-
+            Collection<String> procedures = getProceduresForOffering(offering, version);
             SosEnvelope envelopeForOffering = getCache().getEnvelopeForOffering(offering);
             Set<String> featuresForoffering = getFOI4offering(offering);
             Collection<String> responseFormats =
@@ -355,13 +355,6 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
                 }
 
                 // set procedures
-                Collection<String> procedures = getCache().getProceduresForOffering(offering);
-                if (procedures == null || procedures.isEmpty()) {
-                    throw new NoApplicableCodeException()
-                            .withMessage(
-                                    "No procedures are contained in the database for the offering: %s! Please contact the admin of this SOS.",
-                                    offering);
-                }
                 sosOffering.setProcedures(procedures);
 
                 // insert result models
@@ -407,7 +400,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         List<SosObservationOffering> sosOfferings = new ArrayList<SosObservationOffering>(offerings.size());
 
         for (String offering : offerings) {
-            Collection<String> procedures = getProceduresForOffering(offering);
+            Collection<String> procedures = getProceduresForOffering(offering, version);
             Collection<String> observationTypes = getObservationTypes(offering);
             if (observationTypes != null && !observationTypes.isEmpty()) {
                 for (String procedure : procedures) {
@@ -765,8 +758,11 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         sosOffering.setProcedureDescriptionFormat(getCache().getProcedureDescriptionFormats());
     }
 
-    private Collection<String> getProceduresForOffering(String offering) throws OwsExceptionReport {
-        Collection<String> procedures = getCache().getProceduresForOffering(offering);
+    private Collection<String> getProceduresForOffering(String offering, String version) throws OwsExceptionReport {
+        Collection<String> procedures = CollectionHelper.asSet(getCache().getProceduresForOffering(offering));
+        if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            procedures.addAll(getCache().getHiddenChildProceduresForOffering(offering));
+        }
         if (procedures.isEmpty()) {
             throw new NoApplicableCodeException()
                     .withMessage(

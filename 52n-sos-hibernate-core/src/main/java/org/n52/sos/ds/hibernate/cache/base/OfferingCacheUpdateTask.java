@@ -27,8 +27,10 @@ package org.n52.sos.ds.hibernate.cache.base;
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
@@ -111,10 +113,10 @@ class OfferingCacheUpdateTask extends RunnableAction {
                 .add(Restrictions.eq(ObservationConstellation.DELETED, false))
                 .add(Restrictions.eq(ObservationConstellation.OFFERING, offering))
                 .list();
-        final Set<String> procedureIdentifiers = getProcedureIdentifierFrom(observationConstellations);
+        final Map<ProcedureFlag, Set<String>> procedureIdentifiers = getProcedureIdentifierFrom(observationConstellations);
 
-
-        getCache().setProceduresForOffering(offeringId, procedureIdentifiers);
+        getCache().setProceduresForOffering(offeringId, procedureIdentifiers.get(ProcedureFlag.PARENT));
+        getCache().setHiddenChildProceduresForOffering(offeringId, procedureIdentifiers.get(ProcedureFlag.HIDDEN_CHILD));
         // Observable properties
         getCache().setObservablePropertiesForOffering(offeringId, getObservablePropertyIdentifierFrom(observationConstellations));
         // Related features
@@ -141,12 +143,20 @@ class OfferingCacheUpdateTask extends RunnableAction {
                 .getMaxResultTime4Offering(dsOfferingId, session));
     }
 
-    protected Set<String> getProcedureIdentifierFrom(Collection<ObservationConstellation> set) {
-        Set<String> procedures = new HashSet<String>(set.size());
+    protected Map<ProcedureFlag, Set<String>> getProcedureIdentifierFrom(Collection<ObservationConstellation> set) {
+        Set<String> procedures = new HashSet<String>(0);
+        Set<String> hiddenChilds = new HashSet<String>(0);
         for (ObservationConstellation oc : set) {
-            procedures.add(CacheHelper.addPrefixOrGetProcedureIdentifier(oc.getProcedure().getIdentifier()));
+            if (oc.isHiddenChild()) {
+                hiddenChilds.add(CacheHelper.addPrefixOrGetProcedureIdentifier(oc.getProcedure().getIdentifier()));
+            } else {
+                procedures.add(CacheHelper.addPrefixOrGetProcedureIdentifier(oc.getProcedure().getIdentifier()));
+            }
         }
-        return procedures;
+        Map<ProcedureFlag, Set<String>> allProcedures = new HashMap<ProcedureFlag, Set<String>>();
+        allProcedures.put(ProcedureFlag.PARENT, procedures);
+        allProcedures.put(ProcedureFlag.HIDDEN_CHILD, hiddenChilds);
+        return allProcedures;
     }
 
     protected Set<String> getRelatedFeatureIdentifiersFrom(Offering hOffering) {
@@ -199,6 +209,10 @@ class OfferingCacheUpdateTask extends RunnableAction {
             obsTypes.add(obsType.getObservationType());
         }
         return obsTypes;
+    }
+    
+    private enum ProcedureFlag {
+        PARENT, HIDDEN_CHILD;
     }
     
     @Override
