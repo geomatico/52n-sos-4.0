@@ -199,7 +199,6 @@ public class SamplingEncoderv100 implements Encoder<XmlObject, SosAbstractFeatur
                     XmlObject xmlObject = encoder.encode(sampFeat.getGeometry(), additionalValues);
                     xbShape.addNewGeometry().set(xmlObject);
                     XmlHelper.substituteElement(xbShape.getGeometry(), xmlObject);
-                    //                    encoder.substitute(xbShape.getAbstractGeometry(), xmlObject);
                 } else {
                     throw new NoApplicableCodeException()
                             .withMessage("Error while encoding geometry for feature, needed encoder is missing!");
