@@ -137,7 +137,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-profile</artifactId>
+            <artifactId>52n-sos-profile-xml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>52n-sos-profile-coding</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

@@ -24,18 +24,22 @@
     </ciManagement>
     <modules>
         <module>52n-sos-api</module>
+        <module>52n-sos-admin</module>
         <module>52n-sos-binding-kvp</module>
         <module>52n-sos-binding-pox</module>
         <module>52n-sos-binding-soap</module>
+        <module>52n-sos-cache</module>
         <module>52n-sos-coding-ows-v110</module>
         <module>52n-sos-coding-sensorML-v101</module>
         <module>52n-sos-coding-sos-v100</module>
         <module>52n-sos-coding-sos-v20</module>
         <module>52n-sos-coding-wml-v20</module>
         <module>52n-sos-config-sqlite</module>
+        <module>52n-sos-core-gc-dao</module>
         <module>52n-sos-core-v100</module>
         <module>52n-sos-core-v20</module>
         <module>52n-sos-enhanced-v20</module>
+        <module>52n-sos-hibernate-api</module>
         <module>52n-sos-hibernate-common</module>
         <module>52n-sos-hibernate-core</module>
         <module>52n-sos-hibernate-dialect</module>
@@ -44,6 +48,7 @@
         <module>52n-sos-hibernate-resultHandling</module>
         <module>52n-sos-hibernate-h2</module>
         <module>52n-sos-hibernate-transactional</module>
+        <module>52n-sos-profile</module>
         <module>52n-sos-resultHandling-v20</module>
         <module>52n-sos-test</module>
         <module>52n-sos-transactional-v20</module>
@@ -232,7 +237,12 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-profile</artifactId>
+                <artifactId>52n-sos-profile-xml</artifactId>
+                <version>${sos.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>52n-sos-profile-coding</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
@@ -713,6 +723,14 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>xmlbeans-maven-plugin</artifactId>
                     <version>2.3.3</version>
+                    <executions>
+						<execution>
+							<id>main</id>
+							<goals>
+								<goal>xmlbeans</goal>
+							</goals>
+						</execution>
+					</executions>
                     <configuration>
                         <!-- xmlbeans plugin only used to generate the classes not for compiling
                         or jar generation. -->
