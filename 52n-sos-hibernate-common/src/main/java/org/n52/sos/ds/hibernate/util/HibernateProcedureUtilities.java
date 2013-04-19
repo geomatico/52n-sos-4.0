@@ -76,6 +76,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweCount;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.SensorDescriptionGenerationSettings;
 import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
@@ -191,13 +192,13 @@ public class HibernateProcedureUtilities {
 		smlSystem.setKeywords(createKeywordsList(procedure,observableProperties));
 		
 		// 5 set classification
-		if (getServiceConfig().isSmlGenerationGenerateClassification())
+		if (generationSettings().isGenerateClassification())
 		{
 			addClassifier(smlSystem);
 		}
 		
 		// 6 set contacts --> take from service information?
-		if (getServiceConfig().isSmlGenerationUseServiceContactAsSensorContact())
+		if (generationSettings().isUseServiceContactAsSensorContact())
 		{
 			final List<SmlContact> contacts = createContactFromServiceContact();
 			if (contacts != null && !contacts.isEmpty()) 
@@ -357,7 +358,7 @@ public class HibernateProcedureUtilities {
                         final SosSweQuantity quantity = new SosSweQuantity();
                         quantity.setValue((Double)latitude);
                         quantity.setAxisID("y");
-                        quantity.setUom("degree"); // TODO add to mapping or setting
+                        quantity.setUom(generationSettings().getLatitudeUom());
                         sweCoordinates.add(new SosSweCoordinate<Double>(northing,quantity));
                 }
                 if (longitude instanceof Double)
@@ -365,7 +366,7 @@ public class HibernateProcedureUtilities {
                         final SosSweQuantity quantity = new SosSweQuantity();
                         quantity.setValue((Double)longitude);
                         quantity.setAxisID("x");
-                        quantity.setUom("degree"); // TODO add to mapping or setting
+                        quantity.setUom(generationSettings().getLongitudeUom());
                         sweCoordinates.add(new SosSweCoordinate<Double>(easting,quantity));
                 }
                 if (oAltitude instanceof Double)
@@ -373,10 +374,10 @@ public class HibernateProcedureUtilities {
                         final SosSweQuantity quantity = new SosSweQuantity();
                         quantity.setValue((Double)oAltitude);
                         quantity.setAxisID("z");
-                        quantity.setUom("m"); // TODO add to mapping or setting
+                        quantity.setUom(generationSettings().getAltitudeUom());
                         sweCoordinates.add(new SosSweCoordinate<Double>(altitude,quantity));
                 }
-                // TODO add Integer
+                // TODO add Integer: Which SweSimpleType to use?
                 return sweCoordinates;
     }
 
@@ -412,26 +413,26 @@ public class HibernateProcedureUtilities {
 
 	private static void addClassifier(final System smlSystem)
 	{
-		if (!getServiceConfig().getSmlGenerationClassifierIntendedApplicationValue().isEmpty())
+		if (!generationSettings().getClassifierIntendedApplicationValue().isEmpty())
 		{
 			smlSystem.addClassification(new SosSMLClassifier(
 					"intendedApplication",
-					getServiceConfig().getSmlGenerationClassifierIntendedApplicationDefinition(),
-					getServiceConfig().getSmlGenerationClassifierIntendedApplicationValue()));
+					generationSettings().getClassifierIntendedApplicationDefinition(),
+					generationSettings().getClassifierIntendedApplicationValue()));
 		}
-		if (!getServiceConfig().getSmlGenerationClassifierSensorTypeValue().isEmpty())
+		if (!generationSettings().getClassifierSensorTypeValue().isEmpty())
 		{
 			smlSystem.addClassification(new SosSMLClassifier(
 					"sensorType",
-					getServiceConfig().getSmlGenerationClassifierSensorTypeDefinition(),
-					getServiceConfig().getSmlGenerationClassifierSensorTypeValue()));
+					generationSettings().getClassifierSensorTypeDefinition(),
+					generationSettings().getClassifierSensorTypeValue()));
 		}
 	}
 
 	private static List<String> createDescriptions(final Procedure procedure,
 			final String[] observableProperties)
 	{
-		return CollectionHelper.list(String.format(getServiceConfig().getSmlGenerationDescriptionTemplate(), 
+		return CollectionHelper.list(String.format(generationSettings().getDescriptionTemplate(), 
 				procedure.getIdentifier(), 
 				StringHelper.join(",", CollectionHelper.list(observableProperties))));
 	}
@@ -439,14 +440,19 @@ public class HibernateProcedureUtilities {
 	private static List<SosSMLIdentifier> createIdentifications(final String identifier)
 	{
 		// get long and short name definition from misc settings
-		final SosSMLIdentifier idShortName = new SosSMLIdentifier("shortname", getServiceConfig().getSmlGenerationIdentifierShortNameDefinition(), identifier);
-		final SosSMLIdentifier idLongName = new SosSMLIdentifier("longname", getServiceConfig().getSmlGenerationIdentifierLongNameDefinition(), identifier);
+		final SosSMLIdentifier idShortName = new SosSMLIdentifier("shortname", generationSettings().getIdentifierShortNameDefinition(), identifier);
+		final SosSMLIdentifier idLongName = new SosSMLIdentifier("longname", generationSettings().getIdentifierLongNameDefinition(), identifier);
 		return CollectionHelper.list(idLongName,idShortName);
 	}
 
 	private static ServiceConfiguration getServiceConfig()
 	{
 		return Configurator.getInstance().getServiceConfiguration();
+	}
+	
+	private static SensorDescriptionGenerationSettings generationSettings()
+	{
+		return SensorDescriptionGenerationSettings.getInstance();
 	}
 
 	private static List<String> createKeywordsList(final Procedure procedure,
@@ -455,15 +461,15 @@ public class HibernateProcedureUtilities {
 		final List<String> keywords = CollectionHelper.list();
 		keywords.addAll(CollectionHelper.list(observableProperties));
 		keywords.add(procedure.getIdentifier());
-		if (getServiceConfig().isSmlGenerationGenerateClassification() && 
-				!getServiceConfig().getSmlGenerationClassifierIntendedApplicationValue().isEmpty())
+		if (generationSettings().isGenerateClassification() && 
+				!generationSettings().getClassifierIntendedApplicationValue().isEmpty())
 		{
-			keywords.add(getServiceConfig().getSmlGenerationClassifierIntendedApplicationValue());
+			keywords.add(generationSettings().getClassifierIntendedApplicationValue());
 		}
-		if (getServiceConfig().isSmlGenerationGenerateClassification() && 
-				!getServiceConfig().getSmlGenerationClassifierSensorTypeValue().isEmpty())
+		if (generationSettings().isGenerateClassification() && 
+				!generationSettings().getClassifierSensorTypeValue().isEmpty())
 		{
-			keywords.add(getServiceConfig().getSmlGenerationClassifierSensorTypeValue());
+			keywords.add(generationSettings().getClassifierSensorTypeValue());
 		}
 		return keywords;
 	}

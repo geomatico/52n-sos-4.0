@@ -61,8 +61,6 @@ public class ServiceConfiguration {
     private String defaultProcedurePrefix;
     private String defaultObservablePropertyPrefix;
     private String defaultFeaturePrefix;
-    private String smlGenerationIdentifierShortNameDefinition;
-    private String smlGenerationIdentifierLongNameDefinition;
     private boolean useDefaultPrefixes;
     private boolean useHttpStatusCodesInKvpAndPoxBinding;
     /**
@@ -126,13 +124,6 @@ public class ServiceConfiguration {
      */
     @Deprecated
     private String decimalSeparator;
-    private String smlGenerationDescriptionTemplate;
-    private boolean smlGenerationGenerateClassification;
-    private String smlGenerationClassifierIntendedApplicationValue;
-    private String smlGenerationClassifierIntendedApplicationDefinition;
-    private String smlGenerationClassifierSensorTypeValue;
-    private String smlGenerationClassifierSensorTypeDefinition;
-    private boolean smlGenerationUseServiceContactAsSensorContact;
 
     /**
      * Returns the default token seperator for results.
@@ -388,28 +379,6 @@ public class ServiceConfiguration {
         this.useHttpStatusCodesInKvpAndPoxBinding = useHttpStatusCodesInKvpAndPoxBinding;
     }
 
-    @Setting(SML_GENERATION_IDENTIFIER_SHORT_NAME_DEFINITION)
-    public void setSmlGenerationIdentifierShortNameDefinition(final String smlGenerationIdentifierShortNameDefinition) {
-        Validation
-                .notNullOrEmpty(SML_GENERATION_IDENTIFIER_SHORT_NAME_DEFINITION, smlGenerationIdentifierShortNameDefinition);
-        this.smlGenerationIdentifierShortNameDefinition = smlGenerationIdentifierShortNameDefinition;
-    }
-
-    @Setting(SML_GENERATION_IDENTIFIER_LONG_NAME_DEFINITION)
-    public void setSmlGenerationIdentifierLongNameDefinition(final String smlGenerationIdentifierLongNameDefinition) {
-        Validation
-                .notNullOrEmpty(SML_GENERATION_IDENTIFIER_LONG_NAME_DEFINITION, smlGenerationIdentifierLongNameDefinition);
-        this.smlGenerationIdentifierLongNameDefinition = smlGenerationIdentifierLongNameDefinition;
-    }
-
-    public String getSmlGenerationIdentifierShortNameDefinition() {
-        return smlGenerationIdentifierShortNameDefinition;
-    }
-
-    public String getSmlGenerationIdentifierLongNameDefinition() {
-        return smlGenerationIdentifierLongNameDefinition;
-    }
-
     /**
      * @return Returns the sensor description directory
      */
@@ -484,83 +453,4 @@ public class ServiceConfiguration {
         srsNamePrefixSosV2 = prefix;
     }
 
-    @Setting(SML_GENERATION_DESCRIPTION_TEMPLATE)
-    public void setSmlGenerationDescriptionTemplate(final String smlGenerationDescriptionTemplate) {
-        Validation.notNullOrEmpty(SML_GENERATION_DESCRIPTION_TEMPLATE, smlGenerationDescriptionTemplate);
-        this.smlGenerationDescriptionTemplate = smlGenerationDescriptionTemplate;
-    }
-
-    /**
-     * @return Depends on configuration. Something like:<br>"<i>The sensor system with the id '%s' observes the
-     *         following properties: '%s'.</i>"
-     */
-    public String getSmlGenerationDescriptionTemplate() {
-        return smlGenerationDescriptionTemplate;
-    }
-
-    public boolean isSmlGenerationGenerateClassification() {
-        return smlGenerationGenerateClassification;
-    }
-
-    @Setting(SML_GENERATION_GENERATE_CLASSIFICATION)
-    public void setSmlGenerationGenerateClassification(final boolean smlGenerationGenerateClassification) {
-        this.smlGenerationGenerateClassification = smlGenerationGenerateClassification;
-    }
-
-    public String getSmlGenerationClassifierIntendedApplicationValue() {
-        return smlGenerationClassifierIntendedApplicationValue;
-    }
-
-    @Setting(SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_VALUE)
-    public void setSmlGenerationClassifierIntendedApplicationValue(
-            final String smlGenerationClassifierIntendedApplicationValue) {
-        this.smlGenerationClassifierIntendedApplicationValue =
-        (smlGenerationClassifierIntendedApplicationValue == null)
-        ? "" : smlGenerationClassifierIntendedApplicationValue;
-    }
-
-    public String getSmlGenerationClassifierIntendedApplicationDefinition() {
-        return smlGenerationClassifierIntendedApplicationDefinition;
-    }
-
-    @Setting(SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_DEFINITION)
-    public void setSmlGenerationClassifierIntendedApplicationDefinition(
-            final String smlGenerationClassifierIntendedApplicationDefinition) {
-        Validation
-                .notNull(SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_DEFINITION, smlGenerationClassifierIntendedApplicationDefinition);
-        this.smlGenerationClassifierIntendedApplicationDefinition = smlGenerationClassifierIntendedApplicationDefinition;
-    }
-
-    public String getSmlGenerationClassifierSensorTypeDefinition() {
-        return smlGenerationClassifierSensorTypeDefinition;
-    }
-
-    @Setting(SML_GENERATION_CLASSIFIER_SENSOR_TYPE_DEFINITION)
-    public void setSmlGenerationClassifierSensorTypeDefinition(final String smlGenerationClassifierSensorTypeDefinition) {
-        Validation
-                .notNull(SML_GENERATION_CLASSIFIER_SENSOR_TYPE_DEFINITION, smlGenerationClassifierSensorTypeDefinition);
-        this.smlGenerationClassifierSensorTypeDefinition = smlGenerationClassifierSensorTypeDefinition;
-    }
-
-    public String getSmlGenerationClassifierSensorTypeValue() {
-        return smlGenerationClassifierSensorTypeValue;
-    }
-
-    @Setting(SML_GENERATION_CLASSIFIER_SENSOR_TYPE_VALUE)
-    public void setSmlGenerationClassifierSensorTypeValue(final String smlGenerationClassifierSensorTypeValue) {
-        this.smlGenerationClassifierSensorTypeValue = (smlGenerationClassifierSensorTypeValue == null) ? ""
-                                                      : smlGenerationClassifierSensorTypeValue;
-    }
-
-    public boolean isSmlGenerationUseServiceContactAsSensorContact() {
-        return smlGenerationUseServiceContactAsSensorContact;
-    }
-
-    @Setting(SML_GENERATION_USE_SERVICE_CONTACT_AS_SENSOR_CONTACT)
-    public void setSmlGenerationUseServiceContactAsSensorContact(
-            final boolean smlGenerationUseServiceContactAsSensorContact) {
-        Validation
-                .notNull(SML_GENERATION_USE_SERVICE_CONTACT_AS_SENSOR_CONTACT, smlGenerationUseServiceContactAsSensorContact);
-        this.smlGenerationUseServiceContactAsSensorContact = smlGenerationUseServiceContactAsSensorContact;
-    }
 }
