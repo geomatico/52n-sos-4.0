@@ -92,7 +92,7 @@ public class KvpBinding extends Binding {
 			final String version = getVersionParameterValue(parameterValueMap);
 
 
-			if ((version != null) && !isVersionSupported(version)) {
+			if ((version != null) && !isVersionSupported(service,version)) {
 				throw new VersionNotSupportedException();
 			}
 			final DecoderKey k = new KvpOperationDecoderKey(service, version, operation);
@@ -144,10 +144,12 @@ public class KvpBinding extends Binding {
 
 	private String getVersionParameterValue(final Map<String, String> parameterValueMap) throws OwsExceptionReport {
 		final String version = KvpHelper.getParameterValue(RequestParams.version, parameterValueMap);
+		final String service = KvpHelper.getParameterValue(RequestParams.service, parameterValueMap);
 		final boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
 		if (!isGetCapabilities) {
 			KvpHelper.checkParameterValue(version, RequestParams.version);
-			if (!isVersionSupported(version)) {
+			KvpHelper.checkParameterValue(service, RequestParams.service);
+			if (!isVersionSupported(service,version)) {
 				throw new VersionNotSupportedException();
 			}
 		}

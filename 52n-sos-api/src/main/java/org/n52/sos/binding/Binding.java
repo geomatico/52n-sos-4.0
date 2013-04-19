@@ -264,7 +264,7 @@ public abstract class Binding implements ConformanceClass {
                     if (sokt.getVersion().isEmpty()) {
                         exceptions.add(new MissingVersionParameterException());
                     } else {
-                        if (!isVersionSupported(sokt.getVersion())) {
+                        if (!isVersionSupported(sokt.getService(),sokt.getVersion())) {
                             exceptions.add(new VersionNotSupportedException());
                         }
                     }
@@ -274,11 +274,6 @@ public abstract class Binding implements ConformanceClass {
         exceptions.throwIfNotEmpty();
     }
 
-    @Deprecated
-    protected boolean isVersionSupported(final String acceptVersion) {
-        return false;
-    }
-    
     protected boolean isVersionSupported(final String service, final String acceptVersion) {
         return getServiceOperatorRepository().isVersionSupported(service, acceptVersion);
     }
