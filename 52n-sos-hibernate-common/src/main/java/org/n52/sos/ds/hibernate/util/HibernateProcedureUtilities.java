@@ -34,8 +34,22 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.n52.sos.config.annotation.Configurable;
+import org.n52.sos.ds.hibernate.HibernateSessionHolder;
+import org.n52.sos.ds.hibernate.entities.BlobObservation;
+import org.n52.sos.ds.hibernate.entities.BooleanObservation;
+import org.n52.sos.ds.hibernate.entities.CategoryObservation;
+import org.n52.sos.ds.hibernate.entities.CountObservation;
+import org.n52.sos.ds.hibernate.entities.GeometryObservation;
+import org.n52.sos.ds.hibernate.entities.NumericObservation;
+import org.n52.sos.ds.hibernate.entities.ObservableProperty;
+import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
+import org.n52.sos.ds.hibernate.entities.TextObservation;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
@@ -56,7 +70,11 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
+import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
+import org.n52.sos.ogc.swe.simpleType.SosSweCategory;
+import org.n52.sos.ogc.swe.simpleType.SosSweCount;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
+import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.util.CodingHelper;
@@ -96,7 +114,6 @@ public class HibernateProcedureUtilities {
         if (filename == null && xmlDoc == null) 
         {
         	final SensorML sml = new SensorML();
-        	sml.setVersion(SensorMLConstants.VERSION_V101); // TODO should this be configurable?
         	
         	// 2 try to get position from entity
         	if (procedure.isSpatial())
@@ -155,7 +172,7 @@ public class HibernateProcedureUtilities {
 		return new ProcessModel();
 	}
 
-	private static org.n52.sos.ogc.sensorML.System createSmlSystem(final Procedure procedure)
+	private static org.n52.sos.ogc.sensorML.System createSmlSystem(final Procedure procedure) throws OwsExceptionReport
 	{
 		final System smlSystem = new System();
 		
@@ -190,43 +207,124 @@ public class HibernateProcedureUtilities {
 		}
 		
 		// 7 set outputs --> observableProperties
-		// TODO where to get the type from
-		smlSystem.setOutputs(createOutputs(observableProperties));
-		
+		smlSystem.setOutputs(createOutputs(procedure,observableProperties));
 		
 		// 8 set position --> from procedure
 		smlSystem.setPosition(createPosition(procedure));
 		
 		// 9 set observed area --> from features
 		
-		// TODO Eike: continue implementation here
 		return smlSystem;
 	}
 
-	private static List<SosSMLIo<?>> createOutputs(final String[] observableProperties)
+	private static List<SosSMLIo<?>> createOutputs(final Procedure procedure, final String[] observableProperties) throws OwsExceptionReport
 	{
 		final ArrayList<SosSMLIo<?>> outputs = new ArrayList<SosSMLIo<?>>(observableProperties.length);
-		// FIXME how to determine the type of the output from sensor id and observable property?
 		int i = 1;
 		for (final String observableProperty : observableProperties)
 		{
-			final SosSweQuantity quantity = new SosSweQuantity();
-			quantity.setDefinition(observableProperty);
-            final SosSMLIo<Double> output = new SosSMLIo<Double>(quantity);
-			output.setIoName("output#"+i++);
-			outputs.add(output);
+			Observation exampleObservation;
+			exampleObservation = getExampleObservation(procedure.getIdentifier(),observableProperty);
+			if (exampleObservation == null)
+			{
+				LOGGER.debug("Could not receive example observation from database for procedure '{}' observing property '{}'.",
+						procedure.getIdentifier(),
+						observableProperty);
+				continue;
+			}
+			SosSMLIo<?> output = null;
+			if (exampleObservation instanceof BlobObservation)
+			{
+				// TODO implement BlobObservations
+				LOGGER.debug("Type '{}' is not supported by the current implementation",BlobObservation.class.getName());
+				continue;
+			}
+			else if (exampleObservation instanceof BooleanObservation)
+			{
+				final SosSweBoolean bool = new SosSweBoolean();
+				bool.setDefinition(observableProperty);
+				output = new SosSMLIo<Boolean>(bool);
+			}
+			else if (exampleObservation instanceof CategoryObservation)
+			{
+				final SosSweCategory category = new SosSweCategory();
+				category.setDefinition(observableProperty);
+				output = new SosSMLIo<String>(category);
+			}
+			else if (exampleObservation instanceof CountObservation)
+			{
+				final SosSweCount count = new SosSweCount();
+				count.setDefinition(observableProperty);
+				output = new SosSMLIo<Integer>(count);
+			}
+			else if (exampleObservation instanceof GeometryObservation)
+			{
+				// TODO implement GeometryObservations
+				LOGGER.debug("Type '{}' is not supported by the current implementation",GeometryObservation.class.getName());
+				continue;
+			}
+			else if (exampleObservation instanceof NumericObservation)
+			{
+				final SosSweQuantity quantity = new SosSweQuantity();
+				quantity.setDefinition(observableProperty);
+				output = new SosSMLIo<Double>(quantity);
+			}
+			else if (exampleObservation instanceof TextObservation)
+			{
+				final SosSweText text = new SosSweText();
+				text.setDefinition(observableProperty);
+				output = new SosSMLIo<String>(text);
+			}
+			if (output != null)
+			{
+				output.setIoName("output#"+i++);
+				outputs.add(output);
+			}
 		}
 		return outputs;
 	}
 
+	private static Observation getExampleObservation(final String identifier,
+			final String observableProperty) throws OwsExceptionReport
+	{
+		final HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+		Session session = null;
+		try
+		{
+			session = sessionHolder.getSession();
+			final String[] procedures = new String[1];
+			procedures[0] = identifier;
+			final String[] observableProperties = new String[1];
+			observableProperties[0] = observableProperty;
+			final Criteria c = session.createCriteria(Observation.class)
+					.add(Restrictions.eq(Observation.DELETED, false))
+					.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+			c.createCriteria(Observation.OBSERVABLE_PROPERTY)
+			.add(Restrictions.in(ObservableProperty.IDENTIFIER, observableProperties));
+			c.createCriteria(Observation.PROCEDURE)
+			.add(Restrictions.in(Procedure.IDENTIFIER, procedures));
+			c.setMaxResults(1);
+			return (Observation) c.list().get(0);
+		} 
+		catch (final HibernateException he) 
+		{
+			throw new NoApplicableCodeException().causedBy(he)
+			.withMessage("Error while querying observation data!")
+			.setStatus(INTERNAL_SERVER_ERROR);
+		} 
+		finally
+		{
+			sessionHolder.returnSession(session);
+		}
+	}
+
 	private static SosSMLPosition createPosition(final Procedure procedure)
 	{
-		// TODO Auto-generated method "createPosition" stub generated on 12.04.2013 around 15:08:04 by eike
 		SosSMLPosition smlPosition = null;
 		smlPosition = new SosSMLPosition();
                 smlPosition.setName("sensorPosition");
                 smlPosition.setFixed(true);
-                int srid = 4326; // TODO use default EPSG code from settings
+        int srid = 4326;
 		// 8.1 set latlong position
 		if (procedure.isSetLongLat())
 		{
@@ -236,22 +334,23 @@ public class HibernateProcedureUtilities {
 		// 8.2 set position from geometry
 		else if (procedure.isSetGeometry())
 		{
-		    if (procedure.getGeom().getSRID() > 0) {
+		    if (procedure.getGeom().getSRID() > 0)
+		    {
 		        srid = procedure.getGeom().getSRID();
 		    }
-			// TODO implement
-		    Coordinate coordinate = procedure.getGeom().getCoordinate();
+		    final Coordinate coordinate = procedure.getGeom().getCoordinate();
 		    smlPosition.setPosition(createCoordinatesForPosition(coordinate.y, coordinate.x, coordinate.z));
 		}
-		if (procedure.isSetSrid()) {
+		if (procedure.isSetSrid())
+		{
 		    srid = procedure.getSrid();
 		}
  		smlPosition.setReferenceFrame(getServiceConfig().getSrsNamePrefixSosV2() + srid);
 		return smlPosition;
 	}
 	
-	private static List<SosSweCoordinate<?>> createCoordinatesForPosition(Object longitude, Object latitude,
-            Object oAltitude) {
+	private static List<SosSweCoordinate<?>> createCoordinatesForPosition(final Object longitude, final Object latitude,
+            final Object oAltitude) {
                 final List<SosSweCoordinate<?>> sweCoordinates = new ArrayList<SosSweCoordinate<?>>(3);
                 if (latitude instanceof Double)
                 {
@@ -277,6 +376,7 @@ public class HibernateProcedureUtilities {
                         quantity.setUom("m"); // TODO add to mapping or setting
                         sweCoordinates.add(new SosSweCoordinate<Double>(altitude,quantity));
                 }
+                // TODO add Integer
                 return sweCoordinates;
     }
 
@@ -284,9 +384,11 @@ public class HibernateProcedureUtilities {
 	{
 		final SmlResponsibleParty smlRespParty = new SmlResponsibleParty();
 		SosServiceProvider serviceProvider = null;
-		try {
+		try
+		{
 			serviceProvider = Configurator.getInstance().getServiceProvider();
-		} catch (final OwsExceptionReport e) {
+		} 
+		catch (final OwsExceptionReport e) {
 			LOGGER.error(String.format("Exception thrown: %s",
 						e.getMessage()),
 					e);
@@ -420,8 +522,8 @@ public class HibernateProcedureUtilities {
 		}
 		return sosProcedureDescription;
 	}
-
-    public static InputStream getDescribeSensorDocumentAsStream(String filename) {
+	
+    private static InputStream getDescribeSensorDocumentAsStream(String filename) {
         final StringBuilder builder = new StringBuilder();
         if (filename.startsWith("standard")) {
             filename = filename.replace("standard", "");
