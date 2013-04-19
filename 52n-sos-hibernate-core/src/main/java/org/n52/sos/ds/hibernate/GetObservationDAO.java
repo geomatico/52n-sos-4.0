@@ -60,6 +60,7 @@ import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.HTTPConstants.StatusCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,14 +72,14 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GetObservationDAO.class);
     
-    private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    private final HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
     
     public GetObservationDAO(){
         super(SosConstants.SOS);
     }
 
     @Override
-    public GetObservationResponse getObservation(GetObservationRequest sosRequest) throws OwsExceptionReport {
+    public GetObservationResponse getObservation(final GetObservationRequest sosRequest) throws OwsExceptionReport {
         Session session = null;
         try {
             session = sessionHolder.getSession();
@@ -86,7 +87,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
                 && sosRequest.getObservedProperties().isEmpty()) {
                 throw new MissingObservedPropertyParameterException();
             } else {
-                GetObservationResponse sosResponse = new GetObservationResponse();
+                final GetObservationResponse sosResponse = new GetObservationResponse();
                 sosResponse.setService(sosRequest.getService());
                 sosResponse.setVersion(sosRequest.getVersion());
                 sosResponse.setResponseFormat(sosRequest.getResponseFormat());
@@ -98,16 +99,17 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
                 }
                 return sosResponse;
             }
-        } catch (HibernateException he) {
+        } catch (final HibernateException he) {
             throw new NoApplicableCodeException().causedBy(he)
-                    .withMessage("Error while querying data observation data!");
+                    .withMessage("Error while querying observation data!")
+                    .setStatus(StatusCode.INTERNAL_SERVER_ERROR);
         } finally {
             sessionHolder.returnSession(session);
         }
     }
 
     @SuppressWarnings("unchecked")
-    protected List<SosObservation> queryObservation(GetObservationRequest request, Session session) throws
+    protected List<SosObservation> queryObservation(final GetObservationRequest request, final Session session) throws
             OwsExceptionReport {
         // TODO Threadable !?!
         // TODO How to ensure no duplicated observations ?!
@@ -120,12 +122,12 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         }
 
         List<Observation> observations = new LinkedList<Observation>();
-        Criterion filterCriterion = getTemporalFilterCriterion(request);
+        final Criterion filterCriterion = getTemporalFilterCriterion(request);
 
         if (request.hasTemporalFilters()) {
-            List<FirstLatest> flFilters = request.getFirstLatestTemporalFilter();
+            final List<FirstLatest> flFilters = request.getFirstLatestTemporalFilter();
             if (!flFilters.isEmpty()) {
-                for (FirstLatest fl : flFilters) {
+                for (final FirstLatest fl : flFilters) {
                     observations.addAll(createTemporalFilterLessCriteria(session, request, features)
                             .addOrder(getOrder(fl)).setMaxResults(1).list());
                 }
@@ -153,28 +155,28 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
      * @throws OwsExceptionReport * If an error occurs.
      */
     @SuppressWarnings("unchecked")
-    protected List<SosObservation> queryObservationHydro(GetObservationRequest request, Session session)
+    protected List<SosObservation> queryObservationHydro(final GetObservationRequest request, final Session session)
             throws OwsExceptionReport {
         // TODO Threadable !?!
         // TODO How to ensure no duplicated observations ?!
         // TODO How to ensure that anti subsetting observation are also included ?!
 
-        long start = System.currentTimeMillis();
+        final long start = System.currentTimeMillis();
         final Set<String> features = getFeatures(request, session);
         if (features != null && features.isEmpty()) {
             return null;
         }
         // temporal filters
-        List<FirstLatest> flFilters = request.getFirstLatestTemporalFilter();
-        Criterion filterCriterion = getTemporalFilterCriterion(request);
+        final List<FirstLatest> flFilters = request.getFirstLatestTemporalFilter();
+        final Criterion filterCriterion = getTemporalFilterCriterion(request);
 
-        List<SosObservation> result = new LinkedList<SosObservation>();
-        Set<Observation> allObservations = new HashSet<Observation>(0);
-        for (ObservationConstellation oc : getObservationConstellations(session, request)) {
-            Set<Observation> observations = new HashSet<Observation>(0);
+        final List<SosObservation> result = new LinkedList<SosObservation>();
+        final Set<Observation> allObservations = new HashSet<Observation>(0);
+        for (final ObservationConstellation oc : getObservationConstellations(session, request)) {
+            final Set<Observation> observations = new HashSet<Observation>(0);
             if (request.hasTemporalFilters()) {
                 if (flFilters != null && !flFilters.isEmpty()) {
-                    for (FirstLatest firstLatest : flFilters) {
+                    for (final FirstLatest firstLatest : flFilters) {
                         observations.addAll(createObservationCriteria(session, oc)
                                 .addOrder(getOrder(firstLatest)).setMaxResults(1).list());
                     }
@@ -186,7 +188,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
             }
             if (observations.isEmpty()) {
                 // if no observations were found, create a "result" observation
-                List<String> featureIds = getAndCheckFeatureOfInterest(oc, features, session);
+                final List<String> featureIds = getAndCheckFeatureOfInterest(oc, features, session);
                 result.addAll(createSosObservationFromObservationConstellation(oc, featureIds,
                                                                                request.getVersion(), session));
             } else {
@@ -199,9 +201,9 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         return result;
     }
 
-    private List<String> getAndCheckFeatureOfInterest(ObservationConstellation observationConstellation,
-            Set<String> featureIdentifier, Session session) {
-        List<String> featuresForConstellation =
+    private List<String> getAndCheckFeatureOfInterest(final ObservationConstellation observationConstellation,
+            final Set<String> featureIdentifier, final Session session) {
+        final List<String> featuresForConstellation =
                      HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForObservationConstellation(
                         observationConstellation, session);
         if (featureIdentifier == null) {
@@ -211,11 +213,11 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         }
     }
 
-    protected List<SosObservation> toSosObservation(Collection<Observation> observations, String version,
-                                                    Session session) throws OwsExceptionReport {
+    protected List<SosObservation> toSosObservation(final Collection<Observation> observations, final String version,
+                                                    final Session session) throws OwsExceptionReport {
         if (!observations.isEmpty()) {
-            long startProcess = System.currentTimeMillis();
-            List<SosObservation> sosObservations = HibernateObservationUtilities
+            final long startProcess = System.currentTimeMillis();
+            final List<SosObservation> sosObservations = HibernateObservationUtilities
                     .createSosObservationsFromObservations(new HashSet<Observation>(observations), version, session);
             LOGGER.debug("Time to process observations needs {} ms!", (System.currentTimeMillis() - startProcess));
             return sosObservations;
@@ -224,13 +226,13 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         }
     }
 
-    protected Set<String> getFeatures(GetObservationRequest request, Session session) throws OwsExceptionReport {
+    protected Set<String> getFeatures(final GetObservationRequest request, final Session session) throws OwsExceptionReport {
         return QueryHelper.getFeatureIdentifier(request.getSpatialFilter(), request.getFeatureIdentifiers(), session);
     }
 
-    protected Criteria createTemporalFilterLessCriteria(Session session, GetObservationRequest request,
-                                                        Set<String> features) throws HibernateException {
-        Criteria c = session.createCriteria(Observation.class)
+    protected Criteria createTemporalFilterLessCriteria(final Session session, final GetObservationRequest request,
+                                                        final Set<String> features) throws HibernateException {
+        final Criteria c = session.createCriteria(Observation.class)
                 .add(Restrictions.eq(Observation.DELETED, false))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         if (request.isSetOffering()) {
@@ -253,9 +255,9 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
     }
 
     @SuppressWarnings("unchecked")
-    protected List<ObservationConstellation> getObservationConstellations(Session session, GetObservationRequest request)
+    protected List<ObservationConstellation> getObservationConstellations(final Session session, final GetObservationRequest request)
             throws HibernateException {
-        Criteria c = session.createCriteria(ObservationConstellation.class)
+        final Criteria c = session.createCriteria(ObservationConstellation.class)
                 .add(Restrictions.eq(ObservationConstellation.DELETED, false))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         if (request.isSetOffering()) {
@@ -273,9 +275,9 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         return c.add(Restrictions.isNotNull(ObservationConstellation.OBSERVATION_TYPE)).list();
     }
 
-    protected Criteria createObservationCriteria(Session session, ObservationConstellation oc) throws
+    protected Criteria createObservationCriteria(final Session session, final ObservationConstellation oc) throws
             HibernateException {
-        Criteria c = session.createCriteria(Observation.class)
+        final Criteria c = session.createCriteria(Observation.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .add(Restrictions.eq(Observation.DELETED, false))
                 .add(Restrictions.eq(Observation.OFFERINGS, oc.getOffering()))
@@ -284,8 +286,8 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         return c;
     }
 
-    protected Criterion getTemporalFilterCriterion(GetObservationRequest request) throws OwsExceptionReport {
-        List<TemporalFilter> filters = request.getNotFirstLatestTemporalFilter();
+    protected Criterion getTemporalFilterCriterion(final GetObservationRequest request) throws OwsExceptionReport {
+        final List<TemporalFilter> filters = request.getNotFirstLatestTemporalFilter();
         if (request.hasTemporalFilters() && filters != null && !filters.isEmpty()) {
             return TemporalRestrictions.filter(filters);
         } else {
@@ -293,7 +295,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         }
     }
 
-    protected Order getOrder(FirstLatest fl) {
+    protected Order getOrder(final FirstLatest fl) {
         return HibernateCriteriaQueryUtilities.getOrderForEnum(fl);
     }
 }
