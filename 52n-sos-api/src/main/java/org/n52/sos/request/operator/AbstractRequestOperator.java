@@ -85,7 +85,7 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
         this.requestOperatorKeyType =
                 new RequestOperatorKeyType(new ServiceOperatorKeyType(service, version), operationName);
         this.requestType = requestType;
-        this.dao = (D) Configurator.getInstance().getOperationDaoRepository().getOperationDAO(operationName);
+        this.dao = (D) Configurator.getInstance().getOperationDaoRepository().getOperationDAO(service, operationName);
         if (this.dao == null) {
             throw new NullPointerException(String.format("OperationDAO for Operation %s has no implementation!",
                     operationName));

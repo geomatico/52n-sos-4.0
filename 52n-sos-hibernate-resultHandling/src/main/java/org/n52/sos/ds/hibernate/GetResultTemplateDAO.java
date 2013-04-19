@@ -32,11 +32,16 @@ import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.sos.concrete.NoSweCommonEncodingForOfferingObservablePropertyCombination;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetResultTemplateRequest;
 import org.n52.sos.response.GetResultTemplateResponse;
 
 public class GetResultTemplateDAO extends AbstractGetResultTemplateDAO {
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    
+    public GetResultTemplateDAO() {
+        super(SosConstants.SOS);
+    }
 
     @Override
     public GetResultTemplateResponse getResultTemplate(GetResultTemplateRequest request) throws OwsExceptionReport {

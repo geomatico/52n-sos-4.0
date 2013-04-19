@@ -30,8 +30,8 @@ import org.n52.sos.request.InsertResultRequest;
 import org.n52.sos.response.InsertResultResponse;
 
 public abstract class AbstractInsertResultDAO extends AbstractOperationDAO {
-    public AbstractInsertResultDAO() {
-        super(Sos2Constants.Operations.InsertResult.name());
+    public AbstractInsertResultDAO(String service) {
+        super(service, Sos2Constants.Operations.InsertResult.name());
     }
 
     

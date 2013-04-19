@@ -47,6 +47,7 @@ import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.sensorML.SensorML;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosInsertionCapabilities;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SosFeatureRelationship;
@@ -56,6 +57,10 @@ import org.n52.sos.response.InsertSensorResponse;
 public class InsertSensorDAO extends AbstractInsertSensorDAO {
 
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    
+    public InsertSensorDAO() {
+        super(SosConstants.SOS);
+    }
 
     @Override
     public synchronized InsertSensorResponse insertSensor(InsertSensorRequest request) throws OwsExceptionReport {

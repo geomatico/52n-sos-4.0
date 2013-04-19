@@ -90,7 +90,11 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
 
     private static final int ALL = 0x20 | SERVICE_IDENTIFICATION | SERVICE_PROVIDER | OPERATIONS_METADATA
             | FILTER_CAPABILITIES | CONTENTS;
-
+    
+    public GetCapabilitiesDAO() {
+        super(SosConstants.SOS);
+    }
+    
     @Override
     public GetCapabilitiesResponse getCapabilities(GetCapabilitiesRequest request) throws OwsExceptionReport {
         GetCapabilitiesResponse response = new GetCapabilitiesResponse();

@@ -44,22 +44,28 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractOperationDAO implements OperationDAO {
     
     private static final Logger LOG = LoggerFactory.getLogger(AbstractOperationDAO.class);
-    private final String operationName;
+    private final OperationDAOKeyType operationDAOIdentifier;
 
-    public AbstractOperationDAO(String operationName) {
-        this.operationName = operationName;
+    public AbstractOperationDAO(String service, String operationName) {
+        operationDAOIdentifier = new OperationDAOKeyType(service, operationName);
     }
 
+    //     TODO check if necessary in feature
     @Override
     public String getOperationName() {
-        return this.operationName;
+        return this.operationDAOIdentifier.getOperationName();
+    }
+    
+    @Override
+    public OperationDAOKeyType getOperationDAOKeyType() {
+        return this.operationDAOIdentifier;
     }
 
     @Override
     public OWSOperation getOperationsMetadata(String service, String version) throws OwsExceptionReport {
-        Map<String, Set<DCP>> dcp = getDCP(new OperationDecoderKey(service, version, getOperationName()));
+        Map<String, Set<DCP>> dcp = getDCP(new OperationDecoderKey(service, version, getOperationDAOKeyType().getOperationName()));
         if (dcp == null || dcp.isEmpty()) {
-            LOG.debug("Operation {} not available due to empty DCP map.", getOperationName());
+            LOG.debug("Operation {} for Service {} not available due to empty DCP map.", getOperationName(), getOperationDAOKeyType().getService());
             return null;
         }
         OWSOperation operation = new OWSOperation();

@@ -34,8 +34,8 @@ import org.n52.sos.response.GetResultTemplateResponse;
 
 
 public abstract class AbstractGetResultTemplateDAO extends AbstractOperationDAO {
-    public AbstractGetResultTemplateDAO() {
-        super(Sos2Constants.Operations.GetResultTemplate.name());
+    public AbstractGetResultTemplateDAO(String service) {
+        super(service, Sos2Constants.Operations.GetResultTemplate.name());
     }
 
     @Override

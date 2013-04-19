@@ -37,8 +37,8 @@ import org.n52.sos.request.GetResultRequest;
 import org.n52.sos.response.GetResultResponse;
 
 public abstract class AbstractGetResultDAO extends AbstractOperationDAO {
-    public AbstractGetResultDAO() {
-        super(SosConstants.Operations.GetResult.name());
+    public AbstractGetResultDAO(String service) {
+        super(service, SosConstants.Operations.GetResult.name());
     }
 
     @Override

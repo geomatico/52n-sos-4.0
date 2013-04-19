@@ -31,8 +31,8 @@ import org.n52.sos.response.UpdateSensorResponse;
 
 public abstract class AbstractUpdateSensorDescriptionDAO extends AbstractOperationDAO {
 
-    public AbstractUpdateSensorDescriptionDAO() {
-        super(Sos2Constants.Operations.UpdateSensorDescription.name());
+    public AbstractUpdateSensorDescriptionDAO(String service) {
+        super(service,Sos2Constants.Operations.UpdateSensorDescription.name());
     }
 
     @Override

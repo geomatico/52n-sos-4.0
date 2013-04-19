@@ -40,6 +40,7 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateProcedureUtilities;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.response.DescribeSensorResponse;
@@ -51,6 +52,10 @@ import org.n52.sos.util.SosHelper;
  */
 public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    
+    public DescribeSensorDAO() {
+        super(SosConstants.SOS);
+    }
 
     @Override
     public DescribeSensorResponse getSensorDescription(DescribeSensorRequest request) throws OwsExceptionReport {

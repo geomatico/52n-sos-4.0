@@ -23,7 +23,6 @@
  */
 package org.n52.sos.ds;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -41,8 +40,9 @@ import org.n52.sos.response.GetCapabilitiesResponse;
  * the data source
  */
 public abstract class AbstractGetCapabilitiesDAO extends AbstractOperationDAO {
-    public AbstractGetCapabilitiesDAO() {
-        super(SosConstants.Operations.GetCapabilities.name());
+    
+    public AbstractGetCapabilitiesDAO(String service) {
+        super(service, SosConstants.Operations.GetCapabilities.name());
     }
 
     @Override

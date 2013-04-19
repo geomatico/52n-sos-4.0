@@ -45,12 +45,17 @@ import org.n52.sos.ogc.om.features.SosFeatureCollection;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetFeatureOfInterestRequest;
 import org.n52.sos.response.GetFeatureOfInterestResponse;
 
 public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
 
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    
+    public GetFeatureOfInterestDAO() {
+        super(SosConstants.SOS);
+    }
 
     @Override
     public GetFeatureOfInterestResponse getFeatureOfInterest(GetFeatureOfInterestRequest request)

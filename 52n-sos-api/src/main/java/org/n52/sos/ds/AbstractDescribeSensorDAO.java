@@ -38,8 +38,8 @@ import org.n52.sos.response.DescribeSensorResponse;
  * 
  */
 public abstract class AbstractDescribeSensorDAO extends AbstractOperationDAO {
-    public AbstractDescribeSensorDAO() {
-        super(SosConstants.Operations.DescribeSensor.name());
+    public AbstractDescribeSensorDAO(String service) {
+        super(service, SosConstants.Operations.DescribeSensor.name());
     }
 
     @Override

@@ -31,8 +31,17 @@ import org.n52.sos.ogc.ows.SwesExtension;
  * Interface for all SOS operation DAOs.
  */
 public interface OperationDAO {
+    
+    /**
+     * Get the operation and service key this DAO supports
+     * 
+     * @return The supported SOS operation name
+     */
+    OperationDAOKeyType getOperationDAOKeyType();
 
     /**
+     * TODO check if necessary in feature
+     * 
      * Get the SOS operation name this DAO supports
      * 
      * @return The supported SOS operation name

@@ -36,6 +36,7 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.request.UpdateSensorRequest;
 import org.n52.sos.response.UpdateSensorResponse;
@@ -43,6 +44,10 @@ import org.n52.sos.response.UpdateSensorResponse;
 public class UpdateSensorDescriptionDAO extends AbstractUpdateSensorDescriptionDAO {
 
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    
+    public UpdateSensorDescriptionDAO() {
+        super(SosConstants.SOS);
+    }
 
     @Override
     public synchronized UpdateSensorResponse updateSensorDescription(UpdateSensorRequest request)

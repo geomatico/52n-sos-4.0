@@ -33,8 +33,8 @@ import org.n52.sos.response.InsertObservationResponse;
 
 public abstract class AbstractInsertObservationDAO extends AbstractOperationDAO {
 
-    public AbstractInsertObservationDAO() {
-        super(SosConstants.Operations.InsertObservation.name());
+    public AbstractInsertObservationDAO(String service) {
+        super(service, SosConstants.Operations.InsertObservation.name());
     }
 
     @Override

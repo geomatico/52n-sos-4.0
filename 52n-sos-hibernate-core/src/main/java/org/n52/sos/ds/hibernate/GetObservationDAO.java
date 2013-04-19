@@ -55,6 +55,7 @@ import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
@@ -71,6 +72,10 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(GetObservationDAO.class);
     
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    
+    public GetObservationDAO(){
+        super(SosConstants.SOS);
+    }
 
     @Override
     public GetObservationResponse getObservation(GetObservationRequest sosRequest) throws OwsExceptionReport {

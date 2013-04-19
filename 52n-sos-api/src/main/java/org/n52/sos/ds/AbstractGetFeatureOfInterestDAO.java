@@ -39,8 +39,8 @@ import org.n52.sos.response.GetFeatureOfInterestResponse;
 import org.n52.sos.util.SosHelper;
 
 public abstract class AbstractGetFeatureOfInterestDAO extends AbstractOperationDAO {
-    public AbstractGetFeatureOfInterestDAO() {
-        super(SosConstants.Operations.GetFeatureOfInterest.name());
+    public AbstractGetFeatureOfInterestDAO(String service) {
+        super(service, SosConstants.Operations.GetFeatureOfInterest.name());
     }
 
     @Override

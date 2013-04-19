@@ -32,8 +32,8 @@ import org.n52.sos.response.InsertSensorResponse;
 
 public abstract class AbstractInsertSensorDAO extends AbstractOperationDAO {
 
-    public AbstractInsertSensorDAO() {
-        super(Sos2Constants.Operations.InsertSensor.name());
+    public AbstractInsertSensorDAO(String service) {
+        super(service,Sos2Constants.Operations.InsertSensor.name());
     }
 
     @Override

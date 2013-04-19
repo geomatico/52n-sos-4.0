@@ -42,6 +42,7 @@ import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
 import org.n52.sos.ds.hibernate.util.TemporalRestrictions;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosResultEncoding;
 import org.n52.sos.ogc.sos.SosResultStructure;
 import org.n52.sos.request.GetResultRequest;
@@ -50,6 +51,10 @@ import org.n52.sos.response.GetResultResponse;
 public class GetResultDAO extends AbstractGetResultDAO {
 
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    
+    public GetResultDAO() {
+        super(SosConstants.SOS);
+    }
 
     @Override
     public GetResultResponse getResult(GetResultRequest request) throws OwsExceptionReport {

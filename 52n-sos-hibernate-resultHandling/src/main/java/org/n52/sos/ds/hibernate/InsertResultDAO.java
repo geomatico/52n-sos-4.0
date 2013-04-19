@@ -62,6 +62,7 @@ import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.sos.SosResultEncoding;
 import org.n52.sos.ogc.sos.SosResultStructure;
@@ -88,6 +89,10 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
     private static final int FLUSH_THRESHOLD = 50;
     
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    
+    public InsertResultDAO() {
+        super(SosConstants.SOS);
+    }
     
     @Override
     public InsertResultResponse insertResult(InsertResultRequest request) throws OwsExceptionReport {

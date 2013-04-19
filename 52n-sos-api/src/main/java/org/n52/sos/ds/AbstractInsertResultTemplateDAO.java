@@ -30,8 +30,8 @@ import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.response.InsertResultTemplateResponse;
 
 public abstract class AbstractInsertResultTemplateDAO extends AbstractOperationDAO {
-    public AbstractInsertResultTemplateDAO() {
-        super(Sos2Constants.Operations.InsertResultTemplate.name());
+    public AbstractInsertResultTemplateDAO(String service) {
+        super(service, Sos2Constants.Operations.InsertResultTemplate.name());
     }
 
     @Override

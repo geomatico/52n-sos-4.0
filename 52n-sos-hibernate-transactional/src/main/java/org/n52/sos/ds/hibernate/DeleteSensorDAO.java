@@ -39,11 +39,16 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.ScrollableIterable;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.response.DeleteSensorResponse;
 
 public class DeleteSensorDAO extends AbstractDeleteSensorDAO {
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    
+    public DeleteSensorDAO() {
+        super(SosConstants.SOS);
+    }
 
     @Override
     public synchronized DeleteSensorResponse deleteSensor(DeleteSensorRequest request) throws OwsExceptionReport {

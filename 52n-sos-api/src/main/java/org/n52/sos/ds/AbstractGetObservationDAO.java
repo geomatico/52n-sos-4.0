@@ -52,8 +52,8 @@ import org.n52.sos.util.SosHelper;
  */
 public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
 
-    public AbstractGetObservationDAO() {
-        super(SosConstants.Operations.GetObservation.name());
+    public AbstractGetObservationDAO(String service) {
+        super(service, SosConstants.Operations.GetObservation.name());
     }
 
     @Override

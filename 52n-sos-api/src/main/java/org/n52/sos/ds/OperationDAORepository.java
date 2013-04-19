@@ -36,46 +36,80 @@ import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
  */
 public class OperationDAORepository extends AbstractConfiguringServiceLoaderRepository<OperationDAO> {
 
-	/** Implemented ISosOperationDAO */
-    private final Map<String, OperationDAO> operationDaos = new HashMap<String, OperationDAO>(0);
+    // TODO create key with service and operation name
+
+    /** Implemented ISosOperationDAO */
+    // private final Map<String, OperationDAO> operationDaos = new
+    // HashMap<String, OperationDAO>(0);
+    private final Map<OperationDAOKeyType, OperationDAO> operationDaos =
+            new HashMap<OperationDAOKeyType, OperationDAO>(0);
 
     /**
      * Load implemented operation dao
-     *
+     * 
      * @throws ConfigurationException
      *             If no operation dao is implemented
      */
     public OperationDAORepository() throws ConfigurationException {
         super(OperationDAO.class, false);
-		load(false);
+        load(false);
     }
 
     /**
-     * Load the implemented operation dao and add them to a map with operation name as key.
-     *
+     * Load the implemented operation dao and add them to a map with operation
+     * name as key.
+     * 
      * @throws ConfigurationException
      *             If no operation dao is implemented
      */
-	@Override
+    @Override
     protected void processConfiguredImplementations(Set<OperationDAO> daos) throws ConfigurationException {
-		this.operationDaos.clear();
-		for (OperationDAO dao : daos) {
-			this.operationDaos.put(dao.getOperationName(), dao);
-		}
+        this.operationDaos.clear();
+        for (OperationDAO dao : daos) {
+                operationDaos.put(dao.getOperationDAOKeyType(), dao);
+            // this.operationDaos.put(dao.getOperationName(), dao);
+        }
     }
 
+    // /**
+    // * @return the implemented operation DAOs
+    // */
+    // public Map<String, OperationDAO> getOperationDAOs() {
+    // return Collections.unmodifiableMap(this.operationDaos);
+    // }
+    //
+    // /**
+    // * @param operationName the operation name
+    // * @return the implemented operation DAO
+    // */
+    // public OperationDAO getOperationDAO(String operationName) {
+    // return this.operationDaos.get(operationName);
+    // }
+
     /**
-     * @return the implemented operation DAOs
+     * // * @return the implemented operation DAOs //
      */
-    public Map<String, OperationDAO> getOperationDAOs() {
+    public Map<OperationDAOKeyType, OperationDAO> getOperationDAOs() {
         return Collections.unmodifiableMap(this.operationDaos);
     }
 
-	 /**
-	  * @param operationName the operation name
-	  * @return the implemented operation DAO
+    /**
+     * @param service
+     *            the service name
+     * @param operationName
+     *            the operation name
+     * @return the implemented operation DAO
      */
-    public OperationDAO getOperationDAO(String operationName) {
-        return this.operationDaos.get(operationName);
+    public OperationDAO getOperationDAO(String service, String operationName) {
+        return this.operationDaos.get(new OperationDAOKeyType(service, operationName));
+    }
+
+    /**
+     * @param operationDAOIdentifier
+     *            the operation DAO identifier
+     * @return the implemented operation DAO
+     */
+    public OperationDAO getOperationDAO(OperationDAOKeyType operationDAOIdentifier) {
+        return this.operationDaos.get(operationDAOIdentifier);
     }
 }

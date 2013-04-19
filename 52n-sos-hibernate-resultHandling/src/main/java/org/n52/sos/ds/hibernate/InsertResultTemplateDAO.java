@@ -36,12 +36,17 @@ import org.n52.sos.exception.ows.concrete.InvalidObservationTypeException;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.response.InsertResultTemplateResponse;
 
 public class InsertResultTemplateDAO extends AbstractInsertResultTemplateDAO {
 
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    
+    public InsertResultTemplateDAO() {
+        super(SosConstants.SOS);
+    }
 
     @Override
     public InsertResultTemplateResponse insertResultTemplate(InsertResultTemplateRequest request)

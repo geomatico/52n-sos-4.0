@@ -55,6 +55,7 @@ import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweDataArray;
@@ -66,6 +67,10 @@ import org.n52.sos.util.XmlOptionsHelper;
 
 public class InsertObservationDAO extends AbstractInsertObservationDAO {
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    
+    public InsertObservationDAO() {
+        super(SosConstants.SOS);
+    }
 
     @Override
     public synchronized InsertObservationResponse insertObservation(InsertObservationRequest request)

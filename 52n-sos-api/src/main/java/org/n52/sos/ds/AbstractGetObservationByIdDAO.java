@@ -31,8 +31,8 @@ import org.n52.sos.request.GetObservationByIdRequest;
 import org.n52.sos.response.GetObservationByIdResponse;
 
 public abstract class AbstractGetObservationByIdDAO extends AbstractOperationDAO {
-    public AbstractGetObservationByIdDAO() {
-        super(SosConstants.Operations.GetObservationById.name());
+    public AbstractGetObservationByIdDAO(String service) {
+        super(service, SosConstants.Operations.GetObservationById.name());
     }
 
     @Override

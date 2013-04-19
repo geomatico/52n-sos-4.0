@@ -31,8 +31,8 @@ import org.n52.sos.response.DeleteSensorResponse;
 
 public abstract class AbstractDeleteSensorDAO extends AbstractOperationDAO {
 
-    public AbstractDeleteSensorDAO() {
-        super(Sos2Constants.Operations.DeleteSensor.name());
+    public AbstractDeleteSensorDAO(String service) {
+        super(service, Sos2Constants.Operations.DeleteSensor.name());
     }
 
     @Override
