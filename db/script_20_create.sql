@@ -286,6 +286,7 @@ CREATE TABLE observation_constellation (
   offering_id bigint NOT NULL,
   observation_type_id bigint NULL,
   deleted BOOL NOT NULL DEFAULT false,
+  hidden_child boolean NOT NULL DEFAULT false,
   UNIQUE (offering_id,procedure_id,observable_property_id),
   PRIMARY KEY(observation_constellation_id)
 );
