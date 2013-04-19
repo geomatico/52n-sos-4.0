@@ -55,7 +55,8 @@ public class ClientController extends AbstractController {
             }
             map.put(OPERATIONS, operations);
             map.put(BINDINGS, Configurator.getInstance().getBindingRepository().getBindings().keySet());
-            map.put(VERSIONS, Configurator.getInstance().getServiceOperatorRepository().getSupportedVersions());
+            // TODO add support for different services
+            map.put(VERSIONS, Configurator.getInstance().getServiceOperatorRepository().getAllSupportedVersions());
             return new ModelAndView(ControllerConstants.Views.CLIENT, map);
 
         } else {

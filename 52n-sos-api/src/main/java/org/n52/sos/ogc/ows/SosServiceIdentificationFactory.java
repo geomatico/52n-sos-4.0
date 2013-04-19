@@ -33,6 +33,7 @@ import org.n52.sos.config.SettingsManager;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.exception.ConfigurationException;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.LazyThreadSafeProducer;
 import org.n52.sos.util.Validation;
@@ -136,7 +137,7 @@ public class SosServiceIdentificationFactory extends LazyThreadSafeProducer<SosS
             serviceIdentification.setTitle(this.title);
             serviceIdentification.setVersions(Configurator.getInstance()
                     .getServiceOperatorRepository()
-                    .getSupportedVersions());
+                    .getSupportedVersions(SosConstants.SOS));
             serviceIdentification.setKeywords(Arrays.asList(this.keywords));
         }
         return serviceIdentification;

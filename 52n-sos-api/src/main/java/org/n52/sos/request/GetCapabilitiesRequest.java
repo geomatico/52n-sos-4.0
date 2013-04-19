@@ -197,7 +197,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
                 }
             } else {
                 serviceOperatorKeyTypes = new ServiceOperatorKeyType[1];
-                setVersion(Collections.max(Configurator.getInstance().getServiceOperatorRepository().getSupportedVersions()));
+                setVersion(Collections.max(Configurator.getInstance().getServiceOperatorRepository().getSupportedVersions(getService())));
                 serviceOperatorKeyTypes[0] = new ServiceOperatorKeyType(getService(), getVersion());
             }
         }

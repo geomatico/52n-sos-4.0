@@ -29,6 +29,7 @@ import java.util.List;
 import org.n52.sos.exception.CodedException;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.HTTPConstants;
 
@@ -74,7 +75,7 @@ public abstract class OwsExceptionReport extends Exception {
 		if (version == null) {
 			/* FIXME shouldn't this be the other way around? defaulting to the newest version? */
 			version = Configurator.getInstance().getServiceOperatorRepository()
-					.isVersionSupported(Sos1Constants.SERVICEVERSION)
+					.isVersionSupported(SosConstants.SOS, Sos1Constants.SERVICEVERSION)
 					? Sos1Constants.SERVICEVERSION
 							: Sos2Constants.SERVICEVERSION;
 		}

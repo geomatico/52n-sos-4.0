@@ -70,7 +70,7 @@ public abstract class AbstractGetCapabilitiesDAO extends AbstractOperationDAO {
         opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.Sections, sectionsValues);
         opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptFormats, SosConstants.ACCEPT_FORMATS);
         opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptVersions,
-                                getConfigurator().getServiceOperatorRepository().getSupportedVersions());
+                                getConfigurator().getServiceOperatorRepository().getSupportedVersions(service));
         opsMeta.addAnyParameterValue(SosConstants.GetCapabilitiesParams.updateSequence);
     }
     

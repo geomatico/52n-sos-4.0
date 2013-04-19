@@ -33,6 +33,7 @@ import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
+import org.n52.sos.util.CollectionHelper;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
@@ -43,55 +44,64 @@ public class ServiceOperatorRepository extends AbstractConfiguringServiceLoaderR
      * Implemented ServiceOperator
      */
     private final Map<ServiceOperatorKeyType, ServiceOperator> serviceOperators =
-                                                               new HashMap<ServiceOperatorKeyType, ServiceOperator>(0);
+            new HashMap<ServiceOperatorKeyType, ServiceOperator>(0);
 
-	 /** supported SOS versions */
-    private final Set<String> supportedVersions = new HashSet<String>(0);
+    /** supported SOS versions */
+    private final Map<String, Set<String>> supportedVersions = new HashMap<String, Set<String>>(0);
 
     /** supported services */
     private final Set<String> supportedServices = new HashSet<String>(0);
 
     /**
      * Load implemented request listener
-     *
+     * 
      * @throws ConfigurationException
      *             If no request listener is implemented
      */
     public ServiceOperatorRepository() throws ConfigurationException {
         super(ServiceOperator.class, false);
-		load(false);
+        load(false);
     }
 
     /**
      * Load the implemented request listener and add them to a map with
      * operation name as key
-     *
-     * @param implementations the loaded implementations
-     *
-     * @throws ConfigurationException If no request listener is implemented
+     * 
+     * @param implementations
+     *            the loaded implementations
+     * 
+     * @throws ConfigurationException
+     *             If no request listener is implemented
      */
     @Override
-    protected void processConfiguredImplementations(Set<ServiceOperator> implementations) throws ConfigurationException {
-		this.serviceOperators.clear();
-		this.supportedServices.clear();
-		this.supportedVersions.clear();
+    protected void processConfiguredImplementations(Set<ServiceOperator> implementations)
+            throws ConfigurationException {
+        this.serviceOperators.clear();
+        this.supportedServices.clear();
+        this.supportedVersions.clear();
         for (ServiceOperator iServiceOperator : implementations) {
-			this.serviceOperators.put(iServiceOperator.getServiceOperatorKeyType(), iServiceOperator);
-			this.supportedVersions.add(iServiceOperator.getServiceOperatorKeyType().getVersion());
-			this.supportedServices.add(iServiceOperator.getServiceOperatorKeyType().getService());
+            this.serviceOperators.put(iServiceOperator.getServiceOperatorKeyType(), iServiceOperator);
+            if (this.supportedVersions.containsKey(iServiceOperator.getServiceOperatorKeyType().getService())) {
+                this.supportedVersions.get(iServiceOperator.getServiceOperatorKeyType().getService()).add(
+                        iServiceOperator.getServiceOperatorKeyType().getVersion());
+            } else {
+                this.supportedVersions.put(iServiceOperator.getServiceOperatorKeyType().getService(),
+                        CollectionHelper.asSet(iServiceOperator.getServiceOperatorKeyType().getVersion()));
+            }
+            this.supportedServices.add(iServiceOperator.getServiceOperatorKeyType().getService());
         }
     }
 
     /**
      * Update/reload the implemented request listener
-     *
+     * 
      * @throws ConfigurationException
      *             If no request listener is implemented
      */
-	@Override
+    @Override
     public void update() throws ConfigurationException {
         Configurator.getInstance().getRequestOperatorRepository().update();
-		super.update();
+        super.update();
     }
 
     /**
@@ -110,39 +120,75 @@ public class ServiceOperatorRepository extends AbstractConfiguringServiceLoaderR
         return serviceOperators.get(serviceOperatorIdentifier);
     }
 
-	 /**
+    /**
      * @param service
      * @param version
      * @return the implemented request listener
-
-     *
+     * 
+     * 
      * @throws OwsExceptionReport
      */
     public ServiceOperator getServiceOperator(String service, String version) throws OwsExceptionReport {
         return getServiceOperator(new ServiceOperatorKeyType(service, version));
     }
 
-	 /**
+    /**
      * @return the supportedVersions
+     * 
+     * @deprecated use getSupporteVersions(String service)
      */
     public Set<String> getSupportedVersions() {
-        return Collections.unmodifiableSet(this.supportedVersions);
+        return Collections.emptySet();
+    }
+    
+    public Set<String> getAllSupportedVersions() {
+        Set<String> set = CollectionHelper.set();
+        for (Set<String> versionSet : supportedVersions.values()) {
+            set.addAll(versionSet);
+        }
+        return set;
     }
 
+    /**
+     * @return the supportedVersions
+     * 
+     */
+    public Set<String> getSupportedVersions(String service) {
+        if (isServiceSupported(service)) {
+            return Collections.unmodifiableSet(supportedVersions.get(service));
+        }
+        return CollectionHelper.set();
+    }
+
+    /**
+     * @return the supportedVersions
+     * 
+     * @deprecated use isVersionSupported(String service, String version)
+     */
     public boolean isVersionSupported(String version) {
-        return this.supportedVersions.contains(version);
+        return getAllSupportedVersions().contains(version);
+    }
+
+    /**
+     * @return the supportedVersions
+     * 
+     */
+    public boolean isVersionSupported(String service, String version) {
+        if (isServiceSupported(service)) {
+            return supportedVersions.get(service).contains(version);
+        }
+        return false;
     }
 
     /**
      * @return the supportedVersions
      */
     public Set<String> getSupportedServices() {
-        return Collections.unmodifiableSet(this.supportedServices);
+        return CollectionHelper.set();
     }
 
     public boolean isServiceSupported(String service) {
         return this.supportedServices.contains(service);
     }
-
 
 }

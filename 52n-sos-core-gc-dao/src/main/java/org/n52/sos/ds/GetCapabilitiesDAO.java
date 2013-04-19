@@ -184,12 +184,12 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         if (!request.isSetVersion()) {
             if (request.isSetAcceptVersions()) {
                 for (String acceptedVersion : request.getAcceptVersions()) {
-                    if (getConfigurator().getServiceOperatorRepository().isVersionSupported(acceptedVersion)) {
+                    if (getConfigurator().getServiceOperatorRepository().isVersionSupported(request.getService(), acceptedVersion)) {
                         return acceptedVersion;
                     }
                 }
             } else {
-                for (String supportedVersion : getConfigurator().getServiceOperatorRepository().getSupportedVersions()) {
+                for (String supportedVersion : getConfigurator().getServiceOperatorRepository().getSupportedVersions(request.getService())) {
                     return supportedVersion;
                 }
             }
@@ -250,7 +250,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
                 new OWSParameterValuePossibleValues(SosConstants.SOS));
         operationsMetadata.addCommonValue(OWSConstants.RequestParams.version.name(),
                 new OWSParameterValuePossibleValues(getConfigurator().getServiceOperatorRepository()
-                        .getSupportedVersions()));
+                        .getSupportedVersions(service)));
 
         // FIXME: OpsMetadata for InsertSensor, InsertObservation SOS 2.0
         Set<RequestOperatorKeyType> requestOperatorKeyTypes =

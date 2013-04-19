@@ -251,7 +251,7 @@ public abstract class Binding implements ConformanceClass {
                 if (gcr.isSetAcceptVersions()) {
                     boolean hasSupportedVersion = false;
                     for (final String acceptVersion : gcr.getAcceptVersions()) {
-                        if (isVersionSupported(acceptVersion)) {
+                        if (isVersionSupported(request.getService(), acceptVersion)) {
                             hasSupportedVersion = true;
                         }
                     }
@@ -274,8 +274,13 @@ public abstract class Binding implements ConformanceClass {
         exceptions.throwIfNotEmpty();
     }
 
+    @Deprecated
     protected boolean isVersionSupported(final String acceptVersion) {
-        return getServiceOperatorRepository().isVersionSupported(acceptVersion);
+        return false;
+    }
+    
+    protected boolean isVersionSupported(final String service, final String acceptVersion) {
+        return getServiceOperatorRepository().isVersionSupported(service, acceptVersion);
     }
 
     protected boolean isServiceSupported(final String service) {
