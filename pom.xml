@@ -29,7 +29,7 @@
         <module>bindings</module>
         <module>coding</module>
         <module>operations</module>
-        <module>52n-sos-config-sqlite</module>
+        <module>sqlite-config</module>
         <module>52n-sos-core-gc-dao</module>
         <module>52n-sos-profile</module>
         <module>52n-sos-hibernate-api</module>
@@ -97,7 +97,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-config-sqlite</artifactId>
+                <artifactId>sqlite-config</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>

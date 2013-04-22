@@ -20,7 +20,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-config-sqlite</artifactId>
+            <artifactId>sqlite-config</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

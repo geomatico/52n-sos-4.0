@@ -8,7 +8,7 @@
         <version>4.0.0-SNAPSHOT</version>
     </parent>
     <groupId>org.n52.sensorweb.sos</groupId>
-    <artifactId>52n-sos-config-sqlite</artifactId>
+    <artifactId>sqlite-config</artifactId>
     <name>52North SOS SQLite Configuration</name>
     <dependencies>
         <dependency>
