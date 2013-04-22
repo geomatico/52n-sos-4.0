@@ -11,21 +11,21 @@
     <packaging>pom</packaging>
     <name>52North SOS Bindings Module</name>
     <modules>
-        <module>52n-sos-binding-kvp</module>
-        <module>52n-sos-binding-pox</module>
-        <module>52n-sos-binding-soap</module>
+        <module>kvp</module>
+        <module>pox</module>
+        <module>soap</module>
     </modules>
     <profiles>
         <profile>
             <id>restful</id>
             <modules>
-                <module>52n-sos-binding-rest</module>
+                <module>rest</module>
             </modules>
         </profile>
         <profile>
             <id>develop</id>
             <modules>
-                <module>52n-sos-binding-rest</module>
+                <module>rest</module>
             </modules>
         </profile>
     </profiles>

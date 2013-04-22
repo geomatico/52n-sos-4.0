@@ -278,11 +278,11 @@
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-kvp</artifactId>
+                    <artifactId>binding-kvp</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-soap</artifactId>
+                    <artifactId>binding-soap</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -307,15 +307,15 @@
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-kvp</artifactId>
+                    <artifactId>binding-kvp</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-soap</artifactId>
+                    <artifactId>binding-soap</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-pox</artifactId>
+                    <artifactId>binding-pox</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -384,11 +384,11 @@
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-kvp</artifactId>
+                    <artifactId>binding-kvp</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-soap</artifactId>
+                    <artifactId>binding-soap</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -397,7 +397,7 @@
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-kvp</artifactId>
+                    <artifactId>binding-kvp</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -406,7 +406,7 @@
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-soap</artifactId>
+                    <artifactId>binding-soap</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -467,7 +467,7 @@
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-pox</artifactId>
+                    <artifactId>binding-pox</artifactId>
                 </dependency>
             </dependencies>
         </profile>

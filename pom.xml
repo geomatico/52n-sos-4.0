@@ -174,17 +174,17 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-binding-kvp</artifactId>
+                <artifactId>binding-kvp</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-binding-soap</artifactId>
+                <artifactId>binding-soap</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-binding-pox</artifactId>
+                <artifactId>binding-pox</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
