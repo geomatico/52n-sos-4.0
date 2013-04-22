@@ -195,7 +195,7 @@
                             case "notmodified": showResponse(xhr); break;
                             case "error":
                                 showError("Request failed: " + xhr.status + " " + xhr.statusText);
-                                if(xhr.responseText && xhr.responseText.indexOf("OwsExceptionReport") < 0) {
+                                if(xhr.responseText && xhr.responseText.indexOf("ExceptionReport") >= 0) {
                                     showResponse(xhr);
                                 }
                                 break;
