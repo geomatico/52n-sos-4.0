@@ -11,15 +11,15 @@
     <packaging>pom</packaging>
     <name>52North SOS Hibernate Module</name>
     <modules>
-        <module>52n-sos-hibernate-api</module>
-        <module>52n-sos-hibernate-common</module>
-        <module>52n-sos-hibernate-core</module>
-        <module>52n-sos-hibernate-dialect</module>
-        <module>52n-sos-hibernate-enhanced</module>
-        <module>52n-sos-hibernate-feature</module>
-        <module>52n-sos-hibernate-resultHandling</module>
-        <module>52n-sos-hibernate-h2</module>
-        <module>52n-sos-hibernate-transactional</module>
-        <module>52n-sos-hibernate-mappings</module>
+        <module>api</module>
+        <module>common</module>
+        <module>core</module>
+        <module>dialect</module>
+        <module>enhanced</module>
+        <module>feature</module>
+        <module>resultHandling</module>
+        <module>h2</module>
+        <module>transactional</module>
+        <module>mappings</module>
     </modules>
 </project>
