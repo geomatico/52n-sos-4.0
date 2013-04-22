@@ -32,7 +32,7 @@
         <module>hibernate</module>
         <module>sqlite-config</module>
         <module>52n-sos-core-gc-dao</module>
-        <module>52n-sos-profile</module>
+        <module>profile</module>
         <module>52n-sos-test</module>
         <module>52n-sos-spring</module>
         <module>52n-sos-webapp</module>
@@ -204,12 +204,12 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-profile-xml</artifactId>
+                <artifactId>profile-xml</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-profile-coding</artifactId>
+                <artifactId>profile-coding</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
