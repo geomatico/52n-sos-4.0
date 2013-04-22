@@ -67,7 +67,7 @@ public class ServiceSettings implements SettingDefinitionProvider {
      */
     @Deprecated public static final String CONFIGURATION_FILES = "service.configurationFiles";
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
-            .setTitle("Service Settings").setOrder(2);
+            .setTitle("Service").setOrder(2);
     
     public static final UriSettingDefinition SERVICE_URL_DEFINITION = new UriSettingDefinition()
             .setGroup(GROUP)

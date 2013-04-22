@@ -59,7 +59,7 @@ public class MiscSettings implements SettingDefinitionProvider {
     public static final String DECIMAL_SEPARATOR = "misc.decimalSeperator";
     
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
-            .setTitle("Miscellaneous Settings").setOrder(3);
+            .setTitle("Miscellaneous").setOrder(3);
 
     /**
      * @deprecated not used by any code, check for external use or remove
