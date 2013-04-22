@@ -35,7 +35,7 @@
         <module>profile</module>
         <module>52n-sos-test</module>
         <module>52n-sos-spring</module>
-        <module>52n-sos-webapp</module>
+        <module>webapp</module>
     </modules>
     <licenses>
         <license>
@@ -264,7 +264,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-webapp</artifactId>
+                <artifactId>webapp</artifactId>
                 <version>${sos.version}</version>
                 <type>war</type>
             </dependency>

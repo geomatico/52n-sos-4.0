@@ -7,7 +7,7 @@
         <version>4.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>52n-sos-webapp</artifactId>
+    <artifactId>webapp</artifactId>
     <packaging>war</packaging>
     <name>52North SOS Webapp</name>
     <description>52North Sensor Observation Service WAR</description>
