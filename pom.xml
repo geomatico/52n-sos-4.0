@@ -24,7 +24,7 @@
     </ciManagement>
     <modules>
         <module>api</module>
-        <module>52n-sos-admin</module>
+        <module>admin</module>
         <module>cache</module>
         <module>bindings</module>
         <module>coding</module>
@@ -102,7 +102,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-admin</artifactId>
+                <artifactId>admin</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
