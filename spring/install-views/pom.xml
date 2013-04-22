@@ -8,7 +8,7 @@
         <version>4.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>install-views</artifactId>
-    <name>52North SOS Web Installer Views</name>
+    <name>52North SOS Web Install Views</name>
     <packaging>war</packaging>
     <dependencies>
         <dependency>

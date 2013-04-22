@@ -9,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>profile</artifactId>
     <packaging>pom</packaging>
-    <name>52North SOS Profile module</name>
+    <name>52North SOS Profile Module</name>
     <description>52North SOS profile module</description>
     <modules>
     	<module>xml</module>

@@ -9,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>coding-sensorML-v101</artifactId>
     <packaging>jar</packaging>
-    <name>52North SOS SML 101 Request Coding</name>
+    <name>52North SOS SensorML 101 Request Coding</name>
     <description>52North Sensor Observation Service SML 101 request Coding</description>
     <dependencies>
         <dependency>

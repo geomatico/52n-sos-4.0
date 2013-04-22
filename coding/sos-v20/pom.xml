@@ -9,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>coding-sos-v20</artifactId>
     <packaging>jar</packaging>
-    <name>52North SOS XML Request Coding</name>
+    <name>52North SOS 2.0 XML Request Coding</name>
     <description>52North Sensor Observation Service XML request Coding</description>
     <dependencies>
         <dependency>

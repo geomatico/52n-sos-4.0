@@ -9,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>profile-xml</artifactId>
     <packaging>jar</packaging>
-    <name>52North SOS Profile XmlBeans module</name>
+    <name>52North SOS Profile XmlBeans Module</name>
     <description>52North SOS profile XmlBeans module</description>
     <build>
         <plugins>

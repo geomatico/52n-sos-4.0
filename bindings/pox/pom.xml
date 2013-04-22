@@ -9,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>binding-pox</artifactId>
     <packaging>jar</packaging>
-    <name>52North SOS POX binding</name>
+    <name>52North SOS POX Binding</name>
     <description>52North Sensor Observation Service Plain Old XML binding</description>
     <dependencies>
         <dependency>
