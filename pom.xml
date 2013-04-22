@@ -541,22 +541,22 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-ext-do-xml</artifactId>
+                <artifactId>do-xml</artifactId>
                 <version>${do.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-ext-do-code</artifactId>
+                <artifactId>do-core</artifactId>
                 <version>${do.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-ext-do-code-hibernate</artifactId>
+                <artifactId>do-hibernate</artifactId>
                 <version>${do.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-ext-do-code-kvp</artifactId>
+                <artifactId>do-kvp</artifactId>
                 <version>${do.version}</version>
             </dependency>
             <dependency>

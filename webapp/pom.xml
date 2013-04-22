@@ -355,19 +355,19 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-ext-do-xml</artifactId>
+                    <artifactId>do-xml</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-ext-do-code</artifactId>
+                    <artifactId>do-core</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-ext-do-code-hibernate</artifactId>
+                    <artifactId>do-hibernate</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-ext-do-code-kvp</artifactId>
+                    <artifactId>do-kvp</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -498,19 +498,19 @@
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-ext-do-xml</artifactId>
+                    <artifactId>do-xml</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-ext-do-code</artifactId>
+                    <artifactId>do-core</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-ext-do-code-hibernate</artifactId>
+                    <artifactId>do-hibernate</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-ext-do-code-kvp</artifactId>
+                    <artifactId>do-kvp</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -519,19 +519,19 @@
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-ext-do-xml</artifactId>
+                    <artifactId>do-xml</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-ext-do-code</artifactId>
+                    <artifactId>do-core</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-ext-do-code-hibernate</artifactId>
+                    <artifactId>do-hibernate</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-ext-do-code-kvp</artifactId>
+                    <artifactId>do-kvp</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
