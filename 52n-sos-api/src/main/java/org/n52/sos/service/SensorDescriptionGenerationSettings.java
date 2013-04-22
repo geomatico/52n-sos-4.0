@@ -72,7 +72,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 	.setOrder(1)
 	.setKey(SensorDescriptionGenerationSettings.IDENTIFIER_LONG_NAME_DEFINITION)
 	.setDefaultValue("urn:ogc:def:identifier:OGC:1.0:longname")
-	.setTitle("SML Ident 'longname' definition")
+	.setTitle("Identifier 'longname' definition")
 	.setDescription("The definition for the sml:identification holding the 'longname'. Used only if the sensor description is <b>generated</b>.");
 
 	private static final StringSettingDefinition IDENTIFIER_SHORT_NAME_DEFINITION_DEFINITION = new StringSettingDefinition()
@@ -80,18 +80,20 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 	.setOrder(2)
 	.setKey(SensorDescriptionGenerationSettings.IDENTIFIER_SHORT_NAME_DEFINITION)
 	.setDefaultValue("urn:ogc:def:identifier:OGC:1.0:shortname")
-	.setTitle("SML Ident 'shortname' definition")
+	.setTitle("Identifier 'shortname' definition")
 	.setDescription("The definition for the sml:identification holding the 'shortname'. Used only if the sensor description is <b>generated</b>.");
 
 	private static final StringSettingDefinition DESCRIPTION_TEMPLATE_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
 	.setOrder(3)
 	.setKey(SensorDescriptionGenerationSettings.DESCRIPTION_TEMPLATE)
-	.setDefaultValue("The sensor system with the id '%s' observes the following properties: '%s'.")
+	.setDefaultValue("The '%s' with the id '%s' observes the following properties: '%s'.")
 	.setTitle("Description template")
 	.setDescription("The template used to generate a description using the sensor identifier and the observed properties " +
-			"related. The template MUST contain '%s' twice. The first one will be replaced with the sensor id and the " +
-			"second with a comma separated list of properties: e.g. <i>The sensor system with the id '%s' observes the following properties: '%s'.</i>.");
+			"related. The template MUST contain '%s' three times. The first one will be replaced with 'sensor system' or " +
+			"'procedure' depending if it's spatial or non-spatial. The seconde one will be replaced with the sensor id and" +
+			" the third with a comma separated list of properties: e.g. <i>The %s with the id '%s' observes the following " +
+			"properties: '%s'.</i>.");
 
 	private static final BooleanSettingDefinition GENERATE_CLASSIFICATION_DEFINITION = new BooleanSettingDefinition()
 	.setGroup(GROUP)
