@@ -194,6 +194,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     @Override
     public String insertFeature(SosSamplingFeature samplingFeature, Object connection) throws OwsExceptionReport {
         if (samplingFeature.getUrl() != null && !samplingFeature.getUrl().isEmpty()) {
+            // FIXME test if this still works
             return samplingFeature.getUrl();
         } else {
             Session session = HibernateSessionHolder.getSession(connection);
