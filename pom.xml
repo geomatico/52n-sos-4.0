@@ -23,19 +23,14 @@
         <url>http://build.dev.52north.org/jenkins/job/sos-dev/</url>
     </ciManagement>
     <modules>
-        <module>api</module>
-        <module>admin</module>
-        <module>cache</module>
+        <module>core</module>
         <module>bindings</module>
         <module>coding</module>
         <module>operations</module>
         <module>hibernate</module>
         <module>extensions</module>
-        <module>sqlite-config</module>
-        <module>gc-dao</module>
-        <module>profile</module>
-        <module>test</module>
         <module>spring</module>
+        <module>webapp</module>
     </modules>
     <licenses>
         <license>
@@ -852,7 +847,6 @@
     </repositories>
     <profiles>
         <profile>
-            <!-- Requires svn:externals definition for 52n-sos-ext-do, 52n-sos-binding-rest and gda -->
             <id>develop</id>
             <properties>
                 <config.logger.level.test.global>WARN</config.logger.level.test.global>
