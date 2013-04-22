@@ -1,4 +1,0 @@
-org.n52.sos.ds.hibernate.DeleteSensorDAO
-org.n52.sos.ds.hibernate.InsertSensorDAO
-org.n52.sos.ds.hibernate.UpdateSensorDescriptionDAO
-org.n52.sos.ds.hibernate.InsertObservationDAO

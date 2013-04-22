@@ -233,23 +233,6 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
         return sosAbstractFois;
     }
 
-    /**
-     * Get FeatureOfInterest objects for the defined restrictions
-     * <p/>
-     * @param aliases     Aliases for query between tables
-     * @param criterions  Restriction for the query
-     * @param projections Projections for the query
-     * @param session     Hibernate session
-     * <p/>
-     * @return FeatureOfInterest objects
-     */
-    @SuppressWarnings("unchecked")
-    @Deprecated
-    protected List<FeatureOfInterest> getFeatureOfInterests(HibernateQueryObject queryObject, Session session) {
-        return (List<FeatureOfInterest>) HibernateCriteriaQueryUtilities.getObjectList(queryObject, session,
-                FeatureOfInterest.class);
-    }
-
     protected FeatureOfInterest getFeatureOfInterest(String identifier, Geometry geometry, Session session) throws
             OwsExceptionReport {
         return (FeatureOfInterest) session.createCriteria(FeatureOfInterest.class)
@@ -257,15 +240,6 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
                                      SpatialRestrictions.eq(FeatureOfInterest.GEOMETRY,
                                                             switchCoordinateAxisOrderIfNeeded(geometry))))
                 .uniqueResult();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Deprecated
-    protected List<String> getFeatureOfInterestIdentifier(HibernateQueryObject queryObject, Session session) {
-        queryObject.addProjection(HibernateCriteriaQueryUtilities
-                .getDistinctProjection(HibernateCriteriaQueryUtilities.getIdentifierParameter(null)));
-        return (List<String>) HibernateCriteriaQueryUtilities.getObjectList(queryObject, session,
-                FeatureOfInterest.class);
     }
 
     /**

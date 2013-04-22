@@ -33,16 +33,10 @@ import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Conjunction;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.SimpleExpression;
 import org.joda.time.DateTime;
-import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.entities.BlobValue;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.CategoryValue;
@@ -52,16 +46,7 @@ import org.n52.sos.ds.hibernate.entities.CountValue;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
 import org.n52.sos.ds.hibernate.entities.GeometryValue;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasFeatureOfInterest;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasFeatureOfInterestType;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasFeatureOfInterestTypes;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasIdentifier;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservableProperty;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservationConstellation;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservationConstellations;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasOffering;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasOfferings;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasProcedure;
 import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
@@ -79,10 +64,7 @@ import org.n52.sos.ds.hibernate.entities.SweType;
 import org.n52.sos.ds.hibernate.entities.TextValue;
 import org.n52.sos.ds.hibernate.entities.Unit;
 import org.n52.sos.ogc.OGCConstants;
-import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
-import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,7 +75,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * Utility class for Hiberntate Criteria queries.
  * 
  */
-public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQueryUtilities {
+public class HibernateCriteriaQueryUtilities {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateCriteriaQueryUtilities.class);
 
@@ -395,285 +377,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     }
 
     /**
-     * Get equal expression for requests
-     * 
-     * @param parameter
-     *            parameter name
-     * @param value
-     *            value
-     * @return Equals expression
-     */
-    @Deprecated
-    public static SimpleExpression getEqualRestriction(String parameter, Object value) {
-        return Restrictions.eq(parameter, value);
-    }
-
-    /**
-     * Get Observation objects for the defined restrictions which are marked as
-     * not deleted
-     * 
-     * @param aliases
-     *            Aliases for query between tables
-     * @param criterions
-     *            Restriction for the query
-     * @param projections
-     *            Projections for the query
-     * @param session
-     *            Hibernate session
-     * @return Observation objects
-     */
-    @SuppressWarnings("unchecked")
-    @Deprecated
-    public static List<Observation> getObservations(HibernateQueryObject queryObject, Session session) {
-        queryObject.addCriterion(Restrictions.eq(Observation.DELETED, false));
-        return (List<Observation>) getObjectList(queryObject, session, Observation.class);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Deprecated
-    public static List<Observation> getAllObservations(HibernateQueryObject queryObject, Session session) {
-        return (List<Observation>) getObjectList(queryObject, session, Observation.class);
-    }
-
-    /**
-     * Get getEqualRestiction filter restrictions
-     * 
-     * @param eventTime Temporal filters
-     *
-     * @return filter restrictions
-     *
-     * @deprecated use {@link TemporalRestrictions#filter(java.lang.Iterable)}
-     * @throws OwsExceptionReport If the getEqualRestiction filter is not supported
-     * 
-     */
-    @Deprecated
-    public static Criterion getCriterionForTemporalFilters(List<TemporalFilter> eventTime) throws OwsExceptionReport {
-        return TemporalRestrictions.filter(eventTime);
-    }
-
-    /**
-     * Get spatial filter restrictions.
-     *
-     * @param propertyName column name
-     * @param operator     Spatial filter
-     * @param geometry     the geometry
-     *
-     * @return filter restriction
-     *
-     * @throws OwsExceptionReport If the spatial filter is not supported
-     * @deprecated use {@link SpatialRestrictions#filter(String, SpatialOperator, Geometry) }
-     */
-    @Deprecated
-    public static Criterion getCriterionForSpatialFilter(String propertyName, SpatialOperator operator,
-                                                         Geometry geometry) throws OwsExceptionReport {
-        return SpatialRestrictions.filter(propertyName, operator, geometry);
-    }
-
-    /**
-     * Get restriction for a value list
-     * 
-     * @param propertyName
-     *            column name
-     * @param list
-     *            restricted values
-     * @return filter restriction
-     */
-    @Deprecated
-    public static Criterion getDisjunctionCriterionForStringList(String propertyName, Collection<String> list) {
-        return Restrictions.in(propertyName, list);
-    }
-
-    /**
-     * Get restriction for a value list
-     * 
-     * @param propertyName
-     *            column name
-     * @param list
-     *            restricted values
-     * @return filter restriction
-     */
-    @Deprecated
-    public static Criterion getDisjunctionCriterionForCollection(String propertyName, Collection<?> list) {
-        return Restrictions.disjunction().add(Restrictions.in(propertyName, list));
-    }
-
-    // OR
-    @Deprecated
-    public static Criterion getDisjunctionFor(List<Criterion> criterions) {
-        Disjunction disjunction = Restrictions.disjunction();
-        for (Criterion criterion : criterions) {
-            disjunction.add(criterion);
-        }
-        return disjunction;
-    }
-
-    // AND
-    @Deprecated
-    public static Criterion getConjunction(List<Criterion> criterions) {
-        Conjunction conjunction = Restrictions.conjunction();
-        for (Criterion criterion : criterions) {
-            conjunction.add(criterion);
-        }
-        return conjunction;
-    }
-
-    /**
-     * Get a distinct projection for the defined column
-     * 
-     * @param propertyName
-     *            Column name for distinct filter
-     * @return Distinct projection
-     */
-    @Deprecated
-    public static Projection getDistinctProjection(String propertyName) {
-        return Projections.distinct(Projections.property(propertyName));
-    }
-
-    /**
-     * Adds an observationConstallation alias to the aliases map
-     * 
-     * @param aliases
-     *            Aliases for query between tables
-     * @param prefix
-     *            Alias prefix, can be null
-     * @return Alias prefix for observationConstallation
-     */
-    @Deprecated
-    public static String addObservationConstallationAliasToMap(Map<String, String> aliases, String prefix) {
-        String alias = "oc";
-        String parameter = HasObservationConstellation.OBSERVATION_CONSTELLATION;
-        addAliasToMap(aliases, prefix, parameter, alias);
-        return alias;
-    }
-
-    @Deprecated
-    public static String addObservationConstallationsAliasToMap(Map<String, String> aliases, String prefix) {
-        String alias = "ocs";
-        String parameter = HasObservationConstellations.OBSERVATION_CONSTELLATIONS;
-        addAliasToMap(aliases, prefix, parameter, alias);
-        return alias;
-    }
-
-    @Deprecated
-    public static String addObservationConstellationOfferingObservationTypeAliasToMap(Map<String, String> aliases,
-            String prefix) {
-        String alias = "ocoot";
-        String parameter = HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPE;
-        addAliasToMap(aliases, prefix, parameter, alias);
-        return alias;
-    }
-
-    @Deprecated
-    public static String addObservationConstellationOfferingObservationTypesAliasToMap(Map<String, String> aliases,
-            String prefix) {
-        String alias = "ocoots";
-        String parameter = HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPES;
-        addAliasToMap(aliases, prefix, parameter, alias);
-        return alias;
-    }
-
-    /**
-     * Adds an offering alias to the aliases map
-     * 
-     * @param aliases
-     *            Aliases for query between tables
-     * @param prefix
-     *            Alias prefix, can be null
-     * @return Alias prefix for offering
-     */
-    @Deprecated
-    public static String addOfferingAliasToMap(Map<String, String> aliases, String prefix) {
-        String alias = "off";
-        String parameter = HasOffering.OFFERING;
-        addAliasToMap(aliases, prefix, parameter, alias);
-        return alias;
-    }
-
-    /**
-     * Adds an observableProperty alias to the aliases map
-     * 
-     * @param aliases
-     *            Aliases for query between tables
-     * @param prefix
-     *            Alias prefix, can be null
-     * @return Alias prefix for observableProperty
-     */
-    @Deprecated
-    public static String addObservablePropertyAliasToMap(Map<String, String> aliases, String prefix) {
-        String alias = "obsProp";
-        String parameter = HasObservableProperty.OBSERVABLE_PROPERTY;
-        addAliasToMap(aliases, prefix, parameter, alias);
-        return alias;
-
-    }
-
-    /**
-     * Adds a procedure alias to the aliases map
-     * 
-     * @param aliases
-     *            Aliases for query between tables
-     * @param prefix
-     *            Alias prefix, can be null
-     * @return Alias prefix for procedure
-     */
-    @Deprecated
-    public static String addProcedureAliasToMap(Map<String, String> aliases, String prefix) {
-        String alias = "proc";
-        String parameter = HasProcedure.PROCEDURE;
-        addAliasToMap(aliases, prefix, parameter, alias);
-        return alias;
-    }
-
-    /**
-     * Adds a featureOfInterest alias to the aliases map
-     * 
-     * @param aliases
-     *            Aliases for query between tables
-     * @param prefix
-     *            Alias prefix, can be null
-     * @return Alias prefix for featureOfInterest
-     */
-    @Deprecated
-    public static String addFeatureOfInterestAliasToMap(Map<String, String> aliases, String prefix) {
-        String alias = "foi";
-        String parameter = HasFeatureOfInterest.FEATURE_OF_INTEREST;
-        addAliasToMap(aliases, prefix, parameter, alias);
-        return alias;
-    }
-
-    @Deprecated
-    public static String addFeatureOfInterestTypeAliasToMap(Map<String, String> aliases, String prefix) {
-        String alias = "foiType";
-        String parameter = HasFeatureOfInterestType.FEATURE_OF_INTEREST_TYPE;
-        addAliasToMap(aliases, prefix, parameter, alias);
-        return alias;
-    }
-
-    @Deprecated
-    public static String addFeatureOfInterestTypesAliasToMap(Map<String, String> aliases, String prefix) {
-        String alias = "foiTypes";
-        String parameter = HasFeatureOfInterestTypes.FEATURE_OF_INTEREST_TYPES;
-        addAliasToMap(aliases, prefix, parameter, alias);
-        return alias;
-    }
-
-    @Deprecated
-    public static String addObservationAliasToMap(Map<String, String> aliases, String prefix) {
-        String alias = "obs";
-        String parameter = HibernateConstants.PARAMETER_OBSERVATIONS;
-        addAliasToMap(aliases, prefix, parameter, alias);
-        return alias;
-    }
-
-    @Deprecated
-    public static String addOfferingsAliasToMap(Map<String, String> aliases, String prefix) {
-        String alias = "offs";
-        String parameter = HasOfferings.OFFERINGS;
-        addAliasToMap(aliases, prefix, parameter, alias);
-        return alias;
-    }
-
-    /**
      * Get identifier parameter for a alias prefix
      * 
      * @param prefix
@@ -727,27 +430,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return (ProcedureDescriptionFormat) session.createCriteria(ProcedureDescriptionFormat.class)
                 .add(Restrictions.eq(ProcedureDescriptionFormat.PROCEDURE_DESCRIPTION_FORMAT, procDescFormat))
                 .uniqueResult();
-    }
-
-    /**
-     * Get FOI identifiers
-     * 
-     * @param aliases
-     *            Aliases for query between tables
-     * @param criterions
-     *            Restriction for the query
-     * @param projections
-     *            Projections for the query
-     * @param session
-     *            Hibernate session
-     * @return FOI identifiers
-     */
-    @SuppressWarnings("unchecked")
-    @Deprecated
-    public static List<String> getFeatureOfInterestIdentifier(HibernateQueryObject queryObject, Session session) {
-        String foiAliases = addFeatureOfInterestAliasToMap(queryObject.getAliases(), null);
-        queryObject.addProjection(getDistinctProjection(getIdentifierParameter(foiAliases)));
-        return (List<String>) getObjectList(queryObject, session, Observation.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -878,20 +560,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     public static List<ObservableProperty> getObservableProperties(List<String> identifiers, Session session) {
         return session.createCriteria(ObservableProperty.class)
                 .add(Restrictions.in(ObservableProperty.IDENTIFIER, identifiers)).list();
-    }
-
-    @Deprecated
-    public static ObservationConstellation getObservationConstallation(Map<String, String> aliases,
-            List<Criterion> restrictions, Session session) {
-        Criteria criteria = session.createCriteria(ObservationConstellation.class);
-        addAliasesToCriteria(criteria, aliases);
-        criteria.add(getConjunction(restrictions));
-        return (ObservationConstellation) criteria.uniqueResult();
-    }
-
-    @Deprecated
-    public static ObservationConstellation getObservationConstellation(HibernateQueryObject queryObject, Session session) {
-        return (ObservationConstellation) getObject(queryObject, session, ObservationConstellation.class);
     }
 
     public static FeatureOfInterest getFeatureOfInterest(String identifier, Session session) {
@@ -1035,13 +703,6 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
                     .add(Restrictions.in(FeatureOfInterest.IDENTIFIER, featureOfInterest));
         }
         return rtc.list();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Deprecated
-    public static List<ObservationConstellation> getObservationConstellations(HibernateQueryObject queryObject,
-            Session session) {
-        return (List<ObservationConstellation>) getObjectList(queryObject, session, ObservationConstellation.class);
     }
 
     public static Order getOrderForEnum(FirstLatest firstLatest) {
