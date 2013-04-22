@@ -39,30 +39,31 @@ public class ObservableProperty implements Serializable, HasIdentifier, HasDescr
     }
 
     public long getObservablePropertyId() {
-        return this.observablePropertyId;
+        return observablePropertyId;
     }
 
-    public void setObservablePropertyId(long observablePropertyId) {
+    public void setObservablePropertyId(final long observablePropertyId) {
         this.observablePropertyId = observablePropertyId;
     }
 
     @Override
     public String getIdentifier() {
-        return this.identifier;
+        return identifier;
     }
 
     @Override
-    public void setIdentifier(String identifier) {
+    public ObservableProperty setIdentifier(final String identifier) {
         this.identifier = identifier;
+        return this;
     }
 
     @Override
     public String getDescription() {
-        return this.description;
+        return description;
     }
 
     @Override
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 }

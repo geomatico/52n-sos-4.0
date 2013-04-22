@@ -61,7 +61,7 @@ public interface HibernateRelations {
 
     interface HasDeletedFlag {
         String DELETED = "deleted";
-        void setDeleted(boolean deleted);
+        HasDeletedFlag setDeleted(boolean deleted);
         boolean isDeleted();
     }
 
@@ -98,13 +98,13 @@ public interface HibernateRelations {
     interface HasGeometry {
         String GEOMETRY = "geom";
         Geometry getGeom();
-        void setGeom(Geometry geom);
+        HasGeometry setGeom(Geometry geom);
     }
 
     interface HasIdentifier {
         String IDENTIFIER = "identifier";
         String getIdentifier();
-        void setIdentifier(String identifier);
+        HasIdentifier setIdentifier(String identifier);
     }
 
     interface HasName {
@@ -152,7 +152,7 @@ public interface HibernateRelations {
     interface HasProcedureDescriptionFormat {
         String PROCEDURE_DESCRIPTION_FORMAT = "procedureDescriptionFormat";
         ProcedureDescriptionFormat getProcedureDescriptionFormat();
-        void setProcedureDescriptionFormat(ProcedureDescriptionFormat procedureDescriptionFormat);
+        HasProcedureDescriptionFormat setProcedureDescriptionFormat(ProcedureDescriptionFormat procedureDescriptionFormat);
     }
 
     interface HasRelatedFeatureRoles {
@@ -245,7 +245,7 @@ public interface HibernateRelations {
     interface HasSrid {
         String SRID = "srid";
         int getSrid();
-        void setSrid(int srid);
+        HasSrid setSrid(int srid);
     }
 
     interface HasCoordinate extends HasSrid {
@@ -253,11 +253,11 @@ public interface HibernateRelations {
         String LATITUDE = "latitude";
         String ALTITUDE = "altitude";
         Object getLongitude();
-        void setLongitude(Object longitude);
+        HasCoordinate setLongitude(Object longitude);
         Object getLatitude();
-        void setLatitude(Object latitude);
+        HasCoordinate setLatitude(Object latitude);
         Object getAltitude();
-        void setAltitude(Object altitude);
+        HasCoordinate setAltitude(Object altitude);
     }
 
     interface HasQualities {
@@ -275,6 +275,6 @@ public interface HibernateRelations {
     interface HasValidProcedureTimes {
         String VALID_PROCEDURE_TIMES = "validProcedureTimes";
         Set<ValidProcedureTime> getValidProcedureTimes();
-        void setValidProcedureTimes(Set<ValidProcedureTime> validProcedureTimes);
+        HasValidProcedureTimes setValidProcedureTimes(Set<ValidProcedureTime> validProcedureTimes);
     }
 }

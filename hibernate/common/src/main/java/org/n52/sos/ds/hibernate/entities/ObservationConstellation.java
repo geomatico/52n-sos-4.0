@@ -46,50 +46,50 @@ public static final String ID = "observationConstellationId";
     }
 
     public long getObservationConstellationId() {
-        return this.observationConstellationId;
+        return observationConstellationId;
     }
 
-    public void setObservationConstellationId(long observationConstellationId) {
+    public void setObservationConstellationId(final long observationConstellationId) {
         this.observationConstellationId = observationConstellationId;
     }
 
     @Override
     public ObservableProperty getObservableProperty() {
-        return this.observableProperty;
+        return observableProperty;
     }
 
     @Override
-    public void setObservableProperty(ObservableProperty observableProperty) {
+    public void setObservableProperty(final ObservableProperty observableProperty) {
         this.observableProperty = observableProperty;
     }
 
     @Override
     public Procedure getProcedure() {
-        return this.procedure;
+        return procedure;
     }
 
     @Override
-    public void setProcedure(Procedure procedure) {
+    public void setProcedure(final Procedure procedure) {
         this.procedure = procedure;
     }
     
     @Override
     public ObservationType getObservationType() {
-        return this.observationType;
+        return observationType;
     }
 
     @Override
-    public void setObservationType(ObservationType observationType) {
+    public void setObservationType(final ObservationType observationType) {
         this.observationType = observationType;
     }
     
     @Override
     public Offering getOffering() {
-        return this.offering;
+        return offering;
     }
 
     @Override
-    public void setOffering(Offering offering) {
+    public void setOffering(final Offering offering) {
         this.offering = offering;
     }
 
@@ -98,8 +98,9 @@ public static final String ID = "observationConstellationId";
     }
 
     @Override
-    public void setDeleted(boolean deleted) {
+    public ObservationConstellation setDeleted(final boolean deleted) {
         this.deleted = deleted;
+        return this;
     }
 
     @Override
@@ -107,7 +108,7 @@ public static final String ID = "observationConstellationId";
         return deleted;
     }
     
-    public void setHiddenChild(boolean hiddenChild) {
+    public void setHiddenChild(final boolean hiddenChild) {
         this.hiddenChild = hiddenChild;
     }
     

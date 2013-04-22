@@ -30,7 +30,6 @@ import java.util.Set;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasCoordinate;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasDeletedFlag;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasGeometry;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasIdentifier;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasProcedureDescriptionFormat;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValidProcedureTimes;
 
@@ -39,7 +38,7 @@ import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValidProcedureTim
  *
  * @since 4.0.0
  */
-public class Procedure extends SpatialEntity implements Serializable, HasIdentifier, HasDeletedFlag,
+public class Procedure extends SpatialEntity implements Serializable, HasDeletedFlag,
                                   HasProcedureDescriptionFormat, HasValidProcedureTimes, HasGeometry, HasCoordinate {
     public static final String ID = "procedureId";
     public static final String PROCEDURES_FOR_CHILD_SENSOR_ID = "proceduresForChildSensorId";
@@ -47,7 +46,6 @@ public class Procedure extends SpatialEntity implements Serializable, HasIdentif
     private static final long serialVersionUID = -4982481368011439515L;
     private long procedureId;
     private ProcedureDescriptionFormat procedureDescriptionFormat;
-    private String identifier;
     private boolean deleted;
     private Set<ValidProcedureTime> validProcedureTimes = new HashSet<ValidProcedureTime>(0);
     private Set<Procedure> proceduresForChildSensorId = new HashSet<Procedure>(0);
@@ -60,8 +58,9 @@ public class Procedure extends SpatialEntity implements Serializable, HasIdentif
         return procedureId;
     }
 
-    public void setProcedureId(final long procedureId) {
+    public Procedure setProcedureId(final long procedureId) {
         this.procedureId = procedureId;
+        return this;
     }
 
     @Override
@@ -70,18 +69,9 @@ public class Procedure extends SpatialEntity implements Serializable, HasIdentif
     }
 
     @Override
-    public void setProcedureDescriptionFormat(final ProcedureDescriptionFormat procedureDescriptionFormat) {
+    public Procedure setProcedureDescriptionFormat(final ProcedureDescriptionFormat procedureDescriptionFormat) {
         this.procedureDescriptionFormat = procedureDescriptionFormat;
-    }
-
-    @Override
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    @Override
-    public void setIdentifier(final String identifier) {
-        this.identifier = identifier;
+        return this;
     }
 
     @Override
@@ -89,8 +79,10 @@ public class Procedure extends SpatialEntity implements Serializable, HasIdentif
         return deleted;
     }
 
-    public void setDeleted(boolean deleted) {
+    @Override
+	public Procedure setDeleted(final boolean deleted) {
         this.deleted = deleted;
+        return this;
     }
 
     @Override
@@ -99,23 +91,26 @@ public class Procedure extends SpatialEntity implements Serializable, HasIdentif
     }
 
     @Override
-    public void setValidProcedureTimes(final Set<ValidProcedureTime> validProcedureTimes) {
+    public Procedure setValidProcedureTimes(final Set<ValidProcedureTime> validProcedureTimes) {
         this.validProcedureTimes = validProcedureTimes;
+        return this;
     }
 
     public Set<Procedure> getProceduresForChildSensorId() {
         return proceduresForChildSensorId;
     }
 
-    public void setProceduresForChildSensorId(final Set<Procedure> proceduresForChildSensorId) {
+    public Procedure setProceduresForChildSensorId(final Set<Procedure> proceduresForChildSensorId) {
         this.proceduresForChildSensorId = proceduresForChildSensorId;
+        return this;
     }
 
     public Set<Procedure> getProceduresForParentSensorId() {
         return proceduresForParentSensorId;
     }
 
-    public void setProceduresForParentSensorId(final Set<Procedure> proceduresForParentSensorId) {
+    public Procedure setProceduresForParentSensorId(final Set<Procedure> proceduresForParentSensorId) {
         this.proceduresForParentSensorId = proceduresForParentSensorId;
+        return this;
     }
 }

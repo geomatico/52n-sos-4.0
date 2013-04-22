@@ -33,7 +33,6 @@ import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasCoordinate;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasDescriptionXml;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasFeatureOfInterestType;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasGeometry;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasIdentifier;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasName;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasUrl;
 
@@ -45,7 +44,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  * @since 4.0.0
  */
-public class FeatureOfInterest extends SpatialEntity implements Serializable, HasIdentifier, HasFeatureOfInterestType, HasGeometry,
+public class FeatureOfInterest extends SpatialEntity implements Serializable, HasFeatureOfInterestType, HasGeometry,
                                           HasDescriptionXml, HasName, HasUrl, HasCodespace, HasCoordinate {
     public static final String ID = "featureOfInterestId";
     public static final String FEATURE_OF_INTEREST_FOR_CHILD_FEATURE_ID = "featureOfInterestsForChildFeatureId";
@@ -53,7 +52,6 @@ public class FeatureOfInterest extends SpatialEntity implements Serializable, Ha
     private static final long serialVersionUID = -4296313199622310037L;
     private long featureOfInterestId;
     private FeatureOfInterestType featureOfInterestType;
-    private String identifier;
     private Codespace codespace;
     private String name;
     private String descriptionXml;
@@ -80,16 +78,6 @@ public class FeatureOfInterest extends SpatialEntity implements Serializable, Ha
     @Override
     public void setFeatureOfInterestType(final FeatureOfInterestType featureOfInterestType) {
         this.featureOfInterestType = featureOfInterestType;
-    }
-
-    @Override
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    @Override
-    public void setIdentifier(final String identifier) {
-        this.identifier = identifier;
     }
 
     @Override

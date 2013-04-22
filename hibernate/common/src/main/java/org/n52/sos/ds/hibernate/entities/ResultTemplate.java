@@ -46,61 +46,62 @@ public class ResultTemplate implements Serializable, HasIdentifier, HasFeatureOf
     }
 
     public long getResultTemplateId() {
-        return this.resultTemplateId;
+        return resultTemplateId;
     }
 
-    public void setResultTemplateId(long resultTemplateId) {
+    public void setResultTemplateId(final long resultTemplateId) {
         this.resultTemplateId = resultTemplateId;
     }
 
     @Override
     public FeatureOfInterest getFeatureOfInterest() {
-        return this.featureOfInterest;
+        return featureOfInterest;
     }
 
     @Override
-    public void setFeatureOfInterest(FeatureOfInterest featureOfInterest) {
+    public void setFeatureOfInterest(final FeatureOfInterest featureOfInterest) {
         this.featureOfInterest = featureOfInterest;
     }
 
     @Override
     public ObservationConstellation getObservationConstellation() {
-        return this.observationConstellation;
+        return observationConstellation;
     }
 
     @Override
     public void setObservationConstellation(
-            ObservationConstellation observationConstellation) {
+            final ObservationConstellation observationConstellation) {
         this.observationConstellation = observationConstellation;
     }
 
     @Override
     public String getIdentifier() {
-        return this.identifier;
+        return identifier;
     }
 
     @Override
-    public void setIdentifier(String identifier) {
+    public ResultTemplate setIdentifier(final String identifier) {
         this.identifier = identifier;
+        return this;
     }
 
     @Override
     public String getResultStructure() {
-        return this.resultStructure;
+        return resultStructure;
     }
 
     @Override
-    public void setResultStructure(String resultStructure) {
+    public void setResultStructure(final String resultStructure) {
         this.resultStructure = resultStructure;
     }
 
     @Override
     public String getResultEncoding() {
-        return this.resultEncoding;
+        return resultEncoding;
     }
 
     @Override
-    public void setResultEncoding(String resultEncoding) {
+    public void setResultEncoding(final String resultEncoding) {
         this.resultEncoding = resultEncoding;
     }
 }

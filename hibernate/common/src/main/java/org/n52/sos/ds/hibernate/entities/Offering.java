@@ -48,60 +48,61 @@ public class Offering implements Serializable, HasIdentifier, HasName, HasObserv
     }
 
     public long getOfferingId() {
-        return this.offeringId;
+        return offeringId;
     }
 
-    public void setOfferingId(long offeringId) {
+    public void setOfferingId(final long offeringId) {
         this.offeringId = offeringId;
     }
 
     @Override
     public String getIdentifier() {
-        return this.identifier;
+        return identifier;
     }
 
     @Override
-    public void setIdentifier(String identifier) {
+    public Offering setIdentifier(final String identifier) {
         this.identifier = identifier;
+        return this;
     }
 
     @Override
     public String getName() {
-        return this.name;
+        return name;
     }
 
     @Override
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
     @Override
     public Set<ObservationType> getObservationTypes() {
-        return this.observationTypes;
+        return observationTypes;
     }
 
     @Override
-    public void setObservationTypes(Set<ObservationType> observationTypes) {
+    public void setObservationTypes(final Set<ObservationType> observationTypes) {
         this.observationTypes = observationTypes;
     }
 
     @Override
     public Set<FeatureOfInterestType> getFeatureOfInterestTypes() {
-        return this.featureOfInterestTypes;
+        return featureOfInterestTypes;
     }
 
     @Override
-    public void setFeatureOfInterestTypes(Set<FeatureOfInterestType> featureOfInterestTypes) {
+    public void setFeatureOfInterestTypes(final Set<FeatureOfInterestType> featureOfInterestTypes) {
         this.featureOfInterestTypes = featureOfInterestTypes;
     }
 
     @Override
     public Set<RelatedFeature> getRelatedFeatures() {
-        return this.relatedFeatures;
+        return relatedFeatures;
     }
 
     @Override
-    public void setRelatedFeatures(Set<RelatedFeature> relatedFeatures) {
+    public void setRelatedFeatures(final Set<RelatedFeature> relatedFeatures) {
         this.relatedFeatures = relatedFeatures;
     }
 }

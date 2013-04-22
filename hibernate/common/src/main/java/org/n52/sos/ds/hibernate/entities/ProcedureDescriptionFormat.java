@@ -38,18 +38,20 @@ public class ProcedureDescriptionFormat implements Serializable {
     }
 
     public long getProcedureDescriptionFormatId() {
-        return this.procedureDescriptionFormatId;
+        return procedureDescriptionFormatId;
     }
 
-    public void setProcedureDescriptionFormatId(long procedureDescriptionFormatId) {
+    public ProcedureDescriptionFormat setProcedureDescriptionFormatId(final long procedureDescriptionFormatId) {
         this.procedureDescriptionFormatId = procedureDescriptionFormatId;
+        return this;
     }
 
     public String getProcedureDescriptionFormat() {
-        return this.procedureDescriptionFormat;
+        return procedureDescriptionFormat;
     }
 
-    public void setProcedureDescriptionFormat(String procedureDescriptionFormat) {
+    public ProcedureDescriptionFormat setProcedureDescriptionFormat(final String procedureDescriptionFormat) {
         this.procedureDescriptionFormat = procedureDescriptionFormat;
+        return this;
     }
 }

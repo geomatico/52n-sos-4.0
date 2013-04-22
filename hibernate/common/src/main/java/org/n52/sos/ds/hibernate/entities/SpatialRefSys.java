@@ -43,11 +43,11 @@ public class SpatialRefSys implements Serializable, HasSrid {
     public SpatialRefSys() {
     }
 
-    public SpatialRefSys(int srid) {
+    public SpatialRefSys(final int srid) {
         this.srid = srid;
     }
 
-    public SpatialRefSys(int srid, String authName, Integer authSrid, String srtext, String proj4text) {
+    public SpatialRefSys(final int srid, final String authName, final Integer authSrid, final String srtext, final String proj4text) {
         this.srid = srid;
         this.authName = authName;
         this.authSrid = authSrid;
@@ -57,43 +57,44 @@ public class SpatialRefSys implements Serializable, HasSrid {
 
     @Override
     public int getSrid() {
-        return this.srid;
+        return srid;
     }
 
     @Override
-    public void setSrid(int srid) {
+    public SpatialRefSys setSrid(final int srid) {
         this.srid = srid;
+        return this;
     }
 
     public String getAuthName() {
-        return this.authName;
+        return authName;
     }
 
-    public void setAuthName(String authName) {
+    public void setAuthName(final String authName) {
         this.authName = authName;
     }
 
     public Integer getAuthSrid() {
-        return this.authSrid;
+        return authSrid;
     }
 
-    public void setAuthSrid(Integer authSrid) {
+    public void setAuthSrid(final Integer authSrid) {
         this.authSrid = authSrid;
     }
 
     public String getSrtext() {
-        return this.srtext;
+        return srtext;
     }
 
-    public void setSrtext(String srtext) {
+    public void setSrtext(final String srtext) {
         this.srtext = srtext;
     }
 
     public String getProj4text() {
-        return this.proj4text;
+        return proj4text;
     }
 
-    public void setProj4text(String proj4text) {
+    public void setProj4text(final String proj4text) {
         this.proj4text = proj4text;
     }
 }

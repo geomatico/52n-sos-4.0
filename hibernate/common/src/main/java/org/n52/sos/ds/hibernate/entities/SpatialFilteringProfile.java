@@ -41,30 +41,32 @@ public class SpatialFilteringProfile implements Serializable, HasIdentifier, Has
     }
 
     public long getSpatialFilteringProfileId() {
-        return this.spatialFilteringProfileId;
+        return spatialFilteringProfileId;
     }
 
-    public void setSpatialFilteringProfileId(long spatialFilteringProfileId) {
+    public void setSpatialFilteringProfileId(final long spatialFilteringProfileId) {
         this.spatialFilteringProfileId = spatialFilteringProfileId;
     }
 
     @Override
     public String getIdentifier() {
-        return this.identifier;
+        return identifier;
     }
 
     @Override
-    public void setIdentifier(String identifier) {
+    public SpatialFilteringProfile setIdentifier(final String identifier) {
         this.identifier = identifier;
+        return this;
     }
 
     @Override
     public Geometry getGeom() {
-        return this.geom;
+        return geom;
     }
 
     @Override
-    public void setGeom(Geometry geom) {
+    public SpatialFilteringProfile setGeom(final Geometry geom) {
         this.geom = geom;
+        return this;
     }
 }

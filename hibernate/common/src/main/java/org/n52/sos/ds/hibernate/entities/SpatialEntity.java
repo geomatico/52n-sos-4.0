@@ -25,6 +25,7 @@ package org.n52.sos.ds.hibernate.entities;
 
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasCoordinate;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasGeometry;
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasIdentifier;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -33,17 +34,29 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @since 4.0.0
  */
-public abstract class SpatialEntity implements HasGeometry, HasCoordinate {
+public abstract class SpatialEntity implements HasGeometry, HasCoordinate, HasIdentifier {
 
 	private Geometry geom;
 	private Object longitude;
 	private Object latitude;
 	private Object altitude;
 	private int srid;
+	private String identifier;
 
 	public SpatialEntity() {
 		super();
 	}
+	
+	@Override
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    @Override
+    public SpatialEntity setIdentifier(final String identifier) {
+        this.identifier = identifier;
+        return this;
+    }
 
 	@Override
 	public Geometry getGeom()
@@ -52,9 +65,10 @@ public abstract class SpatialEntity implements HasGeometry, HasCoordinate {
 	}
 
 	@Override
-	public void setGeom(final Geometry geom)
+	public SpatialEntity setGeom(final Geometry geom)
 	{
 	    this.geom = geom;
+	    return this;
 	}
 
 	@Override
@@ -64,9 +78,10 @@ public abstract class SpatialEntity implements HasGeometry, HasCoordinate {
 	}
 
 	@Override
-	public void setLongitude(final Object longitude)
+	public SpatialEntity setLongitude(final Object longitude)
 	{
 	    this.longitude = longitude;
+	    return this;
 	}
 
 	@Override
@@ -76,9 +91,10 @@ public abstract class SpatialEntity implements HasGeometry, HasCoordinate {
 	}
 
 	@Override
-	public void setLatitude(final Object latitude)
+	public SpatialEntity setLatitude(final Object latitude)
 	{
 	    this.latitude = latitude;
+	    return this;
 	}
 
 	@Override
@@ -88,9 +104,10 @@ public abstract class SpatialEntity implements HasGeometry, HasCoordinate {
 	}
 
 	@Override
-	public void setAltitude(final Object altitude)
+	public SpatialEntity setAltitude(final Object altitude)
 	{
 	    this.altitude = altitude;
+	    return this;
 	}
 
 	@Override
@@ -100,9 +117,10 @@ public abstract class SpatialEntity implements HasGeometry, HasCoordinate {
 	}
 
 	@Override
-	public void setSrid(final int srid)
+	public SpatialEntity setSrid(final int srid)
 	{
 	    this.srid = srid;
+	    return this;
 	}
 
 	public boolean isSetGeometry()

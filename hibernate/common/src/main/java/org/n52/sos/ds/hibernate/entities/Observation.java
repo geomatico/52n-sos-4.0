@@ -72,148 +72,149 @@ public class Observation implements Serializable, HasIdentifier, HasDeletedFlag,
     }
 
     public long getObservationId() {
-        return this.observationId;
+        return observationId;
     }
 
-    public void setObservationId(long observationId) {
+    public void setObservationId(final long observationId) {
         this.observationId = observationId;
     }
 
     @Override
     public FeatureOfInterest getFeatureOfInterest() {
-        return this.featureOfInterest;
+        return featureOfInterest;
     }
 
     @Override
-    public void setFeatureOfInterest(FeatureOfInterest featureOfInterest) {
+    public void setFeatureOfInterest(final FeatureOfInterest featureOfInterest) {
         this.featureOfInterest = featureOfInterest;
     }
     
     @Override
     public ObservableProperty getObservableProperty() {
-        return this.observableProperty;
+        return observableProperty;
     }
     @Override
-    public void setObservableProperty(ObservableProperty observableProperty) {
+    public void setObservableProperty(final ObservableProperty observableProperty) {
         this.observableProperty = observableProperty;
     }
 
     @Override
     public Procedure getProcedure() {
-        return this.procedure;
+        return procedure;
     }
 
     @Override
-    public void setProcedure(Procedure procedure) {
+    public void setProcedure(final Procedure procedure) {
         this.procedure = procedure;
     }
 
     @Override
     public String getIdentifier() {
-        return this.identifier;
+        return identifier;
     }
 
     @Override
-    public void setIdentifier(String identifier) {
+    public Observation setIdentifier(final String identifier) {
         this.identifier = identifier;
+        return this;
     }
 
     @Override
     public Codespace getCodespace() {
-        return this.codespace;
+        return codespace;
     }
 
     @Override
-    public void setCodespace(Codespace codespace) {
+    public void setCodespace(final Codespace codespace) {
         this.codespace = codespace;
     }
 
     public Date getPhenomenonTimeStart() {
-        return this.phenomenonTimeStart;
+        return phenomenonTimeStart;
     }
 
-    public void setPhenomenonTimeStart(Date phenomenonTimeStart) {
+    public void setPhenomenonTimeStart(final Date phenomenonTimeStart) {
         this.phenomenonTimeStart = phenomenonTimeStart;
     }
 
     public Date getPhenomenonTimeEnd() {
-        return this.phenomenonTimeEnd;
+        return phenomenonTimeEnd;
     }
 
-    public void setPhenomenonTimeEnd(Date phenomenonTimeEnd) {
+    public void setPhenomenonTimeEnd(final Date phenomenonTimeEnd) {
         this.phenomenonTimeEnd = phenomenonTimeEnd;
     }
 
     public Date getResultTime() {
-        return this.resultTime;
+        return resultTime;
     }
 
-    public void setResultTime(Date resultTime) {
+    public void setResultTime(final Date resultTime) {
         this.resultTime = resultTime;
     }
 
     public Date getValidTimeStart() {
-        return this.validTimeStart;
+        return validTimeStart;
     }
 
-    public void setValidTimeStart(Date validTimeStart) {
+    public void setValidTimeStart(final Date validTimeStart) {
         this.validTimeStart = validTimeStart;
     }
 
     public Date getValidTimeEnd() {
-        return this.validTimeEnd;
+        return validTimeEnd;
     }
 
-    public void setValidTimeEnd(Date validTimeEnd) {
+    public void setValidTimeEnd(final Date validTimeEnd) {
         this.validTimeEnd = validTimeEnd;
     }
 
     @Override
     public Unit getUnit() {
-        return this.unit;
+        return unit;
     }
 
     @Override
-    public void setUnit(Unit unit) {
+    public void setUnit(final Unit unit) {
         this.unit = unit;
     }
 
     public String getSetId() {
-        return this.setId;
+        return setId;
     }
 
-    public void setSetId(String setId) {
+    public void setSetId(final String setId) {
         this.setId = setId;
     }
 
     @Override
     public Set<Offering> getOfferings() {
-        return this.offerings;
+        return offerings;
     }
 
     @Override
     public void setOfferings(
-            Set<Offering> offerings) {
+            final Set<Offering> offerings) {
         this.offerings = offerings;
     }
 
     @Override
     public Set<SpatialFilteringProfile> getSpatialFilteringProfiles() {
-        return this.spatialFilteringProfiles;
+        return spatialFilteringProfiles;
     }
 
     @Override
-    public void setSpatialFilteringProfiles(Set<SpatialFilteringProfile> spatialFilteringProfiles) {
+    public void setSpatialFilteringProfiles(final Set<SpatialFilteringProfile> spatialFilteringProfiles) {
         this.spatialFilteringProfiles = spatialFilteringProfiles;
     }
 
     @Override
     public Set<Quality> getQualities() {
-        return this.qualities;
+        return qualities;
     }
 
     @Override
-    public void setQualities(Set<Quality> qualities) {
+    public void setQualities(final Set<Quality> qualities) {
         this.qualities = qualities;
     }
 
@@ -223,8 +224,9 @@ public class Observation implements Serializable, HasIdentifier, HasDeletedFlag,
     }
 
     @Override
-    public void setDeleted(boolean deleted) {
+    public Observation setDeleted(final boolean deleted) {
         this.deleted = deleted;
+        return this;
     }
 
     public boolean isSetIdentifier() {

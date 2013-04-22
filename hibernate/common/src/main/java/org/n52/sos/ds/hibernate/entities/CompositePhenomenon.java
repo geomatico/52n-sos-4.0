@@ -45,13 +45,13 @@ public class CompositePhenomenon implements Serializable, HasIdentifier, HasDesc
     public CompositePhenomenon() {
     }
 
-    public CompositePhenomenon(long compositePhenomenonId, String identifier) {
+    public CompositePhenomenon(final long compositePhenomenonId, final String identifier) {
         this.compositePhenomenonId = compositePhenomenonId;
         this.identifier = identifier;
     }
 
-    public CompositePhenomenon(long compositePhenomenonId, String identifier, String description, Set<Request> requests,
-                               Set<ObservableProperty> observableProperties) {
+    public CompositePhenomenon(final long compositePhenomenonId, final String identifier, final String description, final Set<Request> requests,
+                               final Set<ObservableProperty> observableProperties) {
         this.compositePhenomenonId = compositePhenomenonId;
         this.identifier = identifier;
         this.description = description;
@@ -60,50 +60,51 @@ public class CompositePhenomenon implements Serializable, HasIdentifier, HasDesc
     }
 
     public long getCompositePhenomenonId() {
-        return this.compositePhenomenonId;
+        return compositePhenomenonId;
     }
 
-    public void setCompositePhenomenonId(long compositePhenomenonId) {
+    public void setCompositePhenomenonId(final long compositePhenomenonId) {
         this.compositePhenomenonId = compositePhenomenonId;
     }
 
     @Override
     public String getIdentifier() {
-        return this.identifier;
+        return identifier;
     }
 
     @Override
-    public void setIdentifier(String identifier) {
+    public CompositePhenomenon setIdentifier(final String identifier) {
         this.identifier = identifier;
+        return this;
     }
 
     @Override
     public String getDescription() {
-        return this.description;
+        return description;
     }
 
     @Override
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
     @Override
     public Set<Request> getRequests() {
-        return this.requests;
+        return requests;
     }
 
     @Override
-    public void setRequests(Set<Request> requests) {
+    public void setRequests(final Set<Request> requests) {
         this.requests = requests;
     }
 
     @Override
     public Set<ObservableProperty> getObservableProperties() {
-        return this.observableProperties;
+        return observableProperties;
     }
 
     @Override
-    public void setObservableProperties(Set<ObservableProperty> observableProperties) {
+    public void setObservableProperties(final Set<ObservableProperty> observableProperties) {
         this.observableProperties = observableProperties;
     }
 }
