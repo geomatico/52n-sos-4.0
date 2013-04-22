@@ -36,7 +36,6 @@
         <module>profile</module>
         <module>test</module>
         <module>spring</module>
-        <module>webapp</module>
     </modules>
     <licenses>
         <license>
@@ -785,7 +784,7 @@
                     <version>2.4</version>
                     <configuration>
                         <descriptors>
-                            <descriptor>assembly.xml</descriptor>
+							<descriptor>misc/assembly.xml</descriptor>
                         </descriptors>
                     </configuration>
                 </plugin>

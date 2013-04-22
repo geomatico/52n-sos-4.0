@@ -13,8 +13,8 @@
     <description>52North Sensor Observation Service WAR</description>
 
     <properties>
-        <sqliteSettingDatabase>${project.parent.basedir}/conf/default_settings.db</sqliteSettingDatabase>
-        <databaseConfigurationFile>${project.parent.basedir}/conf/datasource.properties</databaseConfigurationFile>
+		<sqliteSettingDatabase>${project.parent.basedir}/misc/conf/default_settings.db</sqliteSettingDatabase>
+		<databaseConfigurationFile>${project.parent.basedir}/misc/conf/datasource.properties</databaseConfigurationFile>
         <!-- do not overwrite this one! -->
         <sqliteSettingDatabaseTargetFile>${project.build.directory}/${project.build.finalName}/configuration.db</sqliteSettingDatabaseTargetFile>
     </properties>
@@ -62,7 +62,7 @@
                             <targetPath>WEB-INF/classes</targetPath>
                         </resource>
                         <resource>
-                            <directory>../db</directory>
+							<directory>../misc/db</directory>
                             <filtering>false</filtering>
                             <targetPath>sql</targetPath>
                             <includes>
