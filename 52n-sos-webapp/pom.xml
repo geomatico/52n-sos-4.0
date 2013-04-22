@@ -193,7 +193,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-hibernate-core</artifactId>
+            <artifactId>hibernate-dao</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -290,7 +290,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-hibernate-enhanced</artifactId>
+                    <artifactId>hibernate-dao</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -298,15 +298,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-hibernate-transactional</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
                     <artifactId>resultHandling-v20</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-hibernate-resultHandling</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -331,7 +323,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-hibernate-enhanced</artifactId>
+                    <artifactId>hibernate-dao</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -339,15 +331,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-hibernate-transactional</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
                     <artifactId>resultHandling-v20</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-hibernate-resultHandling</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -448,7 +432,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-hibernate-enhanced</artifactId>
+                    <artifactId>hibernate-dao</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -461,7 +445,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-hibernate-transactional</artifactId>
+                    <artifactId>hibernate-dao</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -474,7 +458,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-hibernate-resultHandling</artifactId>
+                    <artifactId>hibernate-dao</artifactId>
                 </dependency>
             </dependencies>
         </profile>
