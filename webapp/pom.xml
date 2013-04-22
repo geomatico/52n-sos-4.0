@@ -73,15 +73,15 @@
                     <overlays>
                         <overlay>
                             <groupId>${project.groupId}</groupId>
-                            <artifactId>52n-sos-spring-client-views</artifactId>
+                            <artifactId>client-views</artifactId>
                         </overlay>
                         <overlay>
                             <groupId>${project.groupId}</groupId>
-                            <artifactId>52n-sos-spring-admin-views</artifactId>
+                            <artifactId>admin-views</artifactId>
                         </overlay>
                         <overlay>
                             <groupId>${project.groupId}</groupId>
-                            <artifactId>52n-sos-spring-installer-views</artifactId>
+                            <artifactId>install-views</artifactId>
                         </overlay>
                     </overlays>
                 </configuration>
@@ -255,17 +255,17 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-spring-client-views</artifactId>
+            <artifactId>client-views</artifactId>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-spring-admin-views</artifactId>
+            <artifactId>admin-views</artifactId>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-spring-installer-views</artifactId>
+            <artifactId>install-views</artifactId>
             <type>war</type>
         </dependency>
     </dependencies>

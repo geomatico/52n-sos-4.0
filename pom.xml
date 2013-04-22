@@ -34,7 +34,7 @@
         <module>52n-sos-core-gc-dao</module>
         <module>profile</module>
         <module>52n-sos-test</module>
-        <module>52n-sos-spring</module>
+        <module>spring</module>
         <module>webapp</module>
     </modules>
     <licenses>
@@ -214,23 +214,23 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-spring-common-controller</artifactId>
+                <artifactId>common-controller</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-spring-common-views</artifactId>
+                <artifactId>common-views</artifactId>
                 <version>${sos.version}</version>
                 <type>war</type>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-spring-admin-controller</artifactId>
+                <artifactId>admin-controller</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-spring-admin-views</artifactId>
+                <artifactId>admin-views</artifactId>
                 <version>${sos.version}</version>
                 <type>war</type>
             </dependency>
@@ -241,13 +241,13 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-spring-installer-views</artifactId>
+                <artifactId>install-views</artifactId>
                 <version>${sos.version}</version>
                 <type>war</type>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-spring-client-controller</artifactId>
+                <artifactId>client-controller</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
@@ -258,7 +258,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-spring-client-views</artifactId>
+                <artifactId>client-views</artifactId>
                 <version>${sos.version}</version>
                 <type>war</type>
             </dependency>
