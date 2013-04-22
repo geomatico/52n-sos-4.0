@@ -62,8 +62,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 	public static final String CLASSIFIER_INTENDED_APPLICATION_VALUE = "sensorDescGen.SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_VALUE";
 	public static final String CLASSIFIER_SENSOR_TYPE_DEFINITION = "sensorDescGen.SML_GENERATION_CLASSIFIER_SENSOR_TYPE_DEFINITION";
 	public static final String CLASSIFIER_SENSOR_TYPE_VALUE = "sensorDescGen.SML_GENERATION_CLASSIFIER_SENSOR_TYPE_VALUE";
-	public static final String LATITUDE_UOM = "sensorDescGen.LATITUDE_UOM";
-	public static final String LONGITUDE_UOM = "sensorDescGen.LONGITUDE_UOM";
+	public static final String LAT_LONG_UOM = "sensorDescGen.LAT_LONG_UOM";
 	public static final String ALTITUDE_UOM = "sensorDescGen.ALTITUDE_UOM";
 	public static final String USE_SERVICE_CONTACT_AS_SENSOR_CONTACT = "sensorDescGen.SML_GENERATION_USE_SERVICE_CONTACT_AS_SENSOR_CONTACT";
 
@@ -145,23 +144,14 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 	.setTitle("Use service contact as sensor contact")
 	.setDescription("Should the service contact be encoded as sensor contact if sensor description generation is activated.");
 	
-	private static final StringSettingDefinition LATITUDE_UOM_DEFINITION = new StringSettingDefinition()
+	private static final StringSettingDefinition LAT_LONG_UOM_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
 	.setOrder(10)
 	.setOptional(true)
-	.setKey(LATITUDE_UOM)
+	.setKey(LAT_LONG_UOM)
 	.setDefaultValue("degree")
-	.setTitle("Latitude UOM")
-	.setDescription("The UOM for the latitude value of spatial procedures (e.g. sml:System). Something like 'degree', 'm'.");
-	
-	private static final StringSettingDefinition LONGITUDE_UOM_DEFINITION = new StringSettingDefinition()
-	.setGroup(GROUP)
-	.setOrder(10)
-	.setOptional(true)
-	.setKey(LONGITUDE_UOM)
-	.setDefaultValue("degree")
-	.setTitle("Longitude UOM")
-	.setDescription("The UOM for the longitude value of spatial procedures (e.g. sml:System). Something like 'degree', 'm'.");
+	.setTitle("Latitude &amp; Longitude UOM")
+	.setDescription("The UOM for the latitude  &amp; longitude values of spatial procedures (e.g. sml:System). Something like 'degree', 'm'.");
 	
 	private static final StringSettingDefinition ALTITUDE_UOM_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
@@ -182,8 +172,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 			CLASSIFIER_SENSOR_TYPE_DEFINITION_DEFINITION,
 			CLASSIFIER_SENSOR_TYPE_VALUE_DEFINITION,
 			USE_SERVICE_CONTACT_AS_SENSOR_CONTACT_DEFINITION,
-			LATITUDE_UOM_DEFINITION,
-			LONGITUDE_UOM_DEFINITION,
+			LAT_LONG_UOM_DEFINITION,
 			ALTITUDE_UOM_DEFINITION
 			);
 
@@ -200,7 +189,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
     private String identifierShortNameDefinition;
     private String identifierLongNameDefinition;
 
-	private String latitudeUom;
+	private String latLongUom;
 
 	private String altitudeUom;
 
@@ -335,26 +324,15 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
         return identifierLongNameDefinition;
     }
 
-    @Setting(LATITUDE_UOM)
-    public void setLatitudeUom(final String latitudeUom)
+    @Setting(LAT_LONG_UOM)
+    public void setLatitudeUom(final String latLongUom)
     {
-    	this.latitudeUom = latitudeUom;
+    	this.latLongUom = latLongUom;
     }
 
-	public String getLatitudeUom()
+	public String getLatLongUom()
 	{
-		return latitudeUom;
-	}
-	
-	@Setting(LONGITUDE_UOM)
-    public void setLongitudeUom(final String longitudeUom)
-    {
-    	this.longitudeUom = longitudeUom;
-    }
-
-	public String getLongitudeUom()
-	{
-		return longitudeUom;
+		return latLongUom;
 	}
 	
 	@Setting(ALTITUDE_UOM)

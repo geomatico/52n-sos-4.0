@@ -237,7 +237,7 @@ public class HibernateProcedureUtilities {
 			if (exampleObservation instanceof BlobObservation)
 			{
 				// TODO implement BlobObservations
-				LOGGER.debug("Type '{}' is not supported by the current implementation",BlobObservation.class.getName());
+				logTypeNotSupported(BlobObservation.class);
 				continue;
 			}
 			else if (exampleObservation instanceof BooleanObservation)
@@ -261,7 +261,7 @@ public class HibernateProcedureUtilities {
 			else if (exampleObservation instanceof GeometryObservation)
 			{
 				// TODO implement GeometryObservations
-				LOGGER.debug("Type '{}' is not supported by the current implementation",GeometryObservation.class.getName());
+				logTypeNotSupported(GeometryObservation.class);
 				continue;
 			}
 			else if (exampleObservation instanceof NumericObservation)
@@ -283,6 +283,11 @@ public class HibernateProcedureUtilities {
 			}
 		}
 		return outputs;
+	}
+
+	private static void logTypeNotSupported(final Class clazz)
+	{
+		LOGGER.debug("Type '{}' is not supported by the current implementation",clazz.getName());
 	}
 
 	private static Observation getExampleObservation(final String identifier,
@@ -358,7 +363,7 @@ public class HibernateProcedureUtilities {
                         final SosSweQuantity quantity = new SosSweQuantity();
                         quantity.setValue((Double)latitude);
                         quantity.setAxisID("y");
-                        quantity.setUom(generationSettings().getLatitudeUom());
+                        quantity.setUom(generationSettings().getLatLongUom());
                         sweCoordinates.add(new SosSweCoordinate<Double>(northing,quantity));
                 }
                 if (longitude instanceof Double)
@@ -366,7 +371,7 @@ public class HibernateProcedureUtilities {
                         final SosSweQuantity quantity = new SosSweQuantity();
                         quantity.setValue((Double)longitude);
                         quantity.setAxisID("x");
-                        quantity.setUom(generationSettings().getLongitudeUom());
+                        quantity.setUom(generationSettings().getLatLongUom());
                         sweCoordinates.add(new SosSweCoordinate<Double>(easting,quantity));
                 }
                 if (oAltitude instanceof Double)
