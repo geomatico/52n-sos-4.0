@@ -32,7 +32,7 @@
         <module>hibernate</module>
         <module>extensions</module>
         <module>sqlite-config</module>
-        <module>52n-sos-core-gc-dao</module>
+        <module>gc-dao</module>
         <module>profile</module>
         <module>test</module>
         <module>spring</module>
@@ -134,7 +134,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-core-gc-dao</artifactId>
+                <artifactId>gc-dao</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
