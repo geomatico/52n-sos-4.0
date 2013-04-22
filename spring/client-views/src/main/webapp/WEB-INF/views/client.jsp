@@ -62,8 +62,8 @@
 			<input id="input-send-inline" type="checkbox" checked> show response inline
 		</label>
 		<button id="send-button" type="button" class="btn btn-info inline">Send</button>
-	</div>
-	<div id="response" class="span12" style="margin-left: 0;"></div>
+    </div>
+    <div id="response" class="span12" style="margin-left: 0;"></div>
 </form>
 
 <script type="text/javascript">
@@ -80,20 +80,19 @@
 
 <script type="text/javascript">
 	$(function() {
-		var $form = $("#form");
-		var $version = $("#input-version");
-		var $binding = $("#input-binding");
-		var $request = $("#input-request");
-		var $url = $("#input-url");
-		var $send = $("#send-button");
-
-		var editor = CodeMirror.fromTextArea($("#editor").get(0), { 
+		var $form = $("#form"),
+            $version = $("#input-version"),
+            $binding = $("#input-binding"),
+            $request = $("#input-request"),
+            $url = $("#input-url"),
+            $send = $("#send-button"),
+            editor = CodeMirror.fromTextArea($("#editor").get(0), {
 			"mode": "xml", "lineNumbers": true, "lineWrapping": true
-		});
-
-		var version, binding, request;
-		
-		var sosUrl = document.location.protocol +"//"+ document.location.host + "<c:url value="/sos" />";
+    		}),
+            version,
+            binding,
+            request,
+            sosUrl = document.location.protocol + "//" + document.location.host + "<c:url value="/sos" />";
 		
 
 		function appendDefaultOption(text, $select) {
@@ -160,27 +159,6 @@
 		}
 
 		function onSend() {
-            function showResponse(data) {
-                var xml = xml2string(data);
-                var $response = $("#response");
-                $response.fadeOut("fast");
-                $response.children().remove();
-                $("<h3>")
-                    .text("Response")
-                    .appendTo($response);
-                $("<pre>")
-                    .addClass("prettyprint")
-                    .addClass("linenums")
-                    .text(xml)
-                    .appendTo($response);
-                prettyPrint();
-                $response.fadeIn("fast");
-                $("html, body").animate({
-                    scrollTop: $("#response").offset().top
-                }, "slow");
-
-            }
-
 			var request = $.trim(editor.getValue());
 			if (sendInline()) {
 				$send.attr("disabled", true);
@@ -188,16 +166,45 @@
 					"type": (request) ? "POST" : "GET",
 					"contentType": "application/xml",
 					"accepts": "application/xml",
-					"data": request
-				}).fail(function(error) {
-					showError("Request failed: " + error.status + " " + error.statusText);
-                    if(error.responseText && error.responseText.indexOf("OwsExceptionReport") < 0) {
-                        showResponse(error.responseText);
+					"data": request,
+                    "complete": function(xhr, status) {
+                        function showResponse(xhr) {
+                            var xml = xml2string(xhr.responseText);
+                            var $response = $("#response");
+                            $("<h3>")
+                                .text("Response")
+                                .appendTo($response);
+                            $("<pre>")
+                                .text((xhr.status + " " + xhr.statusText + "\n"
+                                    + xhr.getAllResponseHeaders()).trim())
+                                .appendTo($response);
+                            $("<pre>")
+                                .addClass("prettyprint")
+                                .addClass("linenums")
+                                .text(xml)
+                                .appendTo($response);
+                            prettyPrint();
+                            $response.fadeIn("fast");
+                            $("html, body").animate({
+                                scrollTop: $("#response").offset().top
+                            }, "slow");
+                        }
+                        $("#response").fadeOut("fast").children().remove();
+                        switch (status) {
+                            case "success": showResponse(xhr); break;
+                            case "notmodified": showResponse(xhr); break;
+                            case "error":
+                                showError("Request failed: " + xhr.status + " " + xhr.statusText);
+                                if(xhr.responseText && xhr.responseText.indexOf("OwsExceptionReport") < 0) {
+                                    showResponse(xhr);
+                                }
+                                break;
+                            case "timeout": showError("Request timed out &hellip;"); break;
+                            case "abort": showError("Request aborted &hellip;"); break;
+                            case "parsererror": showError("Unparsable response &hellip;"); break;
+                        }
+                        $send.removeAttr("disabled");
                     }
-					$send.attr("disabled", false);
-				}).done(function(data) {
-					showResponse(data);
-                    $send.removeAttr("disabled");
 				});
 			} else {
 				if (request) {
