@@ -12,7 +12,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-hibernate-api</artifactId>
+            <artifactId>hibernate-session-factory</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

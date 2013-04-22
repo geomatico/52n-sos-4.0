@@ -11,12 +11,12 @@
     <packaging>pom</packaging>
     <name>52North SOS Hibernate Module</name>
     <modules>
+        <module>mappings</module>
         <module>session-factory</module>
         <module>common</module>
         <module>dao</module>
         <module>dialect</module>
         <module>feature</module>
         <module>h2</module>
-        <module>mappings</module>
     </modules>
 </project>

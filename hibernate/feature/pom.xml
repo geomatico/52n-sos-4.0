@@ -7,9 +7,9 @@
         <version>4.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>52n-sos-hibernate-feature</artifactId>
+    <artifactId>hibernate-feature</artifactId>
     <packaging>jar</packaging>
-    <name>52North SOS Feature Query Hibernate DAOs</name>
+    <name>52North SOS Hibernate Feature Query DAO</name>
     <description>52North Sensor Observation Service Feature query Hibernate DAOs module</description>
     <dependencies>
         <dependency>
@@ -18,11 +18,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-hibernate-api</artifactId>
+            <artifactId>hibernate-session-factory</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-hibernate-common</artifactId>
+            <artifactId>hibernate-common</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

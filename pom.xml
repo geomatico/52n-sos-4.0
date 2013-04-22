@@ -138,27 +138,27 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-hibernate-api</artifactId>
+                <artifactId>hibernate-session-factory</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-hibernate-common</artifactId>
+                <artifactId>hibernate-common</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-hibernate-mappings</artifactId>
+                <artifactId>hibernate-mappings</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-hibernate-dialect</artifactId>
+                <artifactId>hibernate-dialect</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-hibernate-h2</artifactId>
+                <artifactId>hibernate-h2</artifactId>
                 <version>${sos.version}</version>
                 <scope>test</scope>
             </dependency>
@@ -169,7 +169,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-hibernate-feature</artifactId>
+                <artifactId>hibernate-feature</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>

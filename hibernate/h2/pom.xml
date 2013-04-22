@@ -7,7 +7,7 @@
         <artifactId>hibernate</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>52n-sos-hibernate-h2</artifactId>
+    <artifactId>hibernate-h2</artifactId>
     <name>52North SOS Hibernate H2</name>
     <dependencies>
         <dependency>
@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-hibernate-api</artifactId>
+            <artifactId>hibernate-session-factory</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -74,7 +74,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>52n-sos-hibernate-mappings</artifactId>
+                                    <artifactId>hibernate-mappings</artifactId>
                                     <overWrite>false</overWrite>
                                 </artifactItem>
                             </artifactItems>

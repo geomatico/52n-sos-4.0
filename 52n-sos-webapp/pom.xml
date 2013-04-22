@@ -35,7 +35,7 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
-                                    <artifactId>52n-sos-hibernate-mappings</artifactId>
+                                    <artifactId>hibernate-mappings</artifactId>
                                     <overWrite>false</overWrite>
                                 </artifactItem>
                             </artifactItems>
@@ -181,15 +181,15 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-hibernate-api</artifactId>
+            <artifactId>hibernate-session-factory</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-hibernate-common</artifactId>
+            <artifactId>hibernate-common</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-hibernate-dialect</artifactId>
+            <artifactId>hibernate-dialect</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -197,7 +197,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-hibernate-feature</artifactId>
+            <artifactId>hibernate-feature</artifactId>
         </dependency>
         <!-- dependencies for integration test -->
         <dependency>

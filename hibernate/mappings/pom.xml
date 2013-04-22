@@ -7,7 +7,7 @@
         <artifactId>hibernate</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>52n-sos-hibernate-mappings</artifactId>
+    <artifactId>hibernate-mappings</artifactId>
     <name>52North SOS Hibernate Mappings</name>
     <packaging>jar</packaging>
 </project>

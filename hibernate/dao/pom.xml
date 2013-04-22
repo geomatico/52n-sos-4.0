@@ -18,11 +18,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-hibernate-api</artifactId>
+            <artifactId>hibernate-session-factory</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-hibernate-common</artifactId>
+            <artifactId>hibernate-common</artifactId>
         </dependency>
         <!-- TODO remove after changing from document to type saving in resultTemplate -->
         <dependency>
@@ -31,7 +31,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-hibernate-h2</artifactId>
+            <artifactId>hibernate-h2</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
