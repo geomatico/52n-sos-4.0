@@ -300,6 +300,11 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                         xbSystem.setOutputs(createOutputs(smlSystem.getOutputs()));
                     }
                 }
+                else if (sml instanceof ProcessModel)
+                {
+                	// FIXME continue implementation here
+                	LOGGER.debug("CONTINUE IMPLEMENTATION HERE");
+                }
             }
         }
         return sensorMLDoc; // projects/internal/2012_TideElbe --> Describe
@@ -444,7 +449,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             return xbSystemDoc;
         } else if (sensorDesc instanceof ProcessModel) {
             // TODO: set values
-            ProcessModel processModel = (ProcessModel) sensorDesc;
+            final ProcessModel processModel = (ProcessModel) sensorDesc;
             final ProcessModelDocument xbProcessModelDoc =
                     ProcessModelDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             final ProcessModelType xbProcessModel = xbProcessModelDoc.addNewProcessModel();
@@ -506,7 +511,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             xbSystem.setPosition(createPosition(system.getPosition()));
         }
         // set components
-        List<SosSMLComponent> smlComponents = new ArrayList<SosSMLComponent>();
+        final List<SosSMLComponent> smlComponents = new ArrayList<SosSMLComponent>();
         if (system.isSetComponents() || system.isSetChildProcedures()) {
             if (system.isSetComponents()) {
                 smlComponents.addAll(system.getComponents());
@@ -765,7 +770,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
     private Outputs createOutputs(final List<SosSMLIo<?>> sosOutputs) throws OwsExceptionReport {
         final Outputs outputs = Outputs.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         final OutputList outputList = outputs.addNewOutputList();
-        Set<String> definitions = new HashSet<String>();
+        final Set<String> definitions = new HashSet<String>();
         int counter = 1;
         for (final SosSMLIo<?> sosSMLIo : sosOutputs) {
             if (!definitions.contains(sosSMLIo.getIoValue().getDefinition())) {
@@ -992,8 +997,8 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         }
     }
 
-    protected void setCapabilitiesForParentProcedures(AbstractProcess sosAbstractProcess,
-            AbstractProcessType abstractProcess) throws OwsExceptionReport {
+    protected void setCapabilitiesForParentProcedures(final AbstractProcess sosAbstractProcess,
+            final AbstractProcessType abstractProcess) throws OwsExceptionReport {
         if (sosAbstractProcess.isSetParentProcedures(sosAbstractProcess.getIdentifier())) {
             final SosSMLCapabilities featureCapabilities =
                     createCapabilitiesFrom(sosAbstractProcess.getParentProcedures(sosAbstractProcess.getIdentifier()),
@@ -1034,13 +1039,13 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         return capabilities;
     }
 
-    protected List<SosSMLComponent> createComponentsForCildProcedures(Set<SosProcedureDescription> childProcedures)
+    protected List<SosSMLComponent> createComponentsForCildProcedures(final Set<SosProcedureDescription> childProcedures)
             throws CodedException {
-        List<SosSMLComponent> smlComponents = new LinkedList<SosSMLComponent>();
+        final List<SosSMLComponent> smlComponents = new LinkedList<SosSMLComponent>();
         int childCount = 0;
-        for (SosProcedureDescription childProcedure : childProcedures) {
+        for (final SosProcedureDescription childProcedure : childProcedures) {
             childCount++;
-            SosSMLComponent component = new SosSMLComponent("component" + childCount);
+            final SosSMLComponent component = new SosSMLComponent("component" + childCount);
             component.setTitle(childProcedure.getIdentifier());
             // TODO add setting for encoding component
             if (childProcedure instanceof AbstractSensorML) {
@@ -1051,7 +1056,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                     // Configurator.getInstance().getServiceOperatorRepository().getSupportedVersions();
                     component.setHref(SosHelper.getDescribeSensorUrl("2.0.0", Configurator.getInstance()
                             .getServiceURL(), childProcedure.getIdentifier(), "/kvp"));
-                } catch (UnsupportedEncodingException uee) {
+                } catch (final UnsupportedEncodingException uee) {
                     throw new NoApplicableCodeException().withMessage("Error while encoding DescribeSensor URL")
                             .causedBy(uee);
                 }
@@ -1061,21 +1066,21 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         return smlComponents;
     }
 
-    protected Collection<? extends SosSMLIo<?>> getOutputsFromChilds(List<SosSMLComponent> smlComponents) {
-        Set<SosSMLIo<?>> outputs = new HashSet<SosSMLIo<?>>();
-        for (SosSMLComponent sosSMLComponent : smlComponents) {
+    protected Collection<? extends SosSMLIo<?>> getOutputsFromChilds(final List<SosSMLComponent> smlComponents) {
+        final Set<SosSMLIo<?>> outputs = new HashSet<SosSMLIo<?>>();
+        for (final SosSMLComponent sosSMLComponent : smlComponents) {
             if (sosSMLComponent.isSetProcess()) {
                 if (sosSMLComponent.getProcess() instanceof SensorML) {
-                    SensorML sensorML = (SensorML) sosSMLComponent.getProcess();
+                    final SensorML sensorML = (SensorML) sosSMLComponent.getProcess();
                     if (sensorML.isSetMembers()) {
-                       for (AbstractProcess abstractProcess : sensorML.getMembers()) {
+                       for (final AbstractProcess abstractProcess : sensorML.getMembers()) {
                            if (abstractProcess.isSetOutputs()) {
                                outputs.addAll(abstractProcess.getOutputs());
                            }
                        }
                     }
                 } else if (sosSMLComponent.getProcess() instanceof AbstractProcess) {
-                    AbstractProcess abstractProcess = (AbstractProcess) sosSMLComponent.getProcess();
+                    final AbstractProcess abstractProcess = (AbstractProcess) sosSMLComponent.getProcess();
                     if (abstractProcess.isSetOutputs()) {
                         outputs.addAll(abstractProcess.getOutputs());
                     }
