@@ -161,15 +161,15 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-coding-ows-v110</artifactId>
+            <artifactId>coding-ows-v110</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-coding-sensorML-v101</artifactId>
+            <artifactId>coding-sensorML-v101</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-coding-sos-v20</artifactId>
+            <artifactId>coding-sos-v20</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -335,7 +335,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-coding-sos-v100</artifactId>
+                    <artifactId>coding-sos-v100</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -343,7 +343,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-coding-wml-v20</artifactId>
+                    <artifactId>coding-wml-v20</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -415,7 +415,7 @@
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-coding-sos-v100</artifactId>
+                    <artifactId>coding-sos-v100</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -476,7 +476,7 @@
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-coding-wml-v20</artifactId>
+                    <artifactId>coding-wml-v20</artifactId>
                 </dependency>
             </dependencies>
         </profile>
