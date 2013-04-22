@@ -173,7 +173,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-core-v20</artifactId>
+            <artifactId>core-v20</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -286,7 +286,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-enhanced-v20</artifactId>
+                    <artifactId>enhanced-v20</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -294,7 +294,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-transactional-v20</artifactId>
+                    <artifactId>transactional-v20</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -302,7 +302,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-resultHandling-v20</artifactId>
+                    <artifactId>resultHandling-v20</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -327,7 +327,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-enhanced-v20</artifactId>
+                    <artifactId>enhanced-v20</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -335,7 +335,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-transactional-v20</artifactId>
+                    <artifactId>transactional-v20</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -343,7 +343,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-resultHandling-v20</artifactId>
+                    <artifactId>resultHandling-v20</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -355,7 +355,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-core-v100</artifactId>
+                    <artifactId>core-v100</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -435,7 +435,7 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-core-v100</artifactId>
+                    <artifactId>core-v100</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -444,7 +444,7 @@
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-enhanced-v20</artifactId>
+                    <artifactId>enhanced-v20</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -457,7 +457,7 @@
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-transactional-v20</artifactId>
+                    <artifactId>transactional-v20</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -470,7 +470,7 @@
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-resultHandling-v20</artifactId>
+                    <artifactId>resultHandling-v20</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>

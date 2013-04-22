@@ -132,12 +132,12 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-core-v100</artifactId>
+                <artifactId>core-v100</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-core-v20</artifactId>
+                <artifactId>core-v20</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
@@ -198,7 +198,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-enhanced-v20</artifactId>
+                <artifactId>enhanced-v20</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
@@ -208,7 +208,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-transactional-v20</artifactId>
+                <artifactId>transactional-v20</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
@@ -218,7 +218,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-resultHandling-v20</artifactId>
+                <artifactId>resultHandling-v20</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
