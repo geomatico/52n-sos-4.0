@@ -432,7 +432,8 @@ public class HibernateProcedureUtilities {
 	private static List<String> createDescriptions(final Procedure procedure,
 			final String[] observableProperties)
 	{
-		return CollectionHelper.list(String.format(generationSettings().getDescriptionTemplate(), 
+		return CollectionHelper.list(String.format(generationSettings().getDescriptionTemplate(),
+				procedure.isSpatial()?"sensor system":"procedure",
 				procedure.getIdentifier(), 
 				StringHelper.join(",", CollectionHelper.list(observableProperties))));
 	}
