@@ -7,7 +7,7 @@
         <artifactId>52n-sos</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>52n-sos-cache</artifactId>
+    <artifactId>cache</artifactId>
     <name>52North SOS Cache</name>
     <description>This module provides the default cache implementations.</description>
     <inceptionYear>2013</inceptionYear>

@@ -157,7 +157,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-cache</artifactId>
+            <artifactId>cache</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

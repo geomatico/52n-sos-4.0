@@ -25,7 +25,7 @@
     <modules>
         <module>api</module>
         <module>52n-sos-admin</module>
-        <module>52n-sos-cache</module>
+        <module>cache</module>
         <module>bindings</module>
         <module>coding</module>
         <module>operations</module>
@@ -107,7 +107,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-cache</artifactId>
+                <artifactId>cache</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
