@@ -371,11 +371,11 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-rest-code</artifactId>
+                    <artifactId>rest-code</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-rest-xml-binding</artifactId>
+                    <artifactId>rest-xml</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -535,11 +535,11 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-rest-code</artifactId>
+                    <artifactId>rest-code</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-rest-xml-binding</artifactId>
+                    <artifactId>rest-xml</artifactId>
                 </dependency>
             </dependencies>
         </profile>

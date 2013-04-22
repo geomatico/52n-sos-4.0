@@ -561,12 +561,12 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-binding-rest-code</artifactId>
+                <artifactId>rest-code</artifactId>
                 <version>${rest-binding.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-binding-rest-xml-binding</artifactId>
+                <artifactId>rest-xml</artifactId>
                 <version>${rest-binding.version}</version>
             </dependency>
             <dependency>
