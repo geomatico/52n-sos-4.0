@@ -38,7 +38,6 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.ds.hibernate.HibernateSessionHolder;
 import org.n52.sos.ds.hibernate.entities.BlobObservation;
 import org.n52.sos.ds.hibernate.entities.BooleanObservation;
@@ -86,15 +85,19 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-// TODO Eike: move all strings to constants classes or create settings for them
-@Configurable
-public class HibernateProcedureUtilities {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateProcedureUtilities.class);
+public class HibernateProcedureConverter {
+    private  final Logger LOGGER = LoggerFactory.getLogger(HibernateProcedureConverter.class);
 
-    public static SosProcedureDescription createSosProcedureDescription(final Procedure procedure,
+    public SosProcedureDescription createSosProcedureDescription(final Procedure procedure,
                                                                         final String procedureIdentifier,
                                                                         final String outputFormat)
             throws OwsExceptionReport {
+    	if (procedure == null)
+    	{
+    		throw new NoApplicableCodeException()
+    		.causedBy(new IllegalArgumentException("Parameter 'procedure' should not be null!"))
+    		.setStatus(INTERNAL_SERVER_ERROR);
+    	}
         String filename = null;
         String xmlDoc = null;
         SosProcedureDescription sosProcedureDescription = null;
@@ -167,13 +170,19 @@ public class HibernateProcedureUtilities {
 	 * @param observableProperties
 	 * @return
 	 */
-	private static ProcessModel createSmlProcessModel(final Procedure procedure)
+	private  ProcessModel createSmlProcessModel(final Procedure procedure)
 	{
 		// TODO Auto-generated method "createSmlProcessModel" stub generated on 10.04.2013 around 12:36:39 by eike
-		return new ProcessModel();
+		final ProcessModel smlProcessModel = new ProcessModel();
+		
+		final String[] observableProperties = getObservablePropertiesForProcedure(procedure.getIdentifier());
+		
+		
+		
+		return smlProcessModel;
 	}
 
-	private static org.n52.sos.ogc.sensorML.System createSmlSystem(final Procedure procedure) throws OwsExceptionReport
+	private  org.n52.sos.ogc.sensorML.System createSmlSystem(final Procedure procedure) throws OwsExceptionReport
 	{
 		final System smlSystem = new System();
 		
@@ -218,7 +227,7 @@ public class HibernateProcedureUtilities {
 		return smlSystem;
 	}
 
-	private static List<SosSMLIo<?>> createOutputs(final Procedure procedure, final String[] observableProperties) throws OwsExceptionReport
+	private  List<SosSMLIo<?>> createOutputs(final Procedure procedure, final String[] observableProperties) throws OwsExceptionReport
 	{
 		final ArrayList<SosSMLIo<?>> outputs = new ArrayList<SosSMLIo<?>>(observableProperties.length);
 		int i = 1;
@@ -285,12 +294,12 @@ public class HibernateProcedureUtilities {
 		return outputs;
 	}
 
-	private static void logTypeNotSupported(final Class clazz)
+	private  void logTypeNotSupported(final Class clazz)
 	{
 		LOGGER.debug("Type '{}' is not supported by the current implementation",clazz.getName());
 	}
 
-	private static Observation getExampleObservation(final String identifier,
+	private  Observation getExampleObservation(final String identifier,
 			final String observableProperty) throws OwsExceptionReport
 	{
 		final HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
@@ -324,7 +333,7 @@ public class HibernateProcedureUtilities {
 		}
 	}
 
-	private static SosSMLPosition createPosition(final Procedure procedure)
+	private  SosSMLPosition createPosition(final Procedure procedure)
 	{
 		SosSMLPosition smlPosition = null;
 		smlPosition = new SosSMLPosition();
@@ -355,7 +364,7 @@ public class HibernateProcedureUtilities {
 		return smlPosition;
 	}
 	
-	private static List<SosSweCoordinate<?>> createCoordinatesForPosition(final Object longitude, final Object latitude,
+	private  List<SosSweCoordinate<?>> createCoordinatesForPosition(final Object longitude, final Object latitude,
             final Object oAltitude) {
                 final List<SosSweCoordinate<?>> sweCoordinates = new ArrayList<SosSweCoordinate<?>>(3);
                 if (latitude instanceof Double)
@@ -386,7 +395,7 @@ public class HibernateProcedureUtilities {
                 return sweCoordinates;
     }
 
-	private static List<SmlContact> createContactFromServiceContact()
+	private  List<SmlContact> createContactFromServiceContact()
 	{
 		final SmlResponsibleParty smlRespParty = new SmlResponsibleParty();
 		SosServiceProvider serviceProvider = null;
@@ -416,7 +425,7 @@ public class HibernateProcedureUtilities {
 		return CollectionHelper.list((SmlContact)smlRespParty);
 	}
 
-	private static void addClassifier(final System smlSystem)
+	private  void addClassifier(final System smlSystem)
 	{
 		if (!generationSettings().getClassifierIntendedApplicationValue().isEmpty())
 		{
@@ -434,7 +443,7 @@ public class HibernateProcedureUtilities {
 		}
 	}
 
-	private static List<String> createDescriptions(final Procedure procedure,
+	private  List<String> createDescriptions(final Procedure procedure,
 			final String[] observableProperties)
 	{
 		return CollectionHelper.list(String.format(generationSettings().getDescriptionTemplate(),
@@ -443,7 +452,7 @@ public class HibernateProcedureUtilities {
 				StringHelper.join(",", CollectionHelper.list(observableProperties))));
 	}
 
-	private static List<SosSMLIdentifier> createIdentifications(final String identifier)
+	private  List<SosSMLIdentifier> createIdentifications(final String identifier)
 	{
 		// get long and short name definition from misc settings
 		final SosSMLIdentifier idShortName = new SosSMLIdentifier("shortname", generationSettings().getIdentifierShortNameDefinition(), identifier);
@@ -451,17 +460,17 @@ public class HibernateProcedureUtilities {
 		return CollectionHelper.list(idLongName,idShortName);
 	}
 
-	private static ServiceConfiguration getServiceConfig()
+	private  ServiceConfiguration getServiceConfig()
 	{
 		return Configurator.getInstance().getServiceConfiguration();
 	}
 	
-	private static SensorDescriptionGenerationSettings generationSettings()
+	private  SensorDescriptionGenerationSettings generationSettings()
 	{
 		return SensorDescriptionGenerationSettings.getInstance();
 	}
 
-	private static List<String> createKeywordsList(final Procedure procedure,
+	private  List<String> createKeywordsList(final Procedure procedure,
 			final String[] observableProperties)
 	{
 		final List<String> keywords = CollectionHelper.list();
@@ -480,12 +489,12 @@ public class HibernateProcedureUtilities {
 		return keywords;
 	}
 
-	private static String[] getObservablePropertiesForProcedure(final String procedureIdentifier)
+	private  String[] getObservablePropertiesForProcedure(final String procedureIdentifier)
 	{
 		return Configurator.getInstance().getCache().getObservablePropertiesForProcedure(procedureIdentifier).toArray(new String[0]);
 	}
 
-	private static SosProcedureDescription createProcedureDescriptionFromXml(final String procedureIdentifier,
+	private  SosProcedureDescription createProcedureDescriptionFromXml(final String procedureIdentifier,
 			final String outputFormat,
 			final String xmlDoc) throws XmlException
 	{
@@ -503,7 +512,7 @@ public class HibernateProcedureUtilities {
 		return sosProcedureDescription;
 	}
 
-	private static SosProcedureDescription createProcedureDescriptionFromFile(final String procedureIdentifier,
+	private  SosProcedureDescription createProcedureDescriptionFromFile(final String procedureIdentifier,
 			final String outputFormat,
 			final String filename,
 			final String descriptionFormat) throws OwsExceptionReport, XmlException, IOException
@@ -535,7 +544,7 @@ public class HibernateProcedureUtilities {
 		return sosProcedureDescription;
 	}
 	
-    private static InputStream getDescribeSensorDocumentAsStream(String filename) {
+    private  InputStream getDescribeSensorDocumentAsStream(String filename) {
         final StringBuilder builder = new StringBuilder();
         if (filename.startsWith("standard")) {
             filename = filename.replace("standard", "");
@@ -547,6 +556,4 @@ public class HibernateProcedureUtilities {
         return Configurator.getInstance().getClass().getResourceAsStream(builder.toString());
     }
     
-    private HibernateProcedureUtilities() {
-    }
 }

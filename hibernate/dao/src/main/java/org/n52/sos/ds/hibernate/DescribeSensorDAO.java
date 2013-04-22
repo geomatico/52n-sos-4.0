@@ -37,7 +37,7 @@ import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
-import org.n52.sos.ds.hibernate.util.HibernateProcedureUtilities;
+import org.n52.sos.ds.hibernate.util.HibernateProcedureConverter;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -51,45 +51,46 @@ import org.n52.sos.util.SosHelper;
  * 
  */
 public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
-    private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    private final HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    private final HibernateProcedureConverter procedureConverter = new HibernateProcedureConverter();
     
     public DescribeSensorDAO() {
         super(SosConstants.SOS);
     }
 
     @Override
-    public DescribeSensorResponse getSensorDescription(DescribeSensorRequest request) throws OwsExceptionReport {
+    public DescribeSensorResponse getSensorDescription(final DescribeSensorRequest request) throws OwsExceptionReport {
         // sensorDocument which should be returned
         Session session = null;
         try {
             session = sessionHolder.getSession();
-            SosProcedureDescription result = queryProcedure(request, session);
+            final SosProcedureDescription result = queryProcedure(request, session);
             
-            Collection<String> features = getFeatureOfInterestIDsForProcedure(request.getProcedure(), request.getVersion(), session);
+            final Collection<String> features = getFeatureOfInterestIDsForProcedure(request.getProcedure(), request.getVersion(), session);
             if (features != null && !features.isEmpty()) {
                 result.addFeatureOfInterest(new HashSet<String>(features), request.getProcedure());
             }
 
             // parent procs
-            Collection<String> parentProcedures = getParentProcedures(request.getProcedure(), request.getVersion());
+            final Collection<String> parentProcedures = getParentProcedures(request.getProcedure(), request.getVersion());
             if (parentProcedures != null && !parentProcedures.isEmpty()) {
                 result.addParentProcedures(new HashSet<String>(parentProcedures), request.getProcedure());
             }
 
             // child procs
-            Set<SosProcedureDescription> childProcedures =
+            final Set<SosProcedureDescription> childProcedures =
                     getChildProcedures(request.getProcedure(), request.getProcedureDescriptionFormat(),
                             request.getVersion(), session);
             if (childProcedures != null && !childProcedures.isEmpty()) {
                 result.addChildProcedures(childProcedures, request.getProcedure());
             }
-            DescribeSensorResponse response = new DescribeSensorResponse();
+            final DescribeSensorResponse response = new DescribeSensorResponse();
             response.setService(request.getService());
             response.setVersion(request.getVersion());
             response.setOutputFormat(request.getProcedureDescriptionFormat());
             response.setSensorDescription(result);
             return response;
-        } catch (HibernateException he) {
+        } catch (final HibernateException he) {
             throw new NoApplicableCodeException().causedBy(he)
                     .withMessage("Error while querying data for DescribeSensor document!");
         } finally {
@@ -97,18 +98,18 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
         }
     }
 
-    private SosProcedureDescription queryProcedure(DescribeSensorRequest request, Session session)
+    private SosProcedureDescription queryProcedure(final DescribeSensorRequest request, final Session session)
             throws OwsExceptionReport {
-        Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(request.getProcedure(), session);
-        return HibernateProcedureUtilities.createSosProcedureDescription(procedure, request.getProcedure(), request.getProcedureDescriptionFormat());
+        final Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(request.getProcedure(), session);
+        return procedureConverter.createSosProcedureDescription(procedure, request.getProcedure(), request.getProcedureDescriptionFormat());
         
        
     }
 
     @SuppressWarnings("unchecked")
-    private Collection<String> getFeatureOfInterestIDsForProcedure(String procedure, String version,
-                                                                   Session session) throws OwsExceptionReport {
-        Criteria c = session.createCriteria(Observation.class);
+    private Collection<String> getFeatureOfInterestIDsForProcedure(final String procedure, final String version,
+                                                                   final Session session) throws OwsExceptionReport {
+        final Criteria c = session.createCriteria(Observation.class);
         c.createCriteria(Observation.PROCEDURE).add(Restrictions.eq(Procedure.IDENTIFIER, procedure));
         c.createCriteria(Observation.FEATURE_OF_INTEREST)
                 .setProjection(Projections.distinct(Projections.property(FeatureOfInterest.IDENTIFIER)));
@@ -127,7 +128,7 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
      *
      * @throws OwsExceptionReport
      */
-    private Set<String> getParentProcedures(String procID, String version) throws OwsExceptionReport {
+    private Set<String> getParentProcedures(final String procID, final String version) throws OwsExceptionReport {
         return getCache().getParentProcedures(procID, false, false);
     }
 
@@ -141,14 +142,14 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
      *
      * @throws OwsExceptionReport
      */
-    private Set<SosProcedureDescription> getChildProcedures(String procID, String outputFormat, String version,
-                                                            Session session) throws OwsExceptionReport {
-        Set<SosProcedureDescription> childProcedures = new HashSet<SosProcedureDescription>(0);
-        Collection<String> childProcedureIds = getCache().getChildProcedures(procID, false, false);
+    private Set<SosProcedureDescription> getChildProcedures(final String procID, final String outputFormat, final String version,
+                                                            final Session session) throws OwsExceptionReport {
+        final Set<SosProcedureDescription> childProcedures = new HashSet<SosProcedureDescription>(0);
+        final Collection<String> childProcedureIds = getCache().getChildProcedures(procID, false, false);
         if (childProcedureIds != null && !childProcedureIds.isEmpty()) {
-            for (String childProcID : childProcedureIds) {
-                Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(childProcID, session);
-                childProcedures.add(HibernateProcedureUtilities.createSosProcedureDescription(procedure, childProcID, outputFormat));
+            for (final String childProcID : childProcedureIds) {
+                final Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(childProcID, session);
+				childProcedures.add(procedureConverter.createSosProcedureDescription(procedure, childProcID, outputFormat));
             }
         }
         return childProcedures;
