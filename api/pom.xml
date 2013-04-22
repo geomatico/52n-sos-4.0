@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-test</artifactId>
+            <artifactId>test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

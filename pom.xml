@@ -34,7 +34,7 @@
         <module>sqlite-config</module>
         <module>52n-sos-core-gc-dao</module>
         <module>profile</module>
-        <module>52n-sos-test</module>
+        <module>test</module>
         <module>spring</module>
         <module>webapp</module>
     </modules>
@@ -253,7 +253,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-test</artifactId>
+                <artifactId>test</artifactId>
                 <version>${sos.version}</version>
 				<scope>test</scope>
             </dependency>
