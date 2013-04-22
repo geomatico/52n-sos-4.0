@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>org.n52.sensorweb.sos</groupId>
-            <artifactId>52n-sos-api</artifactId>
+            <artifactId>api</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

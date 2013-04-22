@@ -23,7 +23,7 @@
         <url>http://build.dev.52north.org/jenkins/job/sos-dev/</url>
     </ciManagement>
     <modules>
-        <module>52n-sos-api</module>
+        <module>api</module>
         <module>52n-sos-admin</module>
         <module>52n-sos-cache</module>
         <module>bindings</module>
@@ -92,7 +92,7 @@
         <dependencies>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-api</artifactId>
+                <artifactId>api</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
@@ -323,7 +323,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-api</artifactId>
+                <artifactId>api</artifactId>
                 <version>${sos.version}</version>
                 <scope>test</scope>
                 <classifier>tests</classifier>

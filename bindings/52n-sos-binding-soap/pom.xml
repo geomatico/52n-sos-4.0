@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-api</artifactId>
+            <artifactId>api</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>
