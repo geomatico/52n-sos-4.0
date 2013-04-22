@@ -30,6 +30,7 @@
         <module>coding</module>
         <module>operations</module>
         <module>hibernate</module>
+        <module>extensions</module>
         <module>sqlite-config</module>
         <module>52n-sos-core-gc-dao</module>
         <module>profile</module>
@@ -852,33 +853,8 @@
     </repositories>
     <profiles>
         <profile>
-            <!-- Requires svn:externals definition for 52n-sos-gda -->
-            <id>gda</id>
-            <modules>
-                <module>52n-sos-gda</module>
-            </modules>
-        </profile>
-        <profile>
-            <!-- Requires svn:externals definition for 52n-sos-ext-do -->
-            <id>do</id>
-            <modules>
-                <module>52n-sos-ext-do</module>
-            </modules>
-        </profile>
-        <profile>
-            <!-- Requires svn:externals definition for 52n-sos-ext-do and 52n-sos-binding-rest -->
-            <id>restful</id>
-            <modules>
-                <module>52n-sos-ext-do</module>
-            </modules>
-        </profile>
-        <profile>
             <!-- Requires svn:externals definition for 52n-sos-ext-do, 52n-sos-binding-rest and 52n-sos-gda -->
             <id>develop</id>
-            <modules>
-                <module>52n-sos-gda</module>
-                <module>52n-sos-ext-do</module>
-            </modules>
             <properties>
                 <config.logger.level.test.global>WARN</config.logger.level.test.global>
                 <config.logger.level.test.n52>WARN</config.logger.level.test.n52>
