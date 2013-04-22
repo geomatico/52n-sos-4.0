@@ -25,10 +25,8 @@
     <modules>
         <module>52n-sos-api</module>
         <module>52n-sos-admin</module>
-        <module>52n-sos-binding-kvp</module>
-        <module>52n-sos-binding-pox</module>
-        <module>52n-sos-binding-soap</module>
         <module>52n-sos-cache</module>
+        <module>bindings</module>
         <module>coding</module>
         <module>operations</module>
         <module>52n-sos-config-sqlite</module>
@@ -895,7 +893,6 @@
             <!-- Requires svn:externals definition for 52n-sos-ext-do and 52n-sos-binding-rest -->
             <id>restful</id>
             <modules>
-                <module>52n-sos-binding-rest</module>
                 <module>52n-sos-ext-do</module>
             </modules>
         </profile>
@@ -904,7 +901,6 @@
             <id>develop</id>
             <modules>
                 <module>52n-sos-gda</module>
-                <module>52n-sos-binding-rest</module>
                 <module>52n-sos-ext-do</module>
             </modules>
             <properties>
