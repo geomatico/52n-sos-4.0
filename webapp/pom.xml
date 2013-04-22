@@ -347,11 +347,11 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-gda-operation</artifactId>
+                    <artifactId>gda-operation</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-gda-hibernate</artifactId>
+                    <artifactId>gda-hibernate</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -485,11 +485,11 @@
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-gda-operation</artifactId>
+                    <artifactId>gda-operation</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-gda-hibernate</artifactId>
+                    <artifactId>gda-hibernate</artifactId>
                 </dependency>
             </dependencies>
         </profile>

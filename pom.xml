@@ -509,17 +509,17 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-gda</artifactId>
+                <artifactId>gda</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-gda-operation</artifactId>
+                <artifactId>gda-operation</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-gda-hibernate</artifactId>
+                <artifactId>gda-hibernate</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <!-- required for common test classes -->
@@ -853,7 +853,7 @@
     </repositories>
     <profiles>
         <profile>
-            <!-- Requires svn:externals definition for 52n-sos-ext-do, 52n-sos-binding-rest and 52n-sos-gda -->
+            <!-- Requires svn:externals definition for 52n-sos-ext-do, 52n-sos-binding-rest and gda -->
             <id>develop</id>
             <properties>
                 <config.logger.level.test.global>WARN</config.logger.level.test.global>
