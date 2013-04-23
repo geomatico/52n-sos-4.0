@@ -29,7 +29,7 @@ import java.io.Serializable;
  * Abstract class for phenomena
  * 
  */
-public class AbstractSosPhenomenon implements Serializable {
+public class AbstractSosPhenomenon implements Comparable<AbstractSosPhenomenon>, Serializable {
     private static final long serialVersionUID = 8730485367220080360L;
 
     /** phenomenon identifier */
@@ -126,4 +126,12 @@ public class AbstractSosPhenomenon implements Serializable {
         hash = 31 * hash + ((identifier != null) ? identifier.hashCode() : 0);
         return hash;
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(T) 
+     */    
+    @Override
+    public int compareTo(AbstractSosPhenomenon o) {
+        return identifier.compareTo( o.getIdentifier() );
+    }    
 }
