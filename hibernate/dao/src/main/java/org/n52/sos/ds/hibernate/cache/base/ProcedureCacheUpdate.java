@@ -80,7 +80,7 @@ public class ProcedureCacheUpdate extends AbstractDatasourceCacheUpdate {
                 getCache().addProcedure(id);
                 getCache().setOfferingsForProcedure(id, getAllOfferingIdentifiersFrom(ocs));
                 getCache().setObservablePropertiesForProcedure(id, getObservableProperties(ocs));
-                getCache().addParentProcedures(id, getProcedureIdentifiers(p.getProceduresForChildSensorId()));
+                getCache().addParentProcedures(id, getProcedureIdentifiers(p.getProceduresForParentSensorId()));
                 getCache().setObservationIdentifiersForProcedure(id, getObservationIdentifiers(getSession(), id));
             }
         }
