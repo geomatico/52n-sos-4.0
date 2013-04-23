@@ -245,7 +245,8 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         }
         if (request.isSetProcedure()) {
             c.createCriteria(Observation.PROCEDURE)
-                    .add(Restrictions.in(Procedure.IDENTIFIER, request.getProcedures()));
+                    .add(Restrictions.in(Procedure.IDENTIFIER, getCache().getChildProcedures(
+                    		new HashSet<String>( request.getProcedures() ), true, true )));
         }
         if (features != null) {
             c.createCriteria(Observation.FEATURE_OF_INTEREST)
