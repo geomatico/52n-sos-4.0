@@ -224,6 +224,11 @@ public class ReadableCache extends AbstractContentCache {
     }
 
     @Override
+    public Set<String> getChildProcedures(Set<String> procedureIdentifiers, boolean fullHierarchy, boolean includeSelves) {
+        return getHierarchy(getChildProceduresForProceduresMap(), procedureIdentifiers, fullHierarchy, includeSelves);
+    }
+    
+    @Override
     public Set<String> getChildFeatures(String featureIdentifier, boolean fullHierarchy, boolean includeSelf) {
         return getHierarchy(getChildFeaturesForFeaturesOfInterestMap(), featureIdentifier, fullHierarchy, includeSelf);
     }

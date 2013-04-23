@@ -578,6 +578,18 @@ public interface ContentCache extends Serializable {
     Set<String> getChildProcedures(String procedure, boolean fullHierarchy, boolean includeSelf);
 
     /**
+     * Returns collection containing child procedures for the passed procedures, optionally navigating the full
+     * hierarchy and including itself.
+     *
+     * @param procedures    procedure ids to find children for
+     * @param fullHierarchy whether or not to navigate the full procedure hierarchy
+     * @param includeSelf   whether or not to include the passed procedure ids in the result
+     *
+     * @return Collection<String> containing the passed procedure ids' children (and optionally themselves)
+     */
+    Set<String> getChildProcedures(Set<String> procedure, boolean fullHierarchy, boolean includeSelves);
+
+    /**
      * @return all epsg codes
      */
     Set<Integer> getEpsgCodes();
