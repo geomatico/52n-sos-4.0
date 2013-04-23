@@ -26,6 +26,7 @@ package org.n52.sos.ds.hibernate.util;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.number.OrderingComparison.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -175,7 +176,7 @@ public class HibernateProcedureConverterTest {
 		final ProcessModel pModel = setupProcessModel();
 		assertThat(pModel.getMethod(), instanceOf(ProcessMethod.class));
 	}
-
+	
 	@Test public void
 	should_set_identifier_for_smlProcessModel()
 	throws OwsExceptionReport {
@@ -184,12 +185,36 @@ public class HibernateProcedureConverterTest {
 		assertThat(uniqueIdIdentifierOf(pModel), is(PROCEDURE_IDENTIFIER));
 	}
 
+	@Test public void
+	should_set_longname_and_shortname_identifier_for_smlProcessModel()
+	throws OwsExceptionReport {
+		final ProcessModel pModel = setupProcessModel();
+		assertThat(pModel.getIdentifications().size(), is(greaterThanOrEqualTo(2)));
+		assertThat(longNameIdentifierOf(pModel), is(PROCEDURE_IDENTIFIER));
+		assertThat(shortNameIdentifierOf(pModel), is(PROCEDURE_IDENTIFIER));
+	}
+	
+	private String shortNameIdentifierOf(final ProcessModel pModel)
+	{
+		return getIdentifier(pModel, "shortName", "urn:ogc:def:identifier:OGC:1.0:shortname");
+	}
+
+	private String longNameIdentifierOf(final ProcessModel pModel)
+	{
+		return getIdentifier(pModel, "longname", "urn:ogc:def:identifier:OGC:1.0:longname");
+	}
+
 	private String uniqueIdIdentifierOf(final ProcessModel pModel)
+	{
+		return getIdentifier(pModel,URN_UNIQUE_IDENTIFIER_END,URN_UNIQUE_IDENTIFIER);
+	}
+	
+	private String getIdentifier(final ProcessModel pModel, final String idName, final String idDefinition)
 	{
 		for (final SosSMLIdentifier identifier : pModel.getIdentifications()) 
 		{
-			if (identifier.getName().equalsIgnoreCase(URN_UNIQUE_IDENTIFIER_END) && 
-					identifier.getDefinition().equalsIgnoreCase(URN_UNIQUE_IDENTIFIER))
+			if (identifier.getName().equalsIgnoreCase(idName) && 
+					identifier.getDefinition().equalsIgnoreCase(idDefinition))
 			{
 				return identifier.getValue();
 			}

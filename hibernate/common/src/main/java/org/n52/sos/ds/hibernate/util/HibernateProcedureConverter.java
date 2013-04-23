@@ -184,6 +184,8 @@ public class HibernateProcedureConverter {
 		
 		smlProcessModel.setIdentifierAndCreateIdentification(procedure.getIdentifier());
 		
+		smlProcessModel.setIdentifications(createIdentifications(procedure.getIdentifier()));
+		
 		smlProcessModel.setMethod(createMethod(procedure));
 		
 		// FIXME Eike: continue development here!
