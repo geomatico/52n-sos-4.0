@@ -305,7 +305,7 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
 
     private ProcessMethod parseProcessMethod(final MethodPropertyType method) {
         final ProcessMethod processMethod = new ProcessMethod();
-        // TODO
+        // TODO implement parsing of sml:ProcessMethod
         return processMethod;
     }
 
