@@ -41,6 +41,7 @@ import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceProvider;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
+import org.n52.sos.ogc.sensorML.ProcessMethod;
 import org.n52.sos.ogc.sensorML.ProcessModel;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
@@ -164,6 +165,15 @@ public class HibernateProcedureConverterTest {
 		final AbstractProcess process = setupAbstractProcess();
 		assertThat(process.getNames().size(), is(1));
 		assertThat(process.getNames().get(0).getValue(), is(PROCEDURE_IDENTIFIER));
+	}
+	
+	@Test public void
+	should_set_method_for_non_spatial_procedure()
+	throws OwsExceptionReport {
+		final AbstractProcess process = setupAbstractProcess();
+		assertThat(process, instanceOf(ProcessModel.class));
+		final ProcessModel pModel = (ProcessModel) process;
+		assertThat(pModel.getMethod(), instanceOf(ProcessMethod.class));
 	}
 	
 	protected AbstractProcess setupAbstractProcess() throws OwsExceptionReport

@@ -56,6 +56,7 @@ import org.n52.sos.exception.ows.concrete.XmlDecodingException;
 import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceProvider;
+import org.n52.sos.ogc.sensorML.ProcessMethod;
 import org.n52.sos.ogc.sensorML.ProcessModel;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
@@ -173,7 +174,6 @@ public class HibernateProcedureConverter {
 	 */
 	private ProcessModel createSmlProcessModel(final Procedure procedure)
 	{
-		// TODO Auto-generated method "createSmlProcessModel" stub generated on 10.04.2013 around 12:36:39 by eike
 		final ProcessModel smlProcessModel = new ProcessModel();
 		
 		final String[] observableProperties = getObservablePropertiesForProcedure(procedure.getIdentifier());
@@ -182,9 +182,17 @@ public class HibernateProcedureConverter {
 		
 		smlProcessModel.setNames(createNames(procedure));
 		
-		// FIXME Eike: continue development here!!!!
+		smlProcessModel.setMethod(createMethod(procedure));
+		
+		// FIXME Eike: continue development here!
 		
 		return smlProcessModel;
+	}
+
+	private ProcessMethod createMethod(final Procedure procedure)
+	{
+		final ProcessMethod pM = new ProcessMethod();
+		return pM;
 	}
 
 	private List<CodeType> createNames(final Procedure procedure)
