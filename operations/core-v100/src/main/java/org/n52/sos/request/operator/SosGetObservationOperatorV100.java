@@ -235,7 +235,7 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<Abs
         if (observedProperties != null) {
             CompositeOwsException exceptions = new CompositeOwsException();
 
-            if (observedProperties.size() != 1) {
+            if (observedProperties.isEmpty()) {
                 throw new MissingObservedPropertyParameterException();
             }
             Collection<String> validObservedProperties =
