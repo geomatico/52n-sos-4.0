@@ -33,6 +33,7 @@ import org.n52.sos.binding.Binding;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.exception.HTTPException;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.operator.RequestOperator;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.request.operator.RequestOperatorRepository;
@@ -45,12 +46,6 @@ import org.n52.sos.util.Producer;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class WSDLFactory implements Producer<String> {
-
-    private static final String SOAP_BINDING_ENDPOINT = "/soap";
-    private static final String POX_BINDING_ENDPOINT = "/pox";
-    private static final String KVP_BINDING_ENDPOINT = "/kvp";
-
-    
     @Override
     public String get() throws ConfigurationException {
         try {
@@ -71,9 +66,9 @@ public class WSDLFactory implements Producer<String> {
 
             final String serviceUrl = Configurator.getInstance().getServiceURL();
             
-            if (bindings.containsKey(SOAP_BINDING_ENDPOINT)) {
-                builder.setSoapEndpoint(URI.create(serviceUrl + SOAP_BINDING_ENDPOINT));
-                final Binding b = bindings.get(SOAP_BINDING_ENDPOINT);
+            if (bindings.containsKey(SosConstants.SOAP_BINDING_ENDPOINT)) {
+                builder.setSoapEndpoint(URI.create(serviceUrl + SosConstants.SOAP_BINDING_ENDPOINT));
+                final Binding b = bindings.get(SosConstants.SOAP_BINDING_ENDPOINT);
                 for (final RequestOperatorKeyType o : requestOperators) {
                     final RequestOperator op = repo.getRequestOperator(o);
                     if (op instanceof WSDLAwareRequestOperator) {
@@ -88,9 +83,9 @@ public class WSDLFactory implements Producer<String> {
                     }
                 }
             }
-            if (bindings.containsKey(POX_BINDING_ENDPOINT)) {
-                builder.setPoxEndpoint(URI.create(serviceUrl + POX_BINDING_ENDPOINT));
-                final Binding b = bindings.get(POX_BINDING_ENDPOINT);
+            if (bindings.containsKey(SosConstants.POX_BINDING_ENDPOINT)) {
+                builder.setPoxEndpoint(URI.create(serviceUrl + SosConstants.POX_BINDING_ENDPOINT));
+                final Binding b = bindings.get(SosConstants.POX_BINDING_ENDPOINT);
                 for (final RequestOperatorKeyType o : requestOperators) {
                     final RequestOperator op = repo.getRequestOperator(o);
                     if (op instanceof WSDLAwareRequestOperator) {
@@ -105,9 +100,9 @@ public class WSDLFactory implements Producer<String> {
                     }
                 }
             }
-            if (bindings.containsKey(KVP_BINDING_ENDPOINT)) {
-                builder.setKvpEndpoint(URI.create(serviceUrl + KVP_BINDING_ENDPOINT + "?"));
-                final Binding b = bindings.get(KVP_BINDING_ENDPOINT);
+            if (bindings.containsKey(SosConstants.KVP_BINDING_ENDPOINT)) {
+                builder.setKvpEndpoint(URI.create(serviceUrl + SosConstants.KVP_BINDING_ENDPOINT + "?"));
+                final Binding b = bindings.get(SosConstants.KVP_BINDING_ENDPOINT);
                 for (final RequestOperatorKeyType o : requestOperators) {
                     final RequestOperator op = repo.getRequestOperator(o);
                     if (op instanceof WSDLAwareRequestOperator) {

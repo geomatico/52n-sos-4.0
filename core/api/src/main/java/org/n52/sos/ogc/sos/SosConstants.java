@@ -36,6 +36,10 @@ import org.n52.sos.ogc.OGCConstants;
  *
  */
 public interface SosConstants {
+	String SOAP_BINDING_ENDPOINT = "/soap";
+	String POX_BINDING_ENDPOINT = "/pox";
+	String KVP_BINDING_ENDPOINT = "/kvp";
+	
     String NS_SOS_PREFIX = "sos";
     /**
      * Constant for the content type of the response

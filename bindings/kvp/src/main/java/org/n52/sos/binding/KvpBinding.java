@@ -62,7 +62,6 @@ public class KvpBinding extends Binding {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(KvpBinding.class);
 	private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_KVP_CORE_BINDING);
-    private static final String URL_PATTERN = "/kvp";
     private static final String ENCODING = "kvp";
 
 	@Override
@@ -72,7 +71,7 @@ public class KvpBinding extends Binding {
 
 	@Override
 	public String getUrlPattern() {
-		return URL_PATTERN;
+		return SosConstants.KVP_BINDING_ENDPOINT;
 	}
 
 	@Override
