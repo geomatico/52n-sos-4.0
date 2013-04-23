@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.gml;
 
-public class SosGmlMetaDataProperty {
+public class GmlMetaDataProperty {
 
     private String title;
 

@@ -26,7 +26,7 @@ package org.n52.sos.ogc.sensorML.elements;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.n52.sos.ogc.gml.SosGmlMetaDataProperty;
+import org.n52.sos.ogc.gml.GmlMetaDataProperty;
 import org.n52.sos.ogc.swe.AbstractDataRecord;
 
 /**
@@ -39,7 +39,7 @@ public class SosSMLCapabilities {
 
     private AbstractDataRecord abstractDataRecord;
 
-    private List<SosGmlMetaDataProperty> metaDataProperties;
+    private List<GmlMetaDataProperty> gmlMetaDataProperties;
 
     /**
      * default constructor
@@ -84,19 +84,19 @@ public class SosSMLCapabilities {
         this.abstractDataRecord = abstractDataRecord;
     }
 
-    public List<SosGmlMetaDataProperty> getMetaDataProperties() {
-        return metaDataProperties;
+    public List<GmlMetaDataProperty> getMetaDataProperties() {
+        return gmlMetaDataProperties;
     }
 
-    public void setMetaDataProperties(List<SosGmlMetaDataProperty> metaDataProperties) {
-        this.metaDataProperties = metaDataProperties;
+    public void setMetaDataProperties(List<GmlMetaDataProperty> gmlMetaDataProperties) {
+        this.gmlMetaDataProperties = gmlMetaDataProperties;
     }
 
-    public void addMetaDataProperties(SosGmlMetaDataProperty metaDataProperty) {
-        if (metaDataProperties == null) {
-            metaDataProperties = new ArrayList<SosGmlMetaDataProperty>();
+    public void addMetaDataProperties(GmlMetaDataProperty gmlMetaDataProperty) {
+        if (gmlMetaDataProperties == null) {
+            gmlMetaDataProperties = new ArrayList<GmlMetaDataProperty>();
         }
-        metaDataProperties.add(metaDataProperty);
+        gmlMetaDataProperties.add(gmlMetaDataProperty);
     }
     
     public boolean isSetAbstractDataRecord() {
