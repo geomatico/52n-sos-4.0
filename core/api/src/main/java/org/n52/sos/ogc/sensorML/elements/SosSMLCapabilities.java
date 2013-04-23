@@ -103,4 +103,8 @@ public class SosSMLCapabilities {
         return abstractDataRecord != null;
     }
 
+    public boolean isSetName() {
+        return name != null && !name.isEmpty();
+    }
+
 }

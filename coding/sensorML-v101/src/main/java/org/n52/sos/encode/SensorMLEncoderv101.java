@@ -119,6 +119,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.XmlHelper;
@@ -229,9 +230,10 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                 for (final Member member : sensorML.getSensorML().getMemberArray()) {
                     if (sensorDesc instanceof SensorML) {
                         for (final AbstractProcess absProcess : ((SensorML) sensorDesc).getMembers()) {
-                            absProcess.setFeatureOfInterest(sensorDesc.getFeatureOfInterest());
-                            absProcess.setParentProcedures(sensorDesc.getParentProcedures());
-                            absProcess.setChildProcedures(sensorDesc.getChildProcedures());
+                            // TODO check and remove
+//                            absProcess.setFeatureOfInterest(sensorDesc.getFeatureOfInterest());
+//                            absProcess.setParentProcedures(sensorDesc.getParentProcedures());
+//                            absProcess.setChildProcedures(sensorDesc.getChildProcedures());
                             addAbstractProcessValues(member.getProcess(), absProcess);
                             if (member.getProcess() instanceof SystemType && absProcess instanceof System) {
                                 addSystemValues((SystemType) member.getProcess(), (System) absProcess);
@@ -288,7 +290,8 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                                             SystemType.type);
                     final System smlSystem = (System) sml;
                     // TODO howTo without explicit setting
-                    smlSystem.setFeatureOfInterest(smlSensorDesc.getFeatureOfInterest());
+                 // TODO check and remove
+//                    smlSystem.setFeatureOfInterest(smlSensorDesc.getFeatureOfInterest());
                     addAbstractProcessValues(xbSystem, smlSystem);
                     addSystemValues(xbSystem, smlSystem);
                 }
@@ -521,8 +524,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                 smlComponents.addAll(system.getComponents());
             }
             if (system.isSetChildProcedures()) {
-                smlComponents.addAll(createComponentsForCildProcedures(system.getChildProcedures(system
-                        .getIdentifier())));
+                smlComponents.addAll(createComponentsForCildProcedures(system.getChildProcedures()));
             }
             if (!smlComponents.isEmpty()) {
                 final Components components = createComponents(smlComponents);
@@ -535,6 +537,8 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         if (!smlComponents.isEmpty()) {
             // TODO check for duplicated outputs
             system.getOutputs().addAll(getOutputsFromChilds(smlComponents));
+            // TODO check if necessary
+//            system.addFeatureOfInterest(getFeaturesFromChild(smlComponents));
         }
         // set outputs
         if (system.isSetOutputs()) {
@@ -846,6 +850,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                         throw new NoApplicableCodeException()
                                 .withMessage("The sensor type is not supported by this SOS");
                     }
+                    // TODO add feature/parentProcs/childProcs to component
                     component.setProcess(xbProcess);
                     if (schemaType == null) {
                         schemaType = xbProcess.schemaType();
@@ -977,22 +982,22 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
 
     protected void setCapabilitiesForFeaturesOfInterest(final AbstractProcess sosAbstractProcess,
             final AbstractProcessType abstractProcess) throws OwsExceptionReport {
-        if (sosAbstractProcess.isSetFeatureOfInterest(sosAbstractProcess.getIdentifier())) {
-            final SosSMLCapabilities featureCapabilities =
+        if (sosAbstractProcess.isSetFeatureOfInterest()) {
+            final SosSMLCapabilities sosSmlCapabilities =
                     createCapabilitiesFrom(
-                            sosAbstractProcess.getFeatureOfInterest(sosAbstractProcess.getIdentifier()),
+                            sosAbstractProcess.getFeatureOfInterest(),
                             SensorMLConstants.ELEMENT_NAME_FEATURE_OF_INTEREST,
                             SensorMLConstants.FEATURE_OF_INTEREST_FIELD_DEFINITION,
                             SensorMLConstants.FEATURE_OF_INTEREST_FIELD_NAME);
             final Capabilities xbCapabilities = abstractProcess.addNewCapabilities();
-            if (featureCapabilities.getName() != null) {
-                xbCapabilities.setName(featureCapabilities.getName());
+            if (sosSmlCapabilities.getName() != null) {
+                xbCapabilities.setName(sosSmlCapabilities.getName());
             }
             final SimpleDataRecordType xbSimpleDataRecord =
                     (SimpleDataRecordType) xbCapabilities.addNewAbstractDataRecord().substitute(
                             SWEConstants.QN_SIMPLEDATARECORD_SWE_101, SimpleDataRecordType.type);
-            if (featureCapabilities.getDataRecord().isSetFields()) {
-                for (final SosSweField field : featureCapabilities.getDataRecord().getFields()) {
+            if (sosSmlCapabilities.getDataRecord().isSetFields()) {
+                for (final SosSweField field : sosSmlCapabilities.getDataRecord().getFields()) {
                     final AnyScalarPropertyType xbField = xbSimpleDataRecord.addNewField();
                     xbField.setName(field.getName());
                     addSweSimpleTypeToField(xbField, field.getElement());
@@ -1003,21 +1008,21 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
 
     protected void setCapabilitiesForParentProcedures(final AbstractProcess sosAbstractProcess,
             final AbstractProcessType abstractProcess) throws OwsExceptionReport {
-        if (sosAbstractProcess.isSetParentProcedures(sosAbstractProcess.getIdentifier())) {
-            final SosSMLCapabilities featureCapabilities =
-                    createCapabilitiesFrom(sosAbstractProcess.getParentProcedures(sosAbstractProcess.getIdentifier()),
+        if (sosAbstractProcess.isSetParentProcedures()) {
+            final SosSMLCapabilities sosSmlapabilities =
+                    createCapabilitiesFrom(sosAbstractProcess.getParentProcedures(),
                             SensorMLConstants.ELEMENT_NAME_PARENT_PROCEDURES,
                             SensorMLConstants.PARENT_PROCEDURES_FIELD_DEFINITION,
                             SensorMLConstants.PARENT_PROCEDURES_FIELD_NAME);
             final Capabilities xbCapabilities = abstractProcess.addNewCapabilities();
-            if (featureCapabilities.getName() != null) {
-                xbCapabilities.setName(featureCapabilities.getName());
+            if (sosSmlapabilities.getName() != null) {
+                xbCapabilities.setName(sosSmlapabilities.getName());
             }
             final SimpleDataRecordType xbSimpleDataRecord =
                     (SimpleDataRecordType) xbCapabilities.addNewAbstractDataRecord().substitute(
                             SWEConstants.QN_SIMPLEDATARECORD_SWE_101, SimpleDataRecordType.type);
-            if (featureCapabilities.getDataRecord().isSetFields()) {
-                for (final SosSweField field : featureCapabilities.getDataRecord().getFields()) {
+            if (sosSmlapabilities.getDataRecord().isSetFields()) {
+                for (final SosSweField field : sosSmlapabilities.getDataRecord().getFields()) {
                     final AnyScalarPropertyType xbField = xbSimpleDataRecord.addNewField();
                     xbField.setName(field.getName());
                     addSweSimpleTypeToField(xbField, field.getElement());
@@ -1071,7 +1076,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
     }
 
     protected Collection<? extends SosSMLIo<?>> getOutputsFromChilds(final List<SosSMLComponent> smlComponents) {
-        final Set<SosSMLIo<?>> outputs = new HashSet<SosSMLIo<?>>();
+        final Set<SosSMLIo<?>> outputs = CollectionHelper.set();
         for (final SosSMLComponent sosSMLComponent : smlComponents) {
             if (sosSMLComponent.isSetProcess()) {
                 if (sosSMLComponent.getProcess() instanceof SensorML) {
@@ -1092,5 +1097,15 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             }
         }
         return outputs;
+    }
+    
+    protected Collection<String> getFeaturesFromChild(final List<SosSMLComponent> smlComponents) {
+        final Set<String> features = CollectionHelper.set();
+        for (final SosSMLComponent sosSMLComponent : smlComponents) {
+            if (sosSMLComponent.isSetProcess() && sosSMLComponent.getProcess().isSetFeatureOfInterest()) {
+                features.addAll(sosSMLComponent.getProcess().getFeatureOfInterest());
+            }
+        }
+        return features;
     }
 }

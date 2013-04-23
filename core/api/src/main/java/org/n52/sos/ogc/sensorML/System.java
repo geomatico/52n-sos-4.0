@@ -32,39 +32,54 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLComponent;
 public class System extends AbstractComponent {
 
     private EngineeringCRS spatialReferenceFrame;
-    
+
     private List<SosSMLComponent> components = new ArrayList<SosSMLComponent>(0);
 
     public List<SosSMLComponent> getComponents() {
         return components;
     }
 
+    @Deprecated
     public void setComponents(List<SosSMLComponent> components) {
-        this.components = components;
-    }
-
-    public void addComponents(List<SosSMLComponent> components) {
-        if (this.components == null) {
-            this.components = new ArrayList<SosSMLComponent>();
-        }
         this.components.addAll(components);
     }
 
-    public void addComponent(SosSMLComponent component) {
-        if (components == null) {
-            components = new ArrayList<SosSMLComponent>();
+    public void addComponents(List<SosSMLComponent> components) {
+        if (components != null) {
+            checkAndSetChildProcedures(components);
+            this.components.addAll(components);
         }
-        components.add(component);
     }
-    
+
+    public void addComponent(SosSMLComponent component) {
+        if (component != null) {
+            checkAndSetChildProcedures(component);
+            components.add(component);
+        }
+    }
+
     public boolean isSetComponents() {
         return components != null && !components.isEmpty();
     }
-    
-//    private SosSMLTemporalReferenceFrame spatialReferenceFrame;
-    
-    
-//    private SosSMLLocation location;
+
+    private void checkAndSetChildProcedures(List<SosSMLComponent> components) {
+        if (components != null) {
+            for (SosSMLComponent component : components) {
+                checkAndSetChildProcedures(component);
+            }
+        }
+    }
+
+    private void checkAndSetChildProcedures(SosSMLComponent component) {
+        if (component != null && component.isSetName()
+                && component.getName().contains(SensorMLConstants.ELEMENT_NAME_CHILD_PROCEDURES)) {
+            addChildProcedures(component.getProcess());
+        }
+    }
+
+    // private SosSMLTemporalReferenceFrame spatialReferenceFrame;
+
+    // private SosSMLLocation location;
 
     // private List<ITime> timePositions;
     //

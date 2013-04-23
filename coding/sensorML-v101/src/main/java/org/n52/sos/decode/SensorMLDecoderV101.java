@@ -99,17 +99,25 @@ import org.slf4j.LoggerFactory;
 public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SensorMLDecoderV101.class);
-    
-    private static final Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(SensorMLConstants.NS_SML, 
+
+    private static final Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(SensorMLConstants.NS_SML,
             SensorMLDocument.class, SystemType.class, ProcessModelType.class);
-    private static final Set<String> SUPPORTED_PROCEDURE_DESCRIPTION_FORMATS = 
-            Collections.singleton(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
-    private static final Set<String> REMOVABLE_CAPABILITIES_NAMES = CollectionHelper.set(SensorMLConstants.ELEMENT_NAME_PARENT_PROCEDURES, SensorMLConstants.ELEMENT_NAME_FEATURE_OF_INTEREST);
-    private static final Set<String> REMOVABLE_COMPONENTS_ROLES = Collections.singleton(SensorMLConstants.ELEMENT_NAME_CHILD_PROCEDURES);
-    private static final Set<String> REMOVABLE_IDENTIFIERS = Collections.singleton(SensorMLConstants.ELEMENT_NAME_OFFERING);
+
+    private static final Set<String> SUPPORTED_PROCEDURE_DESCRIPTION_FORMATS = Collections
+            .singleton(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
+
+    private static final Set<String> REMOVABLE_CAPABILITIES_NAMES = CollectionHelper.set(
+            SensorMLConstants.ELEMENT_NAME_PARENT_PROCEDURES, SensorMLConstants.ELEMENT_NAME_FEATURE_OF_INTEREST);
+
+    private static final Set<String> REMOVABLE_COMPONENTS_ROLES = Collections
+            .singleton(SensorMLConstants.ELEMENT_NAME_CHILD_PROCEDURES);
+
+    private static final Set<String> REMOVABLE_IDENTIFIERS = Collections
+            .singleton(SensorMLConstants.ELEMENT_NAME_OFFERING);
 
     public SensorMLDecoderV101() {
-        LOGGER.debug("Decoder for the following keys initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));
+        LOGGER.debug("Decoder for the following keys initialized successfully: {}!",
+                StringHelper.join(", ", DECODER_KEYS));
     }
 
     @Override
@@ -137,7 +145,8 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return Collections.singletonMap(SupportedTypeKey.ProcedureDescriptionFormat, SUPPORTED_PROCEDURE_DESCRIPTION_FORMATS);
+        return Collections.singletonMap(SupportedTypeKey.ProcedureDescriptionFormat,
+                SUPPORTED_PROCEDURE_DESCRIPTION_FORMATS);
     }
 
     private SensorML parseSensorML(final SensorMLDocument xbSensorML) throws OwsExceptionReport {
@@ -155,28 +164,27 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
                     } else if (xbAbstractProcess.schemaType() == ComponentType.type) {
                         abstractProcess = parseComponent((ComponentType) xbAbstractProcess);
                     } else {
-                        throw new InvalidParameterValueException().at(XmlHelper.getLocalName(xbMember))
-                                .withMessage("The process of a member of the SensorML Document (%s) is not supported!",
-                                             xbMember.getProcess().getDomNode().getNodeName());
+                        throw new InvalidParameterValueException().at(XmlHelper.getLocalName(xbMember)).withMessage(
+                                "The process of a member of the SensorML Document (%s) is not supported!",
+                                xbMember.getProcess().getDomNode().getNodeName());
                     }
                     sensorML.addMember(abstractProcess);
                 } else {
-                    throw new InvalidParameterValueException().at(XmlHelper.getLocalName(xbMember))
-                            .withMessage("The process of a member of the SensorML Document (%s) is not supported!",
-                                         xbMember.getProcess().getDomNode().getNodeName());
+                    throw new InvalidParameterValueException().at(XmlHelper.getLocalName(xbMember)).withMessage(
+                            "The process of a member of the SensorML Document (%s) is not supported!",
+                            xbMember.getProcess().getDomNode().getNodeName());
                 }
             } else {
-                throw new InvalidParameterValueException().at(XmlHelper.getLocalName(xbMember))
-                        .withMessage("The process of a member of the SensorML Document is null (%s)!",
-                                     xbMember.getProcess());
+                throw new InvalidParameterValueException().at(XmlHelper.getLocalName(xbMember)).withMessage(
+                        "The process of a member of the SensorML Document is null (%s)!", xbMember.getProcess());
             }
         }
         sensorML.setSensorDescriptionXmlString(xbSensorML.xmlText());
         return sensorML;
     }
 
-    private void parseAbstractProcess(final AbstractProcessType xbAbstractProcess, final AbstractProcess abstractProcess) throws
-            OwsExceptionReport {
+    private void parseAbstractProcess(final AbstractProcessType xbAbstractProcess,
+            final AbstractProcess abstractProcess) throws OwsExceptionReport {
         if (xbAbstractProcess.getIdentificationArray() != null) {
             abstractProcess.setIdentifications(parseIdentification(xbAbstractProcess.getIdentificationArray()));
             final List<Integer> identificationsToRemove =
@@ -192,7 +200,7 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
             abstractProcess.setCharacteristics(parseCharacteristics(xbAbstractProcess.getCharacteristicsArray()));
         }
         if (xbAbstractProcess.getCapabilitiesArray() != null) {
-            abstractProcess.setCapabilities(parseCapabilities(xbAbstractProcess.getCapabilitiesArray()));
+            abstractProcess.addCapabilities(parseCapabilities(xbAbstractProcess.getCapabilitiesArray()));
             final List<Integer> capsToRemove = checkCapabilitiesForRemoval(xbAbstractProcess.getCapabilitiesArray());
             for (final Integer integer : capsToRemove) {
                 xbAbstractProcess.removeCapabilities(integer);
@@ -221,22 +229,22 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
             for (int i = 0; i < length; i++) {
                 final Object decodedElement = CodingHelper.decodeXmlElement(xbAbstractProcess.getNameArray(i));
                 if (decodedElement instanceof CodeType) {
-                    abstractProcess.addName((CodeType)decodedElement);
+                    abstractProcess.addName((CodeType) decodedElement);
                 }
             }
         }
     }
 
     private void parseAbstractDerivableComponent(final AbstractDerivableComponentType xbAbstractDerivableComponent,
-                                                 final AbstractComponent abstractComponent) throws OwsExceptionReport {
+            final AbstractComponent abstractComponent) throws OwsExceptionReport {
         if (xbAbstractDerivableComponent.isSetPosition()) {
             abstractComponent.setPosition(parsePosition(xbAbstractDerivableComponent.getPosition()));
         }
         // TODO ...
     }
 
-    private void parseAbstractComponent(final AbstractComponentType xbAbstractComponent, final AbstractProcess abstractProcess)
-            throws OwsExceptionReport {
+    private void parseAbstractComponent(final AbstractComponentType xbAbstractComponent,
+            final AbstractProcess abstractProcess) throws OwsExceptionReport {
         if (xbAbstractComponent.isSetInputs()) {
             abstractProcess.setInputs(parseInputs(xbAbstractComponent.getInputs()));
         }
@@ -248,8 +256,8 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
         }
     }
 
-    private void parseAbstractPureProcess(final AbstractPureProcessType xbAbstractPureProcess, final ProcessModel processModel)
-            throws OwsExceptionReport {
+    private void parseAbstractPureProcess(final AbstractPureProcessType xbAbstractPureProcess,
+            final ProcessModel processModel) throws OwsExceptionReport {
         if (xbAbstractPureProcess.isSetInputs()) {
             processModel.setInputs(parseInputs(xbAbstractPureProcess.getInputs()));
         }
@@ -259,7 +267,7 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
         if (xbAbstractPureProcess.isSetParameters()) {
             processModel.setParameters(parseParameters(xbAbstractPureProcess.getParameters()));
         }
-        
+
     }
 
     private System parseSystem(final SystemType xbSystemType) throws OwsExceptionReport {
@@ -267,9 +275,10 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
         parseAbstractProcess(xbSystemType, system);
         parseAbstractComponent(xbSystemType, system);
         parseAbstractDerivableComponent(xbSystemType, system);
-        if (xbSystemType.isSetComponents()) {
-            system.setComponents(parseComponents(xbSystemType.getComponents()));
-            final List<Integer> compsToRemove = checkComponentsForRemoval(xbSystemType.getComponents().getComponentList());
+        if (xbSystemType.isSetComponents() && xbSystemType.getComponents().isSetComponentList()) {
+            system.addComponents(parseComponents(xbSystemType.getComponents()));
+            final List<Integer> compsToRemove =
+                    checkComponentsForRemoval(xbSystemType.getComponents().getComponentList());
             for (final Integer integer : compsToRemove) {
                 xbSystemType.getComponents().getComponentList().removeComponent(integer);
             }
@@ -339,8 +348,7 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
         for (final Classification xbClassification : classificationArray) {
             for (final Classifier xbClassifier : xbClassification.getClassifierList().getClassifierArray()) {
                 sosClassifiers.add(new SosSMLClassifier(xbClassifier.getName(),
-                                                        xbClassifier.getTerm().getDefinition(),
-                                                        xbClassifier.getTerm().getValue()));
+                        xbClassifier.getTerm().getDefinition(), xbClassifier.getTerm().getValue()));
             }
         }
         return sosClassifiers;
@@ -352,28 +360,30 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
      * @param characteristicsArray
      *            XML characteristics
      * @return SOS characteristics
-
-     *
-     * @throws OwsExceptionReport     *             if an error occurs
+     * 
+     * 
+     * @throws OwsExceptionReport
+     *             * if an error occurs
      */
     private List<SosSMLCharacteristics> parseCharacteristics(final Characteristics[] characteristicsArray)
             throws OwsExceptionReport {
-        final List<SosSMLCharacteristics> sosCharacteristicsList = new ArrayList<SosSMLCharacteristics>(characteristicsArray.length);
+        final List<SosSMLCharacteristics> sosCharacteristicsList =
+                new ArrayList<SosSMLCharacteristics>(characteristicsArray.length);
         final SosSMLCharacteristics sosCharacteristics = new SosSMLCharacteristics();
         for (final Characteristics xbCharacteristics : characteristicsArray) {
             final Object decodedObject = CodingHelper.decodeXmlElement(xbCharacteristics.getAbstractDataRecord());
             if (decodedObject instanceof AbstractDataRecord) {
-                sosCharacteristics.setDataRecord((AbstractDataRecord)decodedObject);
+                sosCharacteristics.setDataRecord((AbstractDataRecord) decodedObject);
             } else {
-                throw new InvalidParameterValueException().at(XmlHelper.getLocalName(xbCharacteristics))
-                        .withMessage("Error while parsing the characteristics of the SensorML (the characteristics' data record is not of type DataRecordPropertyType)!");
+                throw new InvalidParameterValueException()
+                        .at(XmlHelper.getLocalName(xbCharacteristics))
+                        .withMessage(
+                                "Error while parsing the characteristics of the SensorML (the characteristics' data record is not of type DataRecordPropertyType)!");
             }
         }
         sosCharacteristicsList.add(sosCharacteristics);
         return sosCharacteristicsList;
     }
-    
-    
 
     /**
      * Parses the capabilities
@@ -381,20 +391,25 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
      * @param capabilitiesArray
      *            XML capabilities
      * @return SOS capabilities
-
-     *
-     * @throws OwsExceptionReport     *             if an error occurs
+     * 
+     * 
+     * @throws OwsExceptionReport
+     *             * if an error occurs
      */
-    private List<SosSMLCapabilities> parseCapabilities(final Capabilities[] capabilitiesArray) throws OwsExceptionReport {
-        final List<SosSMLCapabilities> sosCapabilitiesList = new ArrayList<SosSMLCapabilities>(capabilitiesArray.length);
+    private List<SosSMLCapabilities> parseCapabilities(final Capabilities[] capabilitiesArray)
+            throws OwsExceptionReport {
+        final List<SosSMLCapabilities> sosCapabilitiesList =
+                new ArrayList<SosSMLCapabilities>(capabilitiesArray.length);
         final SosSMLCapabilities sosCapabilities = new SosSMLCapabilities();
         for (final Capabilities xbCpabilities : capabilitiesArray) {
             final Object decodedObject = CodingHelper.decodeXmlElement(xbCpabilities.getAbstractDataRecord());
             if (decodedObject instanceof AbstractDataRecord) {
-                sosCapabilities.setDataRecord((AbstractDataRecord)decodedObject);
+                sosCapabilities.setDataRecord((AbstractDataRecord) decodedObject);
             } else {
-                throw new InvalidParameterValueException().at(XmlHelper.getLocalName(xbCpabilities))
-                        .withMessage("Error while parsing the capabilities of the SensorML (the capabilities data record is not of type DataRecordPropertyType)!");
+                throw new InvalidParameterValueException()
+                        .at(XmlHelper.getLocalName(xbCpabilities))
+                        .withMessage(
+                                "Error while parsing the capabilities of the SensorML (the capabilities data record is not of type DataRecordPropertyType)!");
             }
         }
         sosCapabilitiesList.add(sosCapabilities);
@@ -407,9 +422,10 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
      * @param position
      *            XML position
      * @return SOS position
-
-     *
-     * @throws OwsExceptionReport     *             if an error occurs
+     * 
+     * 
+     * @throws OwsExceptionReport
+     *             * if an error occurs
      */
     private SosSMLPosition parsePosition(final Position position) throws OwsExceptionReport {
         SosSMLPosition sosSMLPosition = null;
@@ -419,8 +435,8 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
                 sosSMLPosition = (SosSMLPosition) pos;
             }
         } else {
-            throw new InvalidParameterValueException().at(XmlHelper.getLocalName(position))
-                    .withMessage("Error while parsing the position of the SensorML (the position is not set)!");
+            throw new InvalidParameterValueException().at(XmlHelper.getLocalName(position)).withMessage(
+                    "Error while parsing the position of the SensorML (the position is not set)!");
         }
         if (position.getName() != null) {
             sosSMLPosition.setName(position.getName());
@@ -467,9 +483,10 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
      * @param inputs
      *            XML inputs
      * @return SOS inputs
-
-     *
-     * @throws OwsExceptionReport     *             if an error occurs
+     * 
+     * 
+     * @throws OwsExceptionReport
+     *             * if an error occurs
      */
     private List<SosSMLIo<?>> parseInputs(final Inputs inputs) throws OwsExceptionReport {
         final List<SosSMLIo<?>> sosInputs = new ArrayList<SosSMLIo<?>>(inputs.getInputList().getInputArray().length);
@@ -485,21 +502,38 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
      * @param outputs
      *            XML outputs
      * @return SOS outputs
-
-     *
-     * @throws OwsExceptionReport     *             if an error occurs
+     * 
+     * 
+     * @throws OwsExceptionReport
+     *             * if an error occurs
      */
     private List<SosSMLIo<?>> parseOutputs(final Outputs outputs) throws OwsExceptionReport {
-        final List<SosSMLIo<?>> sosOutputs = new ArrayList<SosSMLIo<?>>(outputs.getOutputList().getOutputArray().length);
+        final List<SosSMLIo<?>> sosOutputs =
+                new ArrayList<SosSMLIo<?>>(outputs.getOutputList().getOutputArray().length);
         for (final IoComponentPropertyType xbOutput : outputs.getOutputList().getOutputArray()) {
             sosOutputs.add(parseIoComponentPropertyType(xbOutput));
         }
         return sosOutputs;
     }
 
-    private List<SosSMLComponent> parseComponents(final Components components) {
-        // TODO Auto-generated method stub
-        return null;
+    private List<SosSMLComponent> parseComponents(final Components components) throws OwsExceptionReport {
+        List<SosSMLComponent> sosSmlComponents = CollectionHelper.list();
+        if (components.isSetComponentList() && components.getComponentList().getComponentArray() != null) {
+            for (Component component : components.getComponentList().getComponentArray()) {
+                if (component.isSetProcess() || component.isSetHref()) {
+                    SosSMLComponent sosSmlcomponent = new SosSMLComponent(component.getName());
+                    AbstractProcess abstractProcess = new AbstractProcess();
+                    if (component.isSetProcess()) {
+                        parseAbstractProcess(component.getProcess(), abstractProcess);
+                    } else {
+                        abstractProcess.setIdentifier(component.getHref());
+                    }
+                    sosSmlcomponent.setProcess(abstractProcess);
+                    sosSmlComponents.add(sosSmlcomponent);
+                }
+            }
+        }
+        return sosSmlComponents;
     }
 
     /**
@@ -508,12 +542,14 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
      * @param xbIoCompPropType
      *            XML components
      * @return SOS components
-
-     *
-     * @throws OwsExceptionReport     *             if an error occurs
+     * 
+     * 
+     * @throws OwsExceptionReport
+     *             * if an error occurs
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private SosSMLIo<?> parseIoComponentPropertyType(final IoComponentPropertyType xbIoCompPropType) throws OwsExceptionReport {
+    private SosSMLIo<?> parseIoComponentPropertyType(final IoComponentPropertyType xbIoCompPropType)
+            throws OwsExceptionReport {
         final SosSMLIo<?> sosIo = new SosSMLIo();
         sosIo.setIoName(xbIoCompPropType.getName());
         XmlObject toDecode = null;
@@ -542,8 +578,8 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
         } else if (xbIoCompPropType.isSetAbstractDataRecord()) {
             toDecode = xbIoCompPropType.getAbstractDataRecord();
         } else {
-            throw new InvalidParameterValueException().at(XmlHelper.getLocalName(xbIoCompPropType))
-                    .withMessage("An \"IoComponentProperty\" is not supported");
+            throw new InvalidParameterValueException().at(XmlHelper.getLocalName(xbIoCompPropType)).withMessage(
+                    "An \"IoComponentProperty\" is not supported");
         }
 
         final Object decodedObject = CodingHelper.decodeXmlElement(toDecode);

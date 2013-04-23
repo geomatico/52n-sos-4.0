@@ -37,6 +37,8 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLCharacteristics;
 import org.n52.sos.ogc.sensorML.elements.SosSMLClassifier;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
+import org.n52.sos.ogc.swe.SosSweField;
+import org.n52.sos.ogc.swe.simpleType.SosSweText;
 
 public class AbstractSensorML extends SosProcedureDescription {
 
@@ -154,6 +156,7 @@ public class AbstractSensorML extends SosProcedureDescription {
         return capabilities;
     }
 
+    @Deprecated
     public void setCapabilities(final List<SosSMLCapabilities> capabilities) {
         if (isSetCapabilities()) {
             this.capabilities.addAll(capabilities);
@@ -161,9 +164,19 @@ public class AbstractSensorML extends SosProcedureDescription {
             this.capabilities = capabilities;
         }
     }
+    
+    public void addCapabilities(final List<SosSMLCapabilities> capabilities) {
+        if (capabilities != null) {
+            checkAndSetParentProcedures(capabilities);
+            this.capabilities.addAll(capabilities);
+        }
+    }
 
     public void addCapabilities(final SosSMLCapabilities capabilities) {
-        this.capabilities.add(capabilities);
+        if (capabilities != null) {
+            checkAndSetParentProcedures(capabilities);
+            this.capabilities.add(capabilities);
+        }
     }
 
     public List<SmlContact> getContact() {
@@ -222,6 +235,12 @@ public class AbstractSensorML extends SosProcedureDescription {
         }
         return sosOfferings;
     }
+    
+    @Override
+    public boolean isSetOffering() {
+        List<SosOffering> offeringIdentifiers = getOfferingIdentifiers();
+        return offeringIdentifiers != null && !offeringIdentifiers.isEmpty();
+    }
 
     private boolean isIdentificationHoldingAnProcedureIdentifier(final SosSMLIdentifier identification) {
         return (identification.getName() != null && identification.getName().equals(URN_UNIQUE_IDENTIFIER_END))
@@ -272,5 +291,29 @@ public class AbstractSensorML extends SosProcedureDescription {
 
     public boolean isSetHistory() {
         return history != null && !history.isEmpty();
+    }
+    
+    private void checkAndSetParentProcedures(List<SosSMLCapabilities> capabilities) {
+        if (capabilities != null) {
+            for (SosSMLCapabilities sosSMLCapabilities : capabilities) {
+                checkAndSetParentProcedures(sosSMLCapabilities);
+            }
+        }
+    }
+
+    private void checkAndSetParentProcedures(SosSMLCapabilities sosSmlCapabilities) {
+        if (sosSmlCapabilities != null && sosSmlCapabilities.isSetName()
+                && sosSmlCapabilities.getName().equals(SensorMLConstants.ELEMENT_NAME_PARENT_PROCEDURES)) {
+            if (sosSmlCapabilities.isSetAbstractDataRecord() && sosSmlCapabilities.getDataRecord().isSetFields()) {
+                for (SosSweField sosSweField : sosSmlCapabilities.getDataRecord().getFields()) {
+                    if (sosSweField.getElement() instanceof SosSweText) {
+                        SosSweText sosSweText = (SosSweText) sosSweField.getElement();
+                        if (sosSweText.isSetValue()) {
+                            addParentProcedures(sosSweText.getValue());
+                        }
+                    }
+                }
+            }
+        }
     }
 }

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
@@ -240,69 +241,35 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
         } else {
             request.setAssignedProcedureIdentifier(getDefaultProcedurePrefix() + JavaHelper.generateID(request.getProcedureDescription().toString()));
         }
-//        // if procedureDescription is SensorML
-//        if (request.getProcedureDescription() instanceof SensorML) {
-//            SensorML sensorML = (SensorML) request.getProcedureDescription();
-//            // if SensorML is not a wrapper
-//            if (!sensorML.isWrapper()) {
-//                if (request.getProcedureDescription().getIdentifier() != null
-//                        && !request.getProcedureDescription().getIdentifier().isEmpty()) {
-//                    procedureIdentifier = request.getProcedureDescription().getIdentifier();
-//                }
-//            }
-//            // if SensorML is a wrapper and member size is 1
-//            else if (sensorML.isWrapper() && sensorML.getMembers().size() == 1) {
-//                AbstractProcess process = sensorML.getMembers().get(0);
-//                if (process.getIdentifier() != null && !process.getIdentifier().isEmpty()) {
-//                    procedureIdentifier = process.getIdentifier();
-//                }
-//            } else {
-//                procedureIdentifier =
-//                        getDefaultProcedurePrefix() + JavaHelper.generateID(sensorML.getSensorDescriptionXmlString());
-//            }
-//        }
-//        // if procedureDescription not SensorML
-//        else {
-//            if (request.getProcedureDescription().getIdentifier() != null
-//                    && !request.getProcedureDescription().getIdentifier().isEmpty()) {
-//                procedureIdentifier = request.getProcedureDescription().getIdentifier();
-//            } else {
-//                procedureIdentifier =
-//                        getDefaultProcedurePrefix() + JavaHelper.generateID(request.getProcedureDescription().toString());
-//            }
-//        }
-//        request.setAssignedProcedureIdentifier(procedureIdentifier);
     }
 
     private void checkAndSetAssignedOffering(InsertSensorRequest request) {
         // if procedureDescription is SensorML
         List<SosOffering> sosOfferings = null;
-        if (request.getProcedureDescription() instanceof SensorML) {
-            SensorML sensorML = (SensorML) request.getProcedureDescription();
-            // if SensorML is not a wrapper
-            if (!sensorML.isWrapper()) {
-                if (request.getProcedureDescription().getOfferingIdentifiers() != null) {
-                    sosOfferings = request.getProcedureDescription().getOfferingIdentifiers();
-                }
-            }
-            // if SensorML is a wrapper and member size is 1
-            else if (sensorML.isWrapper() && sensorML.getMembers().size() == 1) {
-                AbstractProcess process = sensorML.getMembers().get(0);
-                if (process.getOfferingIdentifiers() != null && !process.getOfferingIdentifiers().isEmpty()) {
-                    sosOfferings = process.getOfferingIdentifiers();
+        if (request.getProcedureDescription().isSetOffering()) {
+            sosOfferings = request.getProcedureDescription().getOfferingIdentifiers();
+        } else {
+            if (request.getProcedureDescription() instanceof SensorML) {
+                SensorML sensorML = (SensorML) request.getProcedureDescription();
+                // if SensorML is a wrapper and member size is 1
+                if (sensorML.isWrapper() && sensorML.getMembers().size() == 1) {
+                    AbstractProcess process = sensorML.getMembers().get(0);
+                    if (process.isSetOffering()) {
+                        sosOfferings = process.getOfferingIdentifiers();
+                    }
+                    if (process.isSetParentProcedures()) {
+                        getOfferingsForParentProcedures(process.getParentProcedures());
+                    }
                 }
             }
         }
-        // if procedureDescription not SensorML
-        else {
-            if (request.getProcedureDescription().getOfferingIdentifiers() != null) {
-                sosOfferings = request.getProcedureDescription().getOfferingIdentifiers();
-            }
+        if (request.getProcedureDescription().isSetParentProcedures()) {
+            
         }
         // check if offering is valid
         if (sosOfferings == null || sosOfferings.isEmpty()) {
             sosOfferings = new ArrayList<SosOffering>(0);
-            sosOfferings.add(new SosOffering(getDefaultProcedurePrefix() + request.getAssignedProcedureIdentifier()));
+            sosOfferings.add(new SosOffering(getDefaultOfferingPrefix()+ request.getAssignedProcedureIdentifier()));
         }
         request.setAssignedOfferings(sosOfferings);
     }
@@ -316,4 +283,25 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
             }
         }
     }
+    
+    private void getParentProcedures() {
+        // checkParentProcedures if exist, else exception
+        // insert proc as hidden child to parents
+        // insert proc with new offering if set
+        // set relation in sensor_system
+    }
+    
+    private void getChildProcedures() {
+        // add parent offerings 
+        // insert if not exist and proc is encoded, else Exception
+        // insert as hidden child
+        // set relation in sensor_system
+    }
+
+    private void getOfferingsForParentProcedures(Set<String> set) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+   
 }

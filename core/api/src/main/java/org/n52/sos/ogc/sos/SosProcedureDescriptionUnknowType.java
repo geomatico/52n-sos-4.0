@@ -52,5 +52,10 @@ public class SosProcedureDescriptionUnknowType extends SosProcedureDescription {
     public void addOfferingIdentifier(SosOffering sosOffering) {
         this.offerings.add(sosOffering);
     }
+
+    @Override
+    public boolean isSetOffering() {
+        return offerings != null && !offerings.isEmpty();
+    }
     
 }

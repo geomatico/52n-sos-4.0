@@ -23,21 +23,20 @@
  */
 package org.n52.sos.ogc.sos;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.n52.sos.ogc.om.SosOffering;
-import org.n52.sos.util.MultiMaps;
-import org.n52.sos.util.SetMultiMap;
+import org.n52.sos.util.CollectionHelper;
 
 public abstract class SosProcedureDescription {
     private String identifier;
     private String sensorDescriptionXmlString;
     private String descriptionFormat;
-    private SetMultiMap<String, String> featureOfInterestForProcedure = MultiMaps.newSetMultiMap();
-    private SetMultiMap<String, String> parentProcedureForProcedure = MultiMaps.newSetMultiMap();
-    private SetMultiMap<String, SosProcedureDescription> childProcedureForProcedure = MultiMaps.newSetMultiMap();
+    private Set<String> featureOfInterest = CollectionHelper.set();
+    private Set<String> parentProcedure = CollectionHelper.set();
+    private Set<SosProcedureDescription> childProcedure = CollectionHelper.set();
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
@@ -52,6 +51,8 @@ public abstract class SosProcedureDescription {
     }
 
     public abstract List<SosOffering> getOfferingIdentifiers();
+
+    public abstract boolean isSetOffering();
 
     public String getSensorDescriptionXmlString() {
         return sensorDescriptionXmlString;
@@ -73,101 +74,56 @@ public abstract class SosProcedureDescription {
         this.descriptionFormat = descriptionFormat;
     }
 
-    public void setFeatureOfInterest(Map<String, Set<String>> features) {
-        featureOfInterestForProcedure.putAll(features);
-    }
-    
-    public void addFeatureOfInterest(Set<String> feature, String procedureIdentifier) {
-        featureOfInterestForProcedure.addAll(procedureIdentifier, feature);
+   
+    public void addFeatureOfInterest(Collection<String> feature) {
+        this.featureOfInterest.addAll(feature);
     }
 
-    public void addFeatureOfInterest(String featureIdentifier, String procedureIdentifier) {
-        featureOfInterestForProcedure.add(procedureIdentifier, featureIdentifier);
+    public void addFeatureOfInterest(String featureIdentifier) {
+        this.featureOfInterest.add(featureIdentifier);
     }
 
-    public Map<String, Set<String>> getFeatureOfInterest() {
-        return featureOfInterestForProcedure;
-    }
-
-    public Set<String> getFeatureOfInterest(String procedureIdentifier) {
-        return featureOfInterestForProcedure.get(procedureIdentifier);
+    public Set<String> getFeatureOfInterest() {
+        return featureOfInterest;
     }
 
     public boolean isSetFeatureOfInterest() {
-        return featureOfInterestForProcedure != null && !featureOfInterestForProcedure.isEmpty();
+        return featureOfInterest != null && !featureOfInterest.isEmpty();
     } 
 
-    public boolean isSetFeatureOfInterest(String procedureIdentifier) {
-        if (isSetFeatureOfInterest()) {
-            Set<String> features = featureOfInterestForProcedure.get(procedureIdentifier);
-            return features != null && !features.isEmpty();
-        }
-        return false;
-    }
-
-    public void setParentProcedures(Map<String, Set<String>> parentProcedures) {
-        parentProcedureForProcedure.putAll(parentProcedures);
+    public void addParentProcedures(Collection<String> parentProcedures) {
+        parentProcedure.addAll( parentProcedures);
     }
     
-    public void addParentProcedures(Set<String> parentProcedures, String procedureIdentifier) {
-        parentProcedureForProcedure.addAll(procedureIdentifier, parentProcedures);
-    }
-    
-    public void addParentProcedures(String parentProcedureIdentifier, String procedureIdentifier) {
-        parentProcedureForProcedure.add(procedureIdentifier, parentProcedureIdentifier);
+    public void addParentProcedures(String parentProcedureIdentifier) {
+        parentProcedure.add(parentProcedureIdentifier);
     }
 
-    public Map<String, Set<String>> getParentProcedures() {
-        return parentProcedureForProcedure;
-    }
-
-    public Set<String> getParentProcedures(String procedureIdentifier) {
-        return parentProcedureForProcedure.get(procedureIdentifier);
+    public Set<String> getParentProcedures() {
+        return parentProcedure;
     }
 
     public boolean isSetParentProcedures() {
-        return parentProcedureForProcedure != null && !parentProcedureForProcedure.isEmpty();
+        return parentProcedure != null && !parentProcedure.isEmpty();
     } 
 
-    public boolean isSetParentProcedures(String procedureIdentifier) {
-        if (isSetFeatureOfInterest()) {
-            Set<String> parentProcedures = parentProcedureForProcedure.get(procedureIdentifier);
-            return parentProcedures != null && !parentProcedures.isEmpty();
+    public void addChildProcedures(Collection<SosProcedureDescription> childProcedures) {
+        if (childProcedures != null) {
+            this.childProcedure.addAll(childProcedures);
         }
-        return false;
     }
     
-    public void setChildProcedures(Map<String, Set<SosProcedureDescription>> childProcedures) {
-        childProcedureForProcedure.putAll(childProcedures);
-    }
-    
-    public void addChildProcedures(Set<SosProcedureDescription> childProcedures, String procedureIdentifier) {
-        childProcedureForProcedure.addAll(procedureIdentifier, childProcedures);
-    }
-    
-    public void addChildProcedures(SosProcedureDescription childProcedure, String procedureIdentifier) {
-        childProcedureForProcedure.add(procedureIdentifier, childProcedure);
+    public void addChildProcedures(SosProcedureDescription childProcedure) {
+        this.childProcedure.add(childProcedure);
     }
 
-    public Map<String, Set<SosProcedureDescription>> getChildProcedures() {
-        return childProcedureForProcedure;
-    }
-
-    public Set<SosProcedureDescription> getChildProcedures(String procedureIdentifier) {
-        return childProcedureForProcedure.get(procedureIdentifier);
+    public Set<SosProcedureDescription> getChildProcedures() {
+        return childProcedure;
     }
 
     public boolean isSetChildProcedures() {
-        return childProcedureForProcedure != null && !childProcedureForProcedure.isEmpty();
+        return childProcedure != null && !childProcedure.isEmpty();
     } 
-
-    public boolean isSetChildProcedures(String procedureIdentifier) {
-        if (isSetFeatureOfInterest()) {
-            Set<SosProcedureDescription> features = childProcedureForProcedure.get(procedureIdentifier);
-            return features != null && !features.isEmpty();
-        }
-        return false;
-    }
 
     @Override
     public int hashCode() {

@@ -40,6 +40,8 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateProcedureConverter;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sensorML.AbstractProcess;
+import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.request.DescribeSensorRequest;
@@ -66,24 +68,14 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
             session = sessionHolder.getSession();
             final SosProcedureDescription result = queryProcedure(request, session);
             
-            final Collection<String> features = getFeatureOfInterestIDsForProcedure(request.getProcedure(), request.getVersion(), session);
-            if (features != null && !features.isEmpty()) {
-                result.addFeatureOfInterest(new HashSet<String>(features), request.getProcedure());
+            if (result instanceof SensorML && ((SensorML)result).isWrapper()) {
+                for (AbstractProcess abstractProcess :  ((SensorML)result).getMembers()) {
+                    addValuesToSensorDescription(abstractProcess, request.getVersion(), request.getProcedureDescriptionFormat(), session);
+                }
+            } else {
+                addValuesToSensorDescription(result, request.getVersion(), request.getProcedureDescriptionFormat(), session);
             }
-
-            // parent procs
-            final Collection<String> parentProcedures = getParentProcedures(request.getProcedure(), request.getVersion());
-            if (parentProcedures != null && !parentProcedures.isEmpty()) {
-                result.addParentProcedures(new HashSet<String>(parentProcedures), request.getProcedure());
-            }
-
-            // child procs
-            final Set<SosProcedureDescription> childProcedures =
-                    getChildProcedures(request.getProcedure(), request.getProcedureDescriptionFormat(),
-                            request.getVersion(), session);
-            if (childProcedures != null && !childProcedures.isEmpty()) {
-                result.addChildProcedures(childProcedures, request.getProcedure());
-            }
+            
             final DescribeSensorResponse response = new DescribeSensorResponse();
             response.setService(request.getService());
             response.setVersion(request.getVersion());
@@ -104,6 +96,26 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
         return procedureConverter.createSosProcedureDescription(procedure, request.getProcedure(), request.getProcedureDescriptionFormat());
         
        
+    }
+
+    private void addValuesToSensorDescription(SosProcedureDescription procedureDescription, String version, String procedureDescriptionFormat,
+            Session session) throws OwsExceptionReport {
+        final Collection<String> features = getFeatureOfInterestIDsForProcedure(procedureDescription.getIdentifier(), version, session);
+        if (features != null && !features.isEmpty()) {
+            procedureDescription.addFeatureOfInterest(new HashSet<String>(features));
+        }
+
+        // parent procs
+        final Collection<String> parentProcedures = getParentProcedures(procedureDescription.getIdentifier(), version);
+        if (parentProcedures != null && !parentProcedures.isEmpty()) {
+            procedureDescription.addParentProcedures(new HashSet<String>(parentProcedures));
+        }
+
+        // child procs
+        final Set<SosProcedureDescription> childProcedures =
+                getChildProcedures(procedureDescription.getIdentifier(), procedureDescriptionFormat,
+                       version, session);
+       procedureDescription.addChildProcedures(childProcedures);
     }
 
     @SuppressWarnings("unchecked")
@@ -149,7 +161,9 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
         if (childProcedureIds != null && !childProcedureIds.isEmpty()) {
             for (final String childProcID : childProcedureIds) {
                 final Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(childProcID, session);
-				childProcedures.add(procedureConverter.createSosProcedureDescription(procedure, childProcID, outputFormat));
+                SosProcedureDescription childProcedure = procedureConverter.createSosProcedureDescription(procedure, childProcID, outputFormat);
+                addValuesToSensorDescription(childProcedure, version, outputFormat, session);
+				childProcedures.add(childProcedure);
             }
         }
         return childProcedures;

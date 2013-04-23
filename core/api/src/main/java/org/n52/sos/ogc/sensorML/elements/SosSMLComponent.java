@@ -107,4 +107,8 @@ public class SosSMLComponent {
         return process != null;
     }
 
+    public boolean isSetName() {
+        return name != null && !name.isEmpty();
+    }
+
 }
