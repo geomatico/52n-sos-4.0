@@ -29,6 +29,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
+import static org.n52.sos.ogc.OGCConstants.*;
 import static org.n52.sos.ogc.sensorML.SensorMLConstants.NS_SML;
 import static org.n52.sos.util.StringHelper.join;
 
@@ -46,6 +47,7 @@ import org.n52.sos.ogc.sensorML.ProcessModel;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.System;
+import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.service.SensorDescriptionGenerationSettings;
 import org.n52.sos.service.ServiceConfiguration;
@@ -140,7 +142,7 @@ public class HibernateProcedureConverterTest {
 	}
 	
 	@Test public void
-	should_return_sml_process_model_for_non_spatial_procedure()
+	should_return_sml_process_model_for_smlProcessModel()
 			throws OwsExceptionReport {
 		final SosProcedureDescription description = converter.createSosProcedureDescription(
 				nonSpatialProc,
@@ -152,7 +154,7 @@ public class HibernateProcedureConverterTest {
 	}
 
 	@Test public void 
-	should_set_description_for_non_spatial_procedure()
+	should_set_description_for_smlProcessModel()
 			throws OwsExceptionReport {
 		final AbstractProcess process = setupAbstractProcess();
 		assertThat(process.getDescriptions().size(), is(1));
@@ -160,7 +162,7 @@ public class HibernateProcedureConverterTest {
 	}
 	
 	@Test public void
-	should_set_name_for_non_spatial_procedure()
+	should_set_name_for_smlProcessModel()
 	throws OwsExceptionReport {
 		final AbstractProcess process = setupAbstractProcess();
 		assertThat(process.getNames().size(), is(1));
@@ -168,12 +170,39 @@ public class HibernateProcedureConverterTest {
 	}
 	
 	@Test public void
-	should_set_method_for_non_spatial_procedure()
+	should_set_method_for_smlProcessModel()
 	throws OwsExceptionReport {
+		final ProcessModel pModel = setupProcessModel();
+		assertThat(pModel.getMethod(), instanceOf(ProcessMethod.class));
+	}
+
+	@Test public void
+	should_set_identifier_for_smlProcessModel()
+	throws OwsExceptionReport {
+		final ProcessModel pModel = setupProcessModel();
+		assertThat(pModel.getIdentifier(), is(PROCEDURE_IDENTIFIER));
+		assertThat(uniqueIdIdentifierOf(pModel), is(PROCEDURE_IDENTIFIER));
+	}
+
+	private String uniqueIdIdentifierOf(final ProcessModel pModel)
+	{
+		for (final SosSMLIdentifier identifier : pModel.getIdentifications()) 
+		{
+			if (identifier.getName().equalsIgnoreCase(URN_UNIQUE_IDENTIFIER_END) && 
+					identifier.getDefinition().equalsIgnoreCase(URN_UNIQUE_IDENTIFIER))
+			{
+				return identifier.getValue();
+			}
+		}
+		return null;
+	}
+
+	protected ProcessModel setupProcessModel() throws OwsExceptionReport
+	{
 		final AbstractProcess process = setupAbstractProcess();
 		assertThat(process, instanceOf(ProcessModel.class));
 		final ProcessModel pModel = (ProcessModel) process;
-		assertThat(pModel.getMethod(), instanceOf(ProcessMethod.class));
+		return pModel;
 	}
 	
 	protected AbstractProcess setupAbstractProcess() throws OwsExceptionReport

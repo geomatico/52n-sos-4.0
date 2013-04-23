@@ -182,6 +182,8 @@ public class HibernateProcedureConverter {
 		
 		smlProcessModel.setNames(createNames(procedure));
 		
+		smlProcessModel.setIdentifierAndCreateIdentification(procedure.getIdentifier());
+		
 		smlProcessModel.setMethod(createMethod(procedure));
 		
 		// FIXME Eike: continue development here!
@@ -200,7 +202,7 @@ public class HibernateProcedureConverter {
 		return CollectionHelper.asList(new CodeType(procedure.getIdentifier()));
 	}
 
-	private org.n52.sos.ogc.sensorML.System createSmlSystem(final Procedure procedure) throws OwsExceptionReport
+	private System createSmlSystem(final Procedure procedure) throws OwsExceptionReport
 	{
 		final System smlSystem = new System();
 		
