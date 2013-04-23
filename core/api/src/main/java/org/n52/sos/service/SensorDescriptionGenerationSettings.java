@@ -219,7 +219,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
     }
 
     /**
-     * @return Depends on configuration. Something like:<br>"<i>The sensor system with the id '%s' observes the
+     * @return Depends on configuration. Something like:<br>"<i>The '%s' with the id '%s' observes the
      *         following properties: '%s'.</i>"
      */
     public String getDescriptionTemplate() 
