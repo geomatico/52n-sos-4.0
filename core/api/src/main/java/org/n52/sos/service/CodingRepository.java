@@ -106,7 +106,7 @@ public class CodingRepository {
     }
 
     private <F, T> Encoder<F, T> processEncoderMatches(Set<Encoder<?, ?>> matches, EncoderKey key) {
-        if (matches.isEmpty()) {
+        if (matches == null || matches.isEmpty()) {
             LOG.debug("No Encoder for {}", key);
             return null;
         } else if (matches.size() > 1) {
@@ -488,9 +488,16 @@ public class CodingRepository {
         public int compare(T o1, T o2) {
             int s1 = getSimilarity(o1);
             int s2 = getSimilarity(o2);
-            return (s1 == s2) ? 0 : (s1 == 0) ? -1 : (s2 == 0) ? 1 : (s1 < 0)
-                                                                     ? ((s2 < 0) ? 0 : 1) : (s2 < 0) ? -1 : ((s1 < s2)
-                                                                                                             ? -1 : 1);
+            if( s1 == s2 ){
+        		if( o1.getClass().isAssignableFrom(o2.getClass()) ){
+        			return 1;
+        		} else if ( o2.getClass().isAssignableFrom(o1.getClass()) ){
+        			return -1;
+            	}            	
+            }
+            return (s1 == 0) ? -1 : (s2 == 0) ? 1 : (s1 < 0)
+                                                    ? ((s2 < 0) ? 0 : 1) : (s2 < 0) ? -1 : ((s1 < s2)
+                                                                                           ? -1 : 1);
         }
 
         protected abstract int getSimilarity(T t);
