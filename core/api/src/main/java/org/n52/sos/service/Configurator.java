@@ -522,10 +522,6 @@ public class Configurator implements Cleanupable {
         return getServiceConfiguration().getMinimumGzipSize();
     }
 
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
     public int getMaxGetObsResults() {
         return getServiceConfiguration().getMaxGetObsResults();
     }
@@ -549,6 +545,10 @@ public class Configurator implements Cleanupable {
     public boolean isUseDefaultPrefixes() {
         return getServiceConfiguration().isUseDefaultPrefixes();
     }
+
+    public boolean isEncodeFullChildrenInDescribeSensor() {
+    	return getServiceConfiguration().isEncodeFullChildrenInDescribeSensor();
+	}
 
     /**
      * @return Returns the lease for the getResult template (in minutes).

@@ -62,7 +62,10 @@ public class ServiceConfiguration {
     private String defaultObservablePropertyPrefix;
     private String defaultFeaturePrefix;
     private boolean useDefaultPrefixes;
+    private boolean encodeFullChildrenInDescribeSensor;
     private boolean useHttpStatusCodesInKvpAndPoxBinding;
+    private int maxGetObsResults;
+
     /**
      * date format of gml.
      */
@@ -72,11 +75,6 @@ public class ServiceConfiguration {
      */
     @Deprecated
     private int lease;
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    private int maxGetObsResults;
     /**
      * minimum size to gzip responses.
      */
@@ -242,9 +240,8 @@ public class ServiceConfiguration {
     /**
      * @param maxResults
      *
-     * @deprecated not used by any code, check for external use or remove
+     * @param max results for GetObservation (0 for unlimited)
      */
-    @Deprecated
     @Setting(MAX_GET_OBSERVATION_RESULTS)
     public void setMaxGetObservationResults(final int maxResults) {
         maxGetObsResults = maxResults;
@@ -295,6 +292,15 @@ public class ServiceConfiguration {
         useDefaultPrefixes = prefix;
     }
 
+    public boolean isEncodeFullChildrenInDescribeSensor() {
+    	return encodeFullChildrenInDescribeSensor;
+    }
+
+    @Setting(ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR)
+    public void setEncodeFullChildrenInDescribeSensor(final boolean encodeFullChildrenInDescribeSensor) {
+    	this.encodeFullChildrenInDescribeSensor = encodeFullChildrenInDescribeSensor;
+    }    
+   
     /**
      * @return Returns the lease for the getResult template (in minutes).
      *

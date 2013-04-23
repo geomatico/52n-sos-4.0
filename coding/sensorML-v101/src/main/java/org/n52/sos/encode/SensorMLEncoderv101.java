@@ -36,6 +36,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import net.opengis.gml.StringOrRefType;
 import net.opengis.sensorML.x101.AbstractProcessType;
 import net.opengis.sensorML.x101.CapabilitiesDocument.Capabilities;
 import net.opengis.sensorML.x101.CharacteristicsDocument.Characteristics;
@@ -103,6 +104,9 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLDocumentationListMember;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
+import org.n52.sos.ogc.sos.Sos1Constants;
+import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
@@ -478,8 +482,9 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
 
         // set description
         if (sosAbstractProcess.isSetDescriptions()) {
-            abstractProcess.addNewDescription()
-                    .setStringValue(createDescription(sosAbstractProcess.getDescriptions()));
+        	StringOrRefType description = abstractProcess.isSetDescription() ?
+        			abstractProcess.getDescription() : abstractProcess.addNewDescription();        
+            description.setStringValue(createDescription(sosAbstractProcess.getDescriptions()));
         }
         // set identification
         if (sosAbstractProcess.isSetIdentifications()) {
@@ -1056,15 +1061,18 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             childCount++;
             final SosSMLComponent component = new SosSMLComponent("component" + childCount);
             component.setTitle(childProcedure.getIdentifier());
-            // TODO add setting for encoding component
-            if (childProcedure instanceof AbstractSensorML) {
+
+            if (Configurator.getInstance().isEncodeFullChildrenInDescribeSensor() &&
+                       childProcedure instanceof AbstractSensorML) {
                 component.setProcess((AbstractSensorML) childProcedure);
             } else {
                 try {
-                    // Set<String> supportedVersions =
-                    // Configurator.getInstance().getServiceOperatorRepository().getSupportedVersions();
-                    component.setHref(SosHelper.getDescribeSensorUrl("2.0.0", Configurator.getInstance()
-                            .getServiceURL(), childProcedure.getIdentifier(), "/kvp"));
+                	String version = Configurator.getInstance().getServiceOperatorRepository()
+                			.getSupportedVersions( SosConstants.SOS ).contains( Sos2Constants.SERVICEVERSION )
+                			? Sos2Constants.SERVICEVERSION : Sos1Constants.SERVICEVERSION;
+
+                	component.setHref(SosHelper.getDescribeSensorUrl(version, Configurator.getInstance()
+                			.getServiceURL(), childProcedure.getIdentifier(), SosConstants.KVP_BINDING_ENDPOINT));
                 } catch (final UnsupportedEncodingException uee) {
                     throw new NoApplicableCodeException().withMessage("Error while encoding DescribeSensor URL")
                             .causedBy(uee);

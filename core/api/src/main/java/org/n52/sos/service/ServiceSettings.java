@@ -47,16 +47,14 @@ public class ServiceSettings implements SettingDefinitionProvider {
     public static final String SUPPORTS_QUALITY = "service.supportsQuality";
     public static final String SENSOR_DIRECTORY = "service.sensorDirectory";
     public static final String USE_DEFAULT_PREFIXES = "service.useDefaultPrefixes";
+    public static final String ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR = "service.encodeFullChildrenInDescribeSensor";
+    public static final String MAX_GET_OBSERVATION_RESULTS = "service.maxGetObservationResults";
+
     /**
      * @deprecated not used by any code, check for external use or remove
      */
     @Deprecated
     public static final String LEASE = "service.lease";
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public static final String MAX_GET_OBSERVATION_RESULTS = "service.maxGetObservationResults";
     /**
      * @deprecated not used by any code, check for external use or remove
      */
@@ -96,10 +94,6 @@ public class ServiceSettings implements SettingDefinitionProvider {
             .setDefaultValue(1048576)
             .setTitle("GZIP Threshold")
             .setDescription("The size (in byte) the SOS starts to gzip responses (if the client supports it).");
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
     public static final IntegerSettingDefinition MAX_GET_OBSERVATION_RESULTS_DEFINITION = new IntegerSettingDefinition()
             .setGroup(GROUP)
             .setOrder(4)
@@ -158,6 +152,14 @@ public class ServiceSettings implements SettingDefinitionProvider {
             .setOptional(true)
             .setTitle("Use default prefixes for offering, procedure, features")
             .setDescription("Use default prefixes for offering, procedure, features.");
+
+    public static final BooleanSettingDefinition ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR_DEFINITION = new BooleanSettingDefinition()
+    		.setGroup(GROUP)
+    		.setOrder(12)
+    		.setKey(ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR)
+    		.setDefaultValue(true)
+    		.setTitle("Whether to encode full SensorML for child procedures in DescribeSensor responses")
+    		.setDescription("Whether to encode full SensorML for child procedures in DescribeSensor responses.");    
     
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
             ServiceSettings.SERVICE_URL_DEFINITION,
@@ -168,7 +170,8 @@ public class ServiceSettings implements SettingDefinitionProvider {
             ServiceSettings.SENSOR_DIRECTORY_DEFINITION,
             ServiceSettings.SKIP_DUPLICATE_OBSERVATIONS_DEFINITION,
             ServiceSettings.CONFIGURATION_FILES_DEFINITION,
-            ServiceSettings.USE_DEFAULT_PREFIXES_DEFINITION);
+            ServiceSettings.USE_DEFAULT_PREFIXES_DEFINITION,
+            ServiceSettings.ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR_DEFINITION);
 
     @Override
     public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
