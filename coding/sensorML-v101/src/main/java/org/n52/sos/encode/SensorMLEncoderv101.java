@@ -285,30 +285,34 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                                     .addNewMember()
                                     .addNewProcess()
                                     .substitute(new QName(SensorMLConstants.NS_SML, SensorMLConstants.EN_SYSTEM),
-                                            SystemType.Factory.newInstance().schemaType());
+                                            SystemType.type);
                     final System smlSystem = (System) sml;
                     // TODO howTo without explicit setting
                     smlSystem.setFeatureOfInterest(smlSensorDesc.getFeatureOfInterest());
                     addAbstractProcessValues(xbSystem, smlSystem);
                     addSystemValues(xbSystem, smlSystem);
-                    // set position
-                    if (smlSystem.isSetPosition()) {
-                        xbSystem.setPosition(createPosition(smlSystem.getPosition()));
-                    }
-                    // set outputs
-                    if (smlSystem.isSetOutputs()) {
-                        xbSystem.setOutputs(createOutputs(smlSystem.getOutputs()));
-                    }
                 }
                 else if (sml instanceof ProcessModel)
                 {
+                	final ProcessModelType xbProcessModel =
+                			(ProcessModelType) xbSensorML
+                			.addNewMember()
+                			.addNewProcess()
+                			.substitute(new QName(
+                					SensorMLConstants.NS_SML,
+                					SensorMLConstants.EN_PROCESS_MODEL), 
+                					ProcessModelType.type);
+                	final ProcessModel smlProcessModel = (ProcessModel) sml;
+                	addAbstractProcessValues(xbProcessModel, smlProcessModel);
+                	addProcessModelValues(xbProcessModel, smlProcessModel);
+                	
                 	// FIXME continue implementation here
+                	// FIXME What is missing here?
                 	LOGGER.debug("CONTINUE IMPLEMENTATION HERE");
                 }
             }
         }
-        return sensorMLDoc; // projects/internal/2012_TideElbe --> Describe
-                            // Sensor DAO
+        return sensorMLDoc;
     }
 
     private ContactList createContactList(final List<SmlContact> contacts) {
