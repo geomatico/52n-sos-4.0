@@ -206,7 +206,6 @@ CREATE TABLE feature_of_interest (
   geom GEOMETRY NULL,
   description_xml TEXT NULL,
   url TEXT NULL,
-  UNIQUE (geom),
   UNIQUE (identifier,geom),
   UNIQUE (url),
   PRIMARY KEY(feature_of_interest_id)
