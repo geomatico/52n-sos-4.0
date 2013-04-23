@@ -76,7 +76,7 @@ public class AbstractSensorML extends SosProcedureDescription {
         super.setIdentifier(identifier);
     }
     
-    public void setIdentifierAndCreateIdentification(final String identifier, boolean createIdentification) {
+    public void setIdentifierAndCreateIdentification(final String identifier) {
         super.setIdentifier(identifier);
         if (isSetIdentifications()) {
             for (final SosSMLIdentifier identification : identifications) {
