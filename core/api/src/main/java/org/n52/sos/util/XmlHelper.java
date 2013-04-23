@@ -535,5 +535,39 @@ public final class XmlHelper {
 
         public abstract boolean shouldPass(XmlValidationError xve);
     }
+
+    /**
+     * Utility method to append the contents of the child docment to the end of the parent XmlObject.
+     * This is useful when dealing with elements without generated methods (like elements with xs:any)
+     * 
+     * @param parent Parent to append contents to
+     * @param childDoc Xml document containing contents to be appended
+     */
+    public static void append( XmlObject parent, XmlObject childDoc ){
+        XmlCursor parentCursor = parent.newCursor();
+        parentCursor.toEndToken();
+
+        XmlCursor childCursor = childDoc.newCursor();
+        childCursor.toFirstChild();
+        
+        childCursor.moveXml( parentCursor );
+        parentCursor.dispose();
+        childCursor.dispose();
+    }
     
+    /**
+     * Remove namespace declarations from an xml fragment (useful for moving all declarations to a document root
+     * @param x The fragment to localize
+     */
+    public static void removeNamespaces( XmlObject x ){
+        XmlCursor c = x.newCursor(); 
+        while( c.hasNextToken() ){
+            if( c.isNamespace() ){ 
+                c.removeXml(); 
+            } else {                
+                c.toNextToken(); 
+            } 
+        } 
+        c.dispose(); 
+    }    
 }
