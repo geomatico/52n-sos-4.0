@@ -127,6 +127,7 @@ public class HibernateObservationUtilitiesTest extends HibernateTestCase {
             hObservationConstellation.setObservableProperty(hObservableProperty);
             hObservationConstellation.setObservationType(hObservationType);
             hObservationConstellation.setDeleted(false);
+            hObservationConstellation.setHiddenChild(false);
 
             session.save(hProcedureDescriptionFormat);
             session.save(hProcedure);

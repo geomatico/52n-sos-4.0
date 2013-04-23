@@ -39,8 +39,8 @@ public static final String ID = "observationConstellationId";
     private Procedure procedure;
     private ObservationType observationType;
     private Offering offering;
-    private Boolean deleted;
-    private Boolean hiddenChild;
+    private Boolean deleted = false;
+    private Boolean hiddenChild = false;
     
     public ObservationConstellation() {
     }
@@ -110,6 +110,10 @@ public static final String ID = "observationConstellationId";
     
     public void setHiddenChild(final boolean hiddenChild) {
         this.hiddenChild = hiddenChild;
+    }
+    
+    public boolean getHiddenChild() {
+        return hiddenChild;
     }
     
     public boolean isHiddenChild() {

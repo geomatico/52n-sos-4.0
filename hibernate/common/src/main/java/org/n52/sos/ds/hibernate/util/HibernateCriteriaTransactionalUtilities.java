@@ -250,6 +250,7 @@ public class HibernateCriteriaTransactionalUtilities {
             obsConst.setProcedure(hProcedure);
             obsConst.setOffering(hOffering);
             obsConst.setDeleted(false);
+            obsConst.setHiddenChild(false);
             session.save(obsConst);
             session.flush();
             session.refresh(obsConst);
