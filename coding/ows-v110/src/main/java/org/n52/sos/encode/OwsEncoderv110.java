@@ -257,7 +257,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
      *
      * @throws CompositeOwsException * if an error occurs
      */
-    private OperationsMetadata encodeOperationsMetadata(OWSOperationsMetadata operationsMetadata)
+    protected OperationsMetadata encodeOperationsMetadata(OWSOperationsMetadata operationsMetadata)
             throws OwsExceptionReport {
         OperationsMetadata xbMeta =
                            OperationsMetadata.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
