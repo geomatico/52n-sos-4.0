@@ -44,6 +44,8 @@ public interface GMLConstants {
 
     /* element names used in GML */
 
+    String EN_DESCRIPTION = "description";
+    
     String EN_TIME_INSTANT = "TimeInstant";
 
     String EN_TIME_PERIOD = "TimePeriod";
@@ -103,6 +105,8 @@ public interface GMLConstants {
 
     String EN_POINT = "Point";
 
+    String EN_MULTIPOINT = "MultiPoint";
+    
     String EN_POLYGON = "Polygon";
 
     String EN_LOWER_CORNER = "lowerCorner";
@@ -115,10 +119,14 @@ public interface GMLConstants {
 	
     /* QNames for elements */
 
+    QName QN_DESCRIPTION = new QName(NS_GML, EN_DESCRIPTION, NS_GML_PREFIX);
+    
     QName QN_ENVELOPE = new QName(NS_GML, EN_ENVELOPE, NS_GML_PREFIX);
 
     QName QN_POINT = new QName(NS_GML, EN_POINT, NS_GML_PREFIX);
 
+    QName QN_MULTIPOINT = new QName(NS_GML, EN_MULTIPOINT, NS_GML_PREFIX);
+    
     QName QN_LINESTRING = new QName(NS_GML, EN_LINE_STRING, NS_GML_PREFIX);
 
     QName QN_POLYGON = new QName(NS_GML, EN_POLYGON, NS_GML_PREFIX);

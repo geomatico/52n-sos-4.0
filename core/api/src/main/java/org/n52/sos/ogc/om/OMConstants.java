@@ -92,6 +92,7 @@ public interface OMConstants {
     String EN_PROCEDURE = "procedure";
     String EN_PHENOMENON_TIME = "phenomenonTime";
     String EN_FEATURE_OF_INTEREST = "featureOfInterest";
+    String EN_PROCESS = "Process";
     // /////////////////////////////////////////////////////////////////////////////////
     // other constants
     String PHEN_SAMPLING_TIME = "http://www.opengis.net/def/property/OGC/0/SamplingTime";

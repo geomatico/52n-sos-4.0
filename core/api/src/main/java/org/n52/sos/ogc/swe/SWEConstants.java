@@ -60,6 +60,8 @@ public interface SWEConstants {
 
     String EN_DATA_ARRAY = "DataArray";
 
+    String EN_DATA_CHOICE = "DataChoice";
+    
     String EN_DATA_RECORD = "DataRecord";
 
     String EN_DELETE_SENSOR = "DeleteSensor";
@@ -69,6 +71,8 @@ public interface SWEConstants {
     String EN_DESCRIBE_SENSOR = "DescribeSensor";
 
     String EN_DESCRIBE_SENSOR_RESPONSE = "DescribeSensorResponse";
+    
+    String EN_ENVELOPE = "Envelope";    
 
     String EN_INSERT_SENSOR = "InsertSensor";
 
@@ -91,11 +95,12 @@ public interface SWEConstants {
     String EN_TIME = "Time";
 
     String EN_TIME_RANGE = "TimeRange";
-    String EN_ENVELOPE = "Envelope";
 
     String EN_UPDATE_SENSOR_DESCRIPTION = "UpdateSensorDescription";
 
     String EN_UPDATE_SENSOR_DESCRIPTION_RESPONSE = "UpdateSensorDescriptionResponse";
+
+    String EN_VECTOR = "Vector";    
 
     // QNames for elements
     QName QN_ABSTRACT_OFFERING = new QName(NS_SWES_20, EN_ABSTRACT_OFFERING, NS_SWES_PREFIX);
