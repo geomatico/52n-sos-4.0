@@ -29,7 +29,7 @@ import org.n52.sos.ogc.gml.GMLConstants.SortingOrder;
  * class represents the gml:sortByType
  * 
  */
-public class SosSortBy {
+public class SortBy {
 
     /** name of the property, by which should be sorted */
     private String property;
@@ -48,7 +48,7 @@ public class SosSortBy {
      *            sorting order (currently only ascending ('ASC') or descending
      *            ('DESC')
      */
-    public SosSortBy(String propertyp, SortingOrder orderp) {
+    public SortBy(String propertyp, SortingOrder orderp) {
         this.property = propertyp;
         this.order = orderp;
     }
@@ -56,7 +56,7 @@ public class SosSortBy {
     /**
      * default constructor
      */
-    public SosSortBy() {
+    public SortBy() {
     }
 
     /**
