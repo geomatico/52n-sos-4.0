@@ -194,6 +194,21 @@ public class HibernateProcedureConverterTest {
 		assertThat(shortNameIdentifierOf(pModel), is(PROCEDURE_IDENTIFIER));
 	}
 	
+	@Test public void
+	should_set_outputs_for_smlProcessModel()
+	throws OwsExceptionReport {
+		final ProcessModel pModel = setupProcessModel();
+		assertThat(pModel.getOutputs().size(), is(greaterThanOrEqualTo(2)));
+		assertThat(outputDefinition(0,pModel), is(OBSERVABLE_PROPERTIES[0]));
+		assertThat(outputDefinition(1,pModel), is(OBSERVABLE_PROPERTIES[1]));
+	}
+	
+	private String outputDefinition(final int i,
+			final ProcessModel pModel)
+	{
+		return pModel.getOutputs().get(i).getIoValue().getDefinition();
+	}
+
 	private String shortNameIdentifierOf(final ProcessModel pModel)
 	{
 		return getIdentifier(pModel, "shortName", "urn:ogc:def:identifier:OGC:1.0:shortname");

@@ -166,13 +166,7 @@ public class HibernateProcedureConverter {
         return sosProcedureDescription;
     }
 
-	/**
-	 * 
-	 * @param procedure
-	 * @param observableProperties
-	 * @return
-	 */
-	private ProcessModel createSmlProcessModel(final Procedure procedure)
+	private ProcessModel createSmlProcessModel(final Procedure procedure) throws OwsExceptionReport
 	{
 		final ProcessModel smlProcessModel = new ProcessModel();
 		
@@ -187,6 +181,8 @@ public class HibernateProcedureConverter {
 		smlProcessModel.setIdentifications(createIdentifications(procedure.getIdentifier()));
 		
 		smlProcessModel.setMethod(createMethod(procedure));
+		
+		smlProcessModel.setOutputs(createOutputs(procedure, observableProperties));
 		
 		// FIXME Eike: continue development here!
 		
