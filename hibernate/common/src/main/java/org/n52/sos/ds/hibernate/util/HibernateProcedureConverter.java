@@ -53,6 +53,7 @@ import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.XmlDecodingException;
+import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceProvider;
 import org.n52.sos.ogc.sensorML.ProcessModel;
@@ -170,19 +171,28 @@ public class HibernateProcedureConverter {
 	 * @param observableProperties
 	 * @return
 	 */
-	private  ProcessModel createSmlProcessModel(final Procedure procedure)
+	private ProcessModel createSmlProcessModel(final Procedure procedure)
 	{
 		// TODO Auto-generated method "createSmlProcessModel" stub generated on 10.04.2013 around 12:36:39 by eike
 		final ProcessModel smlProcessModel = new ProcessModel();
 		
 		final String[] observableProperties = getObservablePropertiesForProcedure(procedure.getIdentifier());
+	
+		smlProcessModel.setDescriptions(createDescriptions(procedure, observableProperties));
 		
+		smlProcessModel.setNames(createNames(procedure));
 		
+		// FIXME Eike: continue development here!!!!
 		
 		return smlProcessModel;
 	}
 
-	private  org.n52.sos.ogc.sensorML.System createSmlSystem(final Procedure procedure) throws OwsExceptionReport
+	private List<CodeType> createNames(final Procedure procedure)
+	{
+		return CollectionHelper.asList(new CodeType(procedure.getIdentifier()));
+	}
+
+	private org.n52.sos.ogc.sensorML.System createSmlSystem(final Procedure procedure) throws OwsExceptionReport
 	{
 		final System smlSystem = new System();
 		
@@ -227,7 +237,7 @@ public class HibernateProcedureConverter {
 		return smlSystem;
 	}
 
-	private  List<SosSMLIo<?>> createOutputs(final Procedure procedure, final String[] observableProperties) throws OwsExceptionReport
+	private List<SosSMLIo<?>> createOutputs(final Procedure procedure, final String[] observableProperties) throws OwsExceptionReport
 	{
 		final ArrayList<SosSMLIo<?>> outputs = new ArrayList<SosSMLIo<?>>(observableProperties.length);
 		int i = 1;
@@ -294,12 +304,12 @@ public class HibernateProcedureConverter {
 		return outputs;
 	}
 
-	private  void logTypeNotSupported(final Class clazz)
+	private void logTypeNotSupported(final Class clazz)
 	{
 		LOGGER.debug("Type '{}' is not supported by the current implementation",clazz.getName());
 	}
 
-	private  Observation getExampleObservation(final String identifier,
+	protected Observation getExampleObservation(final String identifier,
 			final String observableProperty) throws OwsExceptionReport
 	{
 		final HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
@@ -333,7 +343,7 @@ public class HibernateProcedureConverter {
 		}
 	}
 
-	private  SosSMLPosition createPosition(final Procedure procedure)
+	private SosSMLPosition createPosition(final Procedure procedure)
 	{
 		SosSMLPosition smlPosition = null;
 		smlPosition = new SosSMLPosition();
@@ -364,7 +374,7 @@ public class HibernateProcedureConverter {
 		return smlPosition;
 	}
 	
-	private  List<SosSweCoordinate<?>> createCoordinatesForPosition(final Object longitude, final Object latitude,
+	private List<SosSweCoordinate<?>> createCoordinatesForPosition(final Object longitude, final Object latitude,
             final Object oAltitude) {
                 final List<SosSweCoordinate<?>> sweCoordinates = new ArrayList<SosSweCoordinate<?>>(3);
                 if (latitude instanceof Double)
@@ -395,19 +405,10 @@ public class HibernateProcedureConverter {
                 return sweCoordinates;
     }
 
-	private  List<SmlContact> createContactFromServiceContact()
+	private List<SmlContact> createContactFromServiceContact()
 	{
 		final SmlResponsibleParty smlRespParty = new SmlResponsibleParty();
-		SosServiceProvider serviceProvider = null;
-		try
-		{
-			serviceProvider = Configurator.getInstance().getServiceProvider();
-		} 
-		catch (final OwsExceptionReport e) {
-			LOGGER.error(String.format("Exception thrown: %s",
-						e.getMessage()),
-					e);
-		}
+		final SosServiceProvider serviceProvider = getServiceProvider();
 		if (serviceProvider == null)
 		{
 			return null;
@@ -425,7 +426,22 @@ public class HibernateProcedureConverter {
 		return CollectionHelper.list((SmlContact)smlRespParty);
 	}
 
-	private  void addClassifier(final System smlSystem)
+	protected SosServiceProvider getServiceProvider()
+	{
+		SosServiceProvider serviceProvider = null;
+		try
+		{
+			serviceProvider = Configurator.getInstance().getServiceProvider();
+		} 
+		catch (final OwsExceptionReport e) {
+			LOGGER.error(String.format("Exception thrown: %s",
+						e.getMessage()),
+					e);
+		}
+		return serviceProvider;
+	}
+
+	private void addClassifier(final System smlSystem)
 	{
 		if (!generationSettings().getClassifierIntendedApplicationValue().isEmpty())
 		{
@@ -443,7 +459,7 @@ public class HibernateProcedureConverter {
 		}
 	}
 
-	private  List<String> createDescriptions(final Procedure procedure,
+	private List<String> createDescriptions(final Procedure procedure,
 			final String[] observableProperties)
 	{
 		return CollectionHelper.list(String.format(generationSettings().getDescriptionTemplate(),
@@ -452,7 +468,7 @@ public class HibernateProcedureConverter {
 				StringHelper.join(",", CollectionHelper.list(observableProperties))));
 	}
 
-	private  List<SosSMLIdentifier> createIdentifications(final String identifier)
+	private List<SosSMLIdentifier> createIdentifications(final String identifier)
 	{
 		// get long and short name definition from misc settings
 		final SosSMLIdentifier idShortName = new SosSMLIdentifier("shortname", generationSettings().getIdentifierShortNameDefinition(), identifier);
@@ -460,17 +476,17 @@ public class HibernateProcedureConverter {
 		return CollectionHelper.list(idLongName,idShortName);
 	}
 
-	private  ServiceConfiguration getServiceConfig()
+	protected ServiceConfiguration getServiceConfig()
 	{
 		return Configurator.getInstance().getServiceConfiguration();
 	}
 	
-	private  SensorDescriptionGenerationSettings generationSettings()
+	private SensorDescriptionGenerationSettings generationSettings()
 	{
 		return SensorDescriptionGenerationSettings.getInstance();
 	}
 
-	private  List<String> createKeywordsList(final Procedure procedure,
+	private List<String> createKeywordsList(final Procedure procedure,
 			final String[] observableProperties)
 	{
 		final List<String> keywords = CollectionHelper.list();
@@ -489,12 +505,12 @@ public class HibernateProcedureConverter {
 		return keywords;
 	}
 
-	private  String[] getObservablePropertiesForProcedure(final String procedureIdentifier)
+	protected String[] getObservablePropertiesForProcedure(final String procedureIdentifier)
 	{
 		return Configurator.getInstance().getCache().getObservablePropertiesForProcedure(procedureIdentifier).toArray(new String[0]);
 	}
 
-	private  SosProcedureDescription createProcedureDescriptionFromXml(final String procedureIdentifier,
+	private SosProcedureDescription createProcedureDescriptionFromXml(final String procedureIdentifier,
 			final String outputFormat,
 			final String xmlDoc) throws XmlException
 	{
@@ -512,7 +528,7 @@ public class HibernateProcedureConverter {
 		return sosProcedureDescription;
 	}
 
-	private  SosProcedureDescription createProcedureDescriptionFromFile(final String procedureIdentifier,
+	private SosProcedureDescription createProcedureDescriptionFromFile(final String procedureIdentifier,
 			final String outputFormat,
 			final String filename,
 			final String descriptionFormat) throws OwsExceptionReport, XmlException, IOException
@@ -544,7 +560,7 @@ public class HibernateProcedureConverter {
 		return sosProcedureDescription;
 	}
 	
-    private  InputStream getDescribeSensorDocumentAsStream(String filename) {
+    private InputStream getDescribeSensorDocumentAsStream(String filename) {
         final StringBuilder builder = new StringBuilder();
         if (filename.startsWith("standard")) {
             filename = filename.replace("standard", "");
