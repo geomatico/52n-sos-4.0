@@ -65,6 +65,7 @@ import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
+import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -186,7 +187,9 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
     private void parseAbstractProcess(final AbstractProcessType xbAbstractProcess,
             final AbstractProcess abstractProcess) throws OwsExceptionReport {
         if (xbAbstractProcess.getIdentificationArray() != null) {
-            abstractProcess.setIdentifications(parseIdentification(xbAbstractProcess.getIdentificationArray()));
+        	IdentificationsAndIdentifier idsAndId = parseIdentifications(xbAbstractProcess.getIdentificationArray());
+        	abstractProcess.setIdentifier(idsAndId.getIdentifier());
+            abstractProcess.setIdentifications(idsAndId.getIdentifications());
             final List<Integer> identificationsToRemove =
                     checkIdentificationsForRemoval(xbAbstractProcess.getIdentificationArray());
             for (final Integer integer : identificationsToRemove) {
@@ -318,24 +321,60 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
         return processMethod;
     }
 
+    private class IdentificationsAndIdentifier{
+    	private final List<SosSMLIdentifier> identifications;
+    	private String identifier;
+    	
+    	public IdentificationsAndIdentifier( int identificationsLength ){
+    		identifications = new ArrayList<SosSMLIdentifier>( identificationsLength );
+    	}
+		public String getIdentifier() {
+			return identifier;
+		}		
+		public void setIdentifier(String identifier) {
+			this.identifier = identifier;
+		}
+		public List<SosSMLIdentifier> getIdentifications() {
+			return identifications;
+		}
+    }
+    
     /**
      * Parses the identification
      * 
      * @param identificationArray
      *            XML identification
-     * @return SOS identification
+     * @return SOS identifications and identifier
      */
-    private List<SosSMLIdentifier> parseIdentification(final Identification[] identificationArray) {
-        final List<SosSMLIdentifier> sosIdentifiers = new ArrayList<SosSMLIdentifier>(identificationArray.length);
+    private IdentificationsAndIdentifier parseIdentifications(final Identification[] identificationArray) {
+    	final IdentificationsAndIdentifier idsAndId = new IdentificationsAndIdentifier(identificationArray.length);
         for (final Identification xbIdentification : identificationArray) {
             for (final Identifier xbIdentifier : xbIdentification.getIdentifierList().getIdentifierArray()) {
-                sosIdentifiers.add(new SosSMLIdentifier(xbIdentifier.getName(),
-                        xbIdentifier.getTerm().getDefinition(), xbIdentifier.getTerm().getValue()));
+            	SosSMLIdentifier identification = new SosSMLIdentifier(xbIdentifier.getName(),
+                        xbIdentifier.getTerm().getDefinition(), xbIdentifier.getTerm().getValue());
+            	idsAndId.getIdentifications().add(identification);
+            	if(isIdentificationProcedureIdentifier(identification)){
+            		idsAndId.setIdentifier(identification.getValue());
+            	}
             }
         }
-        return sosIdentifiers;
+        return idsAndId;
     }
 
+    /**
+     * Determine if an SosSMLIdentifier is the unique identifier for a procedure
+     * @param identification SosSMLIdentifier to example for unique identifier
+     * @return whether the SosSMLIdentifier contains the unique identifier
+     */
+    protected boolean isIdentificationProcedureIdentifier(final SosSMLIdentifier identification) {
+    	return (identification.getName() != null && identification.getName().equals(OGCConstants.URN_UNIQUE_IDENTIFIER_END))
+          || (identification.getDefinition() != null && (identification.getDefinition().equals(
+        		  OGCConstants.URN_UNIQUE_IDENTIFIER)
+                  || identification.getDefinition().equals(OGCConstants.URN_IDENTIFIER_IDENTIFICATION) || (identification
+                  .getDefinition().startsWith(OGCConstants.URN_UNIQUE_IDENTIFIER_START) && identification.getDefinition()
+                  .contains(OGCConstants.URN_UNIQUE_IDENTIFIER_END))));
+    }    
+    
     /**
      * Parses the classification
      * 

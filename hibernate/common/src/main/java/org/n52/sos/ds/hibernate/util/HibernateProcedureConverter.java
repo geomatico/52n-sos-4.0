@@ -53,6 +53,7 @@ import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.XmlDecodingException;
+import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceProvider;
@@ -175,8 +176,8 @@ public class HibernateProcedureConverter {
 		smlProcessModel.setDescriptions(createDescriptions(procedure, observableProperties));
 		
 		smlProcessModel.setNames(createNames(procedure));
-		
-		smlProcessModel.setIdentifierAndCreateIdentification(procedure.getIdentifier());
+
+		smlProcessModel.setIdentifier(procedure.getIdentifier());
 		
 		smlProcessModel.setIdentifications(createIdentifications(procedure.getIdentifier()));
 		
@@ -479,9 +480,10 @@ public class HibernateProcedureConverter {
 	private List<SosSMLIdentifier> createIdentifications(final String identifier)
 	{
 		// get long and short name definition from misc settings
+		final SosSMLIdentifier idUniqueId = new SosSMLIdentifier( OGCConstants.URN_UNIQUE_IDENTIFIER_END, OGCConstants.URN_UNIQUE_IDENTIFIER, identifier);
 		final SosSMLIdentifier idShortName = new SosSMLIdentifier("shortname", generationSettings().getIdentifierShortNameDefinition(), identifier);
 		final SosSMLIdentifier idLongName = new SosSMLIdentifier("longname", generationSettings().getIdentifierLongNameDefinition(), identifier);
-		return CollectionHelper.list(idLongName,idShortName);
+		return CollectionHelper.list(idUniqueId,idLongName,idShortName);
 	}
 
 	protected ServiceConfiguration getServiceConfig()

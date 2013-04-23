@@ -60,33 +60,9 @@ public class AbstractSensorML extends SosProcedureDescription {
 
     private String history;
 
-    private String getProcedureIdentifierFromIdentifications() {
-        if (isSetIdentifications()) {
-            for (final SosSMLIdentifier identification : identifications) {
-                if (isIdentificationHoldingAnProcedureIdentifier(identification)) {
-                    return identification.getValue();
-                }
-            }
-        }
-        return null;
-    }
-
     @Override
     public void setIdentifier(final String identifier) {
         super.setIdentifier(identifier);
-    }
-    
-    public void setIdentifierAndCreateIdentification(final String identifier) {
-        super.setIdentifier(identifier);
-        if (isSetIdentifications()) {
-            for (final SosSMLIdentifier identification : identifications) {
-                if (isIdentificationHoldingAnProcedureIdentifier(identification)) {
-                    identification.setValue(identifier);
-                    return;
-                }
-            }
-        }
-        identifications.add(new SosSMLIdentifier(URN_UNIQUE_IDENTIFIER_END, URN_UNIQUE_IDENTIFIER, identifier));
     }
 
     public List<String> getKeywords() {
@@ -106,10 +82,6 @@ public class AbstractSensorML extends SosProcedureDescription {
             this.identifications = identifications;
         } else {
             this.identifications.addAll(identifications);
-        }
-        final String identifier = getProcedureIdentifierFromIdentifications();
-        if (!isSetIdentifier() && identifier != null && !identifier.isEmpty()) {
-            super.setIdentifier(identifier);
         }
     }
 
@@ -240,15 +212,6 @@ public class AbstractSensorML extends SosProcedureDescription {
     public boolean isSetOffering() {
         List<SosOffering> offeringIdentifiers = getOfferingIdentifiers();
         return offeringIdentifiers != null && !offeringIdentifiers.isEmpty();
-    }
-
-    private boolean isIdentificationHoldingAnProcedureIdentifier(final SosSMLIdentifier identification) {
-        return (identification.getName() != null && identification.getName().equals(URN_UNIQUE_IDENTIFIER_END))
-                || (identification.getDefinition() != null && (identification.getDefinition().equals(
-                        URN_UNIQUE_IDENTIFIER)
-                        || identification.getDefinition().equals(URN_IDENTIFIER_IDENTIFICATION) || (identification
-                        .getDefinition().startsWith(URN_UNIQUE_IDENTIFIER_START) && identification.getDefinition()
-                        .contains(URN_UNIQUE_IDENTIFIER_END))));
     }
 
     private boolean isIdentificationHoldingAnOfferingId(final SosSMLIdentifier identification) {
