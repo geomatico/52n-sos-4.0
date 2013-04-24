@@ -282,7 +282,7 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
         return xmlObject;
     }
     
-    private XmlObject createGetObservationResponseDocument(GetObservationResponse response) throws OwsExceptionReport {
+    protected XmlObject createGetObservationResponseDocument(GetObservationResponse response) throws OwsExceptionReport {
 
     	// create ObservationCollectionDocument and add Collection
         ObservationCollectionDocument xb_obsColDoc = ObservationCollectionDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
