@@ -299,6 +299,7 @@ public class HibernateObservationUtilities {
                     sosObservation.setSetId(hObservation.getSetId());
                 }
                 observationCollection.add(sosObservation);
+                //TODO reduce memory usage by evicting object session.evict(hObservation);, check for ScrollableResult/Batching/FetchingSize
             }
         }
         return observationCollection;
