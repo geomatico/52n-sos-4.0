@@ -58,10 +58,13 @@ import net.opengis.sensorML.x101.IdentificationDocument.Identification.Identifie
 import net.opengis.sensorML.x101.InputsDocument.Inputs;
 import net.opengis.sensorML.x101.InputsDocument.Inputs.InputList;
 import net.opengis.sensorML.x101.IoComponentPropertyType;
+import net.opengis.sensorML.x101.MethodPropertyType;
 import net.opengis.sensorML.x101.OutputsDocument.Outputs;
 import net.opengis.sensorML.x101.OutputsDocument.Outputs.OutputList;
 import net.opengis.sensorML.x101.PersonDocument.Person;
 import net.opengis.sensorML.x101.PositionDocument.Position;
+import net.opengis.sensorML.x101.ProcessMethodType;
+import net.opengis.sensorML.x101.ProcessMethodType.Rules.RulesDefinition;
 import net.opengis.sensorML.x101.ProcessModelDocument;
 import net.opengis.sensorML.x101.ProcessModelType;
 import net.opengis.sensorML.x101.ResponsiblePartyDocument.ResponsibleParty;
@@ -86,6 +89,7 @@ import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
 import org.n52.sos.ogc.sensorML.AbstractSensorML;
+import org.n52.sos.ogc.sensorML.ProcessMethod;
 import org.n52.sos.ogc.sensorML.ProcessModel;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
@@ -124,6 +128,7 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.HTTPConstants.StatusCode;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.XmlHelper;
@@ -274,6 +279,32 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                     .withMessage("The sensor description type is not supported by this service!");
         }
 
+    }
+    
+    private XmlObject createProcessDescription(final AbstractProcess sensorDesc) throws OwsExceptionReport {
+    	// TODO Review: System -> return doc; ProcessModel -> return type
+    	if (sensorDesc instanceof System) {
+    		final System system = (System) sensorDesc;
+    		final SystemDocument xbSystemDoc =
+    				SystemDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+    		final SystemType xbSystem = xbSystemDoc.addNewSystem();
+    		addAbstractProcessValues(xbSystem, system);
+    		addSystemValues(xbSystem, system);
+    		return xbSystem;
+    	} else if (sensorDesc instanceof ProcessModel) {
+    		// TODO: set values
+    		final ProcessModel processModel = (ProcessModel) sensorDesc;
+    		final ProcessModelDocument xbProcessModelDoc =
+    				ProcessModelDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+    		final ProcessModelType xbProcessModel = xbProcessModelDoc.addNewProcessModel();
+    		addAbstractProcessValues(xbProcessModel, processModel);
+    		addProcessModelValues(xbProcessModel, processModel);
+    		return xbProcessModel;
+    	} else {
+    		throw new NoApplicableCodeException()
+    		.withMessage("The sensor description type is not supported by this service!")
+    		.setStatus(StatusCode.INTERNAL_SERVER_ERROR);
+    	}
     }
 
     private XmlObject createSensorMLDescription(final SensorML smlSensorDesc) throws OwsExceptionReport {
@@ -432,30 +463,6 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         return "";
     }
 
-    private XmlObject createProcessDescription(final AbstractProcess sensorDesc) throws OwsExceptionReport {
-        if (sensorDesc instanceof System) {
-            final System system = (System) sensorDesc;
-            final SystemDocument xbSystemDoc =
-                    SystemDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-            final SystemType xbSystem = xbSystemDoc.addNewSystem();
-            addAbstractProcessValues(xbSystem, system);
-            addSystemValues(xbSystem, system);
-            return xbSystemDoc;
-        } else if (sensorDesc instanceof ProcessModel) {
-            // TODO: set values
-            final ProcessModel processModel = (ProcessModel) sensorDesc;
-            final ProcessModelDocument xbProcessModelDoc =
-                    ProcessModelDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-            final ProcessModelType xbProcessModel = xbProcessModelDoc.addNewProcessModel();
-            addAbstractProcessValues(xbProcessModel, processModel);
-            addProcessModelValues(xbProcessModel, processModel);
-            return xbProcessModel;
-        } else {
-            throw new NoApplicableCodeException()
-                    .withMessage("The sensor description type is not supported by this service!");
-        }
-    }
-
     // TODO refactor/rename
     private void addAbstractProcessValues(final AbstractProcessType abstractProcess,
             final AbstractProcess sosAbstractProcess) throws OwsExceptionReport {
@@ -545,9 +552,23 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         if (sosProcessModel.isSetOutputs()) {
             processModel.setOutputs(createOutputs(sosProcessModel.getOutputs()));
         }
+        // set method
+        processModel.setMethod(createMethod(sosProcessModel.getMethod()));
     }
 
-    /**
+	private MethodPropertyType createMethod(final ProcessMethod method)
+	{
+		final MethodPropertyType xbMethod = MethodPropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+		final ProcessMethodType xbProcessMethod = xbMethod.addNewProcessMethod();
+		final RulesDefinition xbRulesDefinition = xbProcessMethod.addNewRules().addNewRulesDefinition();
+		if (method.getRulesDefinition().isSetDescription())
+		{
+			xbRulesDefinition.addNewDescription().setStringValue(method.getRulesDefinition().getDescription());
+		}
+		return xbMethod;
+	}
+
+	/**
      * Creates the identification section of the SensorML description.
      * 
      * @param xbIdentification
