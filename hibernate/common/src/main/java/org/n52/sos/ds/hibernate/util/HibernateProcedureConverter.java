@@ -59,6 +59,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceProvider;
 import org.n52.sos.ogc.sensorML.ProcessMethod;
 import org.n52.sos.ogc.sensorML.ProcessModel;
+import org.n52.sos.ogc.sensorML.RulesDefinition;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.SmlContact;
@@ -181,7 +182,7 @@ public class HibernateProcedureConverter {
 		
 		smlProcessModel.setIdentifications(createIdentifications(procedure.getIdentifier()));
 		
-		smlProcessModel.setMethod(createMethod(procedure));
+		smlProcessModel.setMethod(createMethod(procedure,observableProperties));
 		
 		smlProcessModel.setOutputs(createOutputs(procedure, observableProperties));
 		
@@ -190,10 +191,22 @@ public class HibernateProcedureConverter {
 		return smlProcessModel;
 	}
 
-	private ProcessMethod createMethod(final Procedure procedure)
+	private ProcessMethod createMethod(final Procedure procedure, final String[] observableProperties)
 	{
-		final ProcessMethod pM = new ProcessMethod();
+		final ProcessMethod pM = new ProcessMethod(createRulesDefinition(procedure,observableProperties));
 		return pM;
+	}
+
+	private RulesDefinition createRulesDefinition(final Procedure procedure,
+			final String[] observableProperties)
+	{
+		final RulesDefinition rD = new RulesDefinition();
+		final String description = String.format(
+				generationSettings().getProcessMethodRulesDefinitionDescriptionTemplate(),
+				procedure.getIdentifier(),
+				StringHelper.join(",", CollectionHelper.list(observableProperties)));
+		rD.setDescription(description);
+		return rD;
 	}
 
 	private List<CodeType> createNames(final Procedure procedure)
@@ -313,7 +326,7 @@ public class HibernateProcedureConverter {
 		return outputs;
 	}
 
-	private void logTypeNotSupported(final Class clazz)
+	private void logTypeNotSupported(final Class<?> clazz)
 	{
 		LOGGER.debug("Type '{}' is not supported by the current implementation",clazz.getName());
 	}

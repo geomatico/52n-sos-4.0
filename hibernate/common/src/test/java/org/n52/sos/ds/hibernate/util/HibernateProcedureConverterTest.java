@@ -26,7 +26,7 @@ package org.n52.sos.ds.hibernate.util;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.number.OrderingComparison.greaterThanOrEqualTo;
+import static org.hamcrest.number.OrderingComparison.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -45,6 +45,7 @@ import org.n52.sos.ogc.ows.SosServiceProvider;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
 import org.n52.sos.ogc.sensorML.ProcessMethod;
 import org.n52.sos.ogc.sensorML.ProcessModel;
+import org.n52.sos.ogc.sensorML.RulesDefinition;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.System;
@@ -201,6 +202,15 @@ public class HibernateProcedureConverterTest {
 		assertThat(pModel.getOutputs().size(), is(greaterThanOrEqualTo(2)));
 		assertThat(outputDefinition(0,pModel), is(OBSERVABLE_PROPERTIES[0]));
 		assertThat(outputDefinition(1,pModel), is(OBSERVABLE_PROPERTIES[1]));
+	}
+	
+	@Test public void
+	should_set_processMethod_description_for_smlProcessModel()
+	throws OwsExceptionReport {
+		final ProcessModel pModel = setupProcessModel();
+		assertThat(pModel.getMethod().getRulesDefinition(), instanceOf(RulesDefinition.class));
+		assertThat(pModel.getMethod().getRulesDefinition().getDescription(), instanceOf(String.class)); // FIXME how to use assertThat with boolean values
+		assertThat(pModel.getMethod().getRulesDefinition().getDescription().length(), is(greaterThan(0)));
 	}
 	
 	private String outputDefinition(final int i,
