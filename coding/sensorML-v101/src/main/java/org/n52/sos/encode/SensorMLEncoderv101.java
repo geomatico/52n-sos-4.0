@@ -435,20 +435,6 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         return "";
     }
 
-    private Classifier[] createClassifierArray(final List<SosSMLClassifier> classifications) {
-        final Classifier[] xbClassifier = new Classifier[classifications.size()];
-        for (int i = 0; i < xbClassifier.length; i++) {
-            if (classifications.get(i) != null) {
-                xbClassifier[i] = Classifier.Factory.newInstance();
-                xbClassifier[i].setName(classifications.get(i).getName());
-                final Term term = xbClassifier[i].addNewTerm();
-                term.setDefinition(classifications.get(i).getDefinition());
-                term.setValue(classifications.get(i).getValue());
-            }
-        }
-        return xbClassifier;
-    }
-
     private XmlObject createProcessDescription(final AbstractProcess sensorDesc) throws OwsExceptionReport {
         if (sensorDesc instanceof System) {
             final System system = (System) sensorDesc;
@@ -889,7 +875,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         if (encoder != null) {
             final XmlObject encoded = (XmlObject) encoder.encode(sosSweData);
             if (sosSweData instanceof SosSweAbstractSimpleType) {
-                final SosSweAbstractSimpleType<?> sosSweSimpleType = (SosSweAbstractSimpleType) sosSweData;
+                final SosSweAbstractSimpleType<?> sosSweSimpleType = (SosSweAbstractSimpleType<?>) sosSweData;
                 switch (sosSweSimpleType.getSimpleType()) {
                 case Boolean:
                     xbField.addNewBoolean().set(encoded);
