@@ -29,7 +29,7 @@ public class CodeType {
     
     private String codeSpace = "";
 
-    public CodeType(String value) {
+    public CodeType(final String value) {
         this.value = value;
     }
 
@@ -41,11 +41,11 @@ public class CodeType {
         return codeSpace;
     }
 
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
     }
 
-    public void setCodeSpace(String codeSpace) {
+	public void setCodeSpace(final String codeSpace) {
         this.codeSpace = codeSpace;
     }
     
@@ -57,4 +57,9 @@ public class CodeType {
         return codeSpace != null && !codeSpace.isEmpty();
     }
 
+    @Override
+    public String toString()
+    {
+    	return String.format("CodeType [value=%s, codeSpace=%s]", value, codeSpace);
+    }
 }
