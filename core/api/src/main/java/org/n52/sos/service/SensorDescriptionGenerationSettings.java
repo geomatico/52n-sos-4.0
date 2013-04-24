@@ -65,6 +65,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 	public static final String LAT_LONG_UOM = "sensorDescGen.LAT_LONG_UOM";
 	public static final String ALTITUDE_UOM = "sensorDescGen.ALTITUDE_UOM";
 	public static final String USE_SERVICE_CONTACT_AS_SENSOR_CONTACT = "sensorDescGen.SML_GENERATION_USE_SERVICE_CONTACT_AS_SENSOR_CONTACT";
+	public static final String PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE = "sensorDescGen.PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE";
 
 	private static final StringSettingDefinition IDENTIFIER_LONG_NAME_DEFINITION_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
@@ -161,6 +162,17 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 	.setDefaultValue("m")
 	.setTitle("Altitude UOM")
 	.setDescription("The UOM for the altitude value of spatial procedures (e.g. sml:System). Something like 'm'.");
+	
+	private static final StringSettingDefinition PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE_DEFINITION = new StringSettingDefinition()
+	.setGroup(GROUP)
+	.setOrder(11)
+	.setKey(PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE)
+	.setDefaultValue("The procedure '%s' generates the following output(s): '%s'. The input(s) is/are unknown (this description is generated).")
+	.setTitle("Description Template for the rules definition")
+	.setDescription("The template used to generate a description using the procedure identifier and the observed properties. " +
+			"The template MUST contain '%s' two times. The first one will be replaced with the sensor id and" +
+			" the second with a comma separated list of properties: e.g. <i>The procedure '%s' generates the following output(s): '%s'. The " +
+			"input(s) is/are unknown (this description is generated).</i>.");
 
 	private static final Set<? extends SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
 			IDENTIFIER_LONG_NAME_DEFINITION_DEFINITION,
@@ -173,8 +185,10 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 			CLASSIFIER_SENSOR_TYPE_VALUE_DEFINITION,
 			USE_SERVICE_CONTACT_AS_SENSOR_CONTACT_DEFINITION,
 			LAT_LONG_UOM_DEFINITION,
-			ALTITUDE_UOM_DEFINITION
+			ALTITUDE_UOM_DEFINITION,
+			PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE_DEFINITION
 			);
+
 
 
 	private static SensorDescriptionGenerationSettings instance = null;
@@ -193,7 +207,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 
 	private String altitudeUom;
 
-	private String longitudeUom;
+	private String processMethodRulesDefinitionDescriptionTemplate;
 
 	public static SensorDescriptionGenerationSettings getInstance()
 	{
@@ -344,6 +358,21 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 	public String getAltitudeUom()
 	{
 		return altitudeUom;
+	}
+
+	@Setting(PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE)
+	public void setProcessMethodRulesDefinitionDescriptionTemplate(final String processMethodRulesDefinitionDescriptionTemplate)
+	{
+		Validation.notNullOrEmpty(PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE, processMethodRulesDefinitionDescriptionTemplate);
+		this.processMethodRulesDefinitionDescriptionTemplate = processMethodRulesDefinitionDescriptionTemplate;
+	}
+
+	/**
+	 * @return Depends on configuration. Something like:<br>"<i>The procedure '%s' generates the following outputs: '%s'. The inputs are unknown (this description is generated).</i>"
+	 */
+	public String getProcessMethodRulesDefinitionDescriptionTemplate()
+	{
+		return processMethodRulesDefinitionDescriptionTemplate;
 	}
 
 }
