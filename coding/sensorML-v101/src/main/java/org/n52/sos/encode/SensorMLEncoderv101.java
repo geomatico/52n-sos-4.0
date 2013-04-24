@@ -235,9 +235,9 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                     if (sensorDesc instanceof SensorML) {
                         for (final AbstractProcess absProcess : ((SensorML) sensorDesc).getMembers()) {
                             // TODO check and remove
-//                            absProcess.setFeatureOfInterest(sensorDesc.getFeatureOfInterest());
-//                            absProcess.setParentProcedures(sensorDesc.getParentProcedures());
-//                            absProcess.setChildProcedures(sensorDesc.getChildProcedures());
+                            // absProcess.setFeatureOfInterest(sensorDesc.getFeatureOfInterest());
+                            // absProcess.setParentProcedures(sensorDesc.getParentProcedures());
+                            // absProcess.setChildProcedures(sensorDesc.getChildProcedures());
                             addAbstractProcessValues(member.getProcess(), absProcess);
                             if (member.getProcess() instanceof SystemType && absProcess instanceof System) {
                                 addSystemValues((SystemType) member.getProcess(), (System) absProcess);
@@ -294,28 +294,25 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                                             SystemType.type);
                     final System smlSystem = (System) sml;
                     // TODO howTo without explicit setting
-                 // TODO check and remove
-//                    smlSystem.setFeatureOfInterest(smlSensorDesc.getFeatureOfInterest());
+                    // TODO check and remove
+                    // smlSystem.setFeatureOfInterest(smlSensorDesc.getFeatureOfInterest());
                     addAbstractProcessValues(xbSystem, smlSystem);
                     addSystemValues(xbSystem, smlSystem);
-                }
-                else if (sml instanceof ProcessModel)
-                {
-                	final ProcessModelType xbProcessModel =
-                			(ProcessModelType) xbSensorML
-                			.addNewMember()
-                			.addNewProcess()
-                			.substitute(new QName(
-                					SensorMLConstants.NS_SML,
-                					SensorMLConstants.EN_PROCESS_MODEL), 
-                					ProcessModelType.type);
-                	final ProcessModel smlProcessModel = (ProcessModel) sml;
-                	addAbstractProcessValues(xbProcessModel, smlProcessModel);
-                	addProcessModelValues(xbProcessModel, smlProcessModel);
-                	
-                	// FIXME continue implementation here
-                	// FIXME What is missing here?
-                	LOGGER.debug("CONTINUE IMPLEMENTATION HERE");
+                } else if (sml instanceof ProcessModel) {
+                    final ProcessModelType xbProcessModel =
+                            (ProcessModelType) xbSensorML
+                                    .addNewMember()
+                                    .addNewProcess()
+                                    .substitute(
+                                            new QName(SensorMLConstants.NS_SML, SensorMLConstants.EN_PROCESS_MODEL),
+                                            ProcessModelType.type);
+                    final ProcessModel smlProcessModel = (ProcessModel) sml;
+                    addAbstractProcessValues(xbProcessModel, smlProcessModel);
+                    addProcessModelValues(xbProcessModel, smlProcessModel);
+
+                    // FIXME continue implementation here
+                    // FIXME What is missing here?
+                    LOGGER.debug("CONTINUE IMPLEMENTATION HERE");
                 }
             }
         }
@@ -469,8 +466,9 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         // set description
         if (sosAbstractProcess.isSetDescriptions()) {
             if (!abstractProcess.isSetDescription()) {
-                abstractProcess.addNewDescription().setStringValue(createDescription(sosAbstractProcess.getDescriptions()));
-            } 
+                abstractProcess.addNewDescription().setStringValue(
+                        createDescription(sosAbstractProcess.getDescriptions()));
+            }
         }
         // set identification
         if (sosAbstractProcess.isSetIdentifications()) {
@@ -529,7 +527,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             // TODO check for duplicated outputs
             system.getOutputs().addAll(getOutputsFromChilds(smlComponents));
             // TODO check if necessary
-//            system.addFeatureOfInterest(getFeaturesFromChild(smlComponents));
+            // system.addFeatureOfInterest(getFeaturesFromChild(smlComponents));
         }
         // set outputs
         if (system.isSetOutputs()) {
@@ -975,8 +973,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             final AbstractProcessType abstractProcess) throws OwsExceptionReport {
         if (sosAbstractProcess.isSetFeatureOfInterest()) {
             final SosSMLCapabilities sosSmlCapabilities =
-                    createCapabilitiesFrom(
-                            sosAbstractProcess.getFeatureOfInterest(),
+                    createCapabilitiesFrom(sosAbstractProcess.getFeatureOfInterest(),
                             SensorMLConstants.ELEMENT_NAME_FEATURE_OF_INTEREST,
                             SensorMLConstants.FEATURE_OF_INTEREST_FIELD_DEFINITION,
                             SensorMLConstants.FEATURE_OF_INTEREST_FIELD_NAME);
@@ -1039,8 +1036,8 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         return capabilities;
     }
 
-    protected List<SosSMLComponent> createComponentsForCildProcedures(final Set<SosProcedureDescription> childProcedures)
-            throws CodedException {
+    protected List<SosSMLComponent> createComponentsForCildProcedures(
+            final Set<SosProcedureDescription> childProcedures) throws CodedException {
         final List<SosSMLComponent> smlComponents = new LinkedList<SosSMLComponent>();
         int childCount = 0;
         for (final SosProcedureDescription childProcedure : childProcedures) {
@@ -1048,17 +1045,24 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             final SosSMLComponent component = new SosSMLComponent("component" + childCount);
             component.setTitle(childProcedure.getIdentifier());
 
-            if (Configurator.getInstance().isEncodeFullChildrenInDescribeSensor() &&
-                       childProcedure instanceof AbstractSensorML) {
+            if (Configurator.getInstance().isEncodeFullChildrenInDescribeSensor()
+                    && childProcedure instanceof AbstractSensorML) {
                 component.setProcess((AbstractSensorML) childProcedure);
             } else {
                 try {
-                	String version = Configurator.getInstance().getServiceOperatorRepository()
-                			.getSupportedVersions( SosConstants.SOS ).contains( Sos2Constants.SERVICEVERSION )
-                			? Sos2Constants.SERVICEVERSION : Sos1Constants.SERVICEVERSION;
+                    if (Configurator.getInstance().getBindingRepository()
+                            .isBindingSupported(BindingConstants.KVP_BINDING_ENDPOINT)) {
+                        String version =
+                                Configurator.getInstance().getServiceOperatorRepository()
+                                        .getSupportedVersions(SosConstants.SOS).contains(Sos2Constants.SERVICEVERSION) ? Sos2Constants.SERVICEVERSION
+                                        : Sos1Constants.SERVICEVERSION;
 
-                	component.setHref(SosHelper.getDescribeSensorUrl(version, Configurator.getInstance()
-                			.getServiceURL(), childProcedure.getIdentifier(), BindingConstants.KVP_BINDING_ENDPOINT));
+                        component.setHref(SosHelper.getDescribeSensorUrl(version, Configurator.getInstance()
+                                .getServiceURL(), childProcedure.getIdentifier(),
+                                BindingConstants.KVP_BINDING_ENDPOINT));
+                    } else {
+                        component.setHref(childProcedure.getIdentifier());
+                    }
                 } catch (final UnsupportedEncodingException uee) {
                     throw new NoApplicableCodeException().withMessage("Error while encoding DescribeSensor URL")
                             .causedBy(uee);
@@ -1076,11 +1080,11 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                 if (sosSMLComponent.getProcess() instanceof SensorML) {
                     final SensorML sensorML = (SensorML) sosSMLComponent.getProcess();
                     if (sensorML.isSetMembers()) {
-                       for (final AbstractProcess abstractProcess : sensorML.getMembers()) {
-                           if (abstractProcess.isSetOutputs()) {
-                               outputs.addAll(abstractProcess.getOutputs());
-                           }
-                       }
+                        for (final AbstractProcess abstractProcess : sensorML.getMembers()) {
+                            if (abstractProcess.isSetOutputs()) {
+                                outputs.addAll(abstractProcess.getOutputs());
+                            }
+                        }
                     }
                 } else if (sosSMLComponent.getProcess() instanceof AbstractProcess) {
                     final AbstractProcess abstractProcess = (AbstractProcess) sosSMLComponent.getProcess();
@@ -1092,7 +1096,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         }
         return outputs;
     }
-    
+
     protected Collection<String> getFeaturesFromChild(final List<SosSMLComponent> smlComponents) {
         final Set<String> features = CollectionHelper.set();
         for (final SosSMLComponent sosSMLComponent : smlComponents) {

@@ -79,6 +79,10 @@ public class BindingRepository extends AbstractConfiguringServiceLoaderRepositor
         Activatable<Binding> binding = this.bindings.get(urlPattern);
         return binding == null ? null : binding.get();
     }
+	
+	public boolean isBindingSupported(String urlPattern) {
+	    return this.bindings.containsKey(urlPattern);
+	}
 
     public Map<String, Binding> getBindings() {
         return Activatable.filter(this.bindings);
