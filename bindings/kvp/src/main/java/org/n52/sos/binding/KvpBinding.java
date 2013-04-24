@@ -71,7 +71,7 @@ public class KvpBinding extends Binding {
 
 	@Override
 	public String getUrlPattern() {
-		return SosConstants.KVP_BINDING_ENDPOINT;
+		return BindingConstants.KVP_BINDING_ENDPOINT;
 	}
 
 	@Override

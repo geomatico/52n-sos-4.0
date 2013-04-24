@@ -36,7 +36,6 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import net.opengis.gml.StringOrRefType;
 import net.opengis.sensorML.x101.AbstractProcessType;
 import net.opengis.sensorML.x101.CapabilitiesDocument.Capabilities;
 import net.opengis.sensorML.x101.CharacteristicsDocument.Characteristics;
@@ -79,6 +78,7 @@ import net.opengis.swe.x101.VectorType;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.binding.BindingConstants;
 import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
@@ -468,9 +468,9 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
 
         // set description
         if (sosAbstractProcess.isSetDescriptions()) {
-        	StringOrRefType description = abstractProcess.isSetDescription() ?
-        			abstractProcess.getDescription() : abstractProcess.addNewDescription();        
-            description.setStringValue(createDescription(sosAbstractProcess.getDescriptions()));
+            if (!abstractProcess.isSetDescription()) {
+                abstractProcess.addNewDescription().setStringValue(createDescription(sosAbstractProcess.getDescriptions()));
+            } 
         }
         // set identification
         if (sosAbstractProcess.isSetIdentifications()) {
@@ -1058,7 +1058,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                 			? Sos2Constants.SERVICEVERSION : Sos1Constants.SERVICEVERSION;
 
                 	component.setHref(SosHelper.getDescribeSensorUrl(version, Configurator.getInstance()
-                			.getServiceURL(), childProcedure.getIdentifier(), SosConstants.KVP_BINDING_ENDPOINT));
+                			.getServiceURL(), childProcedure.getIdentifier(), BindingConstants.KVP_BINDING_ENDPOINT));
                 } catch (final UnsupportedEncodingException uee) {
                     throw new NoApplicableCodeException().withMessage("Error while encoding DescribeSensor URL")
                             .causedBy(uee);
