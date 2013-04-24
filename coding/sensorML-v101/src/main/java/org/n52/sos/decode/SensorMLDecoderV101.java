@@ -74,6 +74,7 @@ import org.n52.sos.ogc.sensorML.AbstractProcess;
 import org.n52.sos.ogc.sensorML.AbstractSensorML;
 import org.n52.sos.ogc.sensorML.ProcessMethod;
 import org.n52.sos.ogc.sensorML.ProcessModel;
+import org.n52.sos.ogc.sensorML.RulesDefinition;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.SmlContact;
@@ -187,7 +188,7 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
     private void parseAbstractProcess(final AbstractProcessType xbAbstractProcess,
             final AbstractProcess abstractProcess) throws OwsExceptionReport {
         if (xbAbstractProcess.getIdentificationArray() != null) {
-        	IdentificationsAndIdentifier idsAndId = parseIdentifications(xbAbstractProcess.getIdentificationArray());
+        	final IdentificationsAndIdentifier idsAndId = parseIdentifications(xbAbstractProcess.getIdentificationArray());
         	abstractProcess.setIdentifier(idsAndId.getIdentifier());
             abstractProcess.setIdentifications(idsAndId.getIdentifications());
             final List<Integer> identificationsToRemove =
@@ -316,22 +317,33 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
     }
 
     private ProcessMethod parseProcessMethod(final MethodPropertyType method) {
-        final ProcessMethod processMethod = new ProcessMethod();
+        final ProcessMethod processMethod = new ProcessMethod(parseRulesDefinition(method.getProcessMethod().getRules().getRulesDefinition()));
         // TODO implement parsing of sml:ProcessMethod
         return processMethod;
     }
 
-    private class IdentificationsAndIdentifier{
+	private RulesDefinition parseRulesDefinition(final net.opengis.sensorML.x101.ProcessMethodType.Rules.RulesDefinition xbRulesDefinition)
+	{
+		final RulesDefinition rulesDefinition = new RulesDefinition();
+		if (xbRulesDefinition.isSetDescription())
+		{
+			rulesDefinition.setDescription(xbRulesDefinition.getDescription().getStringValue());
+		}
+		// TODO add other options if required
+		return rulesDefinition;
+	}
+
+	private class IdentificationsAndIdentifier{
     	private final List<SosSMLIdentifier> identifications;
     	private String identifier;
     	
-    	public IdentificationsAndIdentifier( int identificationsLength ){
+    	public IdentificationsAndIdentifier( final int identificationsLength ){
     		identifications = new ArrayList<SosSMLIdentifier>( identificationsLength );
     	}
 		public String getIdentifier() {
 			return identifier;
 		}		
-		public void setIdentifier(String identifier) {
+		public void setIdentifier(final String identifier) {
 			this.identifier = identifier;
 		}
 		public List<SosSMLIdentifier> getIdentifications() {
@@ -350,7 +362,7 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
     	final IdentificationsAndIdentifier idsAndId = new IdentificationsAndIdentifier(identificationArray.length);
         for (final Identification xbIdentification : identificationArray) {
             for (final Identifier xbIdentifier : xbIdentification.getIdentifierList().getIdentifierArray()) {
-            	SosSMLIdentifier identification = new SosSMLIdentifier(xbIdentifier.getName(),
+            	final SosSMLIdentifier identification = new SosSMLIdentifier(xbIdentifier.getName(),
                         xbIdentifier.getTerm().getDefinition(), xbIdentifier.getTerm().getValue());
             	idsAndId.getIdentifications().add(identification);
             	if(isIdentificationProcedureIdentifier(identification)){
@@ -556,12 +568,12 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
     }
 
     private List<SosSMLComponent> parseComponents(final Components components) throws OwsExceptionReport {
-        List<SosSMLComponent> sosSmlComponents = CollectionHelper.list();
+        final List<SosSMLComponent> sosSmlComponents = CollectionHelper.list();
         if (components.isSetComponentList() && components.getComponentList().getComponentArray() != null) {
-            for (Component component : components.getComponentList().getComponentArray()) {
+            for (final Component component : components.getComponentList().getComponentArray()) {
                 if (component.isSetProcess() || component.isSetHref()) {
-                    SosSMLComponent sosSmlcomponent = new SosSMLComponent(component.getName());
-                    AbstractProcess abstractProcess = new AbstractProcess();
+                    final SosSMLComponent sosSmlcomponent = new SosSMLComponent(component.getName());
+                    final AbstractProcess abstractProcess = new AbstractProcess();
                     if (component.isSetProcess()) {
                         parseAbstractProcess(component.getProcess(), abstractProcess);
                     } else {
