@@ -23,6 +23,33 @@
  */
 package org.n52.sos.ogc.sensorML;
 
+/**
+ * Implementation for sml:ProcessMethod
+ * 
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ *
+ * @since 4.0.0
+ */
 public class ProcessMethod {
+	
+	private final RulesDefinition rulesDefinition;
+	
+	public ProcessMethod(final RulesDefinition rulesDefinition)
+	{
+		if (rulesDefinition == null)
+		{
+			throw new IllegalArgumentException("parameter 'rulesDefinition' is MANDATORY");
+		}
+		this.rulesDefinition = rulesDefinition;
+	}
+	
+	/**
+	 * Text and/or language defining rules for process profile (e.g. inputs, outputs, parameters, and metadata) (Source: SensorML 1.0.1)
+	 * @return
+	 */
+	public RulesDefinition getRulesDefinition()
+	{
+		return rulesDefinition;
+	}
 
 }
