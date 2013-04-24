@@ -29,6 +29,7 @@ import static org.n52.sos.util.CollectionHelper.set;
 import java.util.Set;
 
 import org.n52.sos.ogc.OGCConstants;
+import org.n52.sos.ogc.sensorML.SensorMLConstants;
 
 /**
  * SosConstants holds all important and often used constants of this SOS (e.g. name of the getCapabilities operation)
@@ -57,26 +58,30 @@ public interface SosConstants {
      * name of System capabilities containing parent procedures for RegisterSensor and DescribeSensor
      * @deprecated Use {@link SensorMLConstants#ELEMENT_NAME_PARENT_PROCEDURES} instead
      */
-    String SYS_CAP_PARENT_PROCEDURES_NAME = "parentProcedures";
+    @Deprecated
+	String SYS_CAP_PARENT_PROCEDURES_NAME = "parentProcedures";
     /**
      * Constant for prefixes of FOIs
      *
      * @deprecated Use {@link OGCConstants#URN_FOI_PREFIX} instead
      */
-    String FOI_PREFIX = OGCConstants.URN_FOI_PREFIX;
+    @Deprecated
+	String FOI_PREFIX = OGCConstants.URN_FOI_PREFIX;
     /**
      * Constant for prefixes of procedures
      *
      * @deprecated Use {@link OGCConstants#URN_PROCEDURE_PREFIX} instead
      */
-    String PROCEDURE_PREFIX = OGCConstants.URN_PROCEDURE_PREFIX;
+    @Deprecated
+	String PROCEDURE_PREFIX = OGCConstants.URN_PROCEDURE_PREFIX;
     String PROCEDURE_STANDARD_DESC_URL = "standardURL";
     /**
      * Constant for prefixes of procedures
      *
      * @deprecated Use {@link OGCConstants#URN_PHENOMENON_PREFIX} instead
      */
-    String PHENOMENON_PREFIX = OGCConstants.URN_PHENOMENON_PREFIX;
+    @Deprecated
+	String PHENOMENON_PREFIX = OGCConstants.URN_PHENOMENON_PREFIX;
     /**
      * Constant for the service name of the SOS
      */
@@ -150,15 +155,18 @@ public interface SosConstants {
     /**
      * @deprecated Use {@link OGCConstants#URN_PROPERTY_NAME_LOCATION} instead
      */
-    String PROPERTY_NAME_LOCATION = OGCConstants.URN_PROPERTY_NAME_LOCATION;
+    @Deprecated
+	String PROPERTY_NAME_LOCATION = OGCConstants.URN_PROPERTY_NAME_LOCATION;
     /**
      * @deprecated Use {@link OGCConstants#URN_PROPERTY_NAME_SAMPLING_GEOMETRY} instead
      */
-    String PROPERTY_NAME_SAMPLING_GEOMETRY = OGCConstants.URN_PROPERTY_NAME_SAMPLING_GEOMETRY;
+    @Deprecated
+	String PROPERTY_NAME_SAMPLING_GEOMETRY = OGCConstants.URN_PROPERTY_NAME_SAMPLING_GEOMETRY;
     /**
      * @deprecated Use {@link OGCConstants#URN_PROPERTY_NAME_SPATIAL_VALUE} instead
      */
-    String PROPERTY_NAME_SPATIAL_VALUE = OGCConstants.URN_PROPERTY_NAME_SPATIAL_VALUE;
+    @Deprecated
+	String PROPERTY_NAME_SPATIAL_VALUE = OGCConstants.URN_PROPERTY_NAME_SPATIAL_VALUE;
     String SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT =
                                "The requested result set exceeds the response size limit of this service and thus cannot be delivered.";
     String SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION =
@@ -254,10 +262,10 @@ public interface SosConstants {
         uncertaintyType,
         notDefined;
 
-        static ValueTypes getValueTypeForString(String valueType) {
+        static ValueTypes getValueTypeForString(final String valueType) {
             try {
                 return valueOf(valueType);
-            } catch (IllegalArgumentException e) {
+            } catch (final IllegalArgumentException e) {
                 return notDefined;
             }
         }
@@ -277,12 +285,12 @@ public interface SosConstants {
         first,
         latest;
 
-        public static boolean contains(String timeString) {
+        public static boolean contains(final String timeString) {
             return timeString.equalsIgnoreCase(first.name())
                    || timeString.equalsIgnoreCase(latest.name());
         }
 
-        public static FirstLatest getEnumForString(String value) {
+        public static FirstLatest getEnumForString(final String value) {
             if (value.equalsIgnoreCase(first.name())) {
                 return first;
             } else if (value.equalsIgnoreCase(latest.name())) {
@@ -292,11 +300,15 @@ public interface SosConstants {
         }
     }
 
+    // TODO add javadoc for each value
     enum HelperValues {
         GMLID,
         EXIST_FOI_IN_DOC,
         VERSION,
         TYPE,
+        /**
+         * Encode the given 'object to encode' in a <tt>*Document</tt> object and not <tt>*Type</tt>.
+         */
         DOCUMENT,
         FOR_OBSERVATION,
         ENCODE,
