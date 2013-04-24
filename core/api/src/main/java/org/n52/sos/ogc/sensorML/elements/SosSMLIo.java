@@ -48,7 +48,7 @@ public class SosSMLIo<T> {
      * @param ioValue
      *            The IO value
      */
-    public SosSMLIo(SosSweAbstractSimpleType<T> ioValue) {
+    public SosSMLIo(final SosSweAbstractSimpleType<T> ioValue) {
         super();
         this.ioValue = ioValue;
     }
@@ -64,7 +64,7 @@ public class SosSMLIo<T> {
      * @param inputName
      *            the inputName to set
      */
-    public void setIoName(String inputName) {
+    public void setIoName(final String inputName) {
         this.ioName = inputName;
     }
 
@@ -79,11 +79,18 @@ public class SosSMLIo<T> {
      * @param ioValue
      *            the input to set
      */
-    public void setIoValue(SosSweAbstractSimpleType<T> ioValue) {
+    public void setIoValue(final SosSweAbstractSimpleType<T> ioValue) {
         this.ioValue = ioValue;
     }
 
     public boolean isSetName() {
         return ioName != null && !ioName.isEmpty();
     }
+
+	@Override
+	public String toString()
+	{
+		return String.format("SosSMLIo [ioName=%s, ioValue=%s]", ioName, ioValue);
+	}
+    
 }
