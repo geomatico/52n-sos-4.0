@@ -445,7 +445,7 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
         Set<String> allProcedures = new HashSet<String>();
         for (String procedure : procedures) {
             allProcedures.add(procedure);
-            allProcedures.addAll(getCache().getChildProcedures(procedure, false, false));
+            allProcedures.addAll(getCache().getChildProcedures(procedure, true, false));
         }
         return CollectionHelper.asList(allProcedures);
     }
