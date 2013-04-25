@@ -231,7 +231,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-spring-installer-controller</artifactId>
+                <artifactId>install-controller</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
