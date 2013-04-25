@@ -13,7 +13,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>installer-controller</artifactId>
+            <artifactId>install-controller</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
