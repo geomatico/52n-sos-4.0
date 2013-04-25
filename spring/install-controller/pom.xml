@@ -7,7 +7,7 @@
         <artifactId>spring</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>installer-controller</artifactId>
+    <artifactId>install-controller</artifactId>
     <name>52North SOS Web Install Controller</name>
     <dependencies>
         <dependency>
