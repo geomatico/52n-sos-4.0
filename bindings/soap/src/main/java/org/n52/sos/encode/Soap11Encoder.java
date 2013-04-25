@@ -42,7 +42,7 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.soap.SoapHeader;
+import org.n52.sos.service.SoapHeader;
 import org.n52.sos.soap.SoapHelper;
 import org.n52.sos.soap.SoapResponse;
 import org.n52.sos.util.CodingHelper;

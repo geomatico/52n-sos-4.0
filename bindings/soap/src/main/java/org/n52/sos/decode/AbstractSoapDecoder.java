@@ -43,7 +43,7 @@ import org.n52.sos.exception.swes.InvalidRequestException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.soap.SoapHeader;
+import org.n52.sos.service.SoapHeader;
 import org.n52.sos.soap.SoapRequest;
 import org.n52.sos.util.LinkedListMultiMap;
 import org.n52.sos.util.ListMultiMap;

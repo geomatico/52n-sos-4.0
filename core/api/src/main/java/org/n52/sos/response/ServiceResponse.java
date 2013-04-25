@@ -33,6 +33,8 @@ import java.util.zip.GZIPOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.service.CommunicationObjectWithSoapHeader;
+import org.n52.sos.service.SoapHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * private Map<HeaderCode, String> httpHeaders;<br />
  * could be extended in future versions
  */
-public class ServiceResponse {
+public class ServiceResponse implements CommunicationObjectWithSoapHeader {
 
     /**
      * the logger, used to log exceptions and additonaly information
@@ -78,6 +80,8 @@ public class ServiceResponse {
      * indicator for being xml encoded response
      */
     private boolean xmlResponse;
+
+	private Map<String, SoapHeader> soapHeaderMap;
 
     /**
      * constructor with content and response code
@@ -289,6 +293,21 @@ public class ServiceResponse {
 				headerMap, 
 				applyZipCompression, 
 				xmlResponse);
+	}
+
+	@Override
+	public Map<String, SoapHeader> getSoapHeader() {
+		return this.soapHeaderMap;
+	}
+
+	@Override
+	public void setSoapHeader(Map<String, SoapHeader> header) {
+		this.soapHeaderMap = header;
+	}
+
+	@Override
+	public boolean isSetSoapHeader() {
+		return this.soapHeaderMap != null && !this.soapHeaderMap.isEmpty();
 	}
     
     

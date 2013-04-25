@@ -23,9 +23,10 @@
  */
 package org.n52.sos.wsa;
 
-import org.n52.sos.soap.SoapHeader;
+import org.n52.sos.service.SoapHeader;
 
-public class WsaHeader extends SoapHeader {
+
+public class WsaHeader implements SoapHeader {
 
     private String toValue;
 

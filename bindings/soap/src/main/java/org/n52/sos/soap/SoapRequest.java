@@ -26,6 +26,7 @@ package org.n52.sos.soap;
 import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.service.SoapHeader;
 
 public class SoapRequest {
 

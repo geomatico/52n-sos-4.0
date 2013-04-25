@@ -26,6 +26,7 @@ package org.n52.sos.soap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.soap.MessageFactory;
@@ -40,6 +41,7 @@ import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.Operations;
 import org.n52.sos.ogc.sos.SosSoapConstants;
+import org.n52.sos.service.SoapHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.NodeList;
@@ -159,4 +161,9 @@ public class SoapHelper {
 
     private SoapHelper() {
     }
+
+	public static byte[] headerToXML(Map<String, SoapHeader> soapHeader) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

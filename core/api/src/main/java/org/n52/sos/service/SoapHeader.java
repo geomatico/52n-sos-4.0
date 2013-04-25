@@ -21,8 +21,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.soap;
+package org.n52.sos.service;
 
-public class SoapHeader {
+/**
+ * Tagging interface for SoapHeader implementations.
+ * 
+ * @author matthes rieke
+ *
+ */
+public interface SoapHeader {
 
 }

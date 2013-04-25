@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.SoapHeader;
 
 public class SoapResponse {
 

@@ -26,6 +26,7 @@ package org.n52.sos.binding;
 import static org.n52.sos.util.HTTPConstants.StatusCode.BAD_REQUEST;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +47,8 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.CommunicationObjectWithSoapHeader;
+import org.n52.sos.service.SoapHeader;
 import org.n52.sos.service.operator.ServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.soap.SoapHelper;
@@ -107,6 +110,13 @@ public class SoapBinding extends Binding {
 						.setStatus(BAD_REQUEST);
 					} else {
 						final AbstractServiceRequest bodyRequest = (AbstractServiceRequest) aBodyRequest;
+						
+						// Soap injections
+						if (bodyRequest instanceof CommunicationObjectWithSoapHeader) {
+							((CommunicationObjectWithSoapHeader) bodyRequest).setSoapHeader(
+									soapRequest.getSoapHeader());
+						}
+						
 						checkServiceOperatorKeyTypes(bodyRequest);
 						for (final ServiceOperatorKeyType sokt : bodyRequest.getServiceOperatorKeyType()) {
 							final ServiceOperator so = getServiceOperatorRepository().getServiceOperator(sokt);
@@ -118,6 +128,17 @@ public class SoapBinding extends Binding {
 									return bodyResponse;
 								}
 								soapResponse.setSoapBodyContent(bodyResponse);
+								
+								//soap injection
+								if (bodyResponse instanceof CommunicationObjectWithSoapHeader) {
+									CommunicationObjectWithSoapHeader soapHeaderObject = (CommunicationObjectWithSoapHeader) bodyResponse;
+									if (soapHeaderObject.isSetSoapHeader()) {
+										Map<String, SoapHeader> header = ((CommunicationObjectWithSoapHeader) soapResponse).getSoapHeader();
+										//TODO do things
+										soapResponse.setHeader(header);
+									}
+								}
+								
 								break;
 							}
 						}
