@@ -13,7 +13,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-spring-installer-controller</artifactId>
+            <artifactId>installer-controller</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
