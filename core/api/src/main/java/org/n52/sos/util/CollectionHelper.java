@@ -69,8 +69,8 @@ public final class CollectionHelper {
     }
 
     public static <T> Set<T> union(final Set<T>... elements) {
-        return ((elements.length == 0) ? Collections.<T>emptySet()
-                : new HashSet<T>(elements.length * elements[0].size()) {
+        return ((elements.length == 0) ? Collections.<T> emptySet() : new HashSet<T>(elements.length
+                * elements[0].size()) {
             private static final long serialVersionUID = -3161916411604210423L;
             {
                 for (Set<T> s : elements) {
@@ -81,49 +81,47 @@ public final class CollectionHelper {
     }
 
     public static <T> Set<T> asSet(final Iterable<? extends T> iterable) {
-        return (iterable instanceof Collection)
-               ? new HashSet<T>((Collection<? extends T>) iterable)
-               : new HashSet<T>() {
-            private static final long serialVersionUID = 3109256773218160485L;
-            {
-                if (iterable != null) {
-                    for (T t : iterable) {
-                        add(t);
+        return (iterable instanceof Collection) ? new HashSet<T>((Collection<? extends T>) iterable)
+                : new HashSet<T>() {
+                    private static final long serialVersionUID = 3109256773218160485L;
+                    {
+                        if (iterable != null) {
+                            for (T t : iterable) {
+                                add(t);
+                            }
+                        }
                     }
-                }
-            }
-        };
+                };
     }
-    
+
     public static <T> List<T> asList(final Iterable<? extends T> iterable) {
-        return (iterable instanceof Collection)
-               ? new LinkedList<T>((Collection<? extends T>) iterable)
-               : new LinkedList<T>() {
-            private static final long serialVersionUID = 3109256773218160485L;
-            {
-                if (iterable != null) {
-                    for (T t : iterable) {
-                        add(t);
+        return (iterable instanceof Collection) ? new LinkedList<T>((Collection<? extends T>) iterable)
+                : new LinkedList<T>() {
+                    private static final long serialVersionUID = 3109256773218160485L;
+                    {
+                        if (iterable != null) {
+                            for (T t : iterable) {
+                                add(t);
+                            }
+                        }
                     }
-                }
-            }
-        };
+                };
     }
 
     public static <T> Set<T> unmodifiableSet(Set<? extends T> s) {
-        return (s == null) ? Collections.<T>emptySet() : Collections.unmodifiableSet(s);
+        return (s == null) ? Collections.<T> emptySet() : Collections.unmodifiableSet(s);
     }
 
     public static <K, V> Map<K, V> unmodifiableMap(Map<? extends K, ? extends V> m) {
-        return (m == null) ? Collections.<K, V>emptyMap() : Collections.unmodifiableMap(m);
+        return (m == null) ? Collections.<K, V> emptyMap() : Collections.unmodifiableMap(m);
     }
 
     public static <T> Collection<T> unmodifiableCollection(Collection<? extends T> c) {
-        return (c == null) ? Collections.<T>emptyList() : Collections.unmodifiableCollection(c);
+        return (c == null) ? Collections.<T> emptyList() : Collections.unmodifiableCollection(c);
     }
 
     public static <T> List<T> unmodifiableList(List<? extends T> l) {
-        return (l == null) ? Collections.<T>emptyList() : Collections.unmodifiableList(l);
+        return (l == null) ? Collections.<T> emptyList() : Collections.unmodifiableList(l);
     }
 
     public static <T> List<T> asList(final T t, final T... ts) {
@@ -132,7 +130,7 @@ public final class CollectionHelper {
         Collections.addAll(list, ts);
         return list;
     }
-    
+
     public static <T> Set<T> asSet(final T t, final T... ts) {
         Set<T> set = new HashSet<T>(ts.length + 1);
         set.add(t);
@@ -164,7 +162,7 @@ public final class CollectionHelper {
 
     /**
      * Constructs a new synchronized {@code Set} based on a {@link HashSet}.
-     *
+     * 
      * @return a synchronized Set
      */
     public static <T> Set<T> synchronizedSet() {
@@ -172,10 +170,12 @@ public final class CollectionHelper {
     }
 
     /**
-     * Constructs a new synchronized {@code Set} based on a {@link HashSet} with the specified {@code initialCapacity}.
-     *
-     * @param initialCapacity the initial capacity of the set
-     *
+     * Constructs a new synchronized {@code Set} based on a {@link HashSet} with
+     * the specified {@code initialCapacity}.
+     * 
+     * @param initialCapacity
+     *            the initial capacity of the set
+     * 
      * @return a synchronized Set
      */
     public static <T> Set<T> synchronizedSet(int initialCapacity) {
@@ -184,7 +184,7 @@ public final class CollectionHelper {
 
     /**
      * Constructs a new synchronized {@code List} based on a {@link LinkedList}.
-     *
+     * 
      * @return a synchronized List
      */
     public static <E> List<E> synchronizedList() {
@@ -192,11 +192,12 @@ public final class CollectionHelper {
     }
 
     /**
-     * Constructs a new synchronized {@code List} based on a {@link ArrayList} with the specified
-     * {@code initialCapacity}.
-     *
-     * @param initialCapacity the initial capacity of the array list
-     *
+     * Constructs a new synchronized {@code List} based on a {@link ArrayList}
+     * with the specified {@code initialCapacity}.
+     * 
+     * @param initialCapacity
+     *            the initial capacity of the array list
+     * 
      * @return a synchronized List
      */
     public static <E> List<E> synchronizedList(int initialCapacity) {
@@ -207,12 +208,13 @@ public final class CollectionHelper {
     }
 
     /**
-     * @param collectionOfCollection a Collection&lt;Collection&lt;T>>
-     *
-     * @return a Set&lt;T> containing all values of all Collections&lt;T> without any duplicates
+     * @param collectionOfCollection
+     *            a Collection&lt;Collection&lt;T>>
+     * 
+     * @return a Set&lt;T> containing all values of all Collections&lt;T>
+     *         without any duplicates
      */
-    public static <T> Set<T> unionOfListOfLists(
-            final Collection<? extends Collection<T>> collectionOfCollection) {
+    public static <T> Set<T> unionOfListOfLists(final Collection<? extends Collection<T>> collectionOfCollection) {
         if (collectionOfCollection == null || collectionOfCollection.isEmpty()) {
             return new HashSet<T>(0);
         }
@@ -227,5 +229,17 @@ public final class CollectionHelper {
             }
         }
         return union;
-	}
+    }
+
+    /**
+     * Check if collection is not null and not empty
+     * 
+     * @param collection
+     *            Collection to check
+     *            
+     * @return empty or not
+     */
+    public static <T> boolean isNotEmpty(Collection<T> collection) {
+        return collection != null && !collection.isEmpty();
+    }
 }

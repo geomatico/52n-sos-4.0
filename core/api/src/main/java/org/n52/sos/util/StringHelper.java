@@ -51,8 +51,9 @@ public final class StringHelper {
         return join(sep, Arrays.asList(src));
     }
 
-	/**
-     * @param toNormalize the string to normalize
+    /**
+     * @param toNormalize
+     *            the string to normalize
      * @return a normalized String for use in a file path, i.e. all
      *         [\,/,:,*,?,",<,>,;] characters are replaced by '_'.
      */
@@ -65,6 +66,18 @@ public final class StringHelper {
         // toNormalize = toNormalize.replaceAll("Ü", "UE");
         // toNormalize = toNormalize.replaceAll("ß", "ss");
         return toNormalize.replaceAll("[\\\\/:\\*?\"<>;,#%=@]", "_");
+    }
+
+    /**
+     * Check if string is not null and not empty
+     * 
+     * @param string
+     *            string to check
+     * 
+     * @return empty or not
+     */
+    public static boolean isNotEmpty(String string) {
+        return string != null && !string.isEmpty();
     }
 
     private StringHelper() {
