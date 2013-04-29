@@ -401,23 +401,10 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     protected String getWktString(FeatureOfInterest feature) {
         StringBuilder builder = new StringBuilder();
         builder.append("POINT(");
-        builder.append(getValueAsString(feature.getLongitude())).append(" ");
-        builder.append(getValueAsString(feature.getLatitude())).append(" ");
+        builder.append(JavaHelper.asString(feature.getLongitude())).append(" ");
+        builder.append(JavaHelper.asString(feature.getLatitude())).append(" ");
         builder.append(")");
         return builder.toString();
-    }
-
-    protected String getValueAsString(Object value) {
-        if (value instanceof String) {
-            return (String) value;
-        } else if (value instanceof BigDecimal) {
-            BigDecimal bdValue = (BigDecimal) value;
-            return Double.toString(bdValue.doubleValue());
-        } else if (value instanceof Double) {
-            return ((Double) value).toString();
-        }
-        return "";
-
     }
 
     protected Geometry getFilterForNonSpatialDatasource(SpatialFilter filter) throws OwsExceptionReport {
