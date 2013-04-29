@@ -53,7 +53,6 @@ import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.W3CConstants;
-import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
