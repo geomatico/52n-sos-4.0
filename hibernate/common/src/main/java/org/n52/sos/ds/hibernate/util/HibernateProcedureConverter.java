@@ -73,6 +73,7 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
+import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
 import org.n52.sos.ogc.swe.simpleType.SosSweCategory;
 import org.n52.sos.ogc.swe.simpleType.SosSweCount;
@@ -83,6 +84,7 @@ import org.n52.sos.service.SensorDescriptionGenerationSettings;
 import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,499 +92,402 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class HibernateProcedureConverter {
-    private  final Logger LOGGER = LoggerFactory.getLogger(HibernateProcedureConverter.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(HibernateProcedureConverter.class);
 
     public SosProcedureDescription createSosProcedureDescription(final Procedure procedure,
-                                                                        final String procedureIdentifier,
-                                                                        final String outputFormat)
-            throws OwsExceptionReport {
-    	if (procedure == null)
-    	{
-    		throw new NoApplicableCodeException()
-    		.causedBy(new IllegalArgumentException("Parameter 'procedure' should not be null!"))
-    		.setStatus(INTERNAL_SERVER_ERROR);
-    	}
+            final String procedureIdentifier, final String outputFormat) throws OwsExceptionReport {
+        if (procedure == null) {
+            throw new NoApplicableCodeException().causedBy(
+                    new IllegalArgumentException("Parameter 'procedure' should not be null!")).setStatus(
+                    INTERNAL_SERVER_ERROR);
+        }
         String filename = null;
         String xmlDoc = null;
         SosProcedureDescription sosProcedureDescription = null;
 
         // TODO: check and query for validTime parameter
         final Set<ValidProcedureTime> validProcedureTimes = procedure.getValidProcedureTimes();
-        for (final ValidProcedureTime validProcedureTime : validProcedureTimes) 
-        {
-            if (validProcedureTime.getEndTime() == null) 
-            {
+        for (final ValidProcedureTime validProcedureTime : validProcedureTimes) {
+            if (validProcedureTime.getEndTime() == null) {
                 filename = validProcedureTime.getDescriptionUrl();
                 xmlDoc = validProcedureTime.getDescriptionXml();
             }
         }
-        
+
         final String descriptionFormat = procedure.getProcedureDescriptionFormat().getProcedureDescriptionFormat();
         // check whether SMLFile or Url is set
-        if (filename == null && xmlDoc == null) 
-        {
-        	final SensorML sml = new SensorML();
-        	
-        	// 2 try to get position from entity
-        	if (procedure.isSpatial())
-        	{
-        		// 2.1 if position is available -> system -> own class <- should be compliant with SWE lightweight profile
-        		sml.addMember(createSmlSystem(procedure));
-        	}
-        	else
-        	{
-        		// 2.2 if no position is available -> processModel -> own class
-        		sml.addMember(createSmlProcessModel(procedure));
-        	}
-        	sosProcedureDescription = sml;
-        }
-        else 
-        {
-            try
-            {
-                if (filename != null && descriptionFormat != null && xmlDoc == null) 
-                {
-                    sosProcedureDescription = createProcedureDescriptionFromFile(procedureIdentifier, outputFormat, filename, descriptionFormat);
-                }
-                else
-                {
-                    sosProcedureDescription = createProcedureDescriptionFromXml(procedureIdentifier, outputFormat, xmlDoc);
-                }
+        if (filename == null && xmlDoc == null) {
+            final SensorML sml = new SensorML();
+
+            // 2 try to get position from entity
+            if (procedure.isSpatial()) {
+                // 2.1 if position is available -> system -> own class <- should
+                // be compliant with SWE lightweight profile
+                sml.addMember(createSmlSystem(procedure));
+            } else {
+                // 2.2 if no position is available -> processModel -> own class
+                sml.addMember(createSmlProcessModel(procedure));
             }
-            catch (final IOException ioe)
-            {
+            sosProcedureDescription = sml;
+        } else {
+            try {
+                if (filename != null && descriptionFormat != null && xmlDoc == null) {
+                    sosProcedureDescription =
+                            createProcedureDescriptionFromFile(procedureIdentifier, outputFormat, filename,
+                                    descriptionFormat);
+                } else {
+                    sosProcedureDescription =
+                            createProcedureDescriptionFromXml(procedureIdentifier, outputFormat, xmlDoc);
+                }
+            } catch (final IOException ioe) {
                 throw new NoApplicableCodeException().causedBy(ioe)
                         .withMessage("An error occured while parsing the sensor description document!")
                         .setStatus(INTERNAL_SERVER_ERROR);
-            } 
-            catch (final XmlException xmle) 
-            {
+            } catch (final XmlException xmle) {
                 throw new XmlDecodingException("sensor description document", xmlDoc, xmle)
-                		.setStatus(INTERNAL_SERVER_ERROR);
+                        .setStatus(INTERNAL_SERVER_ERROR);
             }
         }
-        if (sosProcedureDescription != null) 
-        {
-        	sosProcedureDescription.setDescriptionFormat(descriptionFormat);
+        if (sosProcedureDescription != null) {
+            sosProcedureDescription.setDescriptionFormat(descriptionFormat);
         }
         return sosProcedureDescription;
     }
 
-	private ProcessModel createSmlProcessModel(final Procedure procedure) throws OwsExceptionReport
-	{
-		final ProcessModel smlProcessModel = new ProcessModel();
-		
-		final String[] observableProperties = getObservablePropertiesForProcedure(procedure.getIdentifier());
-	
-		smlProcessModel.setDescriptions(createDescriptions(procedure, observableProperties));
-		
-		smlProcessModel.setNames(createNames(procedure));
+    private ProcessModel createSmlProcessModel(final Procedure procedure) throws OwsExceptionReport {
+        final ProcessModel smlProcessModel = new ProcessModel();
 
-		smlProcessModel.setIdentifier(procedure.getIdentifier());
-		
-		smlProcessModel.setIdentifications(createIdentifications(procedure.getIdentifier()));
-		
-		smlProcessModel.setMethod(createMethod(procedure,observableProperties));
-		
-		smlProcessModel.setOutputs(createOutputs(procedure, observableProperties));
-		
-		// FIXME Eike: continue development here!
-		
-		return smlProcessModel;
-	}
+        final String[] observableProperties = getObservablePropertiesForProcedure(procedure.getIdentifier());
 
-	private ProcessMethod createMethod(final Procedure procedure, final String[] observableProperties)
-	{
-		final ProcessMethod pM = new ProcessMethod(createRulesDefinition(procedure,observableProperties));
-		return pM;
-	}
+        smlProcessModel.setDescriptions(createDescriptions(procedure, observableProperties));
 
-	private RulesDefinition createRulesDefinition(final Procedure procedure,
-			final String[] observableProperties)
-	{
-		final RulesDefinition rD = new RulesDefinition();
-		final String description = String.format(
-				generationSettings().getProcessMethodRulesDefinitionDescriptionTemplate(),
-				procedure.getIdentifier(),
-				StringHelper.join(",", CollectionHelper.list(observableProperties)));
-		rD.setDescription(description);
-		return rD;
-	}
+        smlProcessModel.setNames(createNames(procedure));
 
-	private List<CodeType> createNames(final Procedure procedure)
-	{
-		return CollectionHelper.asList(new CodeType(procedure.getIdentifier()));
-	}
+        smlProcessModel.setIdentifier(procedure.getIdentifier());
 
-	private System createSmlSystem(final Procedure procedure) throws OwsExceptionReport
-	{
-		final System smlSystem = new System();
-		
-    	final String[] observableProperties = getObservablePropertiesForProcedure(procedure.getIdentifier());
-		
-		// 1 set description
-		smlSystem.setDescriptions(createDescriptions(procedure,observableProperties));
-		
-		// 2 identifier 
-		smlSystem.setIdentifier(procedure.getIdentifier());
-		
-		// 3 set identification
-		smlSystem.setIdentifications(createIdentifications(procedure.getIdentifier()));
-		
-		// 4 set keywords
-		smlSystem.setKeywords(createKeywordsList(procedure,observableProperties));
-		
-		// 5 set classification
-		if (generationSettings().isGenerateClassification())
-		{
-			addClassifier(smlSystem);
-		}
-		
-		// 6 set contacts --> take from service information?
-		if (generationSettings().isUseServiceContactAsSensorContact())
-		{
-			final List<SmlContact> contacts = createContactFromServiceContact();
-			if (contacts != null && !contacts.isEmpty()) 
-			{
-				smlSystem.setContact(contacts);
-			}
-		}
-		
-		// 7 set outputs --> observableProperties
-		smlSystem.setOutputs(createOutputs(procedure,observableProperties));
-		
-		// 8 set position --> from procedure
-		smlSystem.setPosition(createPosition(procedure));
-		
-		// 9 set observed area --> from features
-		
-		return smlSystem;
-	}
+        smlProcessModel.setIdentifications(createIdentifications(procedure.getIdentifier()));
 
-	private List<SosSMLIo<?>> createOutputs(final Procedure procedure, final String[] observableProperties) throws OwsExceptionReport
-	{
-		final ArrayList<SosSMLIo<?>> outputs = new ArrayList<SosSMLIo<?>>(observableProperties.length);
-		int i = 1;
-		for (final String observableProperty : observableProperties)
-		{
-			Observation exampleObservation;
-			exampleObservation = getExampleObservation(procedure.getIdentifier(),observableProperty);
-			if (exampleObservation == null)
-			{
-				LOGGER.debug("Could not receive example observation from database for procedure '{}' observing property '{}'.",
-						procedure.getIdentifier(),
-						observableProperty);
-				continue;
-			}
-			SosSMLIo<?> output = null;
-			if (exampleObservation instanceof BlobObservation)
-			{
-				// TODO implement BlobObservations
-				logTypeNotSupported(BlobObservation.class);
-				continue;
-			}
-			else if (exampleObservation instanceof BooleanObservation)
-			{
-				final SosSweBoolean bool = new SosSweBoolean();
-				bool.setDefinition(observableProperty);
-				output = new SosSMLIo<Boolean>(bool);
-			}
-			else if (exampleObservation instanceof CategoryObservation)
-			{
-				final SosSweCategory category = new SosSweCategory();
-				category.setDefinition(observableProperty);
-				output = new SosSMLIo<String>(category);
-			}
-			else if (exampleObservation instanceof CountObservation)
-			{
-				final SosSweCount count = new SosSweCount();
-				count.setDefinition(observableProperty);
-				output = new SosSMLIo<Integer>(count);
-			}
-			else if (exampleObservation instanceof GeometryObservation)
-			{
-				// TODO implement GeometryObservations
-				logTypeNotSupported(GeometryObservation.class);
-				continue;
-			}
-			else if (exampleObservation instanceof NumericObservation)
-			{
-				final SosSweQuantity quantity = new SosSweQuantity();
-				quantity.setDefinition(observableProperty);
-				output = new SosSMLIo<Double>(quantity);
-			}
-			else if (exampleObservation instanceof TextObservation)
-			{
-				final SosSweText text = new SosSweText();
-				text.setDefinition(observableProperty);
-				output = new SosSMLIo<String>(text);
-			}
-			if (output != null)
-			{
-				output.setIoName("output#"+i++);
-				outputs.add(output);
-			}
-		}
-		return outputs;
-	}
+        smlProcessModel.setMethod(createMethod(procedure, observableProperties));
 
-	private void logTypeNotSupported(final Class<?> clazz)
-	{
-		LOGGER.debug("Type '{}' is not supported by the current implementation",clazz.getName());
-	}
+        smlProcessModel.setOutputs(createOutputs(procedure, observableProperties));
 
-	protected Observation getExampleObservation(final String identifier,
-			final String observableProperty) throws OwsExceptionReport
-	{
-		final HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
-		Session session = null;
-		try
-		{
-			session = sessionHolder.getSession();
-			final String[] procedures = new String[1];
-			procedures[0] = identifier;
-			final String[] observableProperties = new String[1];
-			observableProperties[0] = observableProperty;
-			final Criteria c = session.createCriteria(Observation.class)
-					.add(Restrictions.eq(Observation.DELETED, false))
-					.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-			c.createCriteria(Observation.OBSERVABLE_PROPERTY)
-			.add(Restrictions.in(ObservableProperty.IDENTIFIER, observableProperties));
-			c.createCriteria(Observation.PROCEDURE)
-			.add(Restrictions.in(Procedure.IDENTIFIER, procedures));
-			c.setMaxResults(1);
-			return (Observation) c.list().get(0);
-		} 
-		catch (final HibernateException he) 
-		{
-			throw new NoApplicableCodeException().causedBy(he)
-			.withMessage("Error while querying observation data!")
-			.setStatus(INTERNAL_SERVER_ERROR);
-		} 
-		finally
-		{
-			sessionHolder.returnSession(session);
-		}
-	}
+        // FIXME Eike: continue development here!
 
-	private SosSMLPosition createPosition(final Procedure procedure)
-	{
-		SosSMLPosition smlPosition = null;
-		smlPosition = new SosSMLPosition();
-                smlPosition.setName("sensorPosition");
-                smlPosition.setFixed(true);
-        int srid = 4326;
-		// 8.1 set latlong position
-		if (procedure.isSetLongLat())
-		{
-			smlPosition.setPosition(createCoordinatesForPosition(procedure.getLongitude(), procedure.getLatitude(), procedure.getAltitude()));
-			
-		}
-		// 8.2 set position from geometry
-		else if (procedure.isSetGeometry())
-		{
-		    if (procedure.getGeom().getSRID() > 0)
-		    {
-		        srid = procedure.getGeom().getSRID();
-		    }
-		    final Coordinate coordinate = procedure.getGeom().getCoordinate();
-		    smlPosition.setPosition(createCoordinatesForPosition(coordinate.y, coordinate.x, coordinate.z));
-		}
-		if (procedure.isSetSrid())
-		{
-		    srid = procedure.getSrid();
-		}
- 		smlPosition.setReferenceFrame(getServiceConfig().getSrsNamePrefixSosV2() + srid);
-		return smlPosition;
-	}
-	
-	private List<SosSweCoordinate<?>> createCoordinatesForPosition(final Object longitude, final Object latitude,
-            final Object oAltitude) {
-                final List<SosSweCoordinate<?>> sweCoordinates = new ArrayList<SosSweCoordinate<?>>(3);
-                if (latitude instanceof Double)
-                {
-                        final SosSweQuantity quantity = new SosSweQuantity();
-                        quantity.setValue((Double)latitude);
-                        quantity.setAxisID("y");
-                        quantity.setUom(generationSettings().getLatLongUom());
-                        sweCoordinates.add(new SosSweCoordinate<Double>(northing,quantity));
-                }
-                if (longitude instanceof Double)
-                {
-                        final SosSweQuantity quantity = new SosSweQuantity();
-                        quantity.setValue((Double)longitude);
-                        quantity.setAxisID("x");
-                        quantity.setUom(generationSettings().getLatLongUom());
-                        sweCoordinates.add(new SosSweCoordinate<Double>(easting,quantity));
-                }
-                if (oAltitude instanceof Double)
-                {
-                        final SosSweQuantity quantity = new SosSweQuantity();
-                        quantity.setValue((Double)oAltitude);
-                        quantity.setAxisID("z");
-                        quantity.setUom(generationSettings().getAltitudeUom());
-                        sweCoordinates.add(new SosSweCoordinate<Double>(altitude,quantity));
-                }
-                // TODO add Integer: Which SweSimpleType to use?
-                return sweCoordinates;
+        return smlProcessModel;
     }
 
-	private List<SmlContact> createContactFromServiceContact()
-	{
-		final SmlResponsibleParty smlRespParty = new SmlResponsibleParty();
-		final SosServiceProvider serviceProvider = getServiceProvider();
-		if (serviceProvider == null)
-		{
-			return null;
-		}
-		smlRespParty.setIndividualName(serviceProvider.getIndividualName());
-		smlRespParty.setOrganizationName(serviceProvider.getName());
-		smlRespParty.addOnlineResource(serviceProvider.getSite());
-		smlRespParty.setPositionName(serviceProvider.getPositionName());
-		smlRespParty.addDeliveryPoint(serviceProvider.getDeliveryPoint());
-		smlRespParty.addPhoneVoice(serviceProvider.getPhone());
-		smlRespParty.setCity(serviceProvider.getCity());
-		smlRespParty.setCountry(serviceProvider.getCountry());
-		smlRespParty.setPostalCode(serviceProvider.getPostalCode());
-		smlRespParty.setEmail(serviceProvider.getMailAddress());
-		return CollectionHelper.list((SmlContact)smlRespParty);
-	}
+    private ProcessMethod createMethod(final Procedure procedure, final String[] observableProperties) {
+        final ProcessMethod pM = new ProcessMethod(createRulesDefinition(procedure, observableProperties));
+        return pM;
+    }
 
-	protected SosServiceProvider getServiceProvider()
-	{
-		SosServiceProvider serviceProvider = null;
-		try
-		{
-			serviceProvider = Configurator.getInstance().getServiceProvider();
-		} 
-		catch (final OwsExceptionReport e) {
-			LOGGER.error(String.format("Exception thrown: %s",
-						e.getMessage()),
-					e);
-		}
-		return serviceProvider;
-	}
+    private RulesDefinition createRulesDefinition(final Procedure procedure, final String[] observableProperties) {
+        final RulesDefinition rD = new RulesDefinition();
+        final String description =
+                String.format(generationSettings().getProcessMethodRulesDefinitionDescriptionTemplate(),
+                        procedure.getIdentifier(), StringHelper.join(",", CollectionHelper.list(observableProperties)));
+        rD.setDescription(description);
+        return rD;
+    }
 
-	private void addClassifier(final System smlSystem)
-	{
-		if (!generationSettings().getClassifierIntendedApplicationValue().isEmpty())
-		{
-			smlSystem.addClassification(new SosSMLClassifier(
-					"intendedApplication",
-					generationSettings().getClassifierIntendedApplicationDefinition(),
-					generationSettings().getClassifierIntendedApplicationValue()));
-		}
-		if (!generationSettings().getClassifierSensorTypeValue().isEmpty())
-		{
-			smlSystem.addClassification(new SosSMLClassifier(
-					"sensorType",
-					generationSettings().getClassifierSensorTypeDefinition(),
-					generationSettings().getClassifierSensorTypeValue()));
-		}
-	}
+    private List<CodeType> createNames(final Procedure procedure) {
+        return CollectionHelper.asList(new CodeType(procedure.getIdentifier()));
+    }
 
-	private List<String> createDescriptions(final Procedure procedure,
-			final String[] observableProperties)
-	{
-		return CollectionHelper.list(String.format(generationSettings().getDescriptionTemplate(),
-				procedure.isSpatial()?"sensor system":"procedure",
-				procedure.getIdentifier(), 
-				StringHelper.join(",", CollectionHelper.list(observableProperties))));
-	}
+    private System createSmlSystem(final Procedure procedure) throws OwsExceptionReport {
+        final System smlSystem = new System();
 
-	private List<SosSMLIdentifier> createIdentifications(final String identifier)
-	{
-		// get long and short name definition from misc settings
-		final SosSMLIdentifier idUniqueId = new SosSMLIdentifier( OGCConstants.URN_UNIQUE_IDENTIFIER_END, OGCConstants.URN_UNIQUE_IDENTIFIER, identifier);
-		final SosSMLIdentifier idShortName = new SosSMLIdentifier("shortname", generationSettings().getIdentifierShortNameDefinition(), identifier);
-		final SosSMLIdentifier idLongName = new SosSMLIdentifier("longname", generationSettings().getIdentifierLongNameDefinition(), identifier);
-		return CollectionHelper.list(idUniqueId,idLongName,idShortName);
-	}
+        final String[] observableProperties = getObservablePropertiesForProcedure(procedure.getIdentifier());
 
-	protected ServiceConfiguration getServiceConfig()
-	{
-		return Configurator.getInstance().getServiceConfiguration();
-	}
-	
-	private SensorDescriptionGenerationSettings generationSettings()
-	{
-		return SensorDescriptionGenerationSettings.getInstance();
-	}
+        // 1 set description
+        smlSystem.setDescriptions(createDescriptions(procedure, observableProperties));
 
-	private List<String> createKeywordsList(final Procedure procedure,
-			final String[] observableProperties)
-	{
-		final List<String> keywords = CollectionHelper.list();
-		keywords.addAll(CollectionHelper.list(observableProperties));
-		keywords.add(procedure.getIdentifier());
-		if (generationSettings().isGenerateClassification() && 
-				!generationSettings().getClassifierIntendedApplicationValue().isEmpty())
-		{
-			keywords.add(generationSettings().getClassifierIntendedApplicationValue());
-		}
-		if (generationSettings().isGenerateClassification() && 
-				!generationSettings().getClassifierSensorTypeValue().isEmpty())
-		{
-			keywords.add(generationSettings().getClassifierSensorTypeValue());
-		}
-		return keywords;
-	}
+        // 2 identifier
+        smlSystem.setIdentifier(procedure.getIdentifier());
 
-	protected String[] getObservablePropertiesForProcedure(final String procedureIdentifier)
-	{
-		return Configurator.getInstance().getCache().getObservablePropertiesForProcedure(procedureIdentifier).toArray(new String[0]);
-	}
+        // 3 set identification
+        smlSystem.setIdentifications(createIdentifications(procedure.getIdentifier()));
 
-	private SosProcedureDescription createProcedureDescriptionFromXml(final String procedureIdentifier,
-			final String outputFormat,
-			final String xmlDoc) throws XmlException
-	{
-		final XmlObject procedureDescription = XmlObject.Factory.parse(xmlDoc);
-		SosProcedureDescription sosProcedureDescription;
-		try {
-		    sosProcedureDescription =
-		            (SosProcedureDescription) CodingHelper.decodeXmlElement(procedureDescription);
-		    sosProcedureDescription.setIdentifier(procedureIdentifier);
-		} catch (final OwsExceptionReport owse) {
-		    sosProcedureDescription =
-		            new SosProcedureDescriptionUnknowType(procedureIdentifier, outputFormat,
-		                    procedureDescription.xmlText());
-		}
-		return sosProcedureDescription;
-	}
+        // 4 set keywords
+        smlSystem.setKeywords(createKeywordsList(procedure, observableProperties));
 
-	private SosProcedureDescription createProcedureDescriptionFromFile(final String procedureIdentifier,
-			final String outputFormat,
-			final String filename,
-			final String descriptionFormat) throws OwsExceptionReport, XmlException, IOException
-	{
-		if (!descriptionFormat.equalsIgnoreCase(outputFormat)
-		    && !descriptionFormat.equalsIgnoreCase(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) 
-		{
-		    throw new InvalidParameterValueException()
-		    		.at(SosConstants.DescribeSensorParams.procedure)
-		            .withMessage("The value of the output format is wrong and has to be %s for procedure %s",
-		                         descriptionFormat, procedureIdentifier)
-		            .setStatus(BAD_REQUEST);
-		}
+        // 5 set classification
+        if (generationSettings().isGenerateClassification()) {
+            addClassifier(smlSystem);
+        }
 
-		// check if filename contains placeholder for configured
-		// sensor directory
-		final XmlObject procedureDescription =
-		        XmlObject.Factory.parse(getDescribeSensorDocumentAsStream(filename));
-		SosProcedureDescription sosProcedureDescription;
-		try {
-		    sosProcedureDescription =
-		            (SosProcedureDescription) CodingHelper.decodeXmlElement(procedureDescription);
-		    sosProcedureDescription.setIdentifier(procedureIdentifier);
-		} catch (final OwsExceptionReport owse) {
-		    sosProcedureDescription =
-		            new SosProcedureDescriptionUnknowType(procedureIdentifier, outputFormat,
-		                    procedureDescription.xmlText());
-		}
-		return sosProcedureDescription;
-	}
-	
+        // 6 set contacts --> take from service information?
+        if (generationSettings().isUseServiceContactAsSensorContact()) {
+            final List<SmlContact> contacts = createContactFromServiceContact();
+            if (contacts != null && !contacts.isEmpty()) {
+                smlSystem.setContact(contacts);
+            }
+        }
+
+        // 7 set outputs --> observableProperties
+        smlSystem.setOutputs(createOutputs(procedure, observableProperties));
+
+        // 8 set position --> from procedure
+        smlSystem.setPosition(createPosition(procedure));
+
+        // 9 set observed area --> from features
+
+        return smlSystem;
+    }
+
+    private List<SosSMLIo<?>> createOutputs(final Procedure procedure, final String[] observableProperties)
+            throws OwsExceptionReport {
+        final ArrayList<SosSMLIo<?>> outputs = new ArrayList<SosSMLIo<?>>(observableProperties.length);
+        int i = 1;
+        for (final String observableProperty : observableProperties) {
+            Observation exampleObservation;
+            exampleObservation = getExampleObservation(procedure.getIdentifier(), observableProperty);
+            if (exampleObservation == null) {
+                LOGGER.debug(
+                        "Could not receive example observation from database for procedure '{}' observing property '{}'.",
+                        procedure.getIdentifier(), observableProperty);
+                continue;
+            }
+            SosSMLIo<?> output = null;
+            if (exampleObservation instanceof BlobObservation) {
+                // TODO implement BlobObservations
+                logTypeNotSupported(BlobObservation.class);
+                continue;
+            } else if (exampleObservation instanceof BooleanObservation) {
+                final SosSweBoolean bool = new SosSweBoolean();
+                bool.setDefinition(observableProperty);
+                output = new SosSMLIo<Boolean>(bool);
+            } else if (exampleObservation instanceof CategoryObservation) {
+                final SosSweCategory category = new SosSweCategory();
+                category.setDefinition(observableProperty);
+                output = new SosSMLIo<String>(category);
+            } else if (exampleObservation instanceof CountObservation) {
+                final SosSweCount count = new SosSweCount();
+                count.setDefinition(observableProperty);
+                output = new SosSMLIo<Integer>(count);
+            } else if (exampleObservation instanceof GeometryObservation) {
+                // TODO implement GeometryObservations
+                logTypeNotSupported(GeometryObservation.class);
+                continue;
+            } else if (exampleObservation instanceof NumericObservation) {
+                final SosSweQuantity quantity = new SosSweQuantity();
+                quantity.setDefinition(observableProperty);
+                output = new SosSMLIo<Double>(quantity);
+            } else if (exampleObservation instanceof TextObservation) {
+                final SosSweText text = new SosSweText();
+                text.setDefinition(observableProperty);
+                output = new SosSMLIo<String>(text);
+            }
+            if (output != null) {
+                output.setIoName("output#" + i++);
+                outputs.add(output);
+            }
+        }
+        return outputs;
+    }
+
+    private void logTypeNotSupported(final Class<?> clazz) {
+        LOGGER.debug("Type '{}' is not supported by the current implementation", clazz.getName());
+    }
+
+    protected Observation getExampleObservation(final String identifier, final String observableProperty)
+            throws OwsExceptionReport {
+        final HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+        Session session = null;
+        try {
+            session = sessionHolder.getSession();
+            final Criteria c =
+                    session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false))
+                            .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+            c.createCriteria(Observation.OBSERVABLE_PROPERTY).add(
+                    Restrictions.eq(ObservableProperty.IDENTIFIER, observableProperty));
+            c.createCriteria(Observation.PROCEDURE).add(Restrictions.eq(Procedure.IDENTIFIER, identifier));
+            c.setMaxResults(1);
+            return (Observation) c.uniqueResult();
+        } catch (final HibernateException he) {
+            throw new NoApplicableCodeException().causedBy(he).withMessage("Error while querying observation data!")
+                    .setStatus(INTERNAL_SERVER_ERROR);
+        } finally {
+            sessionHolder.returnSession(session);
+        }
+    }
+
+    private SosSMLPosition createPosition(final Procedure procedure) {
+        SosSMLPosition smlPosition = null;
+        smlPosition = new SosSMLPosition();
+        smlPosition.setName("sensorPosition");
+        smlPosition.setFixed(true);
+        int srid = 4326;
+        // 8.1 set latlong position
+        if (procedure.isSetLongLat()) {
+            smlPosition.setPosition(createCoordinatesForPosition(procedure.getLongitude(), procedure.getLatitude(),
+                    procedure.getAltitude()));
+
+        }
+        // 8.2 set position from geometry
+        else if (procedure.isSetGeometry()) {
+            if (procedure.getGeom().getSRID() > 0) {
+                srid = procedure.getGeom().getSRID();
+            }
+            final Coordinate coordinate = procedure.getGeom().getCoordinate();
+            smlPosition.setPosition(createCoordinatesForPosition(coordinate.y, coordinate.x, coordinate.z));
+        }
+        if (procedure.isSetSrid()) {
+            srid = procedure.getSrid();
+        }
+        smlPosition.setReferenceFrame(getServiceConfig().getSrsNamePrefixSosV2() + srid);
+        return smlPosition;
+    }
+
+    private List<SosSweCoordinate<?>> createCoordinatesForPosition(final Object longitude, final Object latitude,
+            final Object oAltitude) {
+        final List<SosSweCoordinate<?>> sweCoordinates = new ArrayList<SosSweCoordinate<?>>(3);
+        sweCoordinates.add(new SosSweCoordinate<Double>(northing, createSweQuantity(JavaHelper.asDouble(latitude),
+                "y", generationSettings().getLatLongUom())));
+        sweCoordinates.add(new SosSweCoordinate<Double>(easting, createSweQuantity(JavaHelper.asDouble(longitude), "x",
+                generationSettings().getLatLongUom())));
+        sweCoordinates.add(new SosSweCoordinate<Double>(altitude, createSweQuantity(JavaHelper.asDouble(altitude),
+                "z", generationSettings().getAltitudeUom())));
+        // TODO add Integer: Which SweSimpleType to use?
+        return sweCoordinates;
+    }
+
+    private SosSweAbstractSimpleType<Double> createSweQuantity(Double value, String asixID, String uom) {
+        final SosSweQuantity quantity = new SosSweQuantity();
+        quantity.setValue(JavaHelper.asDouble(value));
+        quantity.setAxisID(asixID);
+        quantity.setUom(uom);
+        return quantity;
+    }
+
+    private List<SmlContact> createContactFromServiceContact() {
+        final SmlResponsibleParty smlRespParty = new SmlResponsibleParty();
+        final SosServiceProvider serviceProvider = getServiceProvider();
+        if (serviceProvider == null) {
+            return null;
+        }
+        smlRespParty.setIndividualName(serviceProvider.getIndividualName());
+        smlRespParty.setOrganizationName(serviceProvider.getName());
+        smlRespParty.addOnlineResource(serviceProvider.getSite());
+        smlRespParty.setPositionName(serviceProvider.getPositionName());
+        smlRespParty.addDeliveryPoint(serviceProvider.getDeliveryPoint());
+        smlRespParty.addPhoneVoice(serviceProvider.getPhone());
+        smlRespParty.setCity(serviceProvider.getCity());
+        smlRespParty.setCountry(serviceProvider.getCountry());
+        smlRespParty.setPostalCode(serviceProvider.getPostalCode());
+        smlRespParty.setEmail(serviceProvider.getMailAddress());
+        return CollectionHelper.list((SmlContact) smlRespParty);
+    }
+
+    protected SosServiceProvider getServiceProvider() {
+        SosServiceProvider serviceProvider = null;
+        try {
+            serviceProvider = Configurator.getInstance().getServiceProvider();
+        } catch (final OwsExceptionReport e) {
+            LOGGER.error(String.format("Exception thrown: %s", e.getMessage()), e);
+        }
+        return serviceProvider;
+    }
+
+    private void addClassifier(final System smlSystem) {
+        if (!generationSettings().getClassifierIntendedApplicationValue().isEmpty()) {
+            smlSystem.addClassification(new SosSMLClassifier("intendedApplication", generationSettings()
+                    .getClassifierIntendedApplicationDefinition(), generationSettings()
+                    .getClassifierIntendedApplicationValue()));
+        }
+        if (!generationSettings().getClassifierSensorTypeValue().isEmpty()) {
+            smlSystem.addClassification(new SosSMLClassifier("sensorType", generationSettings()
+                    .getClassifierSensorTypeDefinition(), generationSettings().getClassifierSensorTypeValue()));
+        }
+    }
+
+    private List<String> createDescriptions(final Procedure procedure, final String[] observableProperties) {
+        return CollectionHelper.list(String.format(generationSettings().getDescriptionTemplate(),
+                procedure.isSpatial() ? "sensor system" : "procedure", procedure.getIdentifier(),
+                StringHelper.join(",", CollectionHelper.list(observableProperties))));
+    }
+
+    private List<SosSMLIdentifier> createIdentifications(final String identifier) {
+        // get long and short name definition from misc settings
+        final SosSMLIdentifier idUniqueId =
+                new SosSMLIdentifier(OGCConstants.URN_UNIQUE_IDENTIFIER_END, OGCConstants.URN_UNIQUE_IDENTIFIER,
+                        identifier);
+        final SosSMLIdentifier idShortName =
+                new SosSMLIdentifier("shortname", generationSettings().getIdentifierShortNameDefinition(), identifier);
+        final SosSMLIdentifier idLongName =
+                new SosSMLIdentifier("longname", generationSettings().getIdentifierLongNameDefinition(), identifier);
+        return CollectionHelper.list(idUniqueId, idLongName, idShortName);
+    }
+
+    protected ServiceConfiguration getServiceConfig() {
+        return Configurator.getInstance().getServiceConfiguration();
+    }
+
+    private SensorDescriptionGenerationSettings generationSettings() {
+        return SensorDescriptionGenerationSettings.getInstance();
+    }
+
+    private List<String> createKeywordsList(final Procedure procedure, final String[] observableProperties) {
+        final List<String> keywords = CollectionHelper.list();
+        keywords.addAll(CollectionHelper.list(observableProperties));
+        keywords.add(procedure.getIdentifier());
+        if (generationSettings().isGenerateClassification()
+                && !generationSettings().getClassifierIntendedApplicationValue().isEmpty()) {
+            keywords.add(generationSettings().getClassifierIntendedApplicationValue());
+        }
+        if (generationSettings().isGenerateClassification()
+                && !generationSettings().getClassifierSensorTypeValue().isEmpty()) {
+            keywords.add(generationSettings().getClassifierSensorTypeValue());
+        }
+        return keywords;
+    }
+
+    protected String[] getObservablePropertiesForProcedure(final String procedureIdentifier) {
+        return Configurator.getInstance().getCache().getObservablePropertiesForProcedure(procedureIdentifier)
+                .toArray(new String[0]);
+    }
+
+    private SosProcedureDescription createProcedureDescriptionFromXml(final String procedureIdentifier,
+            final String outputFormat, final String xmlDoc) throws XmlException {
+        final XmlObject procedureDescription = XmlObject.Factory.parse(xmlDoc);
+        SosProcedureDescription sosProcedureDescription;
+        try {
+            sosProcedureDescription = (SosProcedureDescription) CodingHelper.decodeXmlElement(procedureDescription);
+            sosProcedureDescription.setIdentifier(procedureIdentifier);
+        } catch (final OwsExceptionReport owse) {
+            sosProcedureDescription =
+                    new SosProcedureDescriptionUnknowType(procedureIdentifier, outputFormat,
+                            procedureDescription.xmlText());
+        }
+        return sosProcedureDescription;
+    }
+
+    private SosProcedureDescription createProcedureDescriptionFromFile(final String procedureIdentifier,
+            final String outputFormat, final String filename, final String descriptionFormat)
+            throws OwsExceptionReport, XmlException, IOException {
+        if (!descriptionFormat.equalsIgnoreCase(outputFormat)
+                && !descriptionFormat.equalsIgnoreCase(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
+            throw new InvalidParameterValueException()
+                    .at(SosConstants.DescribeSensorParams.procedure)
+                    .withMessage("The value of the output format is wrong and has to be %s for procedure %s",
+                            descriptionFormat, procedureIdentifier).setStatus(BAD_REQUEST);
+        }
+
+        // check if filename contains placeholder for configured
+        // sensor directory
+        final XmlObject procedureDescription = XmlObject.Factory.parse(getDescribeSensorDocumentAsStream(filename));
+        SosProcedureDescription sosProcedureDescription;
+        try {
+            sosProcedureDescription = (SosProcedureDescription) CodingHelper.decodeXmlElement(procedureDescription);
+            sosProcedureDescription.setIdentifier(procedureIdentifier);
+        } catch (final OwsExceptionReport owse) {
+            sosProcedureDescription =
+                    new SosProcedureDescriptionUnknowType(procedureIdentifier, outputFormat,
+                            procedureDescription.xmlText());
+        }
+        return sosProcedureDescription;
+    }
+
     private InputStream getDescribeSensorDocumentAsStream(String filename) {
         final StringBuilder builder = new StringBuilder();
         if (filename.startsWith("standard")) {
@@ -594,5 +499,5 @@ public class HibernateProcedureConverter {
         LOGGER.debug("Procedure description file name '{}'!", filename);
         return Configurator.getInstance().getClass().getResourceAsStream(builder.toString());
     }
-    
+
 }
