@@ -300,7 +300,7 @@ public class HibernateObservationUtilities {
                 }
                 observationCollection.add(sosObservation);
                 session.evict(hObservation);
-                //TODO reduce memory usage by evicting object session.evict(hObservation);, check for ScrollableResult/Batching/FetchingSize
+                //TODO  check for ScrollableResult vs setFetchSize/setMaxResult + setFirstResult
             }
         }
         return observationCollection;
