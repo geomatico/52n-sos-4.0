@@ -150,6 +150,8 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         LOGGER.debug("Encoder for the following keys initialized successfully: {}!",
                 StringHelper.join(", ", ENCODER_KEYS));
     }
+    
+    private static final String OUTPUT_PREFIX = "output#";
 
     @Override
     public Set<EncoderKey> getEncoderKeyType() {
@@ -790,16 +792,26 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         final OutputList outputList = outputs.addNewOutputList();
         final Set<String> definitions = new HashSet<String>();
         int counter = 1;
+        Set<String> outputNames = CollectionHelper.set();
         for (final SosSMLIo<?> sosSMLIo : sosOutputs) {
             if (!definitions.contains(sosSMLIo.getIoValue().getDefinition())) {
-                if (!sosSMLIo.isSetName()) {
-                    sosSMLIo.setIoName("output_" + counter++);
+                if (!sosSMLIo.isSetName() || outputNames.contains(sosSMLIo.getIoName())) {
+                    sosSMLIo.setIoName(getValidOutputName(counter++, outputNames));
                 }
+                outputNames.add(sosSMLIo.getIoName());
                 addIoComponentPropertyType(outputList.addNewOutput(), sosSMLIo);
                 definitions.add(sosSMLIo.getIoValue().getDefinition());
             }
         }
         return outputs;
+    }
+
+    private String getValidOutputName(int counter, Set<String> outputNames) {
+        String outputName = OUTPUT_PREFIX + counter;
+        while (outputNames.contains(outputName)) {
+            outputName =  OUTPUT_PREFIX + (++counter);
+        }
+        return outputName;
     }
 
     /**
