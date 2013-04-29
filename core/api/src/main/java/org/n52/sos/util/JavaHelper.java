@@ -23,6 +23,7 @@
  */
 package org.n52.sos.util;
 
+import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -59,7 +60,7 @@ public final class JavaHelper {
 
     /**
      * Generates a sensor id from description and current time as long.
-     *
+     * 
      * @param message
      *            sensor description
      * @return generated sensor id as hex SHA-1.
@@ -72,7 +73,7 @@ public final class JavaHelper {
 
     /**
      * Transforms byte to hex representation
-     *
+     * 
      * @param b
      *            bytes
      * @return hex
@@ -85,7 +86,7 @@ public final class JavaHelper {
         }
         return buf.toString();
     }
-    
+
     public static void appendTextToStringBuilderWithLineBreak(StringBuilder stringBuilder, String message) {
         if (stringBuilder != null && message != null && !message.isEmpty()) {
             stringBuilder.append(message);
@@ -98,6 +99,44 @@ public final class JavaHelper {
      */
     public static List<String> createStringListWithValue(String value) {
         return CollectionHelper.asList(value);
+    }
+
+    /**
+     * return Object value as String
+     * 
+     * @param object
+     *            to get as String
+     * @return String value
+     */
+    public static String asString(Object object) {
+        if (object instanceof String) {
+            return (String) object;
+        } else if (object instanceof BigDecimal) {
+            BigDecimal bdValue = (BigDecimal) object;
+            return Double.toString(bdValue.doubleValue());
+        } else if (object instanceof Double) {
+            return ((Double) object).toString();
+        }
+        return "";
+    }
+
+    /**
+     * return Object value as Double
+     * 
+     * @param object
+     *            to get as Double
+     * @return Double value
+     */
+    public static Double asDouble(Object object) {
+        if (object instanceof String) {
+            return Double.parseDouble((String) object);
+        } else if (object instanceof BigDecimal) {
+            BigDecimal bdValue = (BigDecimal) object;
+            return bdValue.doubleValue();
+        } else if (object instanceof Double) {
+            return (Double) object;
+        }
+        return new Double(Double.NaN);
     }
 
     private JavaHelper() {
