@@ -471,6 +471,8 @@ SELECT insert_offering('http://www.52north.org/test/offering/3');
 SELECT insert_offering('http://www.52north.org/test/offering/4');
 SELECT insert_offering('http://www.52north.org/test/offering/5');
 SELECT insert_offering('http://www.52north.org/test/offering/6');
+SELECT insert_offering('http://www.52north.org/test/offering/8');
+SELECT insert_offering('http://www.52north.org/test/offering/9');
 
 SELECT insert_allowed_observation_types_for_offering('http://www.52north.org/test/offering/1', 'Measurement');
 SELECT insert_allowed_observation_types_for_offering('http://www.52north.org/test/offering/2', 'CountObservation');
@@ -478,6 +480,8 @@ SELECT insert_allowed_observation_types_for_offering('http://www.52north.org/tes
 SELECT insert_allowed_observation_types_for_offering('http://www.52north.org/test/offering/4', 'CategoryObservation');
 SELECT insert_allowed_observation_types_for_offering('http://www.52north.org/test/offering/5', 'TextObservation');
 SELECT insert_allowed_observation_types_for_offering('http://www.52north.org/test/offering/6', 'SWEArrayObservation');
+SELECT insert_allowed_observation_types_for_offering('http://www.52north.org/test/offering/8', 'Measurement');
+SELECT insert_allowed_observation_types_for_offering('http://www.52north.org/test/offering/9', 'Measurement');
 
 SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north.org/test/offering/1', 'Point');
 SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north.org/test/offering/2', 'Point');
@@ -485,14 +489,18 @@ SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north
 SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north.org/test/offering/4', 'Point');
 SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north.org/test/offering/5', 'Point');
 SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north.org/test/offering/6', 'Point');
+SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north.org/test/offering/8', 'Point');
+SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north.org/test/offering/9', 'Point');
 
 ---- FEATURE_OF_INTEREST
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/1', 20.401108, 49.594538);
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/2',  8.401108, 52.980090);
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/3', 10.401108, 52.512348);
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/4',  2.401108, 51.594538);
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/5', 21.401108, 52.127812);
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/6', 12.412312, 53.123212);
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/1', 7.651968812254194, 51.935101100104916); -- 52N/con terra
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/2', -117.1957110000000, 34.056517); -- ESRI
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/3', 6.1320144042060925, 50.78570661296184); -- Kisters
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/4', 7.593655600000034, 51.9681661); -- IfGI
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/5', 13.72375999999997, 51.02881); -- TU-D
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/6', 7.270806, 51.447722); -- HBO
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/8', 4.283393599999954, 52.0464393); -- ITC
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/9', 10.94306000000006, 50.68606); -- DLZ-IT
 
 ---- UNIT
 SELECT insert_unit('test_unit_1');
@@ -501,6 +509,8 @@ SELECT insert_unit('test_unit_3');
 SELECT insert_unit('test_unit_4');
 SELECT insert_unit('test_unit_5');
 SELECT insert_unit('test_unit_6');
+SELECT insert_unit('test_unit_8');
+SELECT insert_unit('test_unit_9');
 
 ---- OBSERVABLE_PROPERTY
 SELECT insert_observable_property('http://www.52north.org/test/observableProperty/1');
@@ -509,14 +519,18 @@ SELECT insert_observable_property('http://www.52north.org/test/observablePropert
 SELECT insert_observable_property('http://www.52north.org/test/observableProperty/4');
 SELECT insert_observable_property('http://www.52north.org/test/observableProperty/5');
 SELECT insert_observable_property('http://www.52north.org/test/observableProperty/6');
+SELECT insert_observable_property('http://www.52north.org/test/observableProperty/8');
+SELECT insert_observable_property('http://www.52north.org/test/observableProperty/9');
 
 -- PROCEDURES
-SELECT insert_procedure('http://www.52north.org/test/procedure/101', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/1', 20.401108, 49.594538, 0.0);
-SELECT insert_procedure('http://www.52north.org/test/procedure/102', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/2',  8.401108, 52.980090, 0.0);
-SELECT insert_procedure('http://www.52north.org/test/procedure/103', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/3', 10.401108, 52.512348, 0.0);
-SELECT insert_procedure('http://www.52north.org/test/procedure/104', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/4',  2.401108, 51.594538, 0.0);
-SELECT insert_procedure('http://www.52north.org/test/procedure/105', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/5', 21.401108, 52.127812, 0.0);
-SELECT insert_procedure('http://www.52north.org/test/procedure/106', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/6', 12.412312, 53.123212, 0.0);
+SELECT insert_procedure('http://www.52north.org/test/procedure/101', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/1', 7.651968812254194, 51.935101100104916, 0.0); -- 52N/con terra
+SELECT insert_procedure('http://www.52north.org/test/procedure/102', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/2', -117.1957110000000, 34.056517, 0.0); -- ESRI
+SELECT insert_procedure('http://www.52north.org/test/procedure/103', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/3', 6.1320144042060925, 50.78570661296184, 0.0); -- Kisters
+SELECT insert_procedure('http://www.52north.org/test/procedure/104', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/4', 7.593655600000034, 51.9681661, 0.0); -- IfGI
+SELECT insert_procedure('http://www.52north.org/test/procedure/105', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/5', 13.72375999999997, 51.02881, 0.0); -- TU-D
+SELECT insert_procedure('http://www.52north.org/test/procedure/106', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/6', 7.270806, 51.447722, 0.0); -- HBO
+SELECT insert_procedure('http://www.52north.org/test/procedure/108', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/8', 4.283393599999954, 52.0464393, 0.0); -- ITC
+SELECT insert_procedure('http://www.52north.org/test/procedure/109', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/9', 10.94306000000006, 50.68606, 0.0); -- DLZ-IT
 
 -- OBSERVATION_CONSTELLATION
 SELECT insert_observation_constellation('http://www.52north.org/test/procedure/101', 'http://www.52north.org/test/observableProperty/1', 'http://www.52north.org/test/offering/1', 'Measurement');
@@ -525,6 +539,8 @@ SELECT insert_observation_constellation('http://www.52north.org/test/procedure/1
 SELECT insert_observation_constellation('http://www.52north.org/test/procedure/104', 'http://www.52north.org/test/observableProperty/4', 'http://www.52north.org/test/offering/4', 'CategoryObservation');
 SELECT insert_observation_constellation('http://www.52north.org/test/procedure/105', 'http://www.52north.org/test/observableProperty/5', 'http://www.52north.org/test/offering/5', 'TextObservation');
 SELECT insert_observation_constellation('http://www.52north.org/test/procedure/106', 'http://www.52north.org/test/observableProperty/6', 'http://www.52north.org/test/offering/6', 'SWEArrayObservation');
+SELECT insert_observation_constellation('http://www.52north.org/test/procedure/108', 'http://www.52north.org/test/observableProperty/8', 'http://www.52north.org/test/offering/8', 'SWEArrayObservation');
+SELECT insert_observation_constellation('http://www.52north.org/test/procedure/109', 'http://www.52north.org/test/observableProperty/9', 'http://www.52north.org/test/offering/9', 'SWEArrayObservation');
 
 -- INSERT OBSERVATIONS
 SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/101', 'http://www.52north.org/test/observableProperty/1', 'http://www.52north.org/test/featureOfInterest/1', 'test_unit_1', '2012-11-19 13:00Z', 'http://www.52north.org/test/offering/1'), 1.2);	
@@ -622,6 +638,30 @@ INSERT INTO observation_has_numeric_value(observation_id, numeric_value_id)
 		WHERE o.identifier = 'http://www.52north.org/test/observation/2'
 			AND o.observation_id NOT IN (SELECT observation_id FROM observation_has_numeric_value AS ohnv
 											WHERE ohnv.observation_id = o.observation_id);
+											
+-- INSERT OBSERVATIONS
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/108', 'http://www.52north.org/test/observableProperty/8', 'http://www.52north.org/test/featureOfInterest/8', 'test_unit_8', '2012-11-19 13:00Z', 'http://www.52north.org/test/offering/8'), 1.2);	
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/108', 'http://www.52north.org/test/observableProperty/8', 'http://www.52north.org/test/featureOfInterest/8', 'test_unit_8', '2012-11-19 13:01Z', 'http://www.52north.org/test/offering/8'), 1.3); 
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/108', 'http://www.52north.org/test/observableProperty/8', 'http://www.52north.org/test/featureOfInterest/8', 'test_unit_8', '2012-11-19 13:02Z', 'http://www.52north.org/test/offering/8'), 1.4);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/108', 'http://www.52north.org/test/observableProperty/8', 'http://www.52north.org/test/featureOfInterest/8', 'test_unit_8', '2012-11-19 13:03Z', 'http://www.52north.org/test/offering/8'), 1.5);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/108', 'http://www.52north.org/test/observableProperty/8', 'http://www.52north.org/test/featureOfInterest/8', 'test_unit_8', '2012-11-19 13:04Z', 'http://www.52north.org/test/offering/8'), 1.6);	
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/108', 'http://www.52north.org/test/observableProperty/8', 'http://www.52north.org/test/featureOfInterest/8', 'test_unit_8', '2012-11-19 13:05Z', 'http://www.52north.org/test/offering/8'), 1.7);	
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/108', 'http://www.52north.org/test/observableProperty/8', 'http://www.52north.org/test/featureOfInterest/8', 'test_unit_8', '2012-11-19 13:06Z', 'http://www.52north.org/test/offering/8'), 1.8);	
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/108', 'http://www.52north.org/test/observableProperty/8', 'http://www.52north.org/test/featureOfInterest/8', 'test_unit_8', '2012-11-19 13:07Z', 'http://www.52north.org/test/offering/8'), 1.9);	
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/108', 'http://www.52north.org/test/observableProperty/8', 'http://www.52north.org/test/featureOfInterest/8', 'test_unit_8', '2012-11-19 13:08Z', 'http://www.52north.org/test/offering/8'), 2.0);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/108', 'http://www.52north.org/test/observableProperty/8', 'http://www.52north.org/test/featureOfInterest/8', 'test_unit_8', '2012-11-19 13:09Z', 'http://www.52north.org/test/offering/8'), 2.1);
+
+-- INSERT OBSERVATIONS
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/109', 'http://www.52north.org/test/observableProperty/9', 'http://www.52north.org/test/featureOfInterest/9', 'test_unit_9', '2012-11-19 13:00Z', 'http://www.52north.org/test/offering/9'), 1.2);	
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/109', 'http://www.52north.org/test/observableProperty/9', 'http://www.52north.org/test/featureOfInterest/9', 'test_unit_9', '2012-11-19 13:01Z', 'http://www.52north.org/test/offering/9'), 1.3); 
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/109', 'http://www.52north.org/test/observableProperty/9', 'http://www.52north.org/test/featureOfInterest/9', 'test_unit_9', '2012-11-19 13:02Z', 'http://www.52north.org/test/offering/9'), 1.4);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/109', 'http://www.52north.org/test/observableProperty/9', 'http://www.52north.org/test/featureOfInterest/9', 'test_unit_9', '2012-11-19 13:03Z', 'http://www.52north.org/test/offering/9'), 1.5);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/109', 'http://www.52north.org/test/observableProperty/9', 'http://www.52north.org/test/featureOfInterest/9', 'test_unit_9', '2012-11-19 13:04Z', 'http://www.52north.org/test/offering/9'), 1.6);	
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/109', 'http://www.52north.org/test/observableProperty/9', 'http://www.52north.org/test/featureOfInterest/9', 'test_unit_9', '2012-11-19 13:05Z', 'http://www.52north.org/test/offering/9'), 1.7);	
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/109', 'http://www.52north.org/test/observableProperty/9', 'http://www.52north.org/test/featureOfInterest/9', 'test_unit_9', '2012-11-19 13:06Z', 'http://www.52north.org/test/offering/9'), 1.8);	
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/109', 'http://www.52north.org/test/observableProperty/9', 'http://www.52north.org/test/featureOfInterest/9', 'test_unit_9', '2012-11-19 13:07Z', 'http://www.52north.org/test/offering/9'), 1.9);	
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/109', 'http://www.52north.org/test/observableProperty/9', 'http://www.52north.org/test/featureOfInterest/9', 'test_unit_9', '2012-11-19 13:08Z', 'http://www.52north.org/test/offering/9'), 2.0);
+SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/109', 'http://www.52north.org/test/observableProperty/9', 'http://www.52north.org/test/featureOfInterest/9', 'test_unit_9', '2012-11-19 13:09Z', 'http://www.52north.org/test/offering/9'), 2.1);
 
 DROP FUNCTION get_feature_of_interest(text);
 DROP FUNCTION get_feature_of_interest_type(text);
