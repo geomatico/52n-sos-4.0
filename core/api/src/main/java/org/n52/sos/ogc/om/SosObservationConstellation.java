@@ -287,7 +287,7 @@ public class SosObservationConstellation implements Serializable, Cloneable {
     }
     
     @Override
-    public SosObservationConstellation clone() {
+    public SosObservationConstellation clone() throws CloneNotSupportedException {
         SosObservationConstellation clone = new SosObservationConstellation();
         clone.setFeatureOfInterest(this.getFeatureOfInterest());
         clone.setObservableProperty(this.getObservableProperty());
