@@ -371,7 +371,7 @@
                             "xmlns(om,http://www.opengis.net/om/2.0)"
                         ],
                         "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,urn:ogc:def:crs:EPSG::4326",
-                        "temporalFilter": "om:phenomenonTime,2012-11-19T13:00:00+01:00/2012-11-19T13:15:00+01:00"
+                        "temporalFilter": "om:phenomenonTime,2012-11-19T14:00:00+01:00/2012-11-19T14:15:00+01:00"
                     }
                 },
                 "GetObservation (offering)": {
@@ -480,7 +480,7 @@
                         "version": "2.0.0",
                         "request": "GetObservation",
                         "namespaces": "xmlns(om,http://www.opengis.net/om/2.0)",
-                        "temporalFilter": "om:phenomenonTime,2012-11-19T13:00:00.000+01:00"
+                        "temporalFilter": "om:phenomenonTime,2012-11-19T14:00:00.000+01:00"
                     }
                 },
                 "GetObservation (temporal filter during)": {
@@ -489,7 +489,7 @@
                         "version": "2.0.0",
                         "request": "GetObservation",
                         "namespaces": "xmlns(om,http://www.opengis.net/om/2.0)",
-                        "temporalFilter": "om:phenomenonTime,2012-11-19T13:00:00+01:00/2012-11-19T13:15:00+01:00"
+                        "temporalFilter": "om:phenomenonTime,2012-11-19T14:00:00+01:00/2012-11-19T14:15:00+01:00"
                     }
                 }
             },
@@ -609,7 +609,7 @@
                     "param": {
                         "service": "SOS",
                         "version": "2.0.0",
-                        "request": "GetResult",
+                        "request": "GetResultTemplate",
                         "offering": "http://www.52north.org/test/offering/7",
                         "observedProperty": "http://www.52north.org/test/observableProperty/7_3"
                     }
