@@ -288,7 +288,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
 
     protected Criterion getTemporalFilterCriterion(final GetObservationRequest request) throws OwsExceptionReport {
         final List<TemporalFilter> filters = request.getNotFirstLatestTemporalFilter();
-        if (request.hasTemporalFilters() && filters != null && !filters.isEmpty()) {
+        if (request.hasTemporalFilters() && CollectionHelper.isNotEmpty(filters)) {
             return TemporalRestrictions.filter(filters);
         } else {
             return null;
