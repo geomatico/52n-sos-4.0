@@ -18,6 +18,25 @@
         <property name="deleted" type="boolean">
             <column name="deleted" not-null="true" default="false"/>
         </property>
+        <!-- optional properties, used for automatic sensor description creation if available -->
+        <!-- <property name="geom" type="org.hibernate.spatial.GeometryType">
+            <column name="geom" unique="true" />
+        </property> -->
+        <!-- supports types big_decimal and string -->
+        <!--  
+        <property name="longitude" type="big_decimal">
+           <column name="longitude" unique="true" />
+        </property>
+        <property name="latitude" type="big_decimal">
+        	<column name="latitude" unique="true" />
+        </property>
+        <property name="altitude" type="big_decimal">
+        	<column name="altitude" unique="true" />
+        </property>
+        <property name="srid" type="integer">
+        	<column name="srid" unique="true" />
+        </property> 
+        -->
         <set name="validProcedureTimes" table="valid_procedure_time" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="procedure_id" not-null="true" />
