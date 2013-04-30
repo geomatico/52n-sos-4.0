@@ -9,21 +9,59 @@
 	http://schemas.opengis.net/sos/1.0.0/sosGetObservation.xsd"
 	service="SOS" version="1.0.0" srsName="urn:ogc:def:crs:EPSG::4326">
 	
+	<!-- mandatory -->
 	<offering>http://www.52north.org/test/offering/6</offering>
 	
+	<!-- optional -->
 	<eventTime>
 		<ogc:TM_During>
 			<ogc:PropertyName>om:samplingTime</ogc:PropertyName>
 			<gml:TimePeriod>
-				<gml:beginPosition>2008-03-01T17:44:15+00:00</gml:beginPosition>
-				<gml:endPosition>2008-05-01T17:44:15+00:00</gml:endPosition>
+				<gml:beginPosition>2012-11-19T14:00:00.000+01:00</gml:beginPosition>
+				<gml:endPosition>2012-11-19T15:00:00.000+01:00</gml:endPosition>
 			</gml:TimePeriod>
 		</ogc:TM_During>
 	</eventTime>
+	<!-- optional
+	<eventTime>
+		<ogc:TM_Equals>
+			<ogc:PropertyName>om:samplingTime</ogc:PropertyName>
+			<gml:TimeInstant>
+				<gml:timePosition>2012-11-19T14:00:00.000+01:00</gml:timePosition>
+			</gml:TimeInstant>
+		</ogc:TM_Equals>
+	</eventTime>
 	
+	<eventTime>
+		<ogc:TM_Equals>
+			<ogc:PropertyName>om:samplingTime</ogc:PropertyName>
+			<gml:TimeInstant>
+				<gml:timePosition>first</gml:timePosition>
+			</gml:TimeInstant>
+		</ogc:TM_Equals>
+	</eventTime>
+	
+	<eventTime>
+		<ogc:TM_Equals>
+			<ogc:PropertyName>om:samplingTime</ogc:PropertyName>
+			<gml:TimeInstant>
+				<gml:timePosition>latest</gml:timePosition>
+			</gml:TimeInstant>
+		</ogc:TM_Equals>
+	</eventTime>
+	-->
+	
+	<!-- optional, multiple values possible -->
 	<procedure>http://www.52north.org/test/procedure/106</procedure>
+	
+	<!-- mandatory, multiple values possible -->
 	<observedProperty>http://www.52north.org/test/observableProperty/6</observedProperty>
 	
+	<!-- optional, multiple values possible -->
+	<featureOfInterest>
+		<ObjectID>http://www.52north.org/test/featureOfInterest/6</ObjectID>
+	</featureOfInterest>
+	<!-- or optional
 	<featureOfInterest>
 		<ogc:BBOX>
 			<ogc:PropertyName>urn:ogc:data:location</ogc:PropertyName>
@@ -33,16 +71,13 @@
 			</gml:Envelope>
 		</ogc:BBOX>
 	</featureOfInterest>
+	 -->
 	
-	<result>
-		<ogc:PropertyIsGreaterThan>
-			<ogc:PropertyName>http://www.52north.org/test/observableProperty/6</ogc:PropertyName>
-			<ogc:Literal>5</ogc:Literal>
-		</ogc:PropertyIsGreaterThan>
-	</result>
-	
+	<!-- mandatory -->
 	<responseFormat>text/xml;subtype=&quot;om/1.0.0&quot;</responseFormat>
+	<!-- optional -->
 	<resultModel>om:Measurement</resultModel>
+	<!-- optional -->
 	<responseMode>inline</responseMode>
 
 </GetObservation>

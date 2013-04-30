@@ -8,15 +8,15 @@
 	xsi:schemaLocation="http://www.opengis.net/sos/1.0
 	http://schemas.opengis.net/sos/1.0.0/sosGetFeatureOfInterest.xsd">
   
+    <!-- mandatory -->
 	<location>
-		<ogc:Overlaps>
+		<ogc:BBOX>
 			<ogc:PropertyName>urn:ogc:data:location</ogc:PropertyName>
-			<gml:LineString srsName="urn:ogc:def:crs:EPSG::4326">
-				<gml:pos>52.90 7.52</gml:pos>
-				<gml:pos>52.92 7.51</gml:pos>
-				<gml:pos>52.96 7.54</gml:pos>		
-			</gml:LineString>
-		</ogc:Overlaps>
+			<gml:Envelope srsName="urn:ogc:def:crs:EPSG::4326">
+				<gml:lowerCorner>50.0 7.0</gml:lowerCorner>
+				<gml:upperCorner>53.0 10.0</gml:upperCorner>
+			</gml:Envelope>
+		</ogc:BBOX>
 	</location>
-  
+	  
 </GetFeatureOfInterest>

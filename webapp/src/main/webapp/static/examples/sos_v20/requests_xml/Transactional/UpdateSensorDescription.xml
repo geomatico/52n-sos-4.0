@@ -9,7 +9,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sosInsertSensor.xsd 
 	http://www.opengis.net/swes/2.0 http://schemas.opengis.net/swes/2.0/swes.xsd">
-	<swes:procedure>http://www.52north.org/test/procedure/107</swes:procedure>
+	<swes:procedure>http://www.52north.org/test/procedure/9</swes:procedure>
 	<swes:procedureDescriptionFormat>http://www.opengis.net/sensorML/1.0.1</swes:procedureDescriptionFormat>
 	<swes:description>
 		<swes:SensorDescription>	
@@ -23,7 +23,7 @@
 								<sml:IdentifierList>
 									<sml:identifier name="uniqueID">
 										<sml:Term definition="urn:ogc:def:identifier:OGC:uniqueID">
-											<sml:value>http://www.52north.org/test/procedure/107</sml:value>
+											<sml:value>http://www.52north.org/test/procedure/9</sml:value>
 										</sml:Term>
 									</sml:identifier>
 								</sml:IdentifierList>
@@ -32,9 +32,9 @@
 							<!-- optional; generated if not present -->
 							<sml:identification xlink:title="offerings">
 								<sml:IdentifierList>
-									<sml:identifier name="Offering for sensor 107">
+									<sml:identifier name="Offering for sensor 9">
 										<sml:Term definition="urn:ogc:def:identifier:OGC:offeringID">
-											<sml:value>http://www.52north.org/test/offering/7</sml:value>
+											<sml:value>http://www.52north.org/test/offering/9</sml:value>
 										</sml:Term>
 									</sml:identifier>
 								</sml:IdentifierList>
@@ -48,7 +48,7 @@
 								<swe:SimpleDataRecord>
 									<swe:field name="FeatureOfInterestID">
 										<swe:Text definition="FeatureOfInterest identifier">
-											<swe:value>http://www.52north.org/test/featureOfInterest/7</swe:value>
+											<swe:value>http://www.52north.org/test/featureOfInterest/9</swe:value>
 										</swe:Text>
 									</swe:field>
 								</swe:SimpleDataRecord>
@@ -81,31 +81,31 @@
 							</sml:position>
 							<sml:inputs>
 								<sml:InputList>
-									<sml:input name="test_observable_property_7">
-										<swe:ObservableProperty definition="http://www.52north.org/test/observableProperty/7"/>
+									<sml:input name="test_observable_property_9">
+										<swe:ObservableProperty definition="http://www.52north.org/test/observableProperty/9"/>
 									</sml:input>
 								</sml:InputList>
 							</sml:inputs>
 							<sml:outputs>
 								<sml:OutputList>
-									<sml:output name="test_observable_property_7_1">
-										<swe:Category definition="http://www.52north.org/test/observableProperty/7_1">
+									<sml:output name="test_observable_property_9_1">
+										<swe:Category definition="http://www.52north.org/test/observableProperty/9_1">
 											<swe:codeSpace xlink:href="NOT_DEFINED"/>
 										</swe:Category>
 									</sml:output>
-									<sml:output name="test_observable_property_7_2">
-										<swe:Count definition="http://www.52north.org/test/observableProperty/7_2" />
+									<sml:output name="test_observable_property_9_2">
+										<swe:Count definition="http://www.52north.org/test/observableProperty/9_2" />
 									</sml:output>
-									<sml:output name="test_observable_property_7_3">
-										<swe:Quantity definition="http://www.52north.org/test/observableProperty/7_3">
+									<sml:output name="test_observable_property_9_3">
+										<swe:Quantity definition="http://www.52north.org/test/observableProperty/9_3">
 											<swe:uom code="NOT_DEFINED"/>
 										</swe:Quantity>
 									</sml:output>
-									<sml:output name="test_observable_property_7_4">
-										<swe:Text definition="http://www.52north.org/test/observableProperty/7_4" />
+									<sml:output name="test_observable_property_9_4">
+										<swe:Text definition="http://www.52north.org/test/observableProperty/9_4" />
 									</sml:output>
-									<sml:output name="test_observable_property_7_5">
-										<swe:Boolean definition="http://www.52north.org/test/observableProperty/7_5" />
+									<sml:output name="test_observable_property_9_5">
+										<swe:Boolean definition="http://www.52north.org/test/observableProperty/9_5" />
 									</sml:output>
 								</sml:OutputList>
 							</sml:outputs>
