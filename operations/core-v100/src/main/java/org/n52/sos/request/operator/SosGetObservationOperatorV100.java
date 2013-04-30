@@ -100,32 +100,11 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<Abs
         try {
             // check SOS version for response encoding
             String namespace = responseFormat;
-            // // O&M 1.0.0
-            // if (responseFormat.equals(OMConstants.CONTENT_TYPE_OM)
-            // || responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM)) {
-            // namespace = responseFormat;
-            // contentType = OMConstants.CONTENT_TYPE_OM;
-            // }
-            // // O&M 2.0 non SOS 2.0
-            // else if
-            // (!request.getVersion().equals(Sos2Constants.SERVICEVERSION)
-            // && (responseFormat.equals(OMConstants.CONTENT_TYPE_OM_2) ||
-            // responseFormat
-            // .equals(OMConstants.RESPONSE_FORMAT_OM_2))) {
-            // namespace.append(responseFormat);
-            // contentType = OMConstants.CONTENT_TYPE_OM_2;
-            // }
-            // O&M 2.0 for SOS 2.0
-            // TODO: check if responseFormat is OM-Subtype
-            // else
 
-            // TODO check for SOS 1.0.0
+            // TODO call encoder directly
             if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
                 namespace = Sos1Constants.NS_SOS;
             }
-            // } else {
-            // namespace.append(responseFormat);
-            // }
             GetObservationResponse response = getDao().getObservation(sosRequest);
             Encoder<XmlObject, GetObservationResponse> encoder = CodingHelper.getEncoder(namespace, response);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

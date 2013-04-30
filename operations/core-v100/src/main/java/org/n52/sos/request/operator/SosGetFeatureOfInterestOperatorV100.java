@@ -79,12 +79,12 @@ public class SosGetFeatureOfInterestOperatorV100 extends
 		boolean applyZIPcomp = false;
 
         checkRequestedParameters(sosRequest);
-        checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), "FeatureOfInterestId");
+        checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), Sos1Constants.GetFeatureOfInterestParams.featureOfInterestID.name());
         
         try {
             String namespace;
             GetFeatureOfInterestResponse response = getDao().getFeatureOfInterest(sosRequest);
-            
+            // TODO call encoder directly, Collection == GmlEncoder, single FOI == SamplingEncoder 
             String contentType = SosConstants.CONTENT_TYPE_XML;
             if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION) ) {
                 namespace = Sos1Constants.NS_SOS;

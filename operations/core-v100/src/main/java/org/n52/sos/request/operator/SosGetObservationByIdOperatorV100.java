@@ -106,6 +106,7 @@ public class SosGetObservationByIdOperatorV100 extends
             String namespace;
             GetObservationByIdResponse response = getDao().getObservationById(sosRequest);
             
+            // TODO call encoder directly
             String contentType = SosConstants.CONTENT_TYPE_XML;
             if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION) ) {
                 namespace = Sos1Constants.NS_SOS;
