@@ -21,7 +21,7 @@
 		<file>${logFile}.log</file>
 		
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logFile}/%d{yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>${logFile}/%d{yyyy-MM-dd}-%i.log</fileNamePattern>
 			<!-- keep ${config.logger.history.max} days' worth of history -->
 			<maxHistory>${config.logger.history.max}</maxHistory>
 			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
