@@ -43,6 +43,9 @@ public class SosEnvelope implements Serializable {
      * SRID
      */
     private int srid;
+    
+    public SosEnvelope() {
+    }
 
     /**
      * constructor
@@ -53,8 +56,8 @@ public class SosEnvelope implements Serializable {
      *            SRID
      */
     public SosEnvelope(Envelope envelope, int srid) {
-        this.envelope = envelope;
-        this.srid = srid;
+        setEnvelope(envelope);
+        setSrid(srid);
     }
 
     /**
@@ -67,7 +70,7 @@ public class SosEnvelope implements Serializable {
     }
 
     public void expandToInclude(Envelope e) {
-        if (getEnvelope() != null) {
+        if (isSetEnvelope()) {
             getEnvelope().expandToInclude(e);
         } else {
             setEnvelope(e);
@@ -81,7 +84,7 @@ public class SosEnvelope implements Serializable {
      *            the envelope to set
      */
     public void setEnvelope(Envelope envelope) {
-        this.envelope = envelope;
+       this.envelope = envelope;
     }
 
     /**
