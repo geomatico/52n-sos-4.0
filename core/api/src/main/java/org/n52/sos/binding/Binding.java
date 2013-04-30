@@ -256,7 +256,7 @@ public abstract class Binding implements ConformanceClass {
                         }
                     }
                     if (!hasSupportedVersion) {
-                        throw new InvalidAcceptVersionsParameterException(gcr.getAcceptVersions());
+                        exceptions.add(new InvalidAcceptVersionsParameterException(gcr.getAcceptVersions()));
                     }
                 }
             } else {
