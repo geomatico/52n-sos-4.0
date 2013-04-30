@@ -33,9 +33,9 @@ public class InstallationSettingsError extends Exception {
 
     private final InstallationConfiguration settings;
 
-    public InstallationSettingsError(InstallationConfiguration c, String message) {
+    public InstallationSettingsError(InstallationConfiguration settings, String message) {
         super(message);
-        this.settings = c;
+        this.settings = settings;
     }
 
     public InstallationSettingsError(InstallationConfiguration settings, String message, Throwable cause) {
