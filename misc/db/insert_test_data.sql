@@ -22,6 +22,17 @@
 -- visit the Free Software Foundation web page, http://www.fsf.org.
 --
 
+--
+-- DO NOT USE END-OF-LINE COMMNETS! because of the quite poor parser the installer uses to excute the SQL file...
+--
+-- ok:
+-- -- offering
+-- SELECT insert_offering();	
+--
+-- wont work:
+-- SELECT insert_offering(); -- offering
+--
+
 CREATE OR REPLACE FUNCTION get_observation_type(text) RETURNS bigint AS
 $$
 	SELECT observation_type_id FROM observation_type 
@@ -493,14 +504,22 @@ SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north
 SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north.org/test/offering/9', 'Point');
 
 ---- FEATURE_OF_INTEREST
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/1', 7.651968812254194, 51.935101100104916); -- 52N/con terra
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/2', -117.1957110000000, 34.056517); -- ESRI
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/3', 6.1320144042060925, 50.78570661296184); -- Kisters
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/4', 7.593655600000034, 51.9681661); -- IfGI
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/5', 13.72375999999997, 51.02881); -- TU-D
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/6', 7.270806, 51.447722); -- HBO
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/8', 4.283393599999954, 52.0464393); -- ITC
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/9', 10.94306000000006, 50.68606); -- DLZ-IT
+-- 52N/con terra
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/1', 7.651968812254194, 51.935101100104916);
+-- ESRI
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/2', -117.1957110000000, 34.056517);
+-- Kisters
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/3', 6.1320144042060925, 50.78570661296184);
+-- IfGI
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/4', 7.593655600000034, 51.9681661);
+-- TU-D
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/5', 13.72375999999997, 51.02881);
+-- HBO
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/6', 7.270806, 51.447722);
+-- ITC
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/8', 4.283393599999954, 52.0464393);
+-- DLZ-IT
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/9', 10.94306000000006, 50.68606);
 
 ---- UNIT
 SELECT insert_unit('test_unit_1');
@@ -522,15 +541,25 @@ SELECT insert_observable_property('http://www.52north.org/test/observablePropert
 SELECT insert_observable_property('http://www.52north.org/test/observableProperty/8');
 SELECT insert_observable_property('http://www.52north.org/test/observableProperty/9');
 
--- PROCEDURES
-SELECT insert_procedure('http://www.52north.org/test/procedure/101', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/1', 7.651968812254194, 51.935101100104916, 0.0); -- 52N/con terra
-SELECT insert_procedure('http://www.52north.org/test/procedure/102', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/2', -117.1957110000000, 34.056517, 0.0); -- ESRI
-SELECT insert_procedure('http://www.52north.org/test/procedure/103', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/3', 6.1320144042060925, 50.78570661296184, 0.0); -- Kisters
-SELECT insert_procedure('http://www.52north.org/test/procedure/104', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/4', 7.593655600000034, 51.9681661, 0.0); -- IfGI
-SELECT insert_procedure('http://www.52north.org/test/procedure/105', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/5', 13.72375999999997, 51.02881, 0.0); -- TU-D
-SELECT insert_procedure('http://www.52north.org/test/procedure/106', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/6', 7.270806, 51.447722, 0.0); -- HBO
-SELECT insert_procedure('http://www.52north.org/test/procedure/108', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/8', 4.283393599999954, 52.0464393, 0.0); -- ITC
-SELECT insert_procedure('http://www.52north.org/test/procedure/109', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/9', 10.94306000000006, 50.68606, 0.0); -- DLZ-IT
+---- PROCEDURES
+
+-- 52N/con terra
+SELECT insert_procedure('http://www.52north.org/test/procedure/101', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/1', 7.651968812254194, 51.935101100104916, 0.0);
+-- ESRI
+SELECT insert_procedure('http://www.52north.org/test/procedure/102', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/2', -117.1957110000000, 34.056517, 0.0);
+-- Kisters
+SELECT insert_procedure('http://www.52north.org/test/procedure/103', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/3', 6.1320144042060925, 50.78570661296184, 0.0);
+-- IfGI
+SELECT insert_procedure('http://www.52north.org/test/procedure/104', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/4', 7.593655600000034, 51.9681661, 0.0);
+-- TU-D
+SELECT insert_procedure('http://www.52north.org/test/procedure/105', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/5', 13.72375999999997, 51.02881, 0.0);
+-- HBO
+SELECT insert_procedure('http://www.52north.org/test/procedure/106', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/6', 7.270806, 51.447722, 0.0);
+-- ITC
+SELECT insert_procedure('http://www.52north.org/test/procedure/108', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/8', 4.283393599999954, 52.0464393, 0.0);
+-- DLZ-IT
+SELECT insert_procedure('http://www.52north.org/test/procedure/109', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/9', 10.94306000000006, 50.68606, 0.0);
+
 
 -- OBSERVATION_CONSTELLATION
 SELECT insert_observation_constellation('http://www.52north.org/test/procedure/101', 'http://www.52north.org/test/observableProperty/1', 'http://www.52north.org/test/offering/1', 'Measurement');
