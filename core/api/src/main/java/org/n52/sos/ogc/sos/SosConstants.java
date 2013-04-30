@@ -309,6 +309,10 @@ public interface SosConstants {
         DOCUMENT,
         FOR_OBSERVATION,
         ENCODE,
-        ENCODE_NAMESPACE
+        ENCODE_NAMESPACE,
+        /**
+         * Encode the given <tt>OwsExceptionReport</tt> not into an <tt>ows:ExceptionReport</tt> but one <tt>ows:Exception</tt> 
+         */
+        ENCODE_OWS_EXCEPTION_ONLY
     }
 }

@@ -100,7 +100,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
     }
 
     @Setting(OwsEncoderSettings.INCLUDE_STACK_TRACE_IN_EXCEPTION_REPORT)
-    public void setIncludeStackTrace(boolean includeStackTraceInExceptionReport) {
+    public void setIncludeStackTrace(final boolean includeStackTraceInExceptionReport) {
         this.includeStackTraceInExceptionReport = includeStackTraceInExceptionReport;
     }
 
@@ -120,7 +120,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
     }
 
     @Override
-    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
+    public void addNamespacePrefixToMap(final Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(OWSConstants.NS_OWS, OWSConstants.NS_OWS_PREFIX);
     }
 
@@ -130,12 +130,12 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
     }
 
     @Override
-    public XmlObject encode(Object element) throws OwsExceptionReport {
+    public XmlObject encode(final Object element) throws OwsExceptionReport {
         return encode(element, null);
     }
 
     @Override
-    public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+    public XmlObject encode(final Object element, final Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         if (element instanceof SosServiceIdentification) {
             return encodeServiceIdentification((SosServiceIdentification) element);
         } else if (element instanceof SosServiceProvider) {
@@ -143,10 +143,19 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
         } else if (element instanceof OWSOperationsMetadata) {
             return encodeOperationsMetadata((OWSOperationsMetadata) element);
         } else if (element instanceof OwsExceptionReport) {
+        	if (isEncodeExceptionsOnly(additionalValues) && !((OwsExceptionReport) element).getExceptions().isEmpty())
+        	{
+        		return encodeOwsException(((OwsExceptionReport) element).getExceptions().get(0));
+        	}
             return encodeOwsExceptionReport((OwsExceptionReport) element);
         }
         throw new UnsupportedEncoderInputException(this, element);
     }
+
+	protected boolean isEncodeExceptionsOnly(final Map<HelperValues, String> additionalValues)
+	{
+		return additionalValues != null && !additionalValues.isEmpty() && additionalValues.containsKey(SosConstants.HelperValues.ENCODE_OWS_EXCEPTION_ONLY);
+	}
 
     /**
      * Set the service identification information
@@ -157,7 +166,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
      *
      * @throws OwsExceptionReport * if the file is invalid.
      */
-    private XmlObject encodeServiceIdentification(SosServiceIdentification sosServiceIdentification)
+    private XmlObject encodeServiceIdentification(final SosServiceIdentification sosServiceIdentification)
             throws OwsExceptionReport {
         ServiceIdentification serviceIdent;
         if (sosServiceIdentification.getServiceIdentification() != null) {
@@ -197,8 +206,8 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
         if (sosServiceIdentification.getKeywords() != null &&
             !sosServiceIdentification.getKeywords().isEmpty() &&
             serviceIdent.getKeywordsArray().length == 0) {
-            KeywordsType keywordsType = serviceIdent.addNewKeywords();
-            for (String keyword : sosServiceIdentification.getKeywords()) {
+            final KeywordsType keywordsType = serviceIdent.addNewKeywords();
+            for (final String keyword : sosServiceIdentification.getKeywords()) {
                 keywordsType.addNewKeyword().setStringValue(keyword.trim());
             }
         }
@@ -215,7 +224,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
      *
      * @throws OwsExceptionReport * if the file is invalid.
      */
-    private XmlObject encodeServiceProvider(SosServiceProvider sosServiceProvider) throws OwsExceptionReport {
+    private XmlObject encodeServiceProvider(final SosServiceProvider sosServiceProvider) throws OwsExceptionReport {
         if (sosServiceProvider.getServiceProvider() != null) {
             if (sosServiceProvider.getServiceProvider() instanceof ServiceProviderDocument) {
                 return ((ServiceProviderDocument) sosServiceProvider.getServiceProvider()).getServiceProvider();
@@ -229,15 +238,15 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
             }
         } else {
             /* TODO check for required fields and fail on missing ones */
-            ServiceProvider serviceProvider = ServiceProvider.Factory.newInstance();
+            final ServiceProvider serviceProvider = ServiceProvider.Factory.newInstance();
             serviceProvider.setProviderName(sosServiceProvider.getName());
             serviceProvider.addNewProviderSite().setHref(sosServiceProvider.getSite());
-            ResponsiblePartySubsetType responsibleParty = serviceProvider.addNewServiceContact();
+            final ResponsiblePartySubsetType responsibleParty = serviceProvider.addNewServiceContact();
             responsibleParty.setIndividualName(sosServiceProvider.getIndividualName());
             responsibleParty.setPositionName(sosServiceProvider.getPositionName());
-            ContactType contact = responsibleParty.addNewContactInfo();
+            final ContactType contact = responsibleParty.addNewContactInfo();
             contact.addNewPhone().addVoice(sosServiceProvider.getPhone());
-            AddressType address = contact.addNewAddress();
+            final AddressType address = contact.addNewAddress();
             address.addDeliveryPoint(sosServiceProvider.getDeliveryPoint());
             address.addElectronicMailAddress(sosServiceProvider.getMailAddress());
             address.setAdministrativeArea(sosServiceProvider.getAdministrativeArea());
@@ -257,19 +266,19 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
      *
      * @throws CompositeOwsException * if an error occurs
      */
-    protected OperationsMetadata encodeOperationsMetadata(OWSOperationsMetadata operationsMetadata)
+    protected OperationsMetadata encodeOperationsMetadata(final OWSOperationsMetadata operationsMetadata)
             throws OwsExceptionReport {
-        OperationsMetadata xbMeta =
+        final OperationsMetadata xbMeta =
                            OperationsMetadata.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        for (OWSOperation operationMetadata : operationsMetadata.getOperations()) {
-            Operation operation = xbMeta.addNewOperation();
+        for (final OWSOperation operationMetadata : operationsMetadata.getOperations()) {
+            final Operation operation = xbMeta.addNewOperation();
             // name
             operation.setName(operationMetadata.getOperationName());
             // dcp
             encodeDCP(operation.addNewDCP(), operationMetadata.getDcp());
             // parameter
             if (operationMetadata.getParameterValues() != null) {
-                for (String parameterName : operationMetadata.getParameterValues().keySet()) {
+                for (final String parameterName : operationMetadata.getParameterValues().keySet()) {
                     setParameterValue(operation.addNewParameter(), parameterName, operationMetadata
                             .getParameterValues().get(parameterName));
                 }
@@ -285,16 +294,16 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
             // }
         }
         // set SERVICE and VERSION for all operations.
-        for (String name : operationsMetadata.getCommonValues().keySet()) {
+        for (final String name : operationsMetadata.getCommonValues().keySet()) {
             setParameterValue(xbMeta.addNewParameter(), name, operationsMetadata.getCommonValues().get(name));
         }
         return xbMeta;
     }
 
-    private ExceptionDocument encodeOwsException(CodedException owsException) {
-        ExceptionDocument exceptionDoc =
+    private ExceptionDocument encodeOwsException(final CodedException owsException) {
+        final ExceptionDocument exceptionDoc =
                           ExceptionDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        ExceptionType exceptionType = exceptionDoc.addNewException();
+        final ExceptionType exceptionType = exceptionDoc.addNewException();
         String exceptionCode;
         if (owsException.getCode() == null) {
             exceptionCode = OwsExceptionCode.NoApplicableCode.toString();
@@ -305,15 +314,15 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
         if (owsException.getLocator() != null) {
             exceptionType.setLocator(owsException.getLocator());
         }
-        StringBuilder exceptionText = new StringBuilder();
+        final StringBuilder exceptionText = new StringBuilder();
         if (owsException.getMessage() != null) {
             exceptionText.append(owsException.getMessage());
             exceptionText.append("\n");
         }
         if (owsException.getCause() != null) {
             exceptionText.append("[EXEPTION]: \n");
-            String localizedMessage = owsException.getCause().getLocalizedMessage();
-            String message = owsException.getCause().getMessage();
+            final String localizedMessage = owsException.getCause().getLocalizedMessage();
+            final String message = owsException.getCause().getMessage();
             if (localizedMessage != null && message != null) {
                 if (!message.equals(localizedMessage)) {
                     JavaHelper.appendTextToStringBuilderWithLineBreak(exceptionText, message);
@@ -324,7 +333,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
                 JavaHelper.appendTextToStringBuilderWithLineBreak(exceptionText, message);
             }
             if (includeStackTraceInExceptionReport) {
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                final ByteArrayOutputStream os = new ByteArrayOutputStream();
                 owsException.getCause().printStackTrace(new PrintStream(os));
                 exceptionText.append(os.toString());
             }
@@ -333,14 +342,14 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
         return exceptionDoc;
     }
 
-    private ExceptionReportDocument encodeOwsExceptionReport(OwsExceptionReport owsExceptionReport) {
-        ExceptionReportDocument erd = ExceptionReportDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        ExceptionReport er = erd.addNewExceptionReport();
+    private ExceptionReportDocument encodeOwsExceptionReport(final OwsExceptionReport owsExceptionReport) {
+        final ExceptionReportDocument erd = ExceptionReportDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        final ExceptionReport er = erd.addNewExceptionReport();
         // er.setLanguage("en");
         er.setVersion(owsExceptionReport.getVersion());
-        List<ExceptionType> exceptionTypes =
+        final List<ExceptionType> exceptionTypes =
                             new ArrayList<ExceptionType>(owsExceptionReport.getExceptions().size());
-        for (CodedException e : owsExceptionReport.getExceptions()) {
+        for (final CodedException e : owsExceptionReport.getExceptions()) {
             exceptionTypes.add(encodeOwsException(e).getException());
         }
         er.setExceptionArray(exceptionTypes.toArray(new ExceptionType[exceptionTypes.size()]));
@@ -354,13 +363,13 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
      * @param dcp The operation.
      * @param get Add GET.
      */
-    private void encodeDCP(DCPDocument.DCP dcp, Map<String, ? extends Collection<DCP>> supportedDcp) {
-        HTTP http = dcp.addNewHTTP();
+    private void encodeDCP(final DCPDocument.DCP dcp, final Map<String, ? extends Collection<DCP>> supportedDcp) {
+        final HTTP http = dcp.addNewHTTP();
         if (supportedDcp.containsKey(SosConstants.HTTP_GET)) {
-            for (DCP dcpGet : supportedDcp.get(SosConstants.HTTP_GET)) {
-                RequestMethodType get = http.addNewGet();
+            for (final DCP dcpGet : supportedDcp.get(SosConstants.HTTP_GET)) {
+                final RequestMethodType get = http.addNewGet();
                 if (dcpGet.getEncoding() != null) {
-                    DomainType contraint = get.addNewConstraint();
+                    final DomainType contraint = get.addNewConstraint();
                     contraint.setName(ENCODING_CONTRAINT);
                     contraint.addNewAllowedValues().addNewValue().setStringValue(dcpGet.getEncoding());
                 }
@@ -368,10 +377,10 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
             }
         }
         if (supportedDcp.containsKey(SosConstants.HTTP_POST)) {
-            for (DCP dcpPost : supportedDcp.get(SosConstants.HTTP_POST)) {
-                RequestMethodType post = http.addNewPost();
+            for (final DCP dcpPost : supportedDcp.get(SosConstants.HTTP_POST)) {
+                final RequestMethodType post = http.addNewPost();
                 if (dcpPost.getEncoding() != null) {
-                    DomainType contraint = post.addNewConstraint();
+                    final DomainType contraint = post.addNewConstraint();
                     contraint.setName(ENCODING_CONTRAINT);
                     contraint.addNewAllowedValues().addNewValue().setStringValue(dcpPost.getEncoding());
                 }
@@ -389,11 +398,11 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
          */
     }
 
-    private void setParameterValue(DomainType domainType, String parameterName,
-                                   Collection<IOWSParameterValue> parameterValues) throws OwsExceptionReport {
+    private void setParameterValue(final DomainType domainType, final String parameterName,
+                                   final Collection<IOWSParameterValue> parameterValues) throws OwsExceptionReport {
         if (parameterValues != null && !parameterValues.isEmpty()) {
             domainType.setName(parameterName);
-            for (IOWSParameterValue parameterValue : parameterValues) {
+            for (final IOWSParameterValue parameterValue : parameterValues) {
                 if (parameterValue instanceof OWSParameterValuePossibleValues) {
                     setParamList(domainType, (OWSParameterValuePossibleValues) parameterValue);
                 } else if (parameterValue instanceof OWSParameterValueRange) {
@@ -415,11 +424,11 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
      * @param name           Parameter name.
      * @param parameterValue .getValues() List of values.
      */
-    private void setParamList(DomainType domainType, OWSParameterValuePossibleValues parameterValue) {
+    private void setParamList(final DomainType domainType, final OWSParameterValuePossibleValues parameterValue) {
         if (parameterValue.getValues() != null) {
             if (!parameterValue.getValues().isEmpty()) {
                 AllowedValues allowedValues = null;
-                for (String value : parameterValue.getValues()) {
+                for (final String value : parameterValue.getValues()) {
                     if (value == null) {
                         domainType.addNewNoValues();
                         break;
@@ -438,7 +447,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
         }
     }
 
-    private void setParamDataType(DomainType domainType, OWSParameterDataType parameterValue) {
+    private void setParamDataType(final DomainType domainType, final OWSParameterDataType parameterValue) {
         if (parameterValue.getReference() != null && !parameterValue.getReference().isEmpty()) {
             domainType.addNewDataType().setReference(parameterValue.getReference());
         } else {
@@ -456,10 +465,10 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
      *
      * @throws CompositeOwsException
      */
-    private void setParamRange(DomainType domainType, OWSParameterValueRange parameterValue) throws OwsExceptionReport {
+    private void setParamRange(final DomainType domainType, final OWSParameterValueRange parameterValue) throws OwsExceptionReport {
         if (parameterValue.getMinValue() != null && parameterValue.getMaxValue() != null) {
             if (!parameterValue.getMinValue().isEmpty() && !parameterValue.getMaxValue().isEmpty()) {
-                RangeType range = domainType.addNewAllowedValues().addNewRange();
+                final RangeType range = domainType.addNewAllowedValues().addNewRange();
                 range.addNewMinimumValue().setStringValue(parameterValue.getMinValue());
                 range.addNewMaximumValue().setStringValue(parameterValue.getMaxValue());
             } else {
