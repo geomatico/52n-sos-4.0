@@ -37,9 +37,9 @@ import org.n52.sos.exception.HTTPException;
 import org.n52.sos.exception.OwsExceptionReportEncodingFailedException;
 import org.n52.sos.exception.ows.concrete.InvalidAcceptVersionsParameterException;
 import org.n52.sos.exception.ows.concrete.InvalidServiceOrVersionException;
+import org.n52.sos.exception.ows.concrete.InvalidServiceParameterException;
 import org.n52.sos.exception.ows.concrete.MissingRequestParameterException;
 import org.n52.sos.exception.ows.concrete.NoDecoderForKeyException;
-import org.n52.sos.exception.ows.concrete.ServiceNotSupportedException;
 import org.n52.sos.exception.ows.concrete.VersionNotSupportedException;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -136,7 +136,7 @@ public class KvpBinding extends Binding {
 			KvpHelper.checkParameterValue(service, RequestParams.service);
 		}
 		if (!isServiceSupported(service)) {
-			throw new ServiceNotSupportedException();
+			throw new InvalidServiceParameterException(service);
 		}
 		return service;
 	}

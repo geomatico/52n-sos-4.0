@@ -40,9 +40,9 @@ import org.n52.sos.event.events.ExceptionEvent;
 import org.n52.sos.exception.HTTPException;
 import org.n52.sos.exception.OwsExceptionReportEncodingFailedException;
 import org.n52.sos.exception.ows.concrete.InvalidAcceptVersionsParameterException;
+import org.n52.sos.exception.ows.concrete.InvalidServiceParameterException;
 import org.n52.sos.exception.ows.concrete.MissingServiceParameterException;
 import org.n52.sos.exception.ows.concrete.MissingVersionParameterException;
-import org.n52.sos.exception.ows.concrete.ServiceNotSupportedException;
 import org.n52.sos.exception.ows.concrete.VersionNotSupportedException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -243,7 +243,7 @@ public abstract class Binding implements ConformanceClass {
                 if (sokt.getService().isEmpty()) {
                     exceptions.add(new MissingServiceParameterException());
                 } else if (!getServiceOperatorRepository().isServiceSupported(sokt.getService())) {
-                    exceptions.add(new ServiceNotSupportedException());
+                    exceptions.add(new InvalidServiceParameterException(sokt.getService()));
                 }
             }
             if (request instanceof GetCapabilitiesRequest) {

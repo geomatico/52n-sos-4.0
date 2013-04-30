@@ -28,11 +28,19 @@ import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @deprecated Use {@link InvalidServiceParameterException} using a useful parameter, e.g. the received value for the request parameter 'service'.
  */
+@Deprecated
 public class ServiceNotSupportedException extends InvalidParameterValueException {
     private static final long serialVersionUID = -4185556617598192292L;
 
-    public ServiceNotSupportedException() {
+    /**
+     * @deprecated Use {@link InvalidServiceParameterException} using a useful parameter, e.g. the received value for the request parameter 'service'.
+     */
+    @Deprecated
+	public ServiceNotSupportedException() {
         super(RequestParams.service, "The requested service is not supported!");
     }
 }
