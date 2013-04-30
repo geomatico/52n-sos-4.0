@@ -25,6 +25,7 @@ package org.n52.sos.encode;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -49,6 +50,7 @@ import org.n52.sos.soap.SoapFault;
 import org.n52.sos.soap.SoapHelper;
 import org.n52.sos.soap.SoapResponse;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.StringHelper;
@@ -79,36 +81,36 @@ public class Soap12Encoder extends AbstractSoapEncoder {
 
 
     @Override
-    public ServiceResponse encode(SoapResponse response, Map<HelperValues, String> additionalValues)
+    public ServiceResponse encode(final SoapResponse response, final Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
         if (response == null) {
             throw new UnsupportedEncoderInputException(this, response);
         }
         String action = null;
-        EnvelopeDocument envelopeDoc = EnvelopeDocument.Factory.newInstance();
-        Envelope envelope = envelopeDoc.addNewEnvelope();
-        Body body = envelope.addNewBody();
+        final EnvelopeDocument envelopeDoc = EnvelopeDocument.Factory.newInstance();
+        final Envelope envelope = envelopeDoc.addNewEnvelope();
+        final Body body = envelope.addNewBody();
         if (response.getSoapFault() != null) {
             body.set(createSOAP12Fault(response.getSoapFault()));
         } else {
             if (response.getException() != null) {
                 if (!response.getException().getExceptions().isEmpty()) {
-                    CodedException firstException = response.getException().getExceptions().get(0);
+                    final CodedException firstException = response.getException().getExceptions().get(0);
                     action = getExceptionActionURI(firstException.getCode());
                 }
                 body.set(createSOAP12FaultFromExceptionResponse(response.getException()));
-                List<String> schemaLocations = new ArrayList<String>(2);
+                final List<String> schemaLocations = new ArrayList<String>(2);
                 schemaLocations.add(N52XmlHelper.getSchemaLocationForSOAP12());
                 schemaLocations.add(N52XmlHelper.getSchemaLocationForOWS110Exception());
                 N52XmlHelper.setSchemaLocationsToDocument(envelopeDoc, schemaLocations);
             } else {
                 action = response.getSoapAction();
-                XmlObject bodyContent = createSOAP12Body(response.getSoapBodyContent());
+                final XmlObject bodyContent = createSOAP12Body(response.getSoapBodyContent());
                 String value = null;
                 Node nodeToRemove = null;
-                NamedNodeMap attributeMap = bodyContent.getDomNode().getFirstChild().getAttributes();
+                final NamedNodeMap attributeMap = bodyContent.getDomNode().getFirstChild().getAttributes();
                 for (int i = 0; i < attributeMap.getLength(); i++) {
-                    Node node = attributeMap.item(i);
+                    final Node node = attributeMap.item(i);
                     if (node.getLocalName().equals(W3CConstants.AN_SCHEMA_LOCATION)) {
                         value = node.getNodeValue();
                         nodeToRemove = node;
@@ -117,7 +119,7 @@ public class Soap12Encoder extends AbstractSoapEncoder {
                 if (nodeToRemove != null) {
                     attributeMap.removeNamedItem(nodeToRemove.getNodeName());
                 }
-                List<String> schemaLocations = new ArrayList<String>(2);
+                final List<String> schemaLocations = new ArrayList<String>(2);
                 schemaLocations.add(N52XmlHelper.getSchemaLocationForSOAP12());
                 if (value != null && !value.isEmpty()) {
                     schemaLocations.add(value);
@@ -157,7 +159,7 @@ public class Soap12Encoder extends AbstractSoapEncoder {
         // TODO for testing an validating
         // checkAndValidateSoapMessage(envelopeDoc);
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             envelopeDoc.save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
 
@@ -166,47 +168,49 @@ public class Soap12Encoder extends AbstractSoapEncoder {
                 applicationZip = response.getSoapBodyContent().getApplyGzipCompression();
             }
             return new ServiceResponse(baos, SosConstants.CONTENT_TYPE_XML, applicationZip, true);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new NoApplicableCodeException().causedBy(e)
                     .withMessage("Error while encoding SOAPMessage!");
         }
     }
 
-    private XmlObject createSOAP12Body(ServiceResponse response) throws OwsExceptionReport {
+    private XmlObject createSOAP12Body(final ServiceResponse response) throws OwsExceptionReport {
         try {
             return XmlObject.Factory.parse(new String(response.getByteArray()), XmlOptionsHelper.getInstance()
                     .getXmlOptions());
-        } catch (XmlException xmle) {
+        } catch (final XmlException xmle) {
             throw new NoApplicableCodeException().causedBy(xmle)
                     .withMessage("Error while creating SOAP body!");
         }
     }
 
-    private XmlObject createSOAP12Fault(SoapFault soapFault) {
-        FaultDocument faultDoc = FaultDocument.Factory.newInstance();
-        Fault fault = faultDoc.addNewFault();
+    private XmlObject createSOAP12Fault(final SoapFault soapFault) {
+        final FaultDocument faultDoc = FaultDocument.Factory.newInstance();
+        final Fault fault = faultDoc.addNewFault();
         fault.addNewCode().setValue(soapFault.getFaultCode());
-        Reasontext addNewText = fault.addNewReason().addNewText();
+        final Reasontext addNewText = fault.addNewReason().addNewText();
         addNewText.setLang(soapFault.getLocale().getDisplayLanguage());
         addNewText.setStringValue(soapFault.getFaultReason());
         if (soapFault.getDetailText() != null) {
-            XmlString xmlString = XmlString.Factory.newInstance();
+            final XmlString xmlString = XmlString.Factory.newInstance();
             xmlString.setStringValue(soapFault.getDetailText());
             fault.addNewDetail().set(xmlString);
         }
         return faultDoc;
     }
 
-    private XmlObject createSOAP12FaultFromExceptionResponse(OwsExceptionReport owsExceptionReport) throws
+    @SuppressWarnings("unchecked") // see http://www.angelikalanger.com/GenericsFAQ/FAQSections/ProgrammingIdioms.html#FAQ300 for more details
+	private XmlObject createSOAP12FaultFromExceptionResponse(final OwsExceptionReport owsExceptionReport) throws
             OwsExceptionReport {
-        FaultDocument faultDoc = FaultDocument.Factory.newInstance();
-        Fault fault = faultDoc.addNewFault();
-        Faultcode code = fault.addNewCode();
+        final FaultDocument faultDoc = FaultDocument.Factory.newInstance();
+        final Fault fault = faultDoc.addNewFault();
+        final Faultcode code = fault.addNewCode();
         code.setValue(SOAPConstants.SOAP_SENDER_FAULT);
 
+        // we encode only the first exception because of OGC#09-001 Section 19.2.3 SOAP 1.2 Fault Binding
         if (!owsExceptionReport.getExceptions().isEmpty()) {
-            CodedException firstException = owsExceptionReport.getExceptions().get(0);
-            Subcode subcode = code.addNewSubcode();
+            final CodedException firstException = owsExceptionReport.getExceptions().get(0);
+            final Subcode subcode = code.addNewSubcode();
             QName qName;
             if (firstException.getCode() != null) {
                 qName = OwsHelper.getQNameForLocalName(firstException.getCode().toString());
@@ -214,14 +218,19 @@ public class Soap12Encoder extends AbstractSoapEncoder {
                 qName = OwsHelper.getQNameForLocalName(OwsExceptionCode.NoApplicableCode.name());
             }
             subcode.setValue(qName);
-            Reasontext addNewText = fault.addNewReason().addNewText();
+            final Reasontext addNewText = fault.addNewReason().addNewText();
             addNewText.setLang(Locale.ENGLISH.getLanguage());
             addNewText.setStringValue(SoapHelper.getSoapFaultReasonText(firstException.getCode()));
 
-            for (OwsExceptionReport owsException : owsExceptionReport.getExceptions()) {
-                fault.addNewDetail().set(CodingHelper.encodeObjectToXml(OWSConstants.NS_OWS, owsException));
-                break;
-            }
+        	fault.addNewDetail().set(
+            		CodingHelper.encodeObjectToXml(
+            				OWSConstants.NS_OWS, firstException,
+            				CollectionHelper.map(
+            						new AbstractMap.SimpleEntry<SosConstants.HelperValues, String>(
+            								SosConstants.HelperValues.ENCODE_OWS_EXCEPTION_ONLY, "")
+            						)
+            				)
+            		);
         }
         return faultDoc;
     }
