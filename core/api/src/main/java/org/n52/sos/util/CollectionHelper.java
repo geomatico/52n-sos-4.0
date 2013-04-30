@@ -32,20 +32,37 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public final class CollectionHelper {
     public static <T> Set<T> set(final T... elements) {
-        HashSet<T> set = new HashSet<T>(elements.length);
+        final HashSet<T> set = new HashSet<T>(elements.length);
         Collections.addAll(set, elements);
         return Collections.unmodifiableSet(set);
     }
 
     public static <T> Set<T> set() {
         return new HashSet<T>();
+    }
+    
+    /**
+     * @param entries the <i>final</i> set of entries to add to the newly created <i>unmodifiable</i> map
+     * @return an <i>unmodifiable</i> map with all given entries
+     */
+    public static <K, V> Map<K, V> map(final Entry<K, V>... entries)
+    {
+    	final HashMap<K, V> map = new HashMap<K, V>(entries.length);
+    	for (final Entry<K, V> entry : entries) {
+			map.put(entry.getKey(), entry.getValue());
+		}
+    	return Collections.unmodifiableMap(map);
     }
 
     public static <K, V> Map<K, V> map() {
@@ -60,11 +77,11 @@ public final class CollectionHelper {
         return list();
     }
 
-    public static <T> Collection<T> collection(T... elements) {
+    public static <T> Collection<T> collection(final T... elements) {
         return list(elements);
     }
 
-    public static <T> List<T> list(T... elements) {
+    public static <T> List<T> list(final T... elements) {
         return Collections.unmodifiableList(Arrays.asList(elements));
     }
 
@@ -73,7 +90,7 @@ public final class CollectionHelper {
                 * elements[0].size()) {
             private static final long serialVersionUID = -3161916411604210423L;
             {
-                for (Set<T> s : elements) {
+                for (final Set<T> s : elements) {
                     addAll(s);
                 }
             }
@@ -86,7 +103,7 @@ public final class CollectionHelper {
                     private static final long serialVersionUID = 3109256773218160485L;
                     {
                         if (iterable != null) {
-                            for (T t : iterable) {
+                            for (final T t : iterable) {
                                 add(t);
                             }
                         }
@@ -100,7 +117,7 @@ public final class CollectionHelper {
                     private static final long serialVersionUID = 3109256773218160485L;
                     {
                         if (iterable != null) {
-                            for (T t : iterable) {
+                            for (final T t : iterable) {
                                 add(t);
                             }
                         }
@@ -108,38 +125,38 @@ public final class CollectionHelper {
                 };
     }
 
-    public static <T> Set<T> unmodifiableSet(Set<? extends T> s) {
+    public static <T> Set<T> unmodifiableSet(final Set<? extends T> s) {
         return (s == null) ? Collections.<T> emptySet() : Collections.unmodifiableSet(s);
     }
 
-    public static <K, V> Map<K, V> unmodifiableMap(Map<? extends K, ? extends V> m) {
+    public static <K, V> Map<K, V> unmodifiableMap(final Map<? extends K, ? extends V> m) {
         return (m == null) ? Collections.<K, V> emptyMap() : Collections.unmodifiableMap(m);
     }
 
-    public static <T> Collection<T> unmodifiableCollection(Collection<? extends T> c) {
+    public static <T> Collection<T> unmodifiableCollection(final Collection<? extends T> c) {
         return (c == null) ? Collections.<T> emptyList() : Collections.unmodifiableCollection(c);
     }
 
-    public static <T> List<T> unmodifiableList(List<? extends T> l) {
+    public static <T> List<T> unmodifiableList(final List<? extends T> l) {
         return (l == null) ? Collections.<T> emptyList() : Collections.unmodifiableList(l);
     }
 
     public static <T> List<T> asList(final T t, final T... ts) {
-        ArrayList<T> list = new ArrayList<T>(ts.length + 1);
+        final ArrayList<T> list = new ArrayList<T>(ts.length + 1);
         list.add(t);
         Collections.addAll(list, ts);
         return list;
     }
 
     public static <T> Set<T> asSet(final T t, final T... ts) {
-        Set<T> set = new HashSet<T>(ts.length + 1);
+        final Set<T> set = new HashSet<T>(ts.length + 1);
         set.add(t);
         Collections.addAll(set, ts);
         return set;
     }
 
-    public static <T> List<T> conjunctCollections(Collection<T> list1, Collection<T> list2) {
-        HashSet<T> s1 = new HashSet<T>(list1);
+    public static <T> List<T> conjunctCollections(final Collection<T> list1, final Collection<T> list2) {
+        final HashSet<T> s1 = new HashSet<T>(list1);
         s1.retainAll(list2);
         return new ArrayList<T>(s1);
     }
@@ -152,11 +169,11 @@ public final class CollectionHelper {
         return Collections.synchronizedMap(new HashMap<K, V>());
     }
 
-    public static <K, V> Map<K, V> synchronizedMap(int initialCapacity) {
+    public static <K, V> Map<K, V> synchronizedMap(final int initialCapacity) {
         return Collections.synchronizedMap(new HashMap<K, V>(initialCapacity));
     }
 
-    protected static <K, V> Map<K, V> synchronizedMap(int initialCapacity, float loadFactor) {
+    protected static <K, V> Map<K, V> synchronizedMap(final int initialCapacity, final float loadFactor) {
         return Collections.synchronizedMap(new HashMap<K, V>(initialCapacity, loadFactor));
     }
 
@@ -178,7 +195,7 @@ public final class CollectionHelper {
      * 
      * @return a synchronized Set
      */
-    public static <T> Set<T> synchronizedSet(int initialCapacity) {
+    public static <T> Set<T> synchronizedSet(final int initialCapacity) {
         return Collections.synchronizedSet(new HashSet<T>(initialCapacity));
     }
 
@@ -200,7 +217,7 @@ public final class CollectionHelper {
      * 
      * @return a synchronized List
      */
-    public static <E> List<E> synchronizedList(int initialCapacity) {
+    public static <E> List<E> synchronizedList(final int initialCapacity) {
         return Collections.synchronizedList(new ArrayList<E>(initialCapacity));
     }
 
@@ -218,10 +235,10 @@ public final class CollectionHelper {
         if (collectionOfCollection == null || collectionOfCollection.isEmpty()) {
             return new HashSet<T>(0);
         }
-        HashSet<T> union = new HashSet<T>();
-        for (Collection<T> col : collectionOfCollection) {
+        final HashSet<T> union = new HashSet<T>();
+        for (final Collection<T> col : collectionOfCollection) {
             if (col != null) {
-                for (T t : col) {
+                for (final T t : col) {
                     if (t != null) {
                         union.add(t);
                     }
@@ -239,7 +256,7 @@ public final class CollectionHelper {
      *            
      * @return empty or not
      */
-    public static <T> boolean isNotEmpty(Collection<T> collection) {
+    public static <T> boolean isNotEmpty(final Collection<T> collection) {
         return collection != null && !collection.isEmpty();
     }
 }
