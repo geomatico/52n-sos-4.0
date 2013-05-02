@@ -23,6 +23,8 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
+import static org.n52.sos.util.DateTimeHelper.formatDateTime2IsoString;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -78,6 +80,7 @@ public class ResultHandlingHelper {
         final String tokenSeparator = getTokenSeparator(sosResultEncoding.getEncoding());
         final String blockSeparator = getBlockSeparator(sosResultEncoding.getEncoding());
         final Map<Integer, String> valueOrder = getValueOrderMap(sosResultStructure.getResultStructure());
+        addElementCount(builder,observations.size(),blockSeparator);
         for (final Observation observation : observations) {
             for (final Integer intger : valueOrder.keySet()) {
                 final String definition = valueOrder.get(intger);
@@ -100,7 +103,15 @@ public class ResultHandlingHelper {
         return null;
     }
 
-    private static Object getTimeStringForResultTime(final Date resultTime) {
+	private static void addElementCount(final StringBuilder builder,
+			final int size,
+			final String blockSeparator)
+	{
+		builder.append(String.valueOf(size));
+		builder.append(blockSeparator);
+	}
+
+	private static Object getTimeStringForResultTime(final Date resultTime) {
         if (resultTime != null) {
             return DateTimeHelper.formatDateTime2IsoString(new DateTime(resultTime));
         }
@@ -108,18 +119,24 @@ public class ResultHandlingHelper {
     }
 
     private static Object getTimeStringForPhenomenonTime(final Date phenomenonTimeStart, final Date phenomenonTimeEnd) {
-        final StringBuilder builder = new StringBuilder();
-        if (phenomenonTimeStart != null && phenomenonTimeEnd != null) {
-            builder.append(DateTimeHelper.formatDateTime2IsoString(new DateTime(phenomenonTimeStart)));
-            builder.append('/');
-            builder.append(DateTimeHelper.formatDateTime2IsoString(new DateTime(phenomenonTimeStart)));
-        } else if (phenomenonTimeStart != null && phenomenonTimeEnd == null) {
-            builder.append(DateTimeHelper.formatDateTime2IsoString(new DateTime(phenomenonTimeStart)));
-        } else {
-            builder.append(Configurator.getInstance().getProfileHandler().getActiveProfile()
-                    .getResponseNoDataPlaceholder());
-        }
-        return builder.toString();
+    	if (phenomenonTimeStart == null && phenomenonTimeEnd == null)
+    	{
+    		return Configurator.getInstance().getProfileHandler().getActiveProfile()
+    				.getResponseNoDataPlaceholder();
+    	}
+    	
+    	final StringBuilder builder = new StringBuilder();
+    	if (phenomenonTimeStart.equals(phenomenonTimeEnd))
+    	{
+    		builder.append(formatDateTime2IsoString(new DateTime(phenomenonTimeStart)));
+    	}
+    	else
+    	{
+    		builder.append(formatDateTime2IsoString(new DateTime(phenomenonTimeStart)));
+    		builder.append('/');
+    		builder.append(formatDateTime2IsoString(new DateTime(phenomenonTimeStart)));
+    	}
+    	return builder.toString();
     }
 
     private static Map<Integer, String> getValueOrderMap(
