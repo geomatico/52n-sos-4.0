@@ -33,9 +33,9 @@ import org.n52.sos.request.AbstractServiceRequest;
  */
 public class RequestEvent implements SosEvent {
 
-	private AbstractServiceRequest request;
+	private final AbstractServiceRequest request;
 
-	public RequestEvent(AbstractServiceRequest request) {
+	public RequestEvent(final AbstractServiceRequest request) {
 		this.request = request;
 	}
 
@@ -45,6 +45,6 @@ public class RequestEvent implements SosEvent {
 
 	@Override
 	public String toString() {
-		return String.format("RequestEvent[response=%s]", getRequest());
+		return String.format("RequestEvent[request=%s]", getRequest());
 	}
 }
