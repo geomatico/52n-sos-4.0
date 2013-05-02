@@ -23,6 +23,8 @@
  */
 package org.n52.sos.util;
 
+import javax.xml.namespace.QName;
+
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.values.BooleanValue;
@@ -76,9 +78,29 @@ public final class OMHelper {
         } else if (value instanceof SweDataArrayValue) {
             return OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION;
         }
-        return null;
+        return OMConstants.OBS_TYPE_OBSERVATION;
     }
 
     private OMHelper() {
+    }
+
+    public static String getObservationTypeForQName(QName resultModel) {
+       if (resultModel.equals(OMConstants.RESULT_MODEL_MEASUREMENT)) {
+           return OMConstants.OBS_TYPE_MEASUREMENT;
+       } else if (resultModel.equals(OMConstants.RESULT_MODEL_OBSERVATION)) {
+           return OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION;
+       }
+       // TODO add all other types
+       return OMConstants.OBS_TYPE_OBSERVATION;
+    }
+
+    public static QName getQNameForObservationTyper(String resultModel) {
+        if (resultModel.equals(OMConstants.OBS_TYPE_MEASUREMENT)) {
+            return OMConstants.RESULT_MODEL_MEASUREMENT;
+        } else if (resultModel.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)) {
+            return OMConstants.RESULT_MODEL_OBSERVATION;
+        }
+        // TODO add all other types
+        return OMConstants.RESULT_MODEL_OBSERVATION;
     }
 }
