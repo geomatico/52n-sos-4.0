@@ -49,7 +49,10 @@ public class Observation implements Serializable, HasIdentifier, HasDeletedFlag,
     public static final String VALID_TIME_END = "validTimeEnd";
     public static final String RESULT_TIME = "resultTime";
     public static final String SET_ID = "setId";
-    private static final long serialVersionUID = 4419764404575493525L;
+    /* see project_root/misc/db/script_20_create.sql -> creation of observation table*/
+	public static final String CONSTRAINT_OBSERVATION_IDENTITY = "observation_identity";
+	public static final String CONSTRAINT_OBSERVATION_IDENTIFIER_IDENTITY = "observation_identifier_identity";
+	private static final long serialVersionUID = 4419764404575493525L;
     private long observationId;
     private Boolean deleted;
     private FeatureOfInterest featureOfInterest;

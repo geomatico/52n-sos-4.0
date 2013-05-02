@@ -332,8 +332,9 @@ CREATE TABLE observation (
   unit_id bigint NULL,
   set_id TEXT NULL,
   deleted BOOL NOT NULL DEFAULT false,
-  UNIQUE (feature_of_interest_id,procedure_id,observable_property_id,phenomenon_time_start,phenomenon_time_end,result_time),
-  UNIQUE (identifier),
+  -- sync name of constraints with observation entity class
+  CONSTRAINT observation_identity UNIQUE (feature_of_interest_id,procedure_id,observable_property_id,phenomenon_time_start,phenomenon_time_end,result_time),
+  CONSTRAINT observation_identifier_identity UNIQUE (identifier),
   PRIMARY KEY(observation_id)
   );
   
