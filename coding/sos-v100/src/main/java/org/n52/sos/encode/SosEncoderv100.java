@@ -40,6 +40,7 @@ import net.opengis.gml.BoundingShapeType;
 import net.opengis.gml.CodeType;
 import net.opengis.gml.EnvelopeType;
 import net.opengis.gml.FeatureCollectionDocument;
+import net.opengis.gml.FeatureCollectionDocument2;
 import net.opengis.gml.ReferenceType;
 import net.opengis.gml.TimePeriodType;
 import net.opengis.ogc.ComparisonOperatorType;
@@ -399,8 +400,8 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
                         }
                     }
                 } else {
-                    FeatureCollectionDocument xbFeatColDoc =
-                            FeatureCollectionDocument.Factory.newInstance(XmlOptionsHelper.getInstance()
+                    FeatureCollectionDocument2 xbFeatColDoc =
+                            FeatureCollectionDocument2.Factory.newInstance(XmlOptionsHelper.getInstance()
                                     .getXmlOptions());
                     AbstractFeatureCollectionType xbFeatCol = xbFeatColDoc.addNewFeatureCollection();
                     StringBuilder builder = new StringBuilder();
@@ -428,7 +429,11 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
                     xmlObject = xbFeatColDoc;
                 }
             } else {
-                throw new NoApplicableCodeException().withMessage("Unknown featuretype");
+                FeatureCollectionDocument2 xbFeatColDoc =
+                        FeatureCollectionDocument2.Factory.newInstance(XmlOptionsHelper.getInstance()
+                                .getXmlOptions());
+                xbFeatColDoc.addNewFeatureCollection();
+                xmlObject = xbFeatColDoc;
             }
         }
         // set schemaLoction
