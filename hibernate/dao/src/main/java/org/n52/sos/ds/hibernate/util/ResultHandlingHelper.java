@@ -59,28 +59,28 @@ public class ResultHandlingHelper {
 
     private static final String PHENOMENON_TIME = "http://www.opengis.net/def/property/OGC/0/PhenomenonTime";
     
-    public static SosResultEncoding createSosResultEncoding(String resultEncoding) {
-        SosResultEncoding sosResultEncoding = new SosResultEncoding();
+    public static SosResultEncoding createSosResultEncoding(final String resultEncoding) {
+        final SosResultEncoding sosResultEncoding = new SosResultEncoding();
         sosResultEncoding.setXml(resultEncoding);
         return sosResultEncoding;
     }
 
-    public static SosResultStructure createSosResultStructure(String resultStructure) {
-        SosResultStructure sosResultStructure = new SosResultStructure();
+    public static SosResultStructure createSosResultStructure(final String resultStructure) {
+        final SosResultStructure sosResultStructure = new SosResultStructure();
         sosResultStructure.setXml(resultStructure);
         return sosResultStructure;
     }
 
-    public static String createResultValuesFromObservations(List<Observation> observations,
-                                                            SosResultEncoding sosResultEncoding,
-                                                            SosResultStructure sosResultStructure) throws OwsExceptionReport {
-        StringBuilder builder = new StringBuilder();
-        String tokenSeparator = getTokenSeparator(sosResultEncoding.getEncoding());
-        String blockSeparator = getBlockSeparator(sosResultEncoding.getEncoding());
-        Map<Integer, String> valueOrder = getValueOrderMap(sosResultStructure.getResultStructure());
-        for (Observation observation : observations) {
-            for (Integer intger : valueOrder.keySet()) {
-                String definition = valueOrder.get(intger);
+    public static String createResultValuesFromObservations(final List<Observation> observations,
+                                                            final SosResultEncoding sosResultEncoding,
+                                                            final SosResultStructure sosResultStructure) throws OwsExceptionReport {
+        final StringBuilder builder = new StringBuilder();
+        final String tokenSeparator = getTokenSeparator(sosResultEncoding.getEncoding());
+        final String blockSeparator = getBlockSeparator(sosResultEncoding.getEncoding());
+        final Map<Integer, String> valueOrder = getValueOrderMap(sosResultStructure.getResultStructure());
+        for (final Observation observation : observations) {
+            for (final Integer intger : valueOrder.keySet()) {
+                final String definition = valueOrder.get(intger);
                 if (definition.equals(PHENOMENON_TIME)) {
                     builder.append(getTimeStringForPhenomenonTime(observation.getPhenomenonTimeStart(), observation.getPhenomenonTimeEnd()));
                 } else if (definition.equals(RESULT_TIME)) {
@@ -100,15 +100,15 @@ public class ResultHandlingHelper {
         return null;
     }
 
-    private static Object getTimeStringForResultTime(Date resultTime) {
+    private static Object getTimeStringForResultTime(final Date resultTime) {
         if (resultTime != null) {
             return DateTimeHelper.formatDateTime2IsoString(new DateTime(resultTime));
         }
         return Configurator.getInstance().getProfileHandler().getActiveProfile().getResponseNoDataPlaceholder();
     }
 
-    private static Object getTimeStringForPhenomenonTime(Date phenomenonTimeStart, Date phenomenonTimeEnd) {
-        StringBuilder builder = new StringBuilder();
+    private static Object getTimeStringForPhenomenonTime(final Date phenomenonTimeStart, final Date phenomenonTimeEnd) {
+        final StringBuilder builder = new StringBuilder();
         if (phenomenonTimeStart != null && phenomenonTimeEnd != null) {
             builder.append(DateTimeHelper.formatDateTime2IsoString(new DateTime(phenomenonTimeStart)));
             builder.append('/');
@@ -123,23 +123,23 @@ public class ResultHandlingHelper {
     }
 
     private static Map<Integer, String> getValueOrderMap(
-            SosSweAbstractDataComponent sweDataElement) {
-        Map<Integer, String> valueOrder = new HashMap<Integer, String>(0);
+            final SosSweAbstractDataComponent sweDataElement) {
+        final Map<Integer, String> valueOrder = new HashMap<Integer, String>(0);
         if (sweDataElement instanceof SosSweDataArray && ((SosSweDataArray) sweDataElement).getElementType() instanceof SosSweDataRecord) {
-            SosSweDataArray dataArray = (SosSweDataArray) sweDataElement;
+            final SosSweDataArray dataArray = (SosSweDataArray) sweDataElement;
             addOrderAndDefinitionToMap(((SosSweDataRecord) dataArray.getElementType()).getFields(), valueOrder);
         } else if (sweDataElement instanceof SosSweDataRecord) {
-            SosSweDataRecord dataRecord = (SosSweDataRecord) sweDataElement;
+            final SosSweDataRecord dataRecord = (SosSweDataRecord) sweDataElement;
             addOrderAndDefinitionToMap(dataRecord.getFields(), valueOrder);
         }
         return new TreeMap<Integer, String>(valueOrder);
     }
 
-    private static void addOrderAndDefinitionToMap(List<SosSweField> fields, Map<Integer, String> valueOrder) {
+    private static void addOrderAndDefinitionToMap(final List<SosSweField> fields, final Map<Integer, String> valueOrder) {
         for (int i = 0; i < fields.size(); i++) {
-            SosSweAbstractDataComponent element = fields.get(i).getElement();
+            final SosSweAbstractDataComponent element = fields.get(i).getElement();
             if (element instanceof SosSweAbstractSimpleType) {
-                SosSweAbstractSimpleType<?> simpleType = (SosSweAbstractSimpleType) element;
+                final SosSweAbstractSimpleType<?> simpleType = (SosSweAbstractSimpleType<?>) element;
                 if (simpleType.isSetDefinition()) {
                     addValueToValueOrderMap(valueOrder, i, simpleType.getDefinition());
                 }
@@ -147,14 +147,14 @@ public class ResultHandlingHelper {
         }
     }
 
-    private static void addValueToValueOrderMap(Map<Integer, String> valueOrder, int index, String value) {
+    private static void addValueToValueOrderMap(final Map<Integer, String> valueOrder, final int index, final String value) {
         if (index >= 0) {
             valueOrder.put(index, value);
         }
     }
 
-    private static String getValueAsStringForObservedProperty(Observation observation, String definition) {
-        String observedProperty = observation.getObservableProperty().getIdentifier();
+    private static String getValueAsStringForObservedProperty(final Observation observation, final String definition) {
+        final String observedProperty = observation.getObservableProperty().getIdentifier();
         
 		if (observedProperty.equals(definition)) {
 		        if (observation instanceof NumericObservation) {
@@ -168,7 +168,7 @@ public class ResultHandlingHelper {
 		        } else if (observation instanceof TextObservation) {
 		            return String.valueOf(((TextObservation) observation).getValue().getValue());
 		        } else if (observation instanceof GeometryObservation) {
-		            WKTWriter writer = new WKTWriter();
+		            final WKTWriter writer = new WKTWriter();
 		            return writer.write(((GeometryObservation) observation).getValue().getValue());
 		        } else if (observation instanceof BlobObservation) {
 		            return String.valueOf(((BlobObservation) observation).getValue().getValue());
@@ -208,48 +208,48 @@ public class ResultHandlingHelper {
         return Configurator.getInstance().getProfileHandler().getActiveProfile().getResponseNoDataPlaceholder();
     }
 
-    public static String getTokenSeparator(SosSweAbstractEncoding encoding) {
+    public static String getTokenSeparator(final SosSweAbstractEncoding encoding) {
         if (encoding instanceof SosSweTextEncoding) {
             return ((SosSweTextEncoding) encoding).getTokenSeparator();
         }
         return null;
     }
     
-    public static String getBlockSeparator(SosSweAbstractEncoding encoding) {
+    public static String getBlockSeparator(final SosSweAbstractEncoding encoding) {
         if (encoding instanceof SosSweTextEncoding) {
             return ((SosSweTextEncoding) encoding).getBlockSeparator();
         }
         return null;
     }
     
-    public static int hasResultTime(SosSweAbstractDataComponent sweDataElement) {
+    public static int hasResultTime(final SosSweAbstractDataComponent sweDataElement) {
         if (sweDataElement instanceof SosSweDataArray && ((SosSweDataArray) sweDataElement).getElementType() instanceof SosSweDataRecord) {
-            SosSweDataArray dataArray = (SosSweDataArray) sweDataElement;
+            final SosSweDataArray dataArray = (SosSweDataArray) sweDataElement;
             return checkFields(((SosSweDataRecord) dataArray.getElementType()).getFields(), RESULT_TIME);
         } else if (sweDataElement instanceof SosSweDataRecord) {
-            SosSweDataRecord dataRecord = (SosSweDataRecord) sweDataElement;
+            final SosSweDataRecord dataRecord = (SosSweDataRecord) sweDataElement;
             return checkFields(dataRecord.getFields(), RESULT_TIME);
         }
         return -1;
     }
     
-    public static int hasPhenomenonTime(SosSweAbstractDataComponent sweDataElement) {
+    public static int hasPhenomenonTime(final SosSweAbstractDataComponent sweDataElement) {
         if (sweDataElement instanceof SosSweDataArray && ((SosSweDataArray) sweDataElement).getElementType() instanceof SosSweDataRecord) {
-            SosSweDataArray dataArray = (SosSweDataArray) sweDataElement;
+            final SosSweDataArray dataArray = (SosSweDataArray) sweDataElement;
             return checkFields(((SosSweDataRecord) dataArray.getElementType()).getFields(), PHENOMENON_TIME);
         } else if (sweDataElement instanceof SosSweDataRecord) {
-            SosSweDataRecord dataRecord = (SosSweDataRecord) sweDataElement;
+            final SosSweDataRecord dataRecord = (SosSweDataRecord) sweDataElement;
             return checkFields(dataRecord.getFields(), PHENOMENON_TIME);
         }
         return -1;
     }
 
-    public static int checkFields(List<SosSweField> fields, String definition) {
+    public static int checkFields(final List<SosSweField> fields, final String definition) {
 		int i = 0;
-		for (SosSweField f : fields) {
-			SosSweAbstractDataComponent element = f.getElement();
+		for (final SosSweField f : fields) {
+			final SosSweAbstractDataComponent element = f.getElement();
             if (element instanceof SosSweAbstractSimpleType) {
-                SosSweAbstractSimpleType<?> simpleType = (SosSweAbstractSimpleType) element;
+                final SosSweAbstractSimpleType<?> simpleType = (SosSweAbstractSimpleType<?>) element;
                 if (simpleType.isSetDefinition() && simpleType.getDefinition().equals(definition)) {
                     return i;
                 }
