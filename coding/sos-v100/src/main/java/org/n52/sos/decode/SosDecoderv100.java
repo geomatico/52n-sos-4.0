@@ -66,6 +66,7 @@ import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.XmlHelper;
@@ -316,6 +317,9 @@ public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObjec
         } else {
             getObsRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM);
         }
+        if (getObs.isSetResultModel()) {
+            getObsRequest.setResultModel(OMHelper.getObservationTypeForQName(getObs.getResultModel()));
+        }
 
         return getObsRequest;
     }
@@ -358,7 +362,9 @@ public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObjec
         if (responseMode != null && responseMode.toString().equalsIgnoreCase(SosConstants.RESPONSE_MODE_INLINE)) {
         	getObsByIdRequest.setResponseMode(SosConstants.RESPONSE_MODE_INLINE);
         }
-        getObsByIdRequest.setResultModel(getObsById.getResultModel());
+        if (getObsById.isSetResultModel()) {
+            getObsByIdRequest.setResultModel(OMHelper.getObservationTypeForQName(getObsById.getResultModel()));
+        }
         getObsByIdRequest.setObservationIdentifier(Arrays.asList(getObsById.getObservationId()));
         return getObsByIdRequest;
     }

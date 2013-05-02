@@ -28,8 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import org.n52.sos.ogc.om.SosObservation;
 
 public class GetObservationResponse extends AbstractServiceResponse {
@@ -38,7 +36,7 @@ public class GetObservationResponse extends AbstractServiceResponse {
 
     private List<SosObservation> observationCollection;
 
-    private QName resultModel;
+    private String resultModel;
 
     public String getResponseFormat() {
         return responseFormat;
@@ -117,11 +115,11 @@ public class GetObservationResponse extends AbstractServiceResponse {
         return false;
     }
 
-    public void setResultModel(QName resultModel) {
+    public void setResultModel(String resultModel) {
         this.resultModel = resultModel;
     }
     
-    public QName GetResultModel() {
+    public String GetResultModel() {
         return resultModel;
     }
     

@@ -59,7 +59,7 @@ public class GetObservationByIdDAO extends AbstractGetObservationByIdDAO {
             response.setVersion(request.getVersion());
             response.setResponseFormat(request.getResponseFormat());
             response.setObservationCollection(HibernateObservationUtilities.
-                    createSosObservationsFromObservations(observations, request.getVersion(), session));
+                    createSosObservationsFromObservations(observations, request.getVersion(), request.getResultModel(), session));
             return response;
 
         } catch (HibernateException he) {

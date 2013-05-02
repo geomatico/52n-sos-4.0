@@ -360,8 +360,7 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
             throws OwsExceptionReport {
         String observationType = sosObservation.getObservationConstellation().getObservationType();
         SosSingleObservationValue<?> observationValue = (SosSingleObservationValue) sosObservation.getValue();
-        if ((observationType.equals(OMConstants.OBS_TYPE_MEASUREMENT) || observationType
-                .equals(OMConstants.RESULT_MODEL_MEASUREMENT)) && observationValue.getValue() instanceof QuantityValue) {
+        if ((observationType.equals(OMConstants.OBS_TYPE_MEASUREMENT)) && observationValue.getValue() instanceof QuantityValue) {
             QuantityValue quantityValue = (QuantityValue) observationValue.getValue();
             MeasureType xbMeasureType =
                     MeasureType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());

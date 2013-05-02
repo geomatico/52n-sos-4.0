@@ -81,7 +81,7 @@ public class HibernateObservationUtilitiesTest extends HibernateTestCase {
     @Test
     public void returnEmptyCollectionIfCalledWithoutAnyParameters() throws OwsExceptionReport {
         List<SosObservation> resultList = HibernateObservationUtilities
-                .createSosObservationsFromObservations(null, null, null);
+                .createSosObservationsFromObservations(null, null, null, null);
         assertThat("result is null", resultList, is(not(nullValue())));
         assertThat("elements in list", resultList.size(), is(0));
     }
@@ -154,7 +154,7 @@ public class HibernateObservationUtilitiesTest extends HibernateTestCase {
             observationsFromDataBase.add(hObservation);
             // CALL
             List<SosObservation> resultList = HibernateObservationUtilities
-                    .createSosObservationsFromObservations(observationsFromDataBase, request.getVersion(), session);
+                    .createSosObservationsFromObservations(observationsFromDataBase, request.getVersion(), null, session);
             // TEST RESULTS
             assertThat(resultList, is(notNullValue()));
             assertThat(resultList.size(), is(1));

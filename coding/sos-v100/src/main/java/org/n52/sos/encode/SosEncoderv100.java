@@ -306,34 +306,31 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
          * only om:Measurement also om:Observation valid? or take
          * observationType from DB as given
          */
-        if (iObservationEncoder.shouldObservationsWithSameXBeMerged()) {
+        if (iObservationEncoder.shouldObservationsWithSameXBeMerged()
+                && (!response.isSetResultModel() || (response.isSetResultModel() && response
+                        .equals(OMConstants.RESULT_MODEL_OBSERVATION)))) {
             response.mergeObservationsWithSameX();
         }
 
         observationCollection = response.getObservationCollection();
 
-        if (observationCollection != null) {
-            if (observationCollection.size() > 0) {
-                xb_obsCol.addNewBoundedBy();
-                xb_obsCol.setBoundedBy(createBoundedBy(observationCollection));
+        if (observationCollection != null && observationCollection.size() > 0) {
+            xb_obsCol.addNewBoundedBy();
+            xb_obsCol.setBoundedBy(createBoundedBy(observationCollection));
 
-                for (SosObservation sosObservation : observationCollection) {
+            for (SosObservation sosObservation : observationCollection) {
 
-                    if (sosObservation.getResultType() != null
-                            && sosObservation.getResultType().equalsIgnoreCase(OMConstants.EN_MEASUREMENT)) {
-                        XmlObject xmlObject =
-                                CodingHelper.encodeObjectToXml(response.getResponseFormat(), sosObservation);
-                        xb_obsCol.addNewMember().set(xmlObject);
-                    } else {
-                        XmlObject xmlObject =
-                                CodingHelper.encodeObjectToXml(response.getResponseFormat(), sosObservation);
-                        xb_obsCol.addNewMember().addNewObservation().set(xmlObject);
-                    }
-
+                if ((response.isSetResultModel() && response.GetResultModel().equals(
+                        OMConstants.OBS_TYPE_MEASUREMENT))
+                        || (sosObservation.getResultType() != null && sosObservation.getResultType().equalsIgnoreCase(
+                                OMConstants.EN_MEASUREMENT))) {
+                    sosObservation.setResultType(OMConstants.EN_MEASUREMENT);
+                    XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getResponseFormat(), sosObservation);
+                    xb_obsCol.addNewMember().set(xmlObject);
+                } else {
+                    XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getResponseFormat(), sosObservation);
+                    xb_obsCol.addNewMember().addNewObservation().set(xmlObject);
                 }
-            } else {
-                ObservationPropertyType xb_obs = xb_obsCol.addNewMember();
-                xb_obs.setHref(GMLConstants.NIL_INAPPLICABLE);
             }
         } else {
             ObservationPropertyType xb_obs = xb_obsCol.addNewMember();
@@ -352,7 +349,8 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
     }
 
     // TODO call GmlEncoder
-    private BoundingShapeType createBoundedBy(Collection<SosObservation> observationCollection) throws OwsExceptionReport {
+    private BoundingShapeType createBoundedBy(Collection<SosObservation> observationCollection)
+            throws OwsExceptionReport {
         SosEnvelope sosEnvelope = new SosEnvelope();
 
         for (SosObservation sosObservation : observationCollection) {
@@ -369,7 +367,8 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
         return xb_boundingShape;
     }
 
-    // TODO remove, call encoder directly, Collection == GmlEncoder, single FOI == SamplingEncoder 
+    // TODO remove, call encoder directly, Collection == GmlEncoder, single FOI
+    // == SamplingEncoder
     private XmlObject createGetFeatureOfInterestResponse(GetFeatureOfInterestResponse response)
             throws OwsExceptionReport {
         XmlObject xmlObject = null;

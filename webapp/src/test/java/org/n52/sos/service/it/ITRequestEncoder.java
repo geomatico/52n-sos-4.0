@@ -67,6 +67,7 @@ import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
+import org.n52.sos.util.OMHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -201,7 +202,7 @@ public class ITRequestEncoder {
             }
 
             if (req.getResultModel() != null) {
-                xb_getObs.setResultModel(req.getResultModel());
+                xb_getObs.setResultModel(OMHelper.getQNameForObservationTyper(req.getResultModel()));
             }
 
             if (req.getResponseMode() != null && !req.getResponseMode().equals(SosConstants.PARAMETER_NOT_SET)) {

@@ -400,12 +400,10 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
             throws OwsExceptionReport {
         String observationType = sosObservation.getObservationConstellation().getObservationType();
         SosSingleObservationValue<?> observationValue = (SosSingleObservationValue) sosObservation.getValue();
-        if ((observationType.equals(OMConstants.OBS_TYPE_MEASUREMENT) || observationType
-                .equals(OMConstants.RESULT_MODEL_MEASUREMENT)) && observationValue.getValue() instanceof QuantityValue) {
+        if ((observationType.equals(OMConstants.OBS_TYPE_MEASUREMENT)) && observationValue.getValue() instanceof QuantityValue) {
             QuantityValue quantityValue = (QuantityValue) observationValue.getValue();
             xbResult.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, quantityValue));
-        } else if ((observationType.equals(OMConstants.OBS_TYPE_COUNT_OBSERVATION) || observationType
-                .equals(OMConstants.RESULT_MODEL_COUNT_OBSERVATION))
+        } else if ((observationType.equals(OMConstants.OBS_TYPE_COUNT_OBSERVATION))
                 && observationValue.getValue() instanceof CountValue) {
             CountValue countValue = (CountValue) observationValue.getValue();
             XmlInteger xbInteger = XmlInteger.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
@@ -415,8 +413,7 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
                 xbInteger.setNil();
             }
             xbResult.set(xbInteger);
-        } else if ((observationType.equals(OMConstants.OBS_TYPE_TEXT_OBSERVATION) || observationType
-                .equals(OMConstants.RESULT_MODEL_TEXT_OBSERVATION))
+        } else if ((observationType.equals(OMConstants.OBS_TYPE_TEXT_OBSERVATION))
                 && observationValue.getValue() instanceof TextValue) {
             TextValue textValue = (TextValue) observationValue.getValue();
             XmlString xbString = XmlString.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
@@ -426,8 +423,7 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
                 xbString.setNil();
             }
             xbResult.set(xbString);
-        } else if ((observationType.equals(OMConstants.OBS_TYPE_TRUTH_OBSERVATION) || observationType
-                .equals(OMConstants.RESULT_MODEL_TRUTH_OBSERVATION))
+        } else if ((observationType.equals(OMConstants.OBS_TYPE_TRUTH_OBSERVATION))
                 && observationValue.getValue() instanceof BooleanValue) {
             BooleanValue booleanValue = (BooleanValue) observationValue.getValue();
             XmlBoolean xbBoolean = XmlBoolean.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
@@ -437,8 +433,7 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
                 xbBoolean.setNil();
             }
             xbResult.set(xbBoolean);
-        } else if ((observationType.equals(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION) || observationType
-                .equals(OMConstants.RESULT_MODEL_CATEGORY_OBSERVATION))
+        } else if ((observationType.equals(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION))
                 && observationValue.getValue() instanceof CategoryValue) {
             CategoryValue categoryValue = (CategoryValue) observationValue.getValue();
             if (categoryValue.getValue() != null && !categoryValue.getValue().isEmpty()) {
@@ -450,8 +445,7 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
             } else {
                 xbResult.setNil();
             }
-        } else if ((observationType.equals(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION) || observationType
-                .equals(OMConstants.RESULT_MODEL_GEOMETRY_OBSERVATION))
+        } else if ((observationType.equals(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION))
                 && observationValue.getValue() instanceof GeometryValue) {
 
             GeometryValue geometryValue = (GeometryValue) observationValue.getValue();
@@ -465,8 +459,7 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
             } else {
                 xbResult.setNil();
             }
-        } else if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)
-                || observationType.equals(OMConstants.RESULT_MODEL_OBSERVATION)) {
+        } else if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)) {
             // TODO create SosSweDataArray
             SosSweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
             Map<HelperValues, String> additionalValues =

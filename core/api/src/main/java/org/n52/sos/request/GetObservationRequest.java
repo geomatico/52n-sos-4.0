@@ -29,8 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 import org.n52.sos.ogc.filter.ComparisonFilter;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
@@ -102,7 +100,7 @@ public class GetObservationRequest extends AbstractServiceRequest {
     /**
      * Result model
      */
-    private QName resultModel;
+    private String resultModel;
 
     private Map<String, String> namespaces;
 
@@ -309,7 +307,7 @@ public class GetObservationRequest extends AbstractServiceRequest {
      * 
      * @return result model
      */
-    public QName getResultModel() {
+    public String getResultModel() {
         return resultModel;
     }
 
@@ -319,7 +317,7 @@ public class GetObservationRequest extends AbstractServiceRequest {
      * @param resultModel
      *            result model
      */
-    public void setResultModel(QName resultModel) {
+    public void setResultModel(String resultModel) {
         this.resultModel = resultModel;
     }
 

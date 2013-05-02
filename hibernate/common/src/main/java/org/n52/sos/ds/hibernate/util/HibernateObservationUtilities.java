@@ -99,6 +99,7 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.SosHelper;
+import org.n52.sos.util.StringHelper;
 
 public class HibernateObservationUtilities {
 
@@ -165,7 +166,7 @@ public class HibernateObservationUtilities {
      */
     @SuppressWarnings("unchecked")
     public static List<SosObservation> createSosObservationsFromObservations(final Collection<Observation> observations,
-            final String version, final Session session) throws OwsExceptionReport {
+            final String version, String resultModel, final Session session) throws OwsExceptionReport {
         final List<SosObservation> observationCollection = new ArrayList<SosObservation>(0);
 
         final Map<String, SosAbstractFeature> features = new HashMap<String, SosAbstractFeature>(0);
@@ -262,9 +263,15 @@ public class HibernateObservationUtilities {
                     final ObservationConstellation hObservationConstellation =
                                              getObservationConstellation(hProcedure, hObservableProperty,
                                                                          hObservation.getOfferings(), session);
-                    final String observationType = hObservationConstellation.getObservationType().getObservationType();
+                    String observationType = null;
+                    if (StringHelper.isNotEmpty(resultModel)) {
+                        observationType = resultModel;
+                    } else {
+                        observationType = hObservationConstellation.getObservationType().getObservationType();
+                    }
                     obsConst.setObservationType(observationType);
-                    if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)) {
+                    if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION) || observationType.equals(
+                            OMConstants.OBS_TYPE_OBSERVATION)) {
                         final List<ResultTemplate> hResultTemplates =
                                              HibernateCriteriaQueryUtilities
                                 .getResultTemplateObjectsForObservationConstellation(

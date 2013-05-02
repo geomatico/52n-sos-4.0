@@ -28,8 +28,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetObservationByIdDAO;
 import org.n52.sos.encode.Encoder;
@@ -53,7 +51,7 @@ import org.slf4j.LoggerFactory;
 public class SosGetObservationByIdOperatorV100 extends
  AbstractV1RequestOperator<AbstractGetObservationByIdDAO, GetObservationByIdRequest> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SosGetFeatureOfInterestOperatorV100.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(SosGetObservationByIdOperatorV100.class.getName());
     private static final String OPERATION_NAME = SosConstants.Operations.GetObservationById.name();
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton("http://www.opengis.net/spec/SOS/1.0/conf/enhanced");
 
@@ -83,7 +81,8 @@ public class SosGetObservationByIdOperatorV100 extends
                     .withMessage("Only responseMode inline is currently supported by this SOS 1.0.0 implementation")
                     .at(SosConstants.GetObservationParams.responseMode);
 		}
-		QName resultModel = sosRequest.getResultModel();
+        
+	String resultModel = sosRequest.getResultModel();
         if (resultModel != null) {
             throw new NoApplicableCodeException().at(SosConstants.GetObservationParams.resultModel)
                     .withMessage("resultModel is currently not supported by this SOS 1.0.0 implementation");

@@ -142,7 +142,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
 
         }
         LOGGER.debug("Time to query observations needed {} ms!", (System.currentTimeMillis() - start));
-        return toSosObservation(observations, request.getVersion(), session);
+        return toSosObservation(observations, request.getVersion(), request.getResultModel(), session);
     }
     
     /**
@@ -200,7 +200,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         }
 
         LOGGER.debug("Time to query observations needs {} ms!", (System.currentTimeMillis() - start));
-        result.addAll(toSosObservation(allObservations, request.getVersion(), session));
+        result.addAll(toSosObservation(allObservations, request.getVersion(), request.getResultModel(), session));
         return result;
     }
 
@@ -216,12 +216,12 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         }
     }
 
-    protected List<SosObservation> toSosObservation(final Collection<Observation> observations, final String version,
+    protected List<SosObservation> toSosObservation(final Collection<Observation> observations, final String version, String resultModel,
                                                     final Session session) throws OwsExceptionReport {
         if (!observations.isEmpty()) {
             final long startProcess = System.currentTimeMillis();
             final List<SosObservation> sosObservations = HibernateObservationUtilities
-                    .createSosObservationsFromObservations(new HashSet<Observation>(observations), version, session);
+                    .createSosObservationsFromObservations(new HashSet<Observation>(observations), version, resultModel, session);
             LOGGER.debug("Time to process observations needs {} ms!", (System.currentTimeMillis() - startProcess));
             return sosObservations;
         } else {

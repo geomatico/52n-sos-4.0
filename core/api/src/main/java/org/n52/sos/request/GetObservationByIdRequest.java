@@ -25,8 +25,6 @@ package org.n52.sos.request;
 
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import org.n52.sos.ogc.sos.SosConstants;
 
 /**
@@ -58,7 +56,7 @@ public class GetObservationByIdRequest extends AbstractServiceRequest {
     /**
      * Result model
      */
-    private QName resultModel;
+    private String resultModel;
 
     /**
      * Response mode
@@ -127,7 +125,7 @@ public class GetObservationByIdRequest extends AbstractServiceRequest {
      * 
      * @return result model
      */
-    public QName getResultModel() {
+    public String getResultModel() {
         return resultModel;
     }
 
@@ -137,7 +135,7 @@ public class GetObservationByIdRequest extends AbstractServiceRequest {
      * @param resultModel
      *            result model
      */
-    public void setResultModel(QName resultModel) {
+    public void setResultModel(String resultModel) {
         this.resultModel = resultModel;
     }
 
