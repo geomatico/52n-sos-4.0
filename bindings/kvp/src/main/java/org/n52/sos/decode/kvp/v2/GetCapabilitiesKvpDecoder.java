@@ -31,6 +31,7 @@ import java.util.Set;
 import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.KvpOperationDecoderKey;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.exception.ows.concrete.ParameterNotSupportedException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OWSConstants;
@@ -86,7 +87,7 @@ public class GetCapabilitiesKvpDecoder extends AbstractKvpDecoder {
                     if (!parameterValues.isEmpty()) {
                         request.setAcceptVersions(Arrays.asList(parameterValues.split(",")));
                     } else {
-                        exceptions.add(new InvalidParameterValueException(parameterName, parameterValues));
+                        exceptions.add(new MissingParameterValueException(parameterName));
                     }
                 } // acceptFormats (optional)
                 else if (parameterName.equalsIgnoreCase(SosConstants.GetCapabilitiesParams.AcceptFormats.name())) {
