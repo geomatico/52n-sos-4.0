@@ -207,8 +207,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
                                 + JavaHelper.generateID(samplingFeature.getXmlDescription());
                 samplingFeature.setIdentifier(new CodeWithAuthority(featureIdentifier));
             }
-            insertFeatureOfInterest(samplingFeature, session);
-            return featureIdentifier;
+            return insertFeatureOfInterest(samplingFeature, session);
         }
     }
 
@@ -235,11 +234,15 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
 
     protected FeatureOfInterest getFeatureOfInterest(String identifier, Geometry geometry, Session session) throws
             OwsExceptionReport {
-        return (FeatureOfInterest) session.createCriteria(FeatureOfInterest.class)
-                .add(Restrictions.or(Restrictions.eq(FeatureOfInterest.IDENTIFIER, identifier),
-                                     SpatialRestrictions.eq(FeatureOfInterest.GEOMETRY,
-                                                            switchCoordinateAxisOrderIfNeeded(geometry))))
-                .uniqueResult();
+        if (!identifier.startsWith(SosConstants.GENERATED_IDENTIFIER_PREFIX)) {
+            return (FeatureOfInterest) session.createCriteria(FeatureOfInterest.class)
+                    .add(Restrictions.eq(FeatureOfInterest.IDENTIFIER, identifier))
+                    .uniqueResult();
+        } else {
+            return (FeatureOfInterest) session.createCriteria(FeatureOfInterest.class)
+                    .add(SpatialRestrictions.eq(FeatureOfInterest.GEOMETRY, switchCoordinateAxisOrderIfNeeded(geometry)))
+                    .uniqueResult();
+        }
     }
 
     /**
@@ -285,7 +288,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
         return sampFeat;
     }
 
-    protected void insertFeatureOfInterest(SosSamplingFeature samplingFeature, Session session) throws OwsExceptionReport {
+    protected String insertFeatureOfInterest(SosSamplingFeature samplingFeature, Session session) throws OwsExceptionReport {
         if (!isSpatialDatasource()) {
             throw new NotYetSupportedException("Insertion of full encoded features for non spatial datasources");
         }
@@ -318,13 +321,9 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
             }
             session.save(feature);
             session.flush();
+            return newId;
         } else {
-            String persistedId = feature.getIdentifier();
-            if (!(persistedId == null ? newId == null : persistedId.equals(newId))) {
-                throw new NoApplicableCodeException()
-                        .withMessage("The featureOfInterest '%s' has the same geometry as the featureOfInterest with the id '%s'",
-                                     newId, persistedId);
-            }
+            return feature.getIdentifier();
         }
     }
 
