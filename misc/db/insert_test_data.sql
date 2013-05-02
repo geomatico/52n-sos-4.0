@@ -578,8 +578,8 @@ SELECT insert_observation_constellation('http://www.52north.org/test/procedure/3
 SELECT insert_observation_constellation('http://www.52north.org/test/procedure/4', 'http://www.52north.org/test/observableProperty/4', 'http://www.52north.org/test/offering/4', 'CategoryObservation');
 SELECT insert_observation_constellation('http://www.52north.org/test/procedure/5', 'http://www.52north.org/test/observableProperty/5', 'http://www.52north.org/test/offering/5', 'TextObservation');
 SELECT insert_observation_constellation('http://www.52north.org/test/procedure/6', 'http://www.52north.org/test/observableProperty/6', 'http://www.52north.org/test/offering/6', 'SWEArrayObservation');
-SELECT insert_observation_constellation('http://www.52north.org/test/procedure/7', 'http://www.52north.org/test/observableProperty/7', 'http://www.52north.org/test/offering/7', 'SWEArrayObservation');
-SELECT insert_observation_constellation('http://www.52north.org/test/procedure/8', 'http://www.52north.org/test/observableProperty/8', 'http://www.52north.org/test/offering/8', 'SWEArrayObservation');
+SELECT insert_observation_constellation('http://www.52north.org/test/procedure/7', 'http://www.52north.org/test/observableProperty/7', 'http://www.52north.org/test/offering/7', 'Measurement');
+SELECT insert_observation_constellation('http://www.52north.org/test/procedure/8', 'http://www.52north.org/test/observableProperty/8', 'http://www.52north.org/test/offering/8', 'Measurement');
 
 -- INSERT OBSERVATIONS
 SELECT insert_numeric_observation(insert_observation('http://www.52north.org/test/procedure/1', 'http://www.52north.org/test/observableProperty/1', 'http://www.52north.org/test/featureOfInterest/1', 'test_unit_1', '2012-11-19 13:00Z', 'http://www.52north.org/test/offering/1'), 1.2);	
