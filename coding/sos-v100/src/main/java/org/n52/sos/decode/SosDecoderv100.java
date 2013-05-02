@@ -46,6 +46,7 @@ import net.opengis.sos.x10.GetObservationDocument.GetObservation;
 import net.opengis.sos.x10.GetObservationDocument.GetObservation.FeatureOfInterest;
 import net.opengis.sos.x10.ResponseModeType.Enum;
 
+import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
@@ -116,6 +117,18 @@ public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObjec
         AbstractServiceCommunicationObject response = null;
         LOGGER.debug("REQUESTTYPE:" + xmlObject.getClass());
 
+        /*
+         *  Add O&M 1.0.0 namespace to GetObservation document.
+         *  XmlBeans removes the namespace from the document because there
+         *  are no om:... elements in the document. But the validation fails
+         *  if the <resultModel> element is set with e.g. om:Measurement.
+         */
+        if (xmlObject instanceof GetObservationDocument) {
+           XmlCursor cursor = xmlObject.newCursor();
+           cursor.toFirstChild();
+           cursor.insertNamespace(OMConstants.NS_OM_PREFIX, OMConstants.NS_OM);
+           cursor.dispose();
+        }
         // validate document
         XmlHelper.validateDocument(xmlObject);
 
