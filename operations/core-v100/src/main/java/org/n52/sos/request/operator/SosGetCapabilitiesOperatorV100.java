@@ -40,6 +40,7 @@ import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +70,9 @@ public class SosGetCapabilitiesOperatorV100 extends AbstractV1RequestOperator<Ab
         boolean zipCompr = false;
         if (sosRequest.isSetAcceptFormats()) {
             zipCompr = checkAcceptFormats(sosRequest.getAcceptFormats());
+        }
+        if (sosRequest.isSetSections()) {
+            SosHelper.checkSection(sosRequest.getSections());
         }
 
         GetCapabilitiesResponse response = getDao().getCapabilities(sosRequest);

@@ -70,12 +70,16 @@ import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.MultiMaps;
 import org.n52.sos.util.SetMultiMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of the interface IGetCapabilitiesDAO
  * 
  */
 public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(GetCapabilitiesDAO.class);
 
     /* section flags (values are powers of 2) */
     private static final int SERVICE_IDENTIFICATION = 0x01;
@@ -154,8 +158,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         } else {
             for (String section : request.getSections()) {
                 if (section.isEmpty()) {
-                    // TODO empty section does not result in an exception -
-                    // report? <-- should be done by RequestOperator
+                    LOGGER.warn("A {} element is empty! Check if operator checks for empty elements!", SosConstants.GetCapabilitiesParams.Section.name());
                     continue;
                 }
                 if (section.equals(SosConstants.CapabilitiesSections.All.name())) {

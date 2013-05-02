@@ -43,6 +43,7 @@ import java.util.Stack;
 import org.n52.sos.binding.Binding;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.encode.Encoder;
+import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
@@ -721,6 +722,15 @@ public static Collection<String> getSupportedResponseFormats(final String servic
 
         protected Collection<Binding> getBindings() {
             return Configurator.getInstance().getBindingRepository().getBindings().values();
+        }
+    }
+
+    public static void checkSection(List<String> sections) throws CodedException {
+        for (String section : sections) {
+            if (section == null || (section != null && section.isEmpty())) {
+                throw new MissingParameterValueException(SosConstants.GetCapabilitiesParams.Section.name())
+                        .withMessage("The section element is empty!");
+            }
         }
     }
 }

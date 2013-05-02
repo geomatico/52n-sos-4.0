@@ -32,10 +32,13 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetCapabilitiesDAO;
 import org.n52.sos.encode.Encoder;
+import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.exception.ows.concrete.EncoderResponseUnsupportedException;
 import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
 import org.n52.sos.exception.ows.concrete.VersionNotSupportedException;
+import org.n52.sos.ogc.ows.CapabilitiesExtension;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -45,14 +48,18 @@ import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
 
-public class SosGetCapabilitiesOperatorV20 extends AbstractV2RequestOperator<AbstractGetCapabilitiesDAO, GetCapabilitiesRequest> {
+public class SosGetCapabilitiesOperatorV20 extends
+        AbstractV2RequestOperator<AbstractGetCapabilitiesDAO, GetCapabilitiesRequest> {
 
     private static final String OPERATION_NAME = SosConstants.Operations.GetCapabilities.name();
-    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_CORE_PROFILE);
+
+    private static final Set<String> CONFORMANCE_CLASSES = Collections
+            .singleton(ConformanceClasses.SOS_V2_CORE_PROFILE);
 
     public SosGetCapabilitiesOperatorV20() {
         super(OPERATION_NAME, GetCapabilitiesRequest.class);
@@ -73,14 +80,18 @@ public class SosGetCapabilitiesOperatorV20 extends AbstractV2RequestOperator<Abs
         if (sosRequest.isSetAcceptFormats()) {
             zipCompr = checkAcceptFormats(sosRequest.getAcceptFormats());
         }
+        if (sosRequest.isSetSections()) {
+            SosHelper.checkSection(sosRequest.getSections());
+        }
 
         GetCapabilitiesResponse response = getDao().getCapabilities(sosRequest);
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         // XmlOptions xmlOptions;
         try {
-            Encoder<?,GetCapabilitiesResponse> encoder = Configurator.getInstance().getCodingRepository()
-                    .getEncoder(CodingHelper.getEncoderKey(Sos2Constants.NS_SOS_20, response));
+            Encoder<?, GetCapabilitiesResponse> encoder =
+                    Configurator.getInstance().getCodingRepository()
+                            .getEncoder(CodingHelper.getEncoderKey(Sos2Constants.NS_SOS_20, response));
             if (encoder != null) {
                 Object encodedObject = encoder.encode(response);
                 if (encodedObject instanceof XmlObject) {
@@ -116,8 +127,8 @@ public class SosGetCapabilitiesOperatorV20 extends AbstractV2RequestOperator<Abs
         if (zip == -1 && xml == -1) {
             throw new InvalidParameterValueException().at(SosConstants.GetCapabilitiesParams.AcceptFormats)
                     .withMessage("The parameter '%s' is invalid. The following values are supported: %s, %s",
-                                 SosConstants.GetCapabilitiesParams.AcceptFormats, SosConstants.CONTENT_TYPE_XML,
-                                 SosConstants.CONTENT_TYPE_ZIP);
+                            SosConstants.GetCapabilitiesParams.AcceptFormats, SosConstants.CONTENT_TYPE_XML,
+                            SosConstants.CONTENT_TYPE_ZIP);
         }
 
         // if zip is requested testing, whether the priority is bigger than xml
