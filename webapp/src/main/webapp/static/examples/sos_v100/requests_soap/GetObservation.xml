@@ -7,7 +7,10 @@
 			xmlns:ogc="http://www.opengis.net/ogc"
 			xmlns:om="http://www.opengis.net/om/1.0">
 	<env:Body>
-		<sos:GetObservation service="SOS" version="1.0.0" srsName="urn:ogc:def:crs:EPSG::4326">
+		<sos:GetObservation service="SOS" version="1.0.0" srsName="urn:ogc:def:crs:EPSG::4326" xmlns:sos="http://www.opengis.net/sos/1.0" xmlns:ows="http://www.opengis.net/ows/1.1"
+			xmlns:gml="http://www.opengis.net/gml"
+			xmlns:ogc="http://www.opengis.net/ogc"
+			xmlns:om="http://www.opengis.net/om/1.0">
 			
 			<!-- mandatory -->
 			<sos:offering>http://www.52north.org/test/offering/6</sos:offering>

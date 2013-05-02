@@ -4,7 +4,7 @@
 	<env:Body>
 		<swes:DescribeSensor service="SOS" version="2.0.0" xmlns:swes="http://www.opengis.net/swes/2.0"
 			xsi:schemaLocation="http://www.opengis.net/swes/2.0 http://schemas.opengis.net/swes/2.0/swes.xsd">
-			<swes:procedure>http://www.52north.org/test/procedure/101</swes:procedure>
+			<swes:procedure>http://www.52north.org/test/procedure/1</swes:procedure>
 			<swes:procedureDescriptionFormat>http://www.opengis.net/sensorML/1.0.1</swes:procedureDescriptionFormat>
 		</swes:DescribeSensor>
 	</env:Body>
