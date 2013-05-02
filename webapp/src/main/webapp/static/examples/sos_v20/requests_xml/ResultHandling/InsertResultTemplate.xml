@@ -50,7 +50,7 @@
 						</swe:Time>
 					</swe:field>
 					<swe:field name="test_observable_property_9">
-						<swe:Quantity definition="http://www.52north.org/test/observableProperty/9">
+						<swe:Quantity definition="http://www.52north.org/test/observableProperty/9_3">
 							<swe:uom code="test_unit_9" />
 						</swe:Quantity>
 					</swe:field>
