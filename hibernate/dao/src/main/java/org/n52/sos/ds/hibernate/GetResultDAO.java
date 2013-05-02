@@ -23,6 +23,9 @@
  */
 package org.n52.sos.ds.hibernate;
 
+import static org.n52.sos.util.CollectionHelper.*;
+import static org.n52.sos.util.HTTPConstants.StatusCode.INTERNAL_SERVER_ERROR;
+
 import java.util.List;
 import java.util.Set;
 
@@ -31,7 +34,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.AbstractGetResultDAO;
-import org.n52.sos.ds.hibernate.HibernateSessionHolder;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
@@ -51,45 +53,45 @@ import org.n52.sos.response.GetResultResponse;
 
 public class GetResultDAO extends AbstractGetResultDAO {
 
-    private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    private final HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
     
     public GetResultDAO() {
         super(SosConstants.SOS);
     }
 
     @Override
-    public GetResultResponse getResult(GetResultRequest request) throws OwsExceptionReport {
+    public GetResultResponse getResult(final GetResultRequest request) throws OwsExceptionReport {
         Session session = null;
         try {
             session = sessionHolder.getSession();
-            GetResultResponse response = new GetResultResponse();
+            final GetResultResponse response = new GetResultResponse();
             response.setService(request.getService());
             response.setVersion(request.getVersion());
-            Set<String> featureIdentifier =
+            final Set<String> featureIdentifier =
                     QueryHelper.getFeatureIdentifier(request.getSpatialFilter(), request.getFeatureIdentifiers(),
                             session);
-            List<ResultTemplate> resultTemplates = queryResultTemplate(request, featureIdentifier, session);
-            if (resultTemplates != null && !resultTemplates.isEmpty()) {
-                SosResultEncoding sosResultEncoding =
-                        ResultHandlingHelper.createSosResultEncoding(resultTemplates.get(0).getResultEncoding());
-                SosResultStructure sosResultStructure =
-                        ResultHandlingHelper.createSosResultStructure(resultTemplates.get(0).getResultStructure());
-                List<Observation> observations = queryObservation(request, featureIdentifier, session);
+            final List<ResultTemplate> resultTemplates = queryResultTemplate(request, featureIdentifier, session);
+            if (isNotEmpty(resultTemplates)) {
+                final SosResultEncoding sosResultEncoding = new SosResultEncoding(resultTemplates.get(0).getResultEncoding());
+                final SosResultStructure sosResultStructure = new SosResultStructure(resultTemplates.get(0).getResultStructure());
+                final List<Observation> observations = queryObservation(request, featureIdentifier, session);
                 response.setResultValues(ResultHandlingHelper.createResultValuesFromObservations(observations,
                         sosResultEncoding, sosResultStructure));
             }
             return response;
-        } catch (HibernateException he) {
-            throw new NoApplicableCodeException().causedBy(he)
-                    .withMessage("Error while querying result data!");
+        } catch (final HibernateException he) {
+            throw new NoApplicableCodeException()
+            		.causedBy(he)
+                    .withMessage("Error while querying result data!")
+                    .setStatus(INTERNAL_SERVER_ERROR);
         } finally {
             sessionHolder.returnSession(session);
         }
     }
 
-    private List<ResultTemplate> queryResultTemplate(GetResultRequest request, Set<String> featureIdentifier,
-            Session session) {
-        List<ResultTemplate> resultTemplates =
+    private List<ResultTemplate> queryResultTemplate(final GetResultRequest request, final Set<String> featureIdentifier,
+            final Session session) {
+        final List<ResultTemplate> resultTemplates =
                 HibernateCriteriaQueryUtilities.getResultTemplateObject(request.getOffering(),
                         request.getObservedProperty(), featureIdentifier, session);
         return resultTemplates;
@@ -100,7 +102,8 @@ public class GetResultDAO extends AbstractGetResultDAO {
      * 
      * @param request
      *            GetObservation request
-     * @param featureIdentifier
+     * @param featureIdentifiers
+     * 			Set of feature identifiers. If <tt>null</tt>, query filter will not be added. If <tt>empty</tt>, <tt>null</tt> will be returned.
      * @param session
      *            Hibernate session
      * @return List of Observation objects
@@ -109,19 +112,19 @@ public class GetResultDAO extends AbstractGetResultDAO {
      * @throws OwsExceptionReport If an error occurs.
      */
     @SuppressWarnings("unchecked")
-    protected List<Observation> queryObservation(GetResultRequest request, Set<String> featureIdentifier,
-                                                 Session session) throws OwsExceptionReport {
-        if (featureIdentifier != null && featureIdentifier.isEmpty()) {
-            return null;
-        }
-
-        Criteria c = session.createCriteria(Observation.class)
+	protected List<Observation> queryObservation(final GetResultRequest request, final Set<String> featureIdentifiers,
+                                                 final Session session) throws OwsExceptionReport {
+        final Criteria c = session.createCriteria(Observation.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .add(Restrictions.eq(Observation.DELETED, false));
 
-        if (featureIdentifier != null) {
+        if (isEmpty(featureIdentifiers))
+        {
+        	return null; // because no features where found regarding the filters
+        } 
+        else if (isNotEmpty(featureIdentifiers)) {
             c.createCriteria(Observation.FEATURE_OF_INTEREST)
-                    .add(Restrictions.in(FeatureOfInterest.IDENTIFIER, featureIdentifier));
+                    .add(Restrictions.in(FeatureOfInterest.IDENTIFIER, featureIdentifiers));
         }
         if (request.getObservedProperty() != null) {
             c.createCriteria(Observation.OBSERVABLE_PROPERTY)
