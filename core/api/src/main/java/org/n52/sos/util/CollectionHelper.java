@@ -259,4 +259,17 @@ public final class CollectionHelper {
     public static <T> boolean isNotEmpty(final Collection<T> collection) {
         return collection != null && !collection.isEmpty();
     }
+    
+    /**
+     * Check if collection is not <tt>null</tt> and empty
+     * 
+     * @param collection
+     * 			Collection to check
+     * 
+     * @return <tt>true</tt>, if collection is not null and empty, else <tt>false</tt>
+     */
+    public static <T> boolean isEmpty(final Collection<T> collection) 
+    {
+    	return collection != null && collection.isEmpty();
+    }
 }
