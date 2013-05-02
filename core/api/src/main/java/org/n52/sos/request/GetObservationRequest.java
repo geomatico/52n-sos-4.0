@@ -510,6 +510,10 @@ public class GetObservationRequest extends AbstractServiceRequest {
         return temporalFilters != null && !temporalFilters.isEmpty();
     }
     
+    public boolean isSetResultModel() {
+        return resultModel != null;
+    }
+    
     public boolean isEmpty() {
         return !isSetOffering() 
                 && !isSetObservableProperty() 

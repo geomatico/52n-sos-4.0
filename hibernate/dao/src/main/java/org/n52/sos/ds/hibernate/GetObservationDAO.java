@@ -91,6 +91,9 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
                 sosResponse.setService(sosRequest.getService());
                 sosResponse.setVersion(sosRequest.getVersion());
                 sosResponse.setResponseFormat(sosRequest.getResponseFormat());
+                if (sosRequest.isSetResultModel()) {
+                    sosResponse.setResultModel(sosRequest.getResultModel());
+                }
                 if (getConfigurator().getProfileHandler().getActiveProfile().isShowMetadataOfEmptyObservations()) {
                     // TODO Hydro-Profile adds result observation metadata to response
                     sosResponse.setObservationCollection(queryObservationHydro(sosRequest, session));
