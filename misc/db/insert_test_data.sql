@@ -504,8 +504,8 @@ SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north
 SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north.org/test/offering/8', 'Point');
 
 ---- FEATURE_OF_INTEREST
--- 52N/con terra
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/1', 7.651968812254194, 51.935101100104916);
+-- con terra
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/1', 7.727958, 51.883906);
 -- ESRI
 SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/2', -117.1957110000000, 34.056517);
 -- Kisters
@@ -543,8 +543,8 @@ SELECT insert_observable_property('http://www.52north.org/test/observablePropert
 
 ---- PROCEDURES
 
--- 52N/con terra
-SELECT insert_procedure('http://www.52north.org/test/procedure/1', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/1', 7.651968812254194, 51.935101100104916, 0.0);
+-- con terra
+SELECT insert_procedure('http://www.52north.org/test/procedure/1', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/1', 7.727958, 51.883906, 0.0);
 -- ESRI
 SELECT insert_procedure('http://www.52north.org/test/procedure/2', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/2', -117.1957110000000, 34.056517, 0.0);
 -- Kisters
