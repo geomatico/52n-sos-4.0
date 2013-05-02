@@ -6,7 +6,7 @@
 	xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns:om="http://www.opengis.net/om/2.0" xmlns:sams="http://www.opengis.net/samplingSpatial/2.0"
 	xmlns:sf="http://www.opengis.net/sampling/2.0" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	xsi:schemaLocation="http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sosInsertResultTemplate.xsd http://www.opengis.net/om/2.0/observation.xsd
+	xsi:schemaLocation="http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sosInsertResultTemplate.xsd http://www.opengis.net/om/2.0 http://schemas.opengis.net/om/2.0/observation.xsd
 	http://www.opengis.net/samplingSpatial/2.0 http://schemas.opengis.net/samplingSpatial/2.0/spatialSamplingFeature.xsd">
 	<sos:proposedTemplate>
 		<!-- Before using this example, make sure that all preconditions are fulfilled, 
@@ -24,16 +24,16 @@
 					<om:observedProperty
 						xlink:href="http://www.52north.org/test/observableProperty/9_3" />
 					<om:featureOfInterest>
-						<sams:SF_SpatialSamplingFeature
-							gml:id="sf_test_feature_9">
+						<sams:SF_SpatialSamplingFeature gml:id="sf_test_feature_9">
 							<gml:identifier codeSpace="">http://www.52north.org/test/featureOfInterest/9
 							</gml:identifier>
+							<gml:name>52°North</gml:name>
 							<sf:type
 								xlink:href="http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint" />
 							<sf:sampledFeature xlink:href="http://www.opengis.net/def/nil/OGC/0/unknown" />
 							<sams:shape>
 								<gml:Point gml:id="point_sf_test_feature_9">
-									<gml:pos srsName="http://www.opengis.net/def/crs/EPSG/0/4326">53.123212 12.412312</gml:pos>
+									<gml:pos srsName="http://www.opengis.net/def/crs/EPSG/0/4326">51.935101100104916 7.651968812254194</gml:pos>
 								</gml:Point>
 							</sams:shape>
 						</sams:SF_SpatialSamplingFeature>

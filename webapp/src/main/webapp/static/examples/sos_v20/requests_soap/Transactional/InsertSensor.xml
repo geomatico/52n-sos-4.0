@@ -61,13 +61,13 @@
 											<swe:coordinate name="easting">
 												<swe:Quantity axisID="x">
 													<swe:uom code="degree" />
-													<swe:value>7.727958</swe:value>
+													<swe:value>7.651968812254194</swe:value>
 												</swe:Quantity>
 											</swe:coordinate>
 											<swe:coordinate name="northing">
 												<swe:Quantity axisID="y">
 													<swe:uom code="degree" />
-													<swe:value>51.883906</swe:value>
+													<swe:value>51.935101100104916</swe:value>
 												</swe:Quantity>
 											</swe:coordinate>
 											<swe:coordinate name="altitude">
