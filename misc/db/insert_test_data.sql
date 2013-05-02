@@ -1,4 +1,4 @@
---
+﻿--
 -- Copyright (C) 2013
 -- by 52 North Initiative for Geospatial Open Source Software GmbH
 --
@@ -191,7 +191,7 @@ $$
 $$
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION insert_feature_of_interest(text, numeric, numeric) RETURNS bigint AS
+CREATE OR REPLACE FUNCTION insert_feature_of_interest(text, numeric, numeric, text) RETURNS bigint AS
 $$
 	INSERT INTO feature_of_interest(feature_of_interest_type_id, identifier, name, geom, description_xml) 
 	SELECT get_spatial_sampling_feature_type('Point'), $1, $1, ST_GeomFromText('POINT(' || $2 || ' ' || $3 || ')', 4326), 
@@ -201,6 +201,7 @@ $$
 	xmlns:sf="http://www.opengis.net/sampling/2.0" 
 	xmlns:gml="http://www.opengis.net/gml/3.2" gml:id="ssf_'::text || $1 || '">
 	<gml:identifier codeSpace="">'::text || $1 || '</gml:identifier>
+	<gml:name>'::text || $4 || '</gml:name>
 	<sf:type xlink:href="http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint"/>
 	<sf:sampledFeature xlink:href="http://www.opengis.net/def/nil/OGC/0/unknown"/>
 	<sams:shape>
@@ -222,7 +223,7 @@ $$
 $$
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION create_sensor_description(text, text, numeric, numeric, numeric) RETURNS text AS
+CREATE OR REPLACE FUNCTION create_sensor_description(text, text, numeric, numeric, numeric, text, text) RETURNS text AS
 $$
 	SELECT 
 '<sml:SensorML version="1.0.1"
@@ -235,8 +236,18 @@ $$
       <sml:identification>
         <sml:IdentifierList>
           <sml:identifier name="uniqueID">
-            <sml:Term definition="urn:ogc:def:identifier:OGC:uniqueID">
+            <sml:Term definition="urn:ogc:def:identifier:OGC:1.0:uniqueID">
               <sml:value>'::text || $1 || '</sml:value>
+            </sml:Term>
+          </sml:identifier>
+          <sml:identifier name="longName">
+            <sml:Term definition="urn:ogc:def:identifier:OGC:1.0:longName">
+              <sml:value>'::text || $6 || '</sml:value>
+            </sml:Term>
+          </sml:identifier>
+          <sml:identifier name="shortName">
+            <sml:Term definition="urn:ogc:def:identifier:OGC:1.0:shortName">
+              <sml:value>'::text || $7 || '</sml:value>
             </sml:Term>
           </sml:identifier>
         </sml:IdentifierList>
@@ -289,13 +300,13 @@ $$
 $$
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION insert_procedure(text,timestamp with time zone,text,numeric,numeric,numeric) RETURNS bigint AS
+CREATE OR REPLACE FUNCTION insert_procedure(text,timestamp with time zone,text,numeric,numeric,numeric, text, text) RETURNS bigint AS
 $$
 	INSERT INTO procedure(identifier, procedure_description_format_id, deleted) SELECT 
 		$1, get_sensor_ml_description_format(), false WHERE $1 NOT IN (
 			SELECT identifier FROM procedure WHERE identifier = $1);
 	INSERT INTO valid_procedure_time(procedure_id, start_time, description_xml) 
-		SELECT get_procedure($1), $2, create_sensor_description($1, $3, $4, $5, $6)
+		SELECT get_procedure($1), $2, create_sensor_description($1, $3, $4, $5, $6, $7, $8)
 		WHERE get_procedure($1) NOT IN (
 			SELECT procedure_id FROM valid_procedure_time WHERE procedure_id = get_procedure($1));
 	SELECT get_procedure($1);
@@ -505,21 +516,21 @@ SELECT insert_allowed_feature_of_interest_types_for_offering('http://www.52north
 
 ---- FEATURE_OF_INTEREST
 -- con terra
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/1', 7.727958, 51.883906);
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/1', 7.727958, 51.883906, 'con terra');
 -- ESRI
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/2', -117.1957110000000, 34.056517);
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/2', -117.1957110000000, 34.056517, 'ESRI');
 -- Kisters
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/3', 6.1320144042060925, 50.78570661296184);
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/3', 6.1320144042060925, 50.78570661296184, 'Kisters');
 -- IfGI
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/4', 7.593655600000034, 51.9681661);
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/4', 7.593655600000034, 51.9681661, 'IfGI');
 -- TU-D
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/5', 13.72375999999997, 51.02881);
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/5', 13.72375999999997, 51.02881, 'TU-Dresden');
 -- HBO
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/6', 7.270806, 51.447722);
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/6', 7.270806, 51.447722, 'Hochschule Bochum');
 -- ITC
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/7', 4.283393599999954, 52.0464393);
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/7', 4.283393599999954, 52.0464393, 'ITC');
 -- DLZ-IT
-SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/8', 10.94306000000006, 50.68606);
+SELECT insert_feature_of_interest('http://www.52north.org/test/featureOfInterest/8', 10.94306000000006, 50.68606, 'DLZ-IT');
 
 ---- UNIT
 SELECT insert_unit('test_unit_1');
@@ -544,21 +555,21 @@ SELECT insert_observable_property('http://www.52north.org/test/observablePropert
 ---- PROCEDURES
 
 -- con terra
-SELECT insert_procedure('http://www.52north.org/test/procedure/1', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/1', 7.727958, 51.883906, 0.0);
+SELECT insert_procedure('http://www.52north.org/test/procedure/1', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/1', 7.727958, 51.883906, 0.0, 'con terra GmbH (www.conterra.de)', 'con terra');
 -- ESRI
-SELECT insert_procedure('http://www.52north.org/test/procedure/2', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/2', -117.1957110000000, 34.056517, 0.0);
+SELECT insert_procedure('http://www.52north.org/test/procedure/2', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/2', -117.1957110000000, 34.056517, 0.0, 'ESRI (www.esri.com)', 'ESRI');
 -- Kisters
-SELECT insert_procedure('http://www.52north.org/test/procedure/3', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/3', 6.1320144042060925, 50.78570661296184, 0.0);
+SELECT insert_procedure('http://www.52north.org/test/procedure/3', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/3', 6.1320144042060925, 50.78570661296184, 0.0, 'Kisters AG (www.kisters.de)', 'Kisters');
 -- IfGI
-SELECT insert_procedure('http://www.52north.org/test/procedure/4', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/4', 7.593655600000034, 51.9681661, 0.0);
+SELECT insert_procedure('http://www.52north.org/test/procedure/4', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/4', 7.593655600000034, 51.9681661, 0.0, 'Institute for Geoinformatics (http://ifgi.uni-muenster.de/en)', 'IfGI');
 -- TU-D
-SELECT insert_procedure('http://www.52north.org/test/procedure/5', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/5', 13.72375999999997, 51.02881, 0.0);
+SELECT insert_procedure('http://www.52north.org/test/procedure/5', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/5', 13.72375999999997, 51.02881, 0.0, 'Technical University Dresden (http://tu-dresden.de/en)', 'TU-Dresden');
 -- HBO
-SELECT insert_procedure('http://www.52north.org/test/procedure/6', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/6', 7.270806, 51.447722, 0.0);
+SELECT insert_procedure('http://www.52north.org/test/procedure/6', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/6', 7.270806, 51.447722, 0.0, 'Hochschule Bochum - Bochum University of Applied Sciences (http://www.hochschule-bochum.de/en/)', 'Hochschule Bochum');
 -- ITC
-SELECT insert_procedure('http://www.52north.org/test/procedure/7', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/7', 4.283393599999954, 52.0464393, 0.0);
+SELECT insert_procedure('http://www.52north.org/test/procedure/7', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/7', 4.283393599999954, 52.0464393, 0.0, 'ITC - University of Twente (http://www.itc.nl/)', 'ITC');
 -- DLZ-IT
-SELECT insert_procedure('http://www.52north.org/test/procedure/8', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/8', 10.94306000000006, 50.68606, 0.0);
+SELECT insert_procedure('http://www.52north.org/test/procedure/8', '2012-11-19 13:00', 'http://www.52north.org/test/observableProperty/8', 10.94306000000006, 50.68606, 0.0, 'Bundesanstalt für IT-Dienstleistungen im Geschäftsbereich des BMVBS (http://www.dlz-it.de)', 'DLZ-IT');
 
 -- OBSERVATION_CONSTELLATION
 SELECT insert_observation_constellation('http://www.52north.org/test/procedure/1', 'http://www.52north.org/test/observableProperty/1', 'http://www.52north.org/test/offering/1', 'Measurement');
@@ -706,7 +717,7 @@ DROP FUNCTION insert_boolean_observation(bigint, boolean);
 DROP FUNCTION insert_category_observation(bigint, text);
 DROP FUNCTION insert_category_value(text);
 DROP FUNCTION insert_count_observation(bigint, int);
-DROP FUNCTION insert_feature_of_interest(text, numeric, numeric);
+DROP FUNCTION insert_feature_of_interest(text, numeric, numeric, text);
 DROP FUNCTION insert_feature_of_interest_type(text);
 DROP FUNCTION insert_geometry_value(geometry);
 DROP FUNCTION insert_numeric_observation(bigint, numeric);
@@ -719,7 +730,7 @@ DROP FUNCTION insert_observation_type(text);
 DROP FUNCTION insert_offering(text);
 DROP FUNCTION insert_observation_offering(bigint, bigint);
 DROP FUNCTION insert_procedure_description_format(text);
-DROP FUNCTION insert_procedure(text,timestamp with time zone,text,numeric,numeric,numeric);
+DROP FUNCTION insert_procedure(text,timestamp with time zone,text,numeric,numeric,numeric, text, text);
 DROP FUNCTION insert_text_observation(bigint, text);
 DROP FUNCTION insert_text_value(text);
 DROP FUNCTION insert_unit(text);
@@ -730,4 +741,4 @@ DROP FUNCTION insert_allowed_observation_types_for_offering(bigint,bigint);
 DROP FUNCTION insert_allowed_feature_of_interest_types_for_offering(text,text);
 DROP FUNCTION insert_allowed_feature_of_interest_types_for_offering(bigint,bigint);
 DROP FUNCTION get_observation(bigint, bigint, text, text, timestamp with time zone);
-DROP FUNCTION create_sensor_description(text,text,numeric,numeric,numeric);
+DROP FUNCTION create_sensor_description(text,text,numeric,numeric,numeric, text, text);
