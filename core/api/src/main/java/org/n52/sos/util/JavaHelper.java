@@ -53,7 +53,7 @@ public final class JavaHelper {
     static {
         try {
             MESSAGE_DIGEST = MessageDigest.getInstance("SHA1");
-        } catch (NoSuchAlgorithmException nsae) {
+        } catch (final NoSuchAlgorithmException nsae) {
             LOGGER.error("Error while getting SHA-1 messagedigest!", nsae);
         }
     }
@@ -65,9 +65,9 @@ public final class JavaHelper {
      *            sensor description
      * @return generated sensor id as hex SHA-1.
      */
-    public static String generateID(String message) {
-        long autoGeneratredID = new DateTime().getMillis();
-        String concate = message + Long.toString(autoGeneratredID);
+    public static String generateID(final String message) {
+        final long autoGeneratredID = new DateTime().getMillis();
+        final String concate = message + Long.toString(autoGeneratredID);
         return bytesToHex(MESSAGE_DIGEST.digest(concate.getBytes()));
     }
 
@@ -78,16 +78,16 @@ public final class JavaHelper {
      *            bytes
      * @return hex
      */
-    private static String bytesToHex(byte[] b) {
-        StringBuilder buf = new StringBuilder();
-        for (int j = 0; j < b.length; j++) {
-            buf.append(HEX_DIGITS[(b[j] >> 4) & 0x0f]);
-            buf.append(HEX_DIGITS[b[j] & 0x0f]);
+    private static String bytesToHex(final byte[] b) {
+        final StringBuilder buf = new StringBuilder();
+        for (final byte element : b) {
+            buf.append(HEX_DIGITS[(element >> 4) & 0x0f]);
+            buf.append(HEX_DIGITS[element & 0x0f]);
         }
         return buf.toString();
     }
 
-    public static void appendTextToStringBuilderWithLineBreak(StringBuilder stringBuilder, String message) {
+    public static void appendTextToStringBuilderWithLineBreak(final StringBuilder stringBuilder, final String message) {
         if (stringBuilder != null && message != null && !message.isEmpty()) {
             stringBuilder.append(message);
             stringBuilder.append("\n");
@@ -97,7 +97,8 @@ public final class JavaHelper {
     /**
      * @deprecated Use {@link CollectionHelper#asList(T, T[]) } instead
      */
-    public static List<String> createStringListWithValue(String value) {
+    @Deprecated
+	public static List<String> createStringListWithValue(final String value) {
         return CollectionHelper.asList(value);
     }
 
@@ -108,16 +109,16 @@ public final class JavaHelper {
      *            to get as String
      * @return String value
      */
-    public static String asString(Object object) {
+    public static String asString(final Object object) {
         if (object instanceof String) {
             return (String) object;
         } else if (object instanceof BigDecimal) {
-            BigDecimal bdValue = (BigDecimal) object;
+            final BigDecimal bdValue = (BigDecimal) object;
             return Double.toString(bdValue.doubleValue());
         } else if (object instanceof Double) {
             return ((Double) object).toString();
         }
-        return "";
+        return ""; // TODO why not object.toString()?
     }
 
     /**
@@ -127,11 +128,11 @@ public final class JavaHelper {
      *            to get as Double
      * @return Double value
      */
-    public static Double asDouble(Object object) {
+    public static Double asDouble(final Object object) {
         if (object instanceof String) {
             return Double.parseDouble((String) object);
         } else if (object instanceof BigDecimal) {
-            BigDecimal bdValue = (BigDecimal) object;
+            final BigDecimal bdValue = (BigDecimal) object;
             return bdValue.doubleValue();
         } else if (object instanceof Double) {
             return (Double) object;
