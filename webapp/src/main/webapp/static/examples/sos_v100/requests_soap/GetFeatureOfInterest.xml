@@ -7,15 +7,7 @@
 	<env:Body>
 		<sos:GetFeatureOfInterest service="SOS" version="1.0.0">
 			<!-- mandatory, multiple values possible -->
-			<sos:location>
-				<ogc:BBOX>
-					<ogc:PropertyName>urn:ogc:data:location</ogc:PropertyName>
-					<gml:Envelope srsName="urn:ogc:def:crs:EPSG::4326">
-						<gml:lowerCorner>50.0 7.0</gml:lowerCorner>
-						<gml:upperCorner>53.0 10.0</gml:upperCorner>
-					</gml:Envelope>
-				</ogc:BBOX>
-			</sos:location>
+			<sos:FeatureOfInterestId>http://www.52north.org/test/featureOfInterest/6</sos:FeatureOfInterestId>
 		</sos:GetFeatureOfInterest>
 	</env:Body>
 </env:Envelope>
