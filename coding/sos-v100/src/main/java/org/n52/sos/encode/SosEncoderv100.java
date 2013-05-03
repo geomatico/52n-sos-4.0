@@ -39,7 +39,6 @@ import net.opengis.gml.AbstractTimeGeometricPrimitiveType;
 import net.opengis.gml.BoundingShapeType;
 import net.opengis.gml.CodeType;
 import net.opengis.gml.EnvelopeType;
-import net.opengis.gml.FeatureCollectionDocument;
 import net.opengis.gml.FeatureCollectionDocument2;
 import net.opengis.gml.ReferenceType;
 import net.opengis.gml.TimePeriodType;
@@ -256,7 +255,6 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
         }
         if (sosCapabilities.getContents() != null && !sosCapabilities.getContents().isEmpty()) {
             setContents(xbCaps.addNewContents(), sosCapabilities.getContents(), response.getVersion());
-
         }
 
         N52XmlHelper.setSchemaLocationToDocument(xbCapsDoc, N52XmlHelper.getSchemaLocationForSOS100());
@@ -277,8 +275,10 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
         // describeSensorResponse.addNewDescription().addNewSensorDescription().addNewData().set(xmlObject);
 
         // set schema location
-        N52XmlHelper.setSchemaLocationsToDocument(xmlObject,
-                Collections.singletonList(N52XmlHelper.getSchemaLocationForSWE101()));
+        List<String> schemaLocations = new ArrayList<String>(3);
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSML101());
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSWE101());
+        N52XmlHelper.setSchemaLocationsToDocument(xmlObject, schemaLocations);
         return xmlObject;
     }
 
@@ -645,8 +645,11 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
                 }
             }
             for (String procedure : offering.getProcedures()) {
-                ReferenceType xb_procedureProperty = xb_oo.addNewProcedure();
-                xb_procedureProperty.setHref(procedure);
+                xb_oo.addNewProcedure().setHref(procedure);
+            }
+            
+            for (String featureOfInterest : offering.getFeatureOfInterest()) {
+                xb_oo.addNewFeatureOfInterest().setHref(featureOfInterest);
             }
 
             // insert result models
