@@ -46,6 +46,24 @@
 					</gml:TimeInstant>
 				</fes:TEquals>
 			</sos:temporalFilter>
+				
+			<sos:temporalFilter>
+				<fes:TEquals>
+					<fes:ValueReference>phenomenonTime</fes:ValueReference>
+					<gml:TimeInstant gml:id="ti_1">
+						<gml:timePosition>first</gml:timePosition>
+					</gml:TimeInstant>
+				</fes:TEquals>
+			</sos:temporalFilter>
+			
+			<sos:temporalFilter>
+				<fes:TEquals>
+					<fes:ValueReference>phenomenonTime</fes:ValueReference>
+					<gml:TimeInstant gml:id="ti_1">
+						<gml:timePosition>latest</gml:timePosition>
+					</gml:TimeInstant>
+				</fes:TEquals>
+			</sos:temporalFilter>
 			-->
 
 			<!-- optional, multiple values possible -->
