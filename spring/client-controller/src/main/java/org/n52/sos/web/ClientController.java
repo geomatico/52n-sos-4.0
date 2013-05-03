@@ -24,12 +24,13 @@
 package org.n52.sos.web;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.MultiMaps;
+import org.n52.sos.util.SetMultiMap;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -46,17 +47,27 @@ public class ClientController extends AbstractController {
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView get() {
         if (Configurator.getInstance() != null) {
-            Map<String, Object> map = new HashMap<String, Object>(2);
-            Set<RequestOperatorKeyType> ops = Configurator.getInstance().getRequestOperatorRepository()
-                    .getActiveRequestOperatorKeyTypes();
-            Set<String> operations = new HashSet<String>(ops.size());
-            for (RequestOperatorKeyType op : ops) {
-                operations.add(op.getOperationName());
+            // service -> (version -> set<operation>)
+            Map<String, SetMultiMap<String, String>> operationsByServiceAndVersion =
+                                                     new HashMap<String, SetMultiMap<String, String>>();
+            Set<String> bindings = Configurator.getInstance().getBindingRepository().getBindings().keySet();
+            Set<RequestOperatorKeyType> rokts = Configurator.getInstance()
+                    .getRequestOperatorRepository().getActiveRequestOperatorKeyTypes();
+
+            for (RequestOperatorKeyType rokt : rokts) {
+                String service = rokt.getServiceOperatorKeyType().getService();
+                String version = rokt.getServiceOperatorKeyType().getVersion();
+                SetMultiMap<String, String> m1 = operationsByServiceAndVersion.get(service);
+                if (m1 == null) {
+                    operationsByServiceAndVersion.put(service, m1 = MultiMaps.newSetMultiMap());
+                }
+
+                m1.add(version, rokt.getOperationName());
             }
-            map.put(OPERATIONS, operations);
-            map.put(BINDINGS, Configurator.getInstance().getBindingRepository().getBindings().keySet());
-            // TODO add support for different services
-            map.put(VERSIONS, Configurator.getInstance().getServiceOperatorRepository().getAllSupportedVersions());
+
+            Map<String, Object> map = new HashMap<String, Object>(2);
+            map.put(OPERATIONS, operationsByServiceAndVersion);
+            map.put(BINDINGS, bindings);
             return new ModelAndView(ControllerConstants.Views.CLIENT, map);
 
         } else {

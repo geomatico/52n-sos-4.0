@@ -1,692 +1,695 @@
 {
-    "1.0.0": {
-        "/pox": {
-            "GetCapabilities": {
-                "GetCapabilities - All Sections": {
-                    "request": "static/examples/sos_v100/requests_xml/GetCapabilities.xml"
-                }
-            },
-            "DescribeSensor": {
-                "DescribeSensor": {
-                    "request": "static/examples/sos_v100/requests_xml/DescribeSensor.xml"
-                }
-            },
-            "GetFeatureOfInterest": {
-                "GetFeatureOfInterest - FeatureOfInterestId": {
-                    "request": "static/examples/sos_v100/requests_xml/GetFeatureOfInterest.xml"
+    "SOS":
+            {
+                "1.0.0": {
+                    "/pox": {
+                        "GetCapabilities": {
+                            "GetCapabilities - All Sections": {
+                                "request": "static/examples/sos_v100/requests_xml/GetCapabilities.xml"
+                            }
+                        },
+                        "DescribeSensor": {
+                            "DescribeSensor": {
+                                "request": "static/examples/sos_v100/requests_xml/DescribeSensor.xml"
+                            }
+                        },
+                        "GetFeatureOfInterest": {
+                            "GetFeatureOfInterest - FeatureOfInterestId": {
+                                "request": "static/examples/sos_v100/requests_xml/GetFeatureOfInterest.xml"
+                            },
+                            "GetFeatureOfInterest - BoundingBox": {
+                                "request": "static/examples/sos_v100/requests_xml/GetFeatureOfInterest_SpatialFilter.xml"
+                            }
+                        },
+                        "GetObservation": {
+                            "GetObservation - All Parameters": {
+                                "request": "static/examples/sos_v100/requests_xml/GetObservation.xml"
+                            }
+                        },
+                        "GetObservationById": {
+                            "GetObservationById": {
+                                "request": "static/examples/sos_v100/requests_xml/GetObservationById.xml"
+                            }
+                        },
+                        "InsertObservation": {
+                            "InsertObservation - Geometry - MovingObject": {
+                                "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObs_geometry_movingObject.xml"
+                            },
+                            "InsertObservation - Geometry": {
+                                "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObs_geometry.xml"
+                            },
+                            "InsertObservation - CategoryObservation": {
+                                "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_categoryObservation.xml"
+                            },
+                            "InsertObservation - SamplingSurface": {
+                                "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_samplingSurface.xml"
+                            },
+                            "InsertObservation - SamplingPoint": {
+                                "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_samplingPoint.xml"
+                            },
+                            "InsertObservation - GenericObservation - Derwent": {
+                                "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_GenericObs_Derwent.xml"
+                            },
+                            "InsertObservation - GenericObservation - Derwent 2": {
+                                "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_GenericObs_Derwent_2.xml"
+                            },
+                            "InsertObservation - RegisterSensor - FeatureOfInterest": {
+                                "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_4_RegSen_withFOI.xml"
+                            },
+                            "InsertObservation - Measurement": {
+                                "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_Measurement.xml"
+                            },
+                            "InsertObservation - GenericObservation - AllTypes": {
+                                "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_GenericObs_allTypes.xml"
+                            },
+                            "InsertObservation - GenericObservation - No ID's": {
+                                "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_GenericObs_noIDs.xml"
+                            }
+                        },
+                        "RegisterSensor": {
+                            "RegisterSensor - CategoryObservation": {
+                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_categoryObservation.xml"
+                            },
+                            "RegisterSensor - Measurement": {
+                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_measurement.xml"
+                            },
+                            "RegisterSensor - Measurement - Derwent": {
+                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Measurement_Derwent.xml"
+                            },
+                            "RegisterSensor - Measurement - Derwent 2": {
+                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Observation_Derwent_2.xml"
+                            },
+                            "RegisterSensor - Geometry": {
+                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_geometry.xml"
+                            },
+                            "RegisterSensor - FeatureOfInterest": {
+                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_withFOI.xml"
+                            },
+                            "RegisterSensor - Observation - AllTypes": {
+                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Observation_allTypes.xml"
+                            },
+                            "RegisterSensor - Observation - No ID's": {
+                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Observation_noIDs.xml"
+                            }
+                        }
+                    },
+                    "/soap": {
+                        "GetCapabilities": {
+                            "GetCapabilities - All Sections (SOAP 1.2)": {
+                                "request": "static/examples/sos_v100/requests_soap/GetCapabilities.xml"
+                            }
+                        },
+                        "DescribeSensor": {
+                            "DescribeSensor (SOAP 1.2)": {
+                                "request": "static/examples/sos_v100/requests_soap/DescribeSensor.xml"
+                            }
+                        },
+                        "GetFeatureOfInterest": {
+                            "GetFeatureOfInterest ID (SOAP 1.2)": {
+                                "request": "static/examples/sos_v100/requests_soap/GetFeatureOfInterest.xml"
+                            },
+                            "GetFeatureOfInterest BBOX (SOAP 1.2)": {
+                                "request": "static/examples/sos_v100/requests_soap/GetFeatureOfInterest_SpatialFilter.xml"
+                            }
+                        },
+                        "GetObservation": {
+                            "GetObservation - All Parameters (SOAP 1.2)": {
+                                "request": "static/examples/sos_v100/requests_soap/GetObservation.xml"
+                            }
+                        },
+                        "InsertObservation": {
+                            "InsertObservation (SOAP 1.2)": {
+                                "request": "static/examples/sos_v100/requests_soap/InsertObservation.xml"
+                            }
+                        },
+                        "RegisterSensor": {
+                            "RegisterSensor (SOAP 1.2)": {
+                                "request": "static/examples/sos_v100/requests_soap/RegisterSensor.xml"
+                            }
+                        }
+                    },
+                    "/kvp": {
+                        "GetCapabilities": {
+                            "GetCapabilities": {
+                                "param": {
+                                    "service": "SOS",
+                                    "request": "GetCapabilities",
+                                    "AcceptVersions": "1.0.0"
+                                }
+                            }
+                        },
+                        "DescribeSensor": {
+                            "DescribeSensor": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "1.0.0",
+                                    "request": "DescribeSensor",
+                                    "procedure": "http://www.52north.org/test/procedure/1",
+                                    "outputFormat": "text/xml;subtype=\"sensorML/1.0.1\""
+                                }
+                            }
+                        },
+                        "GetObservation": {
+                            "GetObservation": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "1.0.0",
+                                    "request": "GetObservation",
+                                    "offering": "http://www.52north.org/test/offering/1",
+                                    "observedProperty": "http://www.52north.org/test/observableProperty/1",
+                                    "procedure": "http://www.52north.org/test/procedure/1",
+                                    "featureOfInterest": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,urn:ogc:def:crs:EPSG::4326",
+                                    "eventTime": "om:phenomenonTime,2012-11-19T14:00:00+01:00/2012-11-19T14:15:00+01:00",
+                                    "responseFormat": "text/xml;subtype=\"om/1.0.0\""
+                                }
+                            }
+                        }
+                    }
                 },
-                "GetFeatureOfInterest - BoundingBox": {
-                    "request": "static/examples/sos_v100/requests_xml/GetFeatureOfInterest_SpatialFilter.xml"
-                }
-            },
-            "GetObservation": {
-                "GetObservation - All Parameters": {
-                    "request": "static/examples/sos_v100/requests_xml/GetObservation.xml"
-                }
-            },
-            "GetObservationById": {
-                "GetObservationById": {
-                    "request": "static/examples/sos_v100/requests_xml/GetObservationById.xml"
-                }
-            },
-            "InsertObservation": {
-                "InsertObservation - Geometry - MovingObject": {
-                    "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObs_geometry_movingObject.xml"
-                },
-                "InsertObservation - Geometry": {
-                    "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObs_geometry.xml"
-                },
-                "InsertObservation - CategoryObservation": {
-                    "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_categoryObservation.xml"
-                },
-                "InsertObservation - SamplingSurface": {
-                    "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_samplingSurface.xml"
-                },
-                "InsertObservation - SamplingPoint": {
-                    "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_samplingPoint.xml"
-                },
-                "InsertObservation - GenericObservation - Derwent": {
-                    "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_GenericObs_Derwent.xml"
-                },
-                "InsertObservation - GenericObservation - Derwent 2": {
-                    "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_GenericObs_Derwent_2.xml"
-                },
-                "InsertObservation - RegisterSensor - FeatureOfInterest": {
-                    "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_4_RegSen_withFOI.xml"
-                },
-                "InsertObservation - Measurement": {
-                    "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_Measurement.xml"
-                },
-                "InsertObservation - GenericObservation - AllTypes": {
-                    "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_GenericObs_allTypes.xml"
-                },
-                "InsertObservation - GenericObservation - No ID's": {
-                    "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_GenericObs_noIDs.xml"
-                }
-            },
-            "RegisterSensor": {
-                "RegisterSensor - CategoryObservation": {
-                    "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_categoryObservation.xml"
-                },
-                "RegisterSensor - Measurement": {
-                    "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_measurement.xml"
-                },
-                "RegisterSensor - Measurement - Derwent": {
-                    "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Measurement_Derwent.xml"
-                },
-                "RegisterSensor - Measurement - Derwent 2": {
-                    "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Observation_Derwent_2.xml"
-                },
-                "RegisterSensor - Geometry": {
-                    "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_geometry.xml"
-                },
-                "RegisterSensor - FeatureOfInterest": {
-                    "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_withFOI.xml"
-                },
-                "RegisterSensor - Observation - AllTypes": {
-                    "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Observation_allTypes.xml"
-                },
-                "RegisterSensor - Observation - No ID's": {
-                    "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Observation_noIDs.xml"
+                "2.0.0": {
+                    "/kvp": {
+                        "GetCapabilities": {
+                            "GetCapabilities (minimal)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "request": "GetCapabilities"
+                                }
+                            },
+                            "GetCapabilities (with AcceptVersions=2.0.0)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "request": "GetCapabilities",
+                                    "AcceptVersions": "2.0.0"
+                                }
+                            },
+                            "GetCapabilities (only OperationsMetadata section)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "request": "GetCapabilities",
+                                    "Sections": "OperationsMetadata"
+                                }
+                            },
+                            "GetCapabilities (only Contents section)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "request": "GetCapabilities",
+                                    "Sections": "Contents"
+                                }
+                            }
+                        },
+                        "DescribeSensor": {
+                            "DescribeSensor": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "DescribeSensor",
+                                    "procedure": "http://www.52north.org/test/procedure/101",
+                                    "procedureDescriptionFormat": "http://www.opengis.net/sensorML/1.0.1"
+                                }
+                            }
+                        },
+                        "GetObservation": {
+                            "GetObservation (full)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetObservation",
+                                    "offering": "http://www.52north.org/test/offering/1",
+                                    "observedProperty": "http://www.52north.org/test/observableProperty/1",
+                                    "procedure": "http://www.52north.org/test/procedure/101",
+                                    "namespaces": [
+                                        "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
+                                        "xmlns(om,http://www.opengis.net/om/2.0)"
+                                    ],
+                                    "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,urn:ogc:def:crs:EPSG::4326",
+                                    "temporalFilter": "om:phenomenonTime,2012-11-19T14:00:00+01:00/2012-11-19T14:15:00+01:00"
+                                }
+                            },
+                            "GetObservation (offering)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetObservation",
+                                    "offering": "http://www.52north.org/test/offering/1"
+                                }
+                            },
+                            "GetObservation (offerings)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetObservation",
+                                    "offering": [
+                                        "http://www.52north.org/test/offering/1",
+                                        "http://www.52north.org/test/offering/3"
+                                    ]
+                                }
+                            },
+                            "GetObservation (procedure)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetObservation",
+                                    "procedure": "http://www.52north.org/test/procedure/101"
+                                }
+                            },
+                            "GetObservation (procedures)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetObservation",
+                                    "procedure": [
+                                        "http://www.52north.org/test/procedure/101",
+                                        "http://www.52north.org/test/procedure/103"
+                                    ]
+                                }
+                            },
+                            "GetObservation (observableProperty)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetObservation",
+                                    "observedProperty": "http://www.52north.org/test/observableProperty/1"
+                                }
+                            },
+                            "GetObservation (observableProperties)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetObservation",
+                                    "observedProperty": [
+                                        "http://www.52north.org/test/observableProperty/1",
+                                        "http://www.52north.org/test/observableProperty/3"
+                                    ]
+                                }
+                            },
+                            "GetObservation (featureOfInterest)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetObservation",
+                                    "featureOfInterest": "http://www.52north.org/test/featureOfInterest/1"
+                                }
+                            },
+                            "GetObservation (featureOfInterests)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetObservation",
+                                    "featureOfInterest": [
+                                        "http://www.52north.org/test/featureOfInterest/1",
+                                        "http://www.52north.org/test/featureOfInterest/3"
+                                    ]
+                                }
+                            },
+                            "GetObservation (spatial filter, URN)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetObservation",
+                                    "namespaces": [
+                                        "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
+                                        "xmlns(om,http://www.opengis.net/om/2.0)"
+                                    ],
+                                    "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,urn:ogc:def:crs:EPSG::4326"
+                                }
+                            },
+                            "GetObservation (spatial filter, URL)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetObservation",
+                                    "namespaces": [
+                                        "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
+                                        "xmlns(om,http://www.opengis.net/om/2.0)"
+                                    ],
+                                    "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,http://www.opengis.net/def/crs/EPSG/0/4326"
+                                }
+                            },
+                            "GetObservation (temporal filter equal)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetObservation",
+                                    "namespaces": "xmlns(om,http://www.opengis.net/om/2.0)",
+                                    "temporalFilter": "om:phenomenonTime,2012-11-19T14:00:00.000+01:00"
+                                }
+                            },
+                            "GetObservation (temporal filter during)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetObservation",
+                                    "namespaces": "xmlns(om,http://www.opengis.net/om/2.0)",
+                                    "temporalFilter": "om:phenomenonTime,2012-11-19T14:00:00+01:00/2012-11-19T14:15:00+01:00"
+                                }
+                            }
+                        },
+                        "GetFeatureOfInterest": {
+                            "GetFeatureOfInterest (minimal)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetFeatureOfInterest"
+                                }
+                            },
+                            "GetFeatureOfInterest (procedure)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetFeatureOfInterest",
+                                    "procedure": "http://www.52north.org/test/procedure/101"
+                                }
+                            },
+                            "GetFeatureOfInterest (procedures)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetFeatureOfInterest",
+                                    "procedure": [
+                                        "http://www.52north.org/test/procedure/101",
+                                        "http://www.52north.org/test/procedure/102"
+                                    ]
+                                }
+                            },
+                            "GetFeatureOfInterest (observableProperty)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetFeatureOfInterest",
+                                    "observedProperty": "http://www.52north.org/test/observableProperty/1"
+                                }
+                            },
+                            "GetFeatureOfInterest (observableProperties)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetFeatureOfInterest",
+                                    "observedProperty": [
+                                        "http://www.52north.org/test/observableProperty/1",
+                                        "http://www.52north.org/test/observableProperty/2"
+                                    ]
+                                }
+                            },
+                            "GetFeatureOfInterest (featureOfInterest)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetFeatureOfInterest",
+                                    "featureOfInterest": "http://www.52north.org/test/featureOfInterest/1"
+                                }
+                            },
+                            "GetFeatureOfInterest (featureOfInterests)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetFeatureOfInterest",
+                                    "featureOfInterest": [
+                                        "http://www.52north.org/test/featureOfInterest/1",
+                                        "http://www.52north.org/test/featureOfInterest/2"
+                                    ]
+                                }
+                            },
+                            "GetFeatureOfInterest (spatial filter, URN)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetFeatureOfInterest",
+                                    "namespaces": [
+                                        "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
+                                        "xmlns(om,http://www.opengis.net/om/2.0)"
+                                    ],
+                                    "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,urn:ogc:def:crs:EPSG::4326"
+                                }
+                            },
+                            "GetFeatureOfInterest (spatial filter, URL)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetFeatureOfInterest",
+                                    "namespaces": [
+                                        "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
+                                        "xmlns(om,http://www.opengis.net/om/2.0)"
+                                    ],
+                                    "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,http://www.opengis.net/def/crs/EPSG/0/4326"
+                                }
+                            }
+                        },
+                        "DeleteSensor": {
+                            "DeleteSensor": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "DeleteSensor",
+                                    "procedure": "http://www.52north.org/test/procedure/107"
+                                }
+                            }
+                        },
+                        "GetResult": {
+                            "GetResult": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetResult",
+                                    "offering": "http://www.52north.org/test/offering/9",
+                                    "observedProperty": "http://www.52north.org/test/observableProperty/9_3"
+                                }
+                            }
+                        },
+                        "GetResultTemplate": {
+                            "GetResultTemplate": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetResultTemplate",
+                                    "offering": "http://www.52north.org/test/offering/9",
+                                    "observedProperty": "http://www.52north.org/test/observableProperty/9_3"
+                                }
+                            }
+                        },
+                        "GetDataAvailability": {
+                            "GetDataAvailability (minimal)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetDataAvailability"
+                                }
+                            },
+                            "GetDataAvailability": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetDataAvailability",
+                                    "observedProperty": [
+                                        "http://www.52north.org/test/observableProperty/1",
+                                        "http://www.52north.org/test/observableProperty/3"
+                                    ],
+                                    "procedure": [
+                                        "http://www.52north.org/test/procedure/101",
+                                        "http://www.52north.org/test/procedure/103"
+                                    ],
+                                    "featureOfInterest": [
+                                        "http://www.52north.org/test/featureOfInterest/1",
+                                        "http://www.52north.org/test/featureOfInterest/3",
+                                        "http://www.52north.org/test/featureOfInterest/4"
+                                    ]
+                                }
+                            }
+                        },
+                        "DeleteObservation": {
+                            "DeleteObservation": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "DeleteObservation",
+                                    "observation": "http://www.52north.org/test/observation/1"
+                                }
+                            }
+                        }
+                    },
+                    "/soap": {
+                        "GetCapabilities": {
+                            "GetCapabilities": {
+                                "request": "static/examples/sos_v20/requests_soap/GetCapabilities.xml"
+                            }
+                        },
+                        "DescribeSensor": {
+                            "DescribeSensor": {
+                                "request": "static/examples/sos_v20/requests_soap/DescribeSensor.xml"
+                            }
+                        },
+                        "GetObservation": {
+                            "GetObservation": {
+                                "request": "static/examples/sos_v20/requests_soap/GetObservation.xml"
+                            }
+                        },
+                        "GetFeatureOfInterest": {
+                            "GetFeatureOfInterest": {
+                                "request": "static/examples/sos_v20/requests_soap/GetFeatureOfInterest.xml"
+                            }
+                        },
+                        "GetObservationById": {
+                            "GetObservationById": {
+                                "request": "static/examples/sos_v20/requests_soap/GetObservationById.xml"
+                            }
+                        },
+                        "InsertResultTemplate": {
+                            "InsertResultTemplate": {
+                                "request": "static/examples/sos_v20/requests_soap/ResultHandling/InsertResultTemplate.xml"
+                            }
+                        },
+                        "InsertResult": {
+                            "InsertResult": {
+                                "request": "static/examples/sos_v20/requests_soap/ResultHandling/InsertResult.xml"
+                            }
+                        },
+                        "GetResult": {
+                            "GetResult": {
+                                "request": "static/examples/sos_v20/requests_soap/ResultHandling/GetResult.xml"
+                            }
+                        },
+                        "GetResultTemplate": {
+                            "GetResultTemplate": {
+                                "request": "static/examples/sos_v20/requests_soap/ResultHandling/GetResultTemplate.xml"
+                            }
+                        },
+                        "DeleteSensor": {
+                            "DeleteSensor": {
+                                "request": "static/examples/sos_v20/requests_soap/Transactional/DeleteSensor.xml"
+                            }
+                        },
+                        "InsertObservation": {
+                            "InsertObservation (Category)": {
+                                "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Category.xml"
+                            },
+                            "InsertObservation (Count)": {
+                                "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Count.xml"
+                            },
+                            "InsertObservation (Measurement)": {
+                                "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Measurement.xml"
+                            },
+                            "InsertObservation (Text)": {
+                                "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Text.xml"
+                            },
+                            "InsertObservation (Truth)": {
+                                "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Truth.xml"
+                            },
+                            "InsertObservation (SweArray)": {
+                                "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_SweArray.xml"
+                            },
+                            "InsertObservation (Multiple observations)": {
+                                "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Multiple.xml"
+                            }
+                        },
+                        "InsertSensor": {
+                            "InsertSensor": {
+                                "request": "static/examples/sos_v20/requests_soap/Transactional/InsertSensor.xml"
+                            }
+                        },
+                        "UpdateSensorDescription": {
+                            "UpdateSensorDescription": {
+                                "request": "static/examples/sos_v20/requests_soap/Transactional/UpdateSensorDescription.xml"
+                            }
+                        },
+                        "GetDataAvailability": {
+                            "GetDataAvailability": {
+                                "request": "static/examples/sos_v20/requests_soap/GetDataAvailability.xml"
+                            }
+                        },
+                        "DeleteObservation": {
+                            "DeleteObservation": {
+                                "request": "static/examples/sos_v20/requests_soap/DeleteObservation.xml"
+                            }
+                        }
+                    },
+                    "/pox": {
+                        "GetCapabilities": {
+                            "GetCapabilities": {
+                                "request": "static/examples/sos_v20/requests_xml/GetCapabilities.xml"
+                            }
+                        },
+                        "DescribeSensor": {
+                            "DescribeSensor": {
+                                "request": "static/examples/sos_v20/requests_xml/DescribeSensor.xml"
+                            }
+                        },
+                        "GetObservation": {
+                            "GetObservation": {
+                                "request": "static/examples/sos_v20/requests_xml/GetObservation.xml"
+                            }
+                        },
+                        "GetFeatureOfInterest": {
+                            "GetFeatureOfInterest": {
+                                "request": "static/examples/sos_v20/requests_xml/GetFeatureOfInterest.xml"
+                            }
+                        },
+                        "GetObservationById": {
+                            "GetObservationById": {
+                                "request": "static/examples/sos_v20/requests_xml/GetObservationById.xml"
+                            }
+                        },
+                        "InsertResultTemplate": {
+                            "InsertResultTemplate": {
+                                "request": "static/examples/sos_v20/requests_xml/ResultHandling/InsertResultTemplate.xml"
+                            }
+                        },
+                        "InsertResult": {
+                            "InsertResult": {
+                                "request": "static/examples/sos_v20/requests_xml/ResultHandling/InsertResult.xml"
+                            }
+                        },
+                        "GetResult": {
+                            "GetResult": {
+                                "request": "static/examples/sos_v20/requests_xml/ResultHandling/GetResult.xml"
+                            }
+                        },
+                        "GetResultTemplate": {
+                            "GetResultTemplate": {
+                                "request": "static/examples/sos_v20/requests_xml/ResultHandling/GetResultTemplate.xml"
+                            }
+                        },
+                        "DeleteSensor": {
+                            "DeleteSensor": {
+                                "request": "static/examples/sos_v20/requests_xml/Transactional/DeleteSensor.xml"
+                            }
+                        },
+                        "InsertObservation": {
+                            "InsertObservation (Category)": {
+                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Category.xml"
+                            },
+                            "InsertObservation (Count)": {
+                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Count.xml"
+                            },
+                            "InsertObservation (Measurement)": {
+                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Measurement.xml"
+                            },
+                            "InsertObservation (Text)": {
+                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Text.xml"
+                            },
+                            "InsertObservation (Truth)": {
+                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Truth.xml"
+                            }
+                        },
+                        "InsertSensor": {
+                            "InsertSensor": {
+                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertSensor.xml"
+                            }
+                        },
+                        "UpdateSensorDescription": {
+                            "UpdateSensorDescription": {
+                                "request": "static/examples/sos_v20/requests_xml/Transactional/UpdateSensorDescription.xml"
+                            }
+                        },
+                        "GetDataAvailability": {
+                            "GetDataAvailability": {
+                                "request": "static/examples/sos_v20/requests_xml/GetDataAvailability.xml"
+                            }
+                        },
+                        "DeleteObservation": {
+                            "DeleteObservation": {
+                                "request": "static/examples/sos_v20/requests_xml/DeleteObservation.xml"
+                            }
+                        }
+                    }
                 }
             }
-        },
-        "/soap": {
-            "GetCapabilities": {
-                "GetCapabilities - All Sections (SOAP 1.2)": {
-                    "request": "static/examples/sos_v100/requests_soap/GetCapabilities.xml"
-                }
-            },
-            "DescribeSensor": {
-                "DescribeSensor (SOAP 1.2)": {
-                    "request": "static/examples/sos_v100/requests_soap/DescribeSensor.xml"
-                }
-            },
-            "GetFeatureOfInterest": {
-                "GetFeatureOfInterest ID (SOAP 1.2)": {
-                    "request": "static/examples/sos_v100/requests_soap/GetFeatureOfInterest.xml"
-                },
-                "GetFeatureOfInterest BBOX (SOAP 1.2)": {
-                    "request": "static/examples/sos_v100/requests_soap/GetFeatureOfInterest_SpatialFilter.xml"
-                }
-            },
-            "GetObservation": {
-                "GetObservation - All Parameters (SOAP 1.2)": {
-                    "request": "static/examples/sos_v100/requests_soap/GetObservation.xml"
-                }
-            },
-            "InsertObservation": {
-                "InsertObservation (SOAP 1.2)": {
-                    "request": "static/examples/sos_v100/requests_soap/InsertObservation.xml"
-                }
-            },
-            "RegisterSensor": {
-                "RegisterSensor (SOAP 1.2)": {
-                    "request": "static/examples/sos_v100/requests_soap/RegisterSensor.xml"
-                }
-            }
-        },
-        "/kvp": {
-            "GetCapabilities": {
-                "GetCapabilities": {
-                    "param": {
-                        "service": "SOS",
-                        "request": "GetCapabilities",
-                        "AcceptVersions": "1.0.0"
-                    }
-                }
-            },
-            "DescribeSensor": {
-                "DescribeSensor": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "1.0.0",
-                        "request": "DescribeSensor",
-                        "procedure": "http://www.52north.org/test/procedure/1",
-                        "outputFormat": "text/xml;subtype=\"sensorML/1.0.1\""
-                    }
-                }
-            },
-            "GetObservation": {
-                "GetObservation": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "1.0.0",
-                        "request": "GetObservation",
-                        "offering": "http://www.52north.org/test/offering/1",
-                        "observedProperty": "http://www.52north.org/test/observableProperty/1",
-                        "procedure": "http://www.52north.org/test/procedure/1",
-                        "featureOfInterest": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,urn:ogc:def:crs:EPSG::4326",
-                        "eventTime": "om:phenomenonTime,2012-11-19T14:00:00+01:00/2012-11-19T14:15:00+01:00",
-                        "responseFormat": "text/xml;subtype=\"om/1.0.0\""
-                    }
-                }
-            }            
-        }
-    },
-    "2.0.0": {
-        "/kvp": {
-            "GetCapabilities": {
-                "GetCapabilities (minimal)": {
-                    "param": {
-                        "service": "SOS",
-                        "request": "GetCapabilities"
-                    }
-                },
-                "GetCapabilities (with AcceptVersions=2.0.0)": {
-                    "param": {
-                        "service": "SOS",
-                        "request": "GetCapabilities",
-                        "AcceptVersions": "2.0.0"
-                    }
-                },
-                "GetCapabilities (only OperationsMetadata section)": {
-                    "param": {
-                        "service": "SOS",
-                        "request": "GetCapabilities",
-                        "Sections": "OperationsMetadata"
-                    }
-                },
-                "GetCapabilities (only Contents section)": {
-                    "param": {
-                        "service": "SOS",
-                        "request": "GetCapabilities",
-                        "Sections": "Contents"
-                    }
-                }
-            },
-            "DescribeSensor": {
-                "DescribeSensor": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "DescribeSensor",
-                        "procedure": "http://www.52north.org/test/procedure/101",
-                        "procedureDescriptionFormat": "http://www.opengis.net/sensorML/1.0.1"
-                    }
-                }
-            },
-            "GetObservation": {
-                "GetObservation (full)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetObservation",
-                        "offering": "http://www.52north.org/test/offering/1",
-                        "observedProperty": "http://www.52north.org/test/observableProperty/1",
-                        "procedure": "http://www.52north.org/test/procedure/101",
-                        "namespaces": [
-                            "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
-                            "xmlns(om,http://www.opengis.net/om/2.0)"
-                        ],
-                        "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,urn:ogc:def:crs:EPSG::4326",
-                        "temporalFilter": "om:phenomenonTime,2012-11-19T14:00:00+01:00/2012-11-19T14:15:00+01:00"
-                    }
-                },
-                "GetObservation (offering)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetObservation",
-                        "offering": "http://www.52north.org/test/offering/1"
-                    }
-                },
-                "GetObservation (offerings)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetObservation",
-                        "offering": [
-                            "http://www.52north.org/test/offering/1",
-                            "http://www.52north.org/test/offering/3"
-                        ]
-                    }
-                },
-                "GetObservation (procedure)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetObservation",
-                        "procedure": "http://www.52north.org/test/procedure/101"
-                    }
-                },
-                "GetObservation (procedures)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetObservation",
-                        "procedure": [
-                            "http://www.52north.org/test/procedure/101",
-                            "http://www.52north.org/test/procedure/103"
-                        ]
-                    }
-                },
-                "GetObservation (observableProperty)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetObservation",
-                        "observedProperty": "http://www.52north.org/test/observableProperty/1"
-                    }
-                },
-                "GetObservation (observableProperties)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetObservation",
-                        "observedProperty": [
-                            "http://www.52north.org/test/observableProperty/1",
-                            "http://www.52north.org/test/observableProperty/3"
-                        ]
-                    }
-                },
-                "GetObservation (featureOfInterest)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetObservation",
-                        "featureOfInterest": "http://www.52north.org/test/featureOfInterest/1"
-                    }
-                },
-                "GetObservation (featureOfInterests)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetObservation",
-                        "featureOfInterest": [
-                            "http://www.52north.org/test/featureOfInterest/1",
-                            "http://www.52north.org/test/featureOfInterest/3"
-                        ]
-                    }
-                },
-                "GetObservation (spatial filter, URN)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetObservation",
-                        "namespaces": [
-                            "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
-                            "xmlns(om,http://www.opengis.net/om/2.0)"
-                        ],
-                        "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,urn:ogc:def:crs:EPSG::4326"
-                    }
-                },
-                "GetObservation (spatial filter, URL)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetObservation",
-                        "namespaces": [
-                            "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
-                            "xmlns(om,http://www.opengis.net/om/2.0)"
-                        ],
-                        "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,http://www.opengis.net/def/crs/EPSG/0/4326"
-                    }
-                },
-                "GetObservation (temporal filter equal)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetObservation",
-                        "namespaces": "xmlns(om,http://www.opengis.net/om/2.0)",
-                        "temporalFilter": "om:phenomenonTime,2012-11-19T14:00:00.000+01:00"
-                    }
-                },
-                "GetObservation (temporal filter during)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetObservation",
-                        "namespaces": "xmlns(om,http://www.opengis.net/om/2.0)",
-                        "temporalFilter": "om:phenomenonTime,2012-11-19T14:00:00+01:00/2012-11-19T14:15:00+01:00"
-                    }
-                }
-            },
-            "GetFeatureOfInterest": {
-                "GetFeatureOfInterest (minimal)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetFeatureOfInterest"
-                    }
-                },
-                "GetFeatureOfInterest (procedure)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetFeatureOfInterest",
-                        "procedure": "http://www.52north.org/test/procedure/101"
-                    }
-                },
-                "GetFeatureOfInterest (procedures)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetFeatureOfInterest",
-                        "procedure": [
-                            "http://www.52north.org/test/procedure/101",
-                            "http://www.52north.org/test/procedure/102"
-                        ]
-                    }
-                },
-                "GetFeatureOfInterest (observableProperty)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetFeatureOfInterest",
-                        "observedProperty": "http://www.52north.org/test/observableProperty/1"
-                    }
-                },
-                "GetFeatureOfInterest (observableProperties)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetFeatureOfInterest",
-                        "observedProperty": [
-                            "http://www.52north.org/test/observableProperty/1",
-                            "http://www.52north.org/test/observableProperty/2"
-                        ]
-                    }
-                },
-                "GetFeatureOfInterest (featureOfInterest)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetFeatureOfInterest",
-                        "featureOfInterest": "http://www.52north.org/test/featureOfInterest/1"
-                    }
-                },
-                "GetFeatureOfInterest (featureOfInterests)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetFeatureOfInterest",
-                        "featureOfInterest": [
-                            "http://www.52north.org/test/featureOfInterest/1",
-                            "http://www.52north.org/test/featureOfInterest/2"
-                        ]
-                    }
-                },
-                "GetFeatureOfInterest (spatial filter, URN)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetFeatureOfInterest",
-                        "namespaces": [
-                            "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
-                            "xmlns(om,http://www.opengis.net/om/2.0)"
-                        ],
-                        "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,urn:ogc:def:crs:EPSG::4326"
-                    }
-                },
-                "GetFeatureOfInterest (spatial filter, URL)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetFeatureOfInterest",
-                        "namespaces": [
-                            "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
-                            "xmlns(om,http://www.opengis.net/om/2.0)"
-                        ],
-                        "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,http://www.opengis.net/def/crs/EPSG/0/4326"
-                    }
-                }
-            },
-            "DeleteSensor": {
-                "DeleteSensor": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "DeleteSensor",
-                        "procedure": "http://www.52north.org/test/procedure/107"
-                    }
-                }
-            },
-            "GetResult": {
-                "GetResult": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetResult",
-                        "offering": "http://www.52north.org/test/offering/9",
-                        "observedProperty": "http://www.52north.org/test/observableProperty/9_3"
-                    }
-                }
-            },
-            "GetResultTemplate": {
-                "GetResultTemplate": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetResultTemplate",
-                        "offering": "http://www.52north.org/test/offering/9",
-                        "observedProperty": "http://www.52north.org/test/observableProperty/9_3"
-                    }
-                }
-            },
-            "GetDataAvailability": {
-                "GetDataAvailability (minimal)": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetDataAvailability"
-                    }
-                },
-                "GetDataAvailability": {
-                    "param": {
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "GetDataAvailability",
-                        "observedProperty": [
-                            "http://www.52north.org/test/observableProperty/1",
-                            "http://www.52north.org/test/observableProperty/3"
-                        ],
-                        "procedure": [
-                            "http://www.52north.org/test/procedure/101",
-                            "http://www.52north.org/test/procedure/103"
-                        ],
-                        "featureOfInterest": [
-                            "http://www.52north.org/test/featureOfInterest/1",
-                            "http://www.52north.org/test/featureOfInterest/3",
-                            "http://www.52north.org/test/featureOfInterest/4"
-                        ]
-                    }
-                }
-            },
-            "DeleteObservation":{
-                "DeleteObservation":{
-                    "param":{
-                        "service": "SOS",
-                        "version": "2.0.0",
-                        "request": "DeleteObservation",
-                        "observation": "http://www.52north.org/test/observation/1"
-                    }
-                }
-            }
-        },
-        "/soap": {
-            "GetCapabilities": {
-                "GetCapabilities": {
-                    "request": "static/examples/sos_v20/requests_soap/GetCapabilities.xml"
-                }
-            },
-            "DescribeSensor": {
-                "DescribeSensor": {
-                    "request": "static/examples/sos_v20/requests_soap/DescribeSensor.xml"
-                }
-            },
-            "GetObservation": {
-                "GetObservation": {
-                    "request": "static/examples/sos_v20/requests_soap/GetObservation.xml"
-                }
-            },
-            "GetFeatureOfInterest": {
-                "GetFeatureOfInterest": {
-                    "request": "static/examples/sos_v20/requests_soap/GetFeatureOfInterest.xml"
-                }
-            },
-            "GetObservationById": {
-                "GetObservationById": {
-                    "request": "static/examples/sos_v20/requests_soap/GetObservationById.xml"
-                }
-            },
-            "InsertResultTemplate": {
-                "InsertResultTemplate": {
-                    "request": "static/examples/sos_v20/requests_soap/ResultHandling/InsertResultTemplate.xml"
-                }
-            },
-            "InsertResult": {
-                "InsertResult": {
-                    "request": "static/examples/sos_v20/requests_soap/ResultHandling/InsertResult.xml"
-                }
-            },
-            "GetResult": {
-                "GetResult": {
-                    "request": "static/examples/sos_v20/requests_soap/ResultHandling/GetResult.xml"
-                }
-            },
-            "GetResultTemplate": {
-                "GetResultTemplate": {
-                    "request": "static/examples/sos_v20/requests_soap/ResultHandling/GetResultTemplate.xml"
-                }
-            },
-            "DeleteSensor": {
-                "DeleteSensor": {
-                    "request": "static/examples/sos_v20/requests_soap/Transactional/DeleteSensor.xml"
-                }
-            },
-            "InsertObservation": {
-                "InsertObservation (Category)": {
-                    "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Category.xml"
-                },
-                "InsertObservation (Count)": {
-                    "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Count.xml"
-                },
-                "InsertObservation (Measurement)": {
-                    "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Measurement.xml"
-                },
-                "InsertObservation (Text)": {
-                    "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Text.xml"
-                },
-                "InsertObservation (Truth)": {
-                    "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Truth.xml"
-                },
-                "InsertObservation (SweArray)": {
-                    "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_SweArray.xml"
-                },
-                "InsertObservation (Multiple observations)": {
-                    "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Multiple.xml"
-                }
-            },
-            "InsertSensor": {
-                "InsertSensor": {
-                    "request": "static/examples/sos_v20/requests_soap/Transactional/InsertSensor.xml"
-                }
-            },
-            "UpdateSensorDescription": {
-                "UpdateSensorDescription": {
-                    "request": "static/examples/sos_v20/requests_soap/Transactional/UpdateSensorDescription.xml"
-                }
-            },
-            "GetDataAvailability": {
-                "GetDataAvailability": {
-                    "request": "static/examples/sos_v20/requests_soap/GetDataAvailability.xml"
-                }
-            },
-            "DeleteObservation":{
-                "DeleteObservation":{
-                    "request": "static/examples/sos_v20/requests_soap/DeleteObservation.xml"
-                }
-            }
-        },
-        "/pox": {
-            "GetCapabilities": {
-                "GetCapabilities": {
-                    "request": "static/examples/sos_v20/requests_xml/GetCapabilities.xml"
-                }
-            },
-            "DescribeSensor": {
-                "DescribeSensor": {
-                    "request": "static/examples/sos_v20/requests_xml/DescribeSensor.xml"
-                }
-            },
-            "GetObservation": {
-                "GetObservation": {
-                    "request": "static/examples/sos_v20/requests_xml/GetObservation.xml"
-                }
-            },
-            "GetFeatureOfInterest": {
-                "GetFeatureOfInterest": {
-                    "request": "static/examples/sos_v20/requests_xml/GetFeatureOfInterest.xml"
-                }
-            },
-            "GetObservationById": {
-                "GetObservationById": {
-                    "request": "static/examples/sos_v20/requests_xml/GetObservationById.xml"
-                }
-            },
-            "InsertResultTemplate": {
-                "InsertResultTemplate": {
-                    "request": "static/examples/sos_v20/requests_xml/ResultHandling/InsertResultTemplate.xml"
-                }
-            },
-            "InsertResult": {
-                "InsertResult": {
-                    "request": "static/examples/sos_v20/requests_xml/ResultHandling/InsertResult.xml"
-                }
-            },
-            "GetResult": {
-                "GetResult": {
-                    "request": "static/examples/sos_v20/requests_xml/ResultHandling/GetResult.xml"
-                }
-            },
-            "GetResultTemplate": {
-                "GetResultTemplate": {
-                    "request": "static/examples/sos_v20/requests_xml/ResultHandling/GetResultTemplate.xml"
-                }
-            },
-            "DeleteSensor": {
-                "DeleteSensor": {
-                    "request": "static/examples/sos_v20/requests_xml/Transactional/DeleteSensor.xml"
-                }
-            },
-            "InsertObservation": {
-                "InsertObservation (Category)": {
-                    "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Category.xml"
-                },
-                "InsertObservation (Count)": {
-                    "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Count.xml"
-                },
-                "InsertObservation (Measurement)": {
-                    "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Measurement.xml"
-                },
-                "InsertObservation (Text)": {
-                    "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Text.xml"
-                },
-                "InsertObservation (Truth)": {
-                    "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Truth.xml"
-                }
-            },
-            "InsertSensor": {
-                "InsertSensor": {
-                    "request": "static/examples/sos_v20/requests_xml/Transactional/InsertSensor.xml"
-                }
-            },
-            "UpdateSensorDescription": {
-                "UpdateSensorDescription": {
-                    "request": "static/examples/sos_v20/requests_xml/Transactional/UpdateSensorDescription.xml"
-                }
-            },
-            "GetDataAvailability": {
-                "GetDataAvailability": {
-                    "request": "static/examples/sos_v20/requests_xml/GetDataAvailability.xml"
-                }
-            },
-            "DeleteObservation":{
-                "DeleteObservation":{
-                    "request": "static/examples/sos_v20/requests_xml/DeleteObservation.xml"
-                }
-            }
-        }
-    }
 }
