@@ -130,7 +130,9 @@ public class KvpBinding extends Binding {
 	private String getServiceParameterValue(final Map<String, String> parameterValueMap) throws OwsExceptionReport {
 		final String service = KvpHelper.getParameterValue(RequestParams.service, parameterValueMap);
 		final boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
-		if (isGetCapabilities && (service == null)) {
+        if (isGetCapabilities && (service == null)) {
+            // unclear behaviour because of imprecise spec:
+            // OGC 12-006 8.1.1 and OGC 12-006 13.2.1/OGC 06-121r3 7.2.3
 			return SosConstants.SOS;
 		} else {
 			KvpHelper.checkParameterValue(service, RequestParams.service);

@@ -31,11 +31,12 @@ import static org.n52.sos.ogc.ows.SosServiceProviderFactorySettings.*;
 
 import javax.xml.namespace.NamespaceContext;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.n52.sos.exception.ows.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * TODO JavaDoc
@@ -43,20 +44,35 @@ import org.w3c.dom.Element;
  */
 public class GetCapabilitiesTest extends AbstractSosServiceTest {
     private NamespaceContext ctx = new SosNamespaceContext();
-    private Element node;
 
-    @Before
-    public void setup() {
-        node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+    @Test
+    public void missingServiceParameter() {
+        Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+                .query(OWSConstants.RequestParams.request,
+                       SosConstants.Operations.GetCapabilities)
+                .accept(SosConstants.CONTENT_TYPE_XML)));
+        assertThat(node, hasXPath("//sos:Capabilities", ctx));
+    }
+
+    @Test
+    public void invalidServiceParameter() {
+        Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
                 .query(OWSConstants.RequestParams.request,
                        SosConstants.Operations.GetCapabilities)
                 .query(OWSConstants.RequestParams.service,
-                       SosConstants.SOS)
+                       "INVALID")
                 .accept(SosConstants.CONTENT_TYPE_XML)));
+        assertThat(node, hasXPath("//ows:ExceptionReport/ows:Exception/@exceptionCode", ctx,
+                                  is(OwsExceptionCode.InvalidParameterValue.name())));
+        assertThat(node, hasXPath("//ows:ExceptionReport/ows:Exception/@locator", ctx,
+                                  is(OWSConstants.RequestParams.service.name())));
+        assertThat(node, hasXPath("//ows:ExceptionReport/ows:Exception/ows:ExceptionText", ctx,
+                                  is("The value of the mandatory parameter 'service' must be 'SOS'. Delivered value was: INVALID")));
     }
 
     @Test
     public void checkServiceIdentification() {
+        Element node = getCapabilities();
         assertThat(node, hasXPath("//sos:Capabilities/ows:ServiceIdentification/ows:Title", ctx,
                                   is(TITLE_DEFINITION.getDefaultValue())));
         assertThat(node, hasXPath("//sos:Capabilities/ows:ServiceIdentification/ows:Abstract", ctx,
@@ -71,6 +87,7 @@ public class GetCapabilitiesTest extends AbstractSosServiceTest {
 
     @Test
     public void checkServiceProvider() {
+        Element node = getCapabilities();
         assertThat(node, hasXPath("//sos:Capabilities/ows:ServiceProvider/ows:ProviderName", ctx,
                                   is(NAME_DEFINITION.getDefaultValue())));
         assertThat(node, hasXPath("//sos:Capabilities/ows:ServiceProvider/ows:ProviderSite/@xlink:href", ctx,
@@ -93,5 +110,14 @@ public class GetCapabilitiesTest extends AbstractSosServiceTest {
                                   is(COUNTRY_DEFINITION.getDefaultValue())));
         assertThat(node, hasXPath("//sos:Capabilities/ows:ServiceProvider/ows:ServiceContact/ows:ContactInfo/ows:Address/ows:ElectronicMailAddress", ctx,
                                   is(MAIL_ADDRESS_DEFINITION.getDefaultValue())));
+    }
+
+    protected Element getCapabilities() {
+        return getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+                .query(OWSConstants.RequestParams.request,
+                       SosConstants.Operations.GetCapabilities)
+                .query(OWSConstants.RequestParams.service,
+                       SosConstants.SOS)
+                .accept(SosConstants.CONTENT_TYPE_XML)));
     }
 }
