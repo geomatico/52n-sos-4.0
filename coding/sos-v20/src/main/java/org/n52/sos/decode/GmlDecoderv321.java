@@ -383,7 +383,7 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
     }
 
     private SosSingleObservationValue<BigDecimal> parseMeasureType(MeasureType measureType) {
-        QuantityValue quantityValue = new QuantityValue(new BigDecimal(measureType.getDoubleValue()));
+        QuantityValue quantityValue = new QuantityValue(new BigDecimal(measureType.getStringValue()));
         quantityValue.setUnit(measureType.getUom());
         return new SosSingleObservationValue<BigDecimal>(quantityValue);
     }
