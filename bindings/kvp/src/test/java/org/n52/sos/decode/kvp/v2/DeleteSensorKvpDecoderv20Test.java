@@ -42,17 +42,17 @@ import org.n52.sos.request.DeleteSensorRequest;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class DeleteSensorKvpDecoderTest extends DeleteSensorKvpDecoder {
+public class DeleteSensorKvpDecoderv20Test extends DeleteSensorKvpDecoderv20 {
     private static final String PROCEDURE = "testprocedure";
     private static final String SERVICE = SosConstants.SOS;
     private static final String VERSION = Sos2Constants.SERVICEVERSION;
     private static final String ADDITIONAL_PARAMETER = "additionalParameter";
     private static final String EMPTY_STRING = "";
-    private DeleteSensorKvpDecoder decoder;
+    private DeleteSensorKvpDecoderv20 decoder;
 
     @Before
     public void setUp() {
-        this.decoder = new DeleteSensorKvpDecoder();
+        this.decoder = new DeleteSensorKvpDecoderv20();
     }
 
     @Test

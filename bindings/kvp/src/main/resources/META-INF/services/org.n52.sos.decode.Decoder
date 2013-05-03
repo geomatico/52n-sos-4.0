@@ -1,8 +1,9 @@
-org.n52.sos.decode.kvp.v2.DescribeSensorKvpDecoder
-org.n52.sos.decode.kvp.v2.DeleteSensorKvpDecoder
-org.n52.sos.decode.kvp.v2.GetCapabilitiesKvpDecoder
-org.n52.sos.decode.kvp.v2.GetFeatureOfInterestKvpDecoder
-org.n52.sos.decode.kvp.v2.GetObservationKvpDecoder
-org.n52.sos.decode.kvp.v2.GetResultKvpDecoder
-org.n52.sos.decode.kvp.v2.GetResultTemplateKvpDecoder
-
+org.n52.sos.decode.kvp.GetCapabilitiesKvpDecoder
+org.n52.sos.decode.kvp.v1.DescribeSensorKvpDecoderv100
+org.n52.sos.decode.kvp.v1.GetObservationKvpDecoderv100
+org.n52.sos.decode.kvp.v2.DeleteSensorKvpDecoderv20
+org.n52.sos.decode.kvp.v2.DescribeSensorKvpDecoderv20
+org.n52.sos.decode.kvp.v2.GetFeatureOfInterestKvpDecoderv20
+org.n52.sos.decode.kvp.v2.GetObservationKvpDecoderv20
+org.n52.sos.decode.kvp.v2.GetResultKvpDecoderv20
+org.n52.sos.decode.kvp.v2.GetResultTemplateKvpDecoderv20
