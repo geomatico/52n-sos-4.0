@@ -24,6 +24,8 @@
 
 package org.n52.sos.service.it;
 
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasXPath;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -36,11 +38,15 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
 import org.n52.sos.ds.hibernate.H2Configuration;
+import org.n52.sos.exception.ows.OwsExceptionCode;
+import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.service.SosService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +54,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 
@@ -60,6 +67,7 @@ public class AbstractSosServiceTest {
     private static SosService service;
     private static final ServletContext servletContext = new MockServletContext();
     private static final ServletConfig servletConfig = new MockServletConfig(servletContext);
+    private static final NamespaceContext namespaceContext = new SosNamespaceContext();
 
     @BeforeClass
     public static void setUp() throws ServletException, IOException {
@@ -68,7 +76,23 @@ public class AbstractSosServiceTest {
         service.init(servletConfig);
     }
 
-    protected MockHttpServletResponse execute(RequestBuilder b){
+    public static Matcher<Node> invalidServiceParameterValueException(String value) {
+        return exception(OwsExceptionCode.InvalidParameterValue, OWSConstants.RequestParams.service,
+                         "The value of the mandatory parameter 'service' must be 'SOS'. Delivered value was: " + value);
+    }
+
+    public static Matcher<Node> missingServiceParameterValue() {
+        return exception(OwsExceptionCode.MissingParameterValue, OWSConstants.RequestParams.service,
+                         "The value for the parameter 'service' is missing in the request!");
+    }
+
+    public static Matcher<Node> exception(Enum<?> code, Enum<?> locator, String text) {
+        return allOf(hasXPath("//ows:ExceptionReport/ows:Exception/@exceptionCode", namespaceContext, is(code.name())),
+                     hasXPath("//ows:ExceptionReport/ows:Exception/@locator", namespaceContext, is(locator.name())),
+                     hasXPath("//ows:ExceptionReport/ows:Exception/ows:ExceptionText", namespaceContext, is(text)));
+    }
+
+    protected MockHttpServletResponse execute(RequestBuilder b) {
         try {
             MockHttpServletResponse res = new MockHttpServletResponse();
             HttpServletRequest req = b.context(servletContext).build();

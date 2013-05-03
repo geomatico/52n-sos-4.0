@@ -22,19 +22,23 @@
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
 
-package org.n52.sos.service.it;
+package org.n52.sos.service.it.kvp.v2;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.n52.sos.ogc.ows.SosServiceIdentificationFactorySettings.*;
 import static org.n52.sos.ogc.ows.SosServiceProviderFactorySettings.*;
+import static org.n52.sos.service.it.AbstractSosServiceTest.missingServiceParameterValue;
 
 import javax.xml.namespace.NamespaceContext;
 
 import org.junit.Test;
-import org.n52.sos.exception.ows.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants;
+import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.service.it.AbstractSosServiceTest;
+import org.n52.sos.service.it.RequestBuilder;
+import org.n52.sos.service.it.SosNamespaceContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -55,6 +59,16 @@ public class GetCapabilitiesTest extends AbstractSosServiceTest {
     }
 
     @Test
+    public void emptyServiceParameter() {
+        Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+                .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetCapabilities)
+                .query(OWSConstants.RequestParams.service, "")
+                .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)
+                .accept(SosConstants.CONTENT_TYPE_XML)));
+        assertThat(node, is(missingServiceParameterValue()));
+    }
+
+    @Test
     public void invalidServiceParameter() {
         Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
                 .query(OWSConstants.RequestParams.request,
@@ -62,12 +76,7 @@ public class GetCapabilitiesTest extends AbstractSosServiceTest {
                 .query(OWSConstants.RequestParams.service,
                        "INVALID")
                 .accept(SosConstants.CONTENT_TYPE_XML)));
-        assertThat(node, hasXPath("//ows:ExceptionReport/ows:Exception/@exceptionCode", ctx,
-                                  is(OwsExceptionCode.InvalidParameterValue.name())));
-        assertThat(node, hasXPath("//ows:ExceptionReport/ows:Exception/@locator", ctx,
-                                  is(OWSConstants.RequestParams.service.name())));
-        assertThat(node, hasXPath("//ows:ExceptionReport/ows:Exception/ows:ExceptionText", ctx,
-                                  is("The value of the mandatory parameter 'service' must be 'SOS'. Delivered value was: INVALID")));
+        assertThat(node, is(invalidServiceParameterValueException("INVALID")));
     }
 
     @Test
