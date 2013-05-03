@@ -42,6 +42,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.junit.BeforeClass;
 import org.n52.sos.ds.hibernate.H2Configuration;
 import org.n52.sos.service.SosService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
@@ -54,6 +56,7 @@ import org.xml.sax.SAXException;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class AbstractSosServiceTest {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractSosServiceTest.class);
     private static SosService service;
     private static final ServletContext servletContext = new MockServletContext();
     private static final ServletConfig servletConfig = new MockServletConfig(servletContext);
@@ -72,9 +75,11 @@ public class AbstractSosServiceTest {
             service.service(req, res);
             return res;
         } catch (ServletException ex) {
-            throw new AssertionError("Error in servlet", ex);
+            LOG.error("Error in servlet", ex);
+            throw new AssertionError("Error in servlet");
         } catch (IOException ex) {
-            throw new AssertionError("Error in servlet", ex);
+            LOG.error("Error in servlet", ex);
+            throw new AssertionError("Error in servlet");
         }
     }
 
@@ -88,11 +93,14 @@ public class AbstractSosServiceTest {
                     .parse(new ByteArrayInputStream(response)).getDocumentElement();
             return node;
         } catch (ParserConfigurationException ex) {
-            throw new AssertionError("Error parsing response", ex);
+            LOG.error("Error parsing response", ex);
+            throw new AssertionError("Error parsing response");
         } catch (SAXException ex) {
-            throw new AssertionError("Error parsing response", ex);
+            LOG.error("Error parsing response", ex);
+            throw new AssertionError("Error parsing response");
         } catch (IOException ex) {
-            throw new AssertionError("Error parsing response", ex);
+            LOG.error("Error parsing response", ex);
+            throw new AssertionError("Error parsing response");
         }
     }
 }
