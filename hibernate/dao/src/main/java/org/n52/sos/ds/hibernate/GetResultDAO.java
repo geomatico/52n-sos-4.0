@@ -32,6 +32,7 @@ import java.util.Set;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.AbstractGetResultDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
@@ -138,6 +139,7 @@ public class GetResultDAO extends AbstractGetResultDAO {
         if (request.getTemporalFilter() != null && !request.getTemporalFilter().isEmpty()) {
             c.add(TemporalRestrictions.filter(request.getTemporalFilter()));
         }
+        c.addOrder(Order.asc(Observation.PHENOMENON_TIME_START));
         return c.list();
 
     }
