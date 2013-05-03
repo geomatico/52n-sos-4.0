@@ -50,6 +50,8 @@ public class GetCapabilitiesTest extends AbstractSosServiceTest {
         node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
                 .query(OWSConstants.RequestParams.request,
                        SosConstants.Operations.GetCapabilities)
+                .query(OWSConstants.RequestParams.service,
+                       SosConstants.SOS)
                 .accept(SosConstants.CONTENT_TYPE_XML)));
     }
 
