@@ -31,6 +31,32 @@
                                 "request": "static/examples/sos_v100/requests_xml/GetObservationById.xml"
                             }
                         },
+                        "RegisterSensor": {
+                            "RegisterSensor - CategoryObservation": {
+                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_categoryObservation.xml"
+                            },
+                            "RegisterSensor - Measurement": {
+                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_measurement.xml"
+                            },
+                            "RegisterSensor - Measurement - Derwent": {
+                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Measurement_Derwent.xml"
+                            },
+                            "RegisterSensor - Measurement - Derwent 2": {
+                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Observation_Derwent_2.xml"
+                            },
+                            "RegisterSensor - Geometry": {
+                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_geometry.xml"
+                            },
+                            "RegisterSensor - FeatureOfInterest": {
+                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_withFOI.xml"
+                            },
+                            "RegisterSensor - Observation - AllTypes": {
+                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Observation_allTypes.xml"
+                            },
+                            "RegisterSensor - Observation - No ID's": {
+                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Observation_noIDs.xml"
+                            }
+                        },
                         "InsertObservation": {
                             "InsertObservation - Geometry - MovingObject": {
                                 "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObs_geometry_movingObject.xml"
@@ -65,32 +91,6 @@
                             "InsertObservation - GenericObservation - No ID's": {
                                 "request": "static/examples/sos_v100/requests_xml/InsertObservation/InsertObservation_GenericObs_noIDs.xml"
                             }
-                        },
-                        "RegisterSensor": {
-                            "RegisterSensor - CategoryObservation": {
-                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_categoryObservation.xml"
-                            },
-                            "RegisterSensor - Measurement": {
-                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_measurement.xml"
-                            },
-                            "RegisterSensor - Measurement - Derwent": {
-                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Measurement_Derwent.xml"
-                            },
-                            "RegisterSensor - Measurement - Derwent 2": {
-                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Observation_Derwent_2.xml"
-                            },
-                            "RegisterSensor - Geometry": {
-                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_geometry.xml"
-                            },
-                            "RegisterSensor - FeatureOfInterest": {
-                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_withFOI.xml"
-                            },
-                            "RegisterSensor - Observation - AllTypes": {
-                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Observation_allTypes.xml"
-                            },
-                            "RegisterSensor - Observation - No ID's": {
-                                "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Observation_noIDs.xml"
-                            }
                         }
                     },
                     "/soap": {
@@ -117,14 +117,14 @@
                                 "request": "static/examples/sos_v100/requests_soap/GetObservation.xml"
                             }
                         },
-                        "InsertObservation": {
-                            "InsertObservation (SOAP 1.2)": {
-                                "request": "static/examples/sos_v100/requests_soap/InsertObservation.xml"
-                            }
-                        },
                         "RegisterSensor": {
                             "RegisterSensor (SOAP 1.2)": {
                                 "request": "static/examples/sos_v100/requests_soap/RegisterSensor.xml"
+                            }
+                        },
+                        "InsertObservation": {
+                            "InsertObservation (SOAP 1.2)": {
+                                "request": "static/examples/sos_v100/requests_soap/InsertObservation.xml"
                             }
                         }
                     },
@@ -203,7 +203,7 @@
                                     "service": "SOS",
                                     "version": "2.0.0",
                                     "request": "DescribeSensor",
-                                    "procedure": "http://www.52north.org/test/procedure/101",
+                                    "procedure": "http://www.52north.org/test/procedure/1",
                                     "procedureDescriptionFormat": "http://www.opengis.net/sensorML/1.0.1"
                                 }
                             }
@@ -216,7 +216,7 @@
                                     "request": "GetObservation",
                                     "offering": "http://www.52north.org/test/offering/1",
                                     "observedProperty": "http://www.52north.org/test/observableProperty/1",
-                                    "procedure": "http://www.52north.org/test/procedure/101",
+                                    "procedure": "http://www.52north.org/test/procedure/1",
                                     "namespaces": [
                                         "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
                                         "xmlns(om,http://www.opengis.net/om/2.0)"
@@ -249,7 +249,7 @@
                                     "service": "SOS",
                                     "version": "2.0.0",
                                     "request": "GetObservation",
-                                    "procedure": "http://www.52north.org/test/procedure/101"
+                                    "procedure": "http://www.52north.org/test/procedure/1"
                                 }
                             },
                             "GetObservation (procedures)": {
@@ -258,8 +258,8 @@
                                     "version": "2.0.0",
                                     "request": "GetObservation",
                                     "procedure": [
-                                        "http://www.52north.org/test/procedure/101",
-                                        "http://www.52north.org/test/procedure/103"
+                                        "http://www.52north.org/test/procedure/1",
+                                        "http://www.52north.org/test/procedure/3"
                                     ]
                                 }
                             },
@@ -334,6 +334,24 @@
                                     "temporalFilter": "om:phenomenonTime,2012-11-19T14:00:00.000+01:00"
                                 }
                             },
+                            "GetObservation (temporal filter first)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetObservation",
+                                    "namespaces": "xmlns(om,http://www.opengis.net/om/2.0)",
+                                    "temporalFilter": "om:phenomenonTime,first"
+                                }
+                            },
+                            "GetObservation (temporal filter latest)": {
+                                "param": {
+                                    "service": "SOS",
+                                    "version": "2.0.0",
+                                    "request": "GetObservation",
+                                    "namespaces": "xmlns(om,http://www.opengis.net/om/2.0)",
+                                    "temporalFilter": "om:phenomenonTime,latest"
+                                }
+                            },
                             "GetObservation (temporal filter during)": {
                                 "param": {
                                     "service": "SOS",
@@ -357,7 +375,7 @@
                                     "service": "SOS",
                                     "version": "2.0.0",
                                     "request": "GetFeatureOfInterest",
-                                    "procedure": "http://www.52north.org/test/procedure/101"
+                                    "procedure": "http://www.52north.org/test/procedure/1"
                                 }
                             },
                             "GetFeatureOfInterest (procedures)": {
@@ -366,8 +384,8 @@
                                     "version": "2.0.0",
                                     "request": "GetFeatureOfInterest",
                                     "procedure": [
-                                        "http://www.52north.org/test/procedure/101",
-                                        "http://www.52north.org/test/procedure/102"
+                                        "http://www.52north.org/test/procedure/1",
+                                        "http://www.52north.org/test/procedure/2"
                                     ]
                                 }
                             },
@@ -440,7 +458,7 @@
                                     "service": "SOS",
                                     "version": "2.0.0",
                                     "request": "DeleteSensor",
-                                    "procedure": "http://www.52north.org/test/procedure/107"
+                                    "procedure": "http://www.52north.org/test/procedure/9"
                                 }
                             }
                         },
@@ -484,8 +502,8 @@
                                         "http://www.52north.org/test/observableProperty/3"
                                     ],
                                     "procedure": [
-                                        "http://www.52north.org/test/procedure/101",
-                                        "http://www.52north.org/test/procedure/103"
+                                        "http://www.52north.org/test/procedure/1",
+                                        "http://www.52north.org/test/procedure/3"
                                     ],
                                     "featureOfInterest": [
                                         "http://www.52north.org/test/featureOfInterest/1",
@@ -532,29 +550,14 @@
                                 "request": "static/examples/sos_v20/requests_soap/GetObservationById.xml"
                             }
                         },
-                        "InsertResultTemplate": {
-                            "InsertResultTemplate": {
-                                "request": "static/examples/sos_v20/requests_soap/ResultHandling/InsertResultTemplate.xml"
+                        "InsertSensor": {
+                            "InsertSensor": {
+                                "request": "static/examples/sos_v20/requests_soap/Transactional/InsertSensor.xml"
                             }
                         },
-                        "InsertResult": {
-                            "InsertResult": {
-                                "request": "static/examples/sos_v20/requests_soap/ResultHandling/InsertResult.xml"
-                            }
-                        },
-                        "GetResult": {
-                            "GetResult": {
-                                "request": "static/examples/sos_v20/requests_soap/ResultHandling/GetResult.xml"
-                            }
-                        },
-                        "GetResultTemplate": {
-                            "GetResultTemplate": {
-                                "request": "static/examples/sos_v20/requests_soap/ResultHandling/GetResultTemplate.xml"
-                            }
-                        },
-                        "DeleteSensor": {
-                            "DeleteSensor": {
-                                "request": "static/examples/sos_v20/requests_soap/Transactional/DeleteSensor.xml"
+                        "UpdateSensorDescription": {
+                            "UpdateSensorDescription": {
+                                "request": "static/examples/sos_v20/requests_soap/Transactional/UpdateSensorDescription.xml"
                             }
                         },
                         "InsertObservation": {
@@ -580,24 +583,39 @@
                                 "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Multiple.xml"
                             }
                         },
-                        "InsertSensor": {
-                            "InsertSensor": {
-                                "request": "static/examples/sos_v20/requests_soap/Transactional/InsertSensor.xml"
+                        "InsertResultTemplate": {
+                            "InsertResultTemplate": {
+                                "request": "static/examples/sos_v20/requests_soap/ResultHandling/InsertResultTemplate.xml"
                             }
                         },
-                        "UpdateSensorDescription": {
-                            "UpdateSensorDescription": {
-                                "request": "static/examples/sos_v20/requests_soap/Transactional/UpdateSensorDescription.xml"
+                        "InsertResult": {
+                            "InsertResult": {
+                                "request": "static/examples/sos_v20/requests_soap/ResultHandling/InsertResult.xml"
                             }
                         },
-                        "GetDataAvailability": {
-                            "GetDataAvailability": {
-                                "request": "static/examples/sos_v20/requests_soap/GetDataAvailability.xml"
+                        "GetResultTemplate": {
+                            "GetResultTemplate": {
+                                "request": "static/examples/sos_v20/requests_soap/ResultHandling/GetResultTemplate.xml"
+                            }
+                        },
+                        "GetResult": {
+                            "GetResult": {
+                                "request": "static/examples/sos_v20/requests_soap/ResultHandling/GetResult.xml"
                             }
                         },
                         "DeleteObservation": {
                             "DeleteObservation": {
                                 "request": "static/examples/sos_v20/requests_soap/DeleteObservation.xml"
+                            }
+                        },
+                        "DeleteSensor": {
+                            "DeleteSensor": {
+                                "request": "static/examples/sos_v20/requests_soap/Transactional/DeleteSensor.xml"
+                            }
+                        },
+                        "GetDataAvailability": {
+                            "GetDataAvailability": {
+                                "request": "static/examples/sos_v20/requests_soap/GetDataAvailability.xml"
                             }
                         }
                     },
@@ -627,6 +645,33 @@
                                 "request": "static/examples/sos_v20/requests_xml/GetObservationById.xml"
                             }
                         },
+                        "InsertSensor": {
+                            "InsertSensor": {
+                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertSensor.xml"
+                            }
+                        },
+                        "UpdateSensorDescription": {
+                            "UpdateSensorDescription": {
+                                "request": "static/examples/sos_v20/requests_xml/Transactional/UpdateSensorDescription.xml"
+                            }
+                        },
+                        "InsertObservation": {
+                            "InsertObservation (Category)": {
+                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Category.xml"
+                            },
+                            "InsertObservation (Count)": {
+                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Count.xml"
+                            },
+                            "InsertObservation (Measurement)": {
+                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Measurement.xml"
+                            },
+                            "InsertObservation (Text)": {
+                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Text.xml"
+                            },
+                            "InsertObservation (Truth)": {
+                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Truth.xml"
+                            }
+                        },
                         "InsertResultTemplate": {
                             "InsertResultTemplate": {
                                 "request": "static/examples/sos_v20/requests_xml/ResultHandling/InsertResultTemplate.xml"
@@ -647,46 +692,19 @@
                                 "request": "static/examples/sos_v20/requests_xml/ResultHandling/GetResultTemplate.xml"
                             }
                         },
+                        "DeleteObservation": {
+                            "DeleteObservation": {
+                                "request": "static/examples/sos_v20/requests_xml/DeleteObservation.xml"
+                            }
+                        },
                         "DeleteSensor": {
                             "DeleteSensor": {
                                 "request": "static/examples/sos_v20/requests_xml/Transactional/DeleteSensor.xml"
                             }
                         },
-                        "InsertObservation": {
-                            "InsertObservation (Category)": {
-                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Category.xml"
-                            },
-                            "InsertObservation (Count)": {
-                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Count.xml"
-                            },
-                            "InsertObservation (Measurement)": {
-                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Measurement.xml"
-                            },
-                            "InsertObservation (Text)": {
-                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Text.xml"
-                            },
-                            "InsertObservation (Truth)": {
-                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertObservation_Truth.xml"
-                            }
-                        },
-                        "InsertSensor": {
-                            "InsertSensor": {
-                                "request": "static/examples/sos_v20/requests_xml/Transactional/InsertSensor.xml"
-                            }
-                        },
-                        "UpdateSensorDescription": {
-                            "UpdateSensorDescription": {
-                                "request": "static/examples/sos_v20/requests_xml/Transactional/UpdateSensorDescription.xml"
-                            }
-                        },
                         "GetDataAvailability": {
                             "GetDataAvailability": {
                                 "request": "static/examples/sos_v20/requests_xml/GetDataAvailability.xml"
-                            }
-                        },
-                        "DeleteObservation": {
-                            "DeleteObservation": {
-                                "request": "static/examples/sos_v20/requests_xml/DeleteObservation.xml"
                             }
                         }
                     }
