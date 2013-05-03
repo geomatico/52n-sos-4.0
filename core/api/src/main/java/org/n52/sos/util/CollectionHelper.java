@@ -272,4 +272,21 @@ public final class CollectionHelper {
     {
     	return collection != null && collection.isEmpty();
     }
+
+    /**
+     * Reverses a map (switches key and value types).
+     *
+     * @param <K> the key type
+     * @param <V> the value type
+     * @param map the map
+     *
+     * @return the reversed map
+     */
+    public static <K, V> Map<V, K> reverse(Map<K, V> map) {
+        Map<V, K> reversed = new HashMap<V, K>(map.size());
+        for (Entry<K, V> e : map.entrySet()) {
+            reversed.put(e.getValue(), e.getKey());
+        }
+        return reversed;
+    }
 }
