@@ -106,7 +106,8 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
     private static final Map<String, Map<String, Set<String>>> SUPPORTED_RESPONSE_FORMATS = Collections.singletonMap(
             SosConstants.SOS,
             Collections.singletonMap(Sos1Constants.SERVICEVERSION,
-                    CollectionHelper.set(OMConstants.NS_OM, OMConstants.CONTENT_TYPE_OM)));
+                    CollectionHelper.set(OMConstants.CONTENT_TYPE_OM)));
+    
     @SuppressWarnings("unchecked")
     private static final Set<EncoderKey> ENCODER_KEYS = CollectionHelper.union(
             CodingHelper.encoderKeysForElements(OMConstants.NS_OM, SosObservation.class),
