@@ -409,6 +409,18 @@ public class SosObservationOffering implements Comparable<SosObservationOffering
 
     @Override
     public int compareTo(SosObservationOffering o) {
+    	if (o == null) {
+    		throw new NullPointerException();
+    	}
+
+        if (getOffering() == null ^ o.getOffering() == null) {
+            return (getOffering() == null) ? -1 : 1;
+        }
+
+        if (getOffering() == null && o.getOffering() == null) {
+            return 0;
+        }
+
         return getOffering().compareTo(o.getOffering());
     }
 
