@@ -51,6 +51,7 @@ import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.DateTimeHelper;
 
 import com.vividsolutions.jts.io.WKTWriter;
@@ -77,30 +78,31 @@ public class ResultHandlingHelper {
                                                             final SosResultEncoding sosResultEncoding,
                                                             final SosResultStructure sosResultStructure) throws OwsExceptionReport {
         final StringBuilder builder = new StringBuilder();
-        final String tokenSeparator = getTokenSeparator(sosResultEncoding.getEncoding());
-        final String blockSeparator = getBlockSeparator(sosResultEncoding.getEncoding());
-        final Map<Integer, String> valueOrder = getValueOrderMap(sosResultStructure.getResultStructure());
-        addElementCount(builder,observations.size(),blockSeparator);
-        for (final Observation observation : observations) {
-            for (final Integer intger : valueOrder.keySet()) {
-                final String definition = valueOrder.get(intger);
-                if (definition.equals(PHENOMENON_TIME)) {
-                    builder.append(getTimeStringForPhenomenonTime(observation.getPhenomenonTimeStart(), observation.getPhenomenonTimeEnd()));
-                } else if (definition.equals(RESULT_TIME)) {
-                    builder.append(getTimeStringForResultTime(observation.getResultTime()));
-                } else {
-                    builder.append(getValueAsStringForObservedProperty(observation, definition));
+        if (CollectionHelper.isNotEmpty(observations)) {
+            final String tokenSeparator = getTokenSeparator(sosResultEncoding.getEncoding());
+            final String blockSeparator = getBlockSeparator(sosResultEncoding.getEncoding());
+            final Map<Integer, String> valueOrder = getValueOrderMap(sosResultStructure.getResultStructure());
+            addElementCount(builder,observations.size(),blockSeparator);
+            for (final Observation observation : observations) {
+                for (final Integer intger : valueOrder.keySet()) {
+                    final String definition = valueOrder.get(intger);
+                    if (definition.equals(PHENOMENON_TIME)) {
+                        builder.append(getTimeStringForPhenomenonTime(observation.getPhenomenonTimeStart(), observation.getPhenomenonTimeEnd()));
+                    } else if (definition.equals(RESULT_TIME)) {
+                        builder.append(getTimeStringForResultTime(observation.getResultTime()));
+                    } else {
+                        builder.append(getValueAsStringForObservedProperty(observation, definition));
+                    }
+                    builder.append(tokenSeparator);
                 }
-                builder.append(tokenSeparator);
+                builder.delete(builder.lastIndexOf(tokenSeparator), builder.length());
+                builder.append(blockSeparator);
             }
-            builder.delete(builder.lastIndexOf(tokenSeparator), builder.length());
-            builder.append(blockSeparator);
+            if (builder.length() > 0) {
+                builder.delete(builder.lastIndexOf(blockSeparator), builder.length());
+            }
         }
-        if (builder.length() > 0) {
-            builder.delete(builder.lastIndexOf(blockSeparator), builder.length());
-            return builder.toString();
-        }
-        return null;
+        return builder.toString();
     }
 
 	private static void addElementCount(final StringBuilder builder,
