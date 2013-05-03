@@ -36,6 +36,8 @@ import org.n52.sos.util.CollectionHelper;
  * views of the cache.
  *
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
  * @since 4.0.0
  */
 public class ReadableCache extends AbstractContentCache {
@@ -87,101 +89,101 @@ public class ReadableCache extends AbstractContentCache {
     }
 
     @Override
-    public Set<String> getOfferingsForObservableProperty(String observableProperty) {
+    public Set<String> getOfferingsForObservableProperty(final String observableProperty) {
         return copyOf(getOfferingsForObservablePropertiesMap().get(observableProperty));
     }
 
     @Override
-    public Set<String> getOfferingsForProcedure(String procedure) {
+    public Set<String> getOfferingsForProcedure(final String procedure) {
         return copyOf(getOfferingsForProceduresMap().get(procedure));
     }
 
     @Override
-    public Set<String> getProceduresForFeatureOfInterest(String featureOfInterest) {
+    public Set<String> getProceduresForFeatureOfInterest(final String featureOfInterest) {
         return copyOf(getProceduresForFeaturesOfInterestMap().get(featureOfInterest));
     }
 
     @Override
-    public Set<String> getProceduresForObservableProperty(String observableProperty) {
+    public Set<String> getProceduresForObservableProperty(final String observableProperty) {
         return copyOf(getProceduresForObservablePropertiesMap().get(observableProperty));
     }
 
     @Override
-    public Set<String> getProceduresForOffering(String offering) {
+    public Set<String> getProceduresForOffering(final String offering) {
         return copyOf(getProceduresForOfferingsMap().get(offering));
     }
     
     @Override
-    public Set<String> getHiddenChildProceduresForOffering(String offering) {
+    public Set<String> getHiddenChildProceduresForOffering(final String offering) {
         return copyOf(getHiddenChildProceduresForOfferingsMap().get(offering));
     }
 
     @Override
-    public Set<String> getRelatedFeaturesForOffering(String offering) {
+    public Set<String> getRelatedFeaturesForOffering(final String offering) {
         return copyOf(getRelatedFeaturesForOfferingsMap().get(offering));
     }
 
     @Override
-    public Set<String> getResultTemplatesForOffering(String offering) {
+    public Set<String> getResultTemplatesForOffering(final String offering) {
         return copyOf(getResultTemplatesForOfferingsMap().get(offering));
     }
 
     @Override
-    public Set<String> getRolesForRelatedFeature(String relatedFeature) {
+    public Set<String> getRolesForRelatedFeature(final String relatedFeature) {
         return copyOf(getRolesForRelatedFeaturesMap().get(relatedFeature));
     }
 
     @Override
-    public SosEnvelope getEnvelopeForOffering(String offering) {
+    public SosEnvelope getEnvelopeForOffering(final String offering) {
         return copyOf(getEnvelopeForOfferingsMap().get(offering));
     }
 
     @Override
-    public String getNameForOffering(String offering) {
+    public String getNameForOffering(final String offering) {
         return getNameForOfferingsMap().get(offering);
     }
 
     @Override
-    public Set<String> getCompositePhenomenonsForOffering(String offering) {
+    public Set<String> getCompositePhenomenonsForOffering(final String offering) {
         return copyOf(getCompositePhenomenonsForOfferingsMap().get(offering));
     }
 
     @Override
-    public Set<String> getObservablePropertiesForCompositePhenomenon(String compositePhenomenon) {
+    public Set<String> getObservablePropertiesForCompositePhenomenon(final String compositePhenomenon) {
         return copyOf(getObservablePropertiesForCompositePhenomenonsMap().get(compositePhenomenon));
     }
 
     @Override
-    public DateTime getMaxPhenomenonTimeForOffering(String offering) {
+    public DateTime getMaxPhenomenonTimeForOffering(final String offering) {
         return getMaxPhenomenonTimeForOfferingsMap().get(offering);
     }
 
     @Override
-    public DateTime getMinPhenomenonTimeForOffering(String offering) {
+    public DateTime getMinPhenomenonTimeForOffering(final String offering) {
         return getMinPhenomenonTimeForOfferingsMap().get(offering);
     }
 
     @Override
-    public Set<String> getAllowedObservationTypesForOffering(String offering) {
+    public Set<String> getAllowedObservationTypesForOffering(final String offering) {
         return copyOf(getAllowedObservationTypesForOfferingsMap().get(offering));
     }
 
     @Override
-    public Set<String> getFeaturesOfInterestForOffering(String offering) {
+    public Set<String> getFeaturesOfInterestForOffering(final String offering) {
         return copyOf(getFeaturesOfInterestForOfferingMap().get(offering));
     }
 
     @Override
-    public Set<String> getFeaturesOfInterestForResultTemplate(String resultTemplate) {
+    public Set<String> getFeaturesOfInterestForResultTemplate(final String resultTemplate) {
         return copyOf(getFeaturesOfInterestForResultTemplatesMap().get(resultTemplate));
     }
 
     @Override
-    public Set<String> getObservablePropertiesForOffering(String offering) {
-        Set<String> result = copyOf(getObservablePropertiesForOfferingsMap().get(offering));
+    public Set<String> getObservablePropertiesForOffering(final String offering) {
+        final Set<String> result = copyOf(getObservablePropertiesForOfferingsMap().get(offering));
         final Set<String> compositePhenomenonsForOffering = getCompositePhenomenonsForOfferingsMap().get(offering);
         if (compositePhenomenonsForOffering != null) {
-            for (String cp : compositePhenomenonsForOffering) {
+            for (final String cp : compositePhenomenonsForOffering) {
                 result.addAll(getObservablePropertiesForCompositePhenomenon(cp));
             }
         }
@@ -189,58 +191,58 @@ public class ReadableCache extends AbstractContentCache {
     }
 
     @Override
-    public Set<String> getObservablePropertiesForProcedure(String procedure) {
+    public Set<String> getObservablePropertiesForProcedure(final String procedure) {
         return copyOf(getObservablePropertiesForProceduresMap().get(procedure));
     }
 
     @Override
-    public Set<String> getObservationIdentifiersForProcedure(String procedure) {
+    public Set<String> getObservationIdentifiersForProcedure(final String procedure) {
         return copyOf(getObservationIdentifiersForProceduresMap().get(procedure));
     }
 
     @Override
-    public Set<String> getObservationTypesForOffering(String offering) {
+    public Set<String> getObservationTypesForOffering(final String offering) {
         return copyOf(getObservationTypesForOfferingsMap().get(offering));
     }
 
     @Override
-    public Set<String> getObservablePropertiesForResultTemplate(String resultTemplate) {
+    public Set<String> getObservablePropertiesForResultTemplate(final String resultTemplate) {
         return copyOf(getObservablePropertiesForResultTemplatesMap().get(resultTemplate));
     }
 
     @Override
-    public Set<String> getParentProcedures(String procedureIdentifier, boolean fullHierarchy, boolean includeSelf) {
+    public Set<String> getParentProcedures(final String procedureIdentifier, final boolean fullHierarchy, final boolean includeSelf) {
         return getHierarchy(getParentProceduresForProceduresMap(), procedureIdentifier, fullHierarchy, includeSelf);
     }
 
     @Override
-    public Set<String> getParentFeatures(String featureIdentifier, boolean fullHierarchy, boolean includeSelf) {
+    public Set<String> getParentFeatures(final String featureIdentifier, final boolean fullHierarchy, final boolean includeSelf) {
         return getHierarchy(getParentFeaturesForFeaturesOfInterestMap(), featureIdentifier, fullHierarchy, includeSelf);
     }
 
     @Override
-    public Set<String> getChildProcedures(String procedureIdentifier, boolean fullHierarchy, boolean includeSelf) {
+    public Set<String> getChildProcedures(final String procedureIdentifier, final boolean fullHierarchy, final boolean includeSelf) {
         return getHierarchy(getChildProceduresForProceduresMap(), procedureIdentifier, fullHierarchy, includeSelf);
     }
 
     @Override
-    public Set<String> getChildProcedures(Set<String> procedureIdentifiers, boolean fullHierarchy, boolean includeSelves) {
+    public Set<String> getChildProcedures(final Set<String> procedureIdentifiers, final boolean fullHierarchy, final boolean includeSelves) {
         return getHierarchy(getChildProceduresForProceduresMap(), procedureIdentifiers, fullHierarchy, includeSelves);
     }
     
     @Override
-    public Set<String> getChildFeatures(String featureIdentifier, boolean fullHierarchy, boolean includeSelf) {
+    public Set<String> getChildFeatures(final String featureIdentifier, final boolean fullHierarchy, final boolean includeSelf) {
         return getHierarchy(getChildFeaturesForFeaturesOfInterestMap(), featureIdentifier, fullHierarchy, includeSelf);
     }
 
     @Override
-    public Set<String> getParentProcedures(Set<String> procedureIdentifiers, boolean fullHierarchy,
-                                           boolean includeSelves) {
+    public Set<String> getParentProcedures(final Set<String> procedureIdentifiers, final boolean fullHierarchy,
+                                           final boolean includeSelves) {
         return getHierarchy(getParentProceduresForProceduresMap(), procedureIdentifiers, fullHierarchy, includeSelves);
     }
 
     @Override
-    public Set<String> getParentFeatures(Set<String> featureIdentifiers, boolean fullHierarchy, boolean includeSelves) {
+    public Set<String> getParentFeatures(final Set<String> featureIdentifiers, final boolean fullHierarchy, final boolean includeSelves) {
         return getHierarchy(getParentFeaturesForFeaturesOfInterestMap(), featureIdentifiers, fullHierarchy, includeSelves);
     }
 
@@ -270,62 +272,62 @@ public class ReadableCache extends AbstractContentCache {
     }
 
     @Override
-    public boolean hasFeatureOfInterest(String featureOfInterest) {
+    public boolean hasFeatureOfInterest(final String featureOfInterest) {
         return getFeaturesOfInterest().contains(featureOfInterest);
     }
 
     @Override
-    public boolean hasObservableProperty(String observableProperty) {
+    public boolean hasObservableProperty(final String observableProperty) {
         return getObservableProperties().contains(observableProperty);
     }
 
     @Override
-    public boolean hasObservationIdentifier(String observationIdentifier) {
+    public boolean hasObservationIdentifier(final String observationIdentifier) {
         return getObservationIdentifiers().contains(observationIdentifier);
     }
 
     @Override
-    public boolean hasObservationType(String observationType) {
+    public boolean hasObservationType(final String observationType) {
         return getObservationTypes().contains(observationType);
     }
 
     @Override
-    public boolean hasOffering(String offering) {
+    public boolean hasOffering(final String offering) {
         return getOfferings().contains(offering);
     }
 
     @Override
-    public boolean hasProcedure(String procedure) {
+    public boolean hasProcedure(final String procedure) {
         return getProcedures().contains(procedure);
     }
 
     @Override
-    public boolean hasRelatedFeature(String relatedFeature) {
+    public boolean hasRelatedFeature(final String relatedFeature) {
         return getRelatedFeatures().contains(relatedFeature);
     }
 
     @Override
-    public boolean hasResultTemplate(String resultTemplate) {
+    public boolean hasResultTemplate(final String resultTemplate) {
         return getResultTemplates().contains(resultTemplate);
     }
 
     @Override
-    public boolean hasEpsgCode(Integer epsgCode) {
+    public boolean hasEpsgCode(final Integer epsgCode) {
         return getEpsgCodes().contains(epsgCode);
     }
 
     @Override
-    public boolean hasMaxPhenomenonTimeForOffering(String offering) {
+    public boolean hasMaxPhenomenonTimeForOffering(final String offering) {
         return getMaxPhenomenonTimeForOffering(offering) != null;
     }
 
     @Override
-    public boolean hasMinPhenomenonTimeForOffering(String offering) {
+    public boolean hasMinPhenomenonTimeForOffering(final String offering) {
         return getMinPhenomenonTimeForOffering(offering) != null;
     }
 
     @Override
-    public boolean hasEnvelopeForOffering(String offering) {
+    public boolean hasEnvelopeForOffering(final String offering) {
         final SosEnvelope e = getEnvelopeForOffering(offering);
         return e != null && e.isSetEnvelope();
     }
@@ -357,12 +359,12 @@ public class ReadableCache extends AbstractContentCache {
     }
 
     @Override
-    public DateTime getMaxResultTimeForOffering(String offering) {
+    public DateTime getMaxResultTimeForOffering(final String offering) {
         return getMaxResultTimeForOfferingsMap().get(offering);
     }
 
     @Override
-    public boolean hasMaxResultTimeForOffering(String offering) {
+    public boolean hasMaxResultTimeForOffering(final String offering) {
         return getMaxResultTimeForOffering(offering) != null;
     }
 
@@ -377,12 +379,12 @@ public class ReadableCache extends AbstractContentCache {
     }
 
     @Override
-    public DateTime getMinResultTimeForOffering(String offering) {
+    public DateTime getMinResultTimeForOffering(final String offering) {
         return getMinResultTimeForOfferingsMap().get(offering);
     }
 
     @Override
-    public boolean hasMinResultTimeForOffering(String offering) {
-        return getMinPhenomenonTimeForOffering(offering) != null;
+    public boolean hasMinResultTimeForOffering(final String offering) {
+        return getMinResultTimeForOffering(offering) != null;
     }
 }
