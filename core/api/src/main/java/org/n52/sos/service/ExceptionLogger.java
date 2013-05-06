@@ -60,7 +60,10 @@ public class ExceptionLogger implements SosEventListener {
 		if (ee.getException() instanceof OwsExceptionReport)
 		{
 			final OwsExceptionReport owse = (OwsExceptionReport) ee.getException();
-			if (owse.getStatus().getCode() >= 500)
+			if (owse.getStatus() == null) {
+				log(owse);
+			}
+			else if (owse.getStatus().getCode() >= 500)
 			{
 				LOGGER.error("Exception thrown", owse);
 			}
@@ -69,12 +72,17 @@ public class ExceptionLogger implements SosEventListener {
 				LOGGER.warn("Exception thrown", owse);
 			}
 			else {
-				LOGGER.debug("Exception thrown", owse);
+				log(owse);
 			}
 		}
 		else
 		{
 			LOGGER.debug("Error processing request", ee.getException());
 		}
+	}
+
+	private void log(final OwsExceptionReport owse)
+	{
+		LOGGER.debug("Exception thrown", owse);		
 	}
 }
