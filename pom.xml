@@ -9,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.n52.sensorweb.sos</groupId>
     <artifactId>52n-sos</artifactId>
-    <version>4.0.0-Beta2</version>
+    <version>4.0.0-Beta3-SNAPSHOT</version>
     <name>52North Sensor Observation Service</name>
     <description>52North Sensor Observation Service - Parent POM for defining dependency versions</description>
     <inceptionYear>2012</inceptionYear>
@@ -70,9 +70,9 @@
             managed dependencies with ${project.version} will be
             wrong in submodules with different versions
         -->
-        <sos.version>4.0.0-Beta2</sos.version>
-        <do.version>0.1.0</do.version>
-        <rest-binding.version>0.1.0</rest-binding.version>
+        <sos.version>4.0.0-Beta3-SNAPSHOT</sos.version>
+        <do.version>0.1.1-SNAPSHOT</do.version>
+        <rest-binding.version>0.1.1-SNAPSHOT</rest-binding.version>
     </properties>
     <dependencyManagement>
         <dependencies>
