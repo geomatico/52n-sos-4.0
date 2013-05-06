@@ -275,7 +275,10 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
     }
 
     private System parseSystem(final SystemType xbSystemType) throws OwsExceptionReport {
-        final System system = new System();
+    	return parseSystem(xbSystemType, new System());
+    }
+    
+    private System parseSystem(final SystemType xbSystemType, final System system) throws OwsExceptionReport {
         parseAbstractProcess(xbSystemType, system);
         parseAbstractComponent(xbSystemType, system);
         parseAbstractDerivableComponent(xbSystemType, system);
@@ -361,14 +364,18 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
     private IdentificationsAndIdentifier parseIdentifications(final Identification[] identificationArray) {
     	final IdentificationsAndIdentifier idsAndId = new IdentificationsAndIdentifier(identificationArray.length);
         for (final Identification xbIdentification : identificationArray) {
-            for (final Identifier xbIdentifier : xbIdentification.getIdentifierList().getIdentifierArray()) {
-            	final SosSMLIdentifier identification = new SosSMLIdentifier(xbIdentifier.getName(),
-                        xbIdentifier.getTerm().getDefinition(), xbIdentifier.getTerm().getValue());
-            	idsAndId.getIdentifications().add(identification);
-            	if(isIdentificationProcedureIdentifier(identification)){
-            		idsAndId.setIdentifier(identification.getValue());
-            	}
-            }
+        	if (xbIdentification.getIdentifierList() != null) {
+	            for (final Identifier xbIdentifier : xbIdentification.getIdentifierList().getIdentifierArray()) {
+	            	if (xbIdentifier.getName() != null && xbIdentifier.getTerm() != null){
+		            	final SosSMLIdentifier identification = new SosSMLIdentifier(xbIdentifier.getName(),
+		                        xbIdentifier.getTerm().getDefinition(), xbIdentifier.getTerm().getValue());
+		            	idsAndId.getIdentifications().add(identification);
+		            	if(isIdentificationProcedureIdentifier(identification)){
+		            		idsAndId.setIdentifier(identification.getValue());
+		            	}
+	            	}
+	            }
+        	}
         }
         return idsAndId;
     }
@@ -573,11 +580,18 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
             for (final Component component : components.getComponentList().getComponentArray()) {
                 if (component.isSetProcess() || component.isSetHref()) {
                     final SosSMLComponent sosSmlcomponent = new SosSMLComponent(component.getName());
-                    final AbstractProcess abstractProcess = new AbstractProcess();
+                    AbstractProcess abstractProcess = null;
                     if (component.isSetProcess()) {
-                        parseAbstractProcess(component.getProcess(), abstractProcess);
+                    	if (component.getProcess() instanceof SystemType) {
+                        	abstractProcess = new System();
+                            parseSystem((SystemType) component.getProcess(), (System) abstractProcess);                        	
+                    	} else {
+                    		abstractProcess = new AbstractProcess();
+                            parseAbstractProcess(component.getProcess(), abstractProcess);                    		
+                    	}
                     } else {
-                        abstractProcess.setIdentifier(component.getHref());
+                    	abstractProcess = new AbstractProcess();
+                    	abstractProcess.setIdentifier(component.getHref());
                     }
                     sosSmlcomponent.setProcess(abstractProcess);
                     sosSmlComponents.add(sosSmlcomponent);
