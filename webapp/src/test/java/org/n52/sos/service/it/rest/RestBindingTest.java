@@ -23,32 +23,32 @@
  */
 package org.n52.sos.service.it.rest;
 
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.RequestBuilder.get;
+import javax.xml.namespace.NamespaceContext;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.junit.Test;
-import org.springframework.mock.web.MockHttpServletResponse;
+import org.n52.sos.binding.rest.Constants;
+import org.n52.sos.service.it.AbstractSosServiceTest;
+import org.n52.sos.service.it.SosNamespaceContext;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
- * 
+ *
  * @since 4.0.0
  */
-public class ServiceEndpointTest extends RestBindingTest {
+public class RestBindingTest extends AbstractSosServiceTest {
 
-	@Test public void 
-	should_redirect_to_capabilities_resource_with_status_and_location_header()
+	protected static final String REST_URL = "/rest";
+	protected static final String CONTENT_TYPE = "application/gml+xml";
+	protected static final NamespaceContext NS_CTXT = new SosNamespaceContext();
+	protected static final Constants CONFIG = Constants.getInstance();
+	
+	protected String link(final String relType, final String resType)
 	{
-		final MockHttpServletResponse response = execute(get(REST_URL).accept(CONTENT_TYPE));
-		final MockHttpServletResponse response2 = execute(get(REST_URL + "/").accept(CONTENT_TYPE));
-		
-		assertThat(response.getStatus(), is(HttpServletResponse.SC_SEE_OTHER));
-		assertThat(response.getHeader("Location"), endsWith(REST_URL + "/capabilities"));
-		assertThat(response2.getStatus(), is(HttpServletResponse.SC_SEE_OTHER));
-		assertThat(response2.getHeader("Location"), endsWith(REST_URL + "/capabilities"));
+		return "sosREST:link[" +
+				"@rel='" + CONFIG.getEncodingNamespace() + "/" + relType + "'" +
+				" and " + 
+				"@href='" + CONFIG.getServiceUrl() + REST_URL + "/" + resType + "'" +
+				" and " + 
+				"@type='" + CONTENT_TYPE + "'" +		
+				"]";
 	}
 }
