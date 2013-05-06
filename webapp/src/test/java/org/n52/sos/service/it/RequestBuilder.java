@@ -39,95 +39,95 @@ import org.springframework.mock.web.MockHttpServletRequest;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class RequestBuilder {
-    public static RequestBuilder get(String path) {
+    public static RequestBuilder get(final String path) {
         return new RequestBuilder("GET", path);
     }
 
-    public static RequestBuilder post(String path) {
+    public static RequestBuilder post(final String path) {
         return new RequestBuilder("POST", path);
     }
 
-    public static RequestBuilder put(String path) {
+    public static RequestBuilder put(final String path) {
         return new RequestBuilder("PUT", path);
     }
 
-    public static RequestBuilder delete(String path) {
+    public static RequestBuilder delete(final String path) {
         return new RequestBuilder("DELETE", path);
     }
 
-    public static RequestBuilder options(String path) {
+    public static RequestBuilder options(final String path) {
         return new RequestBuilder("OPTIONS", path);
     }
 
-    public static RequestBuilder head(String path) {
+    public static RequestBuilder head(final String path) {
         return new RequestBuilder("HEAD", path);
     }
     private ServletContext context = null;
-    private SetMultiMap<String, String> headers = MultiMaps.newSetMultiMap();
-    private SetMultiMap<String, String> query = MultiMaps.newSetMultiMap();
+    private final SetMultiMap<String, String> headers = MultiMaps.newSetMultiMap();
+    private final SetMultiMap<String, String> query = MultiMaps.newSetMultiMap();
     private String method = null;
     private String path = null;
     private String content = null;
 
-    private RequestBuilder(String method, String path) {
+    private RequestBuilder(final String method, final String path) {
         this.method = method;
         this.path = path;
     }
 
-    public RequestBuilder header(String header, String value) {
+    public RequestBuilder header(final String header, final String value) {
         headers.add(header, value);
         return this;
     }
 
-    public RequestBuilder contentType(String type) {
+    public RequestBuilder contentType(final String type) {
         return header("Content-Type", type);
     }
 
-    public RequestBuilder accept(String type) {
+    public RequestBuilder accept(final String type) {
         return header("Accept", type);
     }
 
-    public RequestBuilder query(String key, String value) {
+    public RequestBuilder query(final String key, final String value) {
         query.add(key, value);
         return this;
     }
 
-    public RequestBuilder query(Enum<?> key, String value) {
+    public RequestBuilder query(final Enum<?> key, final String value) {
         return query(key.name(), value);
     }
 
-    public RequestBuilder query(Enum<?> key, Enum<?> value) {
+    public RequestBuilder query(final Enum<?> key, final Enum<?> value) {
         return query(key.name(), value.name());
     }
 
-    public RequestBuilder query(String key, Enum<?> value) {
+    public RequestBuilder query(final String key, final Enum<?> value) {
         return query(key, value.name());
     }
 
-    public RequestBuilder entity(String content) {
+    public RequestBuilder entity(final String content) {
         this.content = content;
         return this;
     }
 
-    RequestBuilder context(ServletContext context) {
+    RequestBuilder context(final ServletContext context) {
         this.context = context;
         return this;
     }
 
     public HttpServletRequest build() {
         try {
-            MockHttpServletRequest req = new MockHttpServletRequest(context);
+            final MockHttpServletRequest req = new MockHttpServletRequest(context);
             req.setMethod(method);
-            for (String header : headers.keySet()) {
-                for (String value : headers.get(header)) {
+            for (final String header : headers.keySet()) {
+                for (final String value : headers.get(header)) {
                     req.addHeader(header, value);
                 }
             }
 
-            StringBuilder queryString = new StringBuilder();
+            final StringBuilder queryString = new StringBuilder();
             boolean first = true;
-            for (String key : query.keySet()) {
-                Set<String> values = query.get(key);
+            for (final String key : query.keySet()) {
+                final Set<String> values = query.get(key);
                 req.addParameter(key, values.toArray(new String[values.size()]));
                 if (first) {
                     queryString.append("?");
@@ -138,13 +138,17 @@ public class RequestBuilder {
                 queryString.append(key).append("=").append(StringHelper.join(",", values));
             }
             req.setQueryString(queryString.toString());
-            req.setRequestURI((path == null ? "/" : path) + queryString.toString());
+            if (path == null) {
+            	path = "/";
+            }
+            req.setRequestURI(path + queryString.toString());
+            req.setPathInfo(path);
             if (content != null) {
                 req.setContent(content.getBytes(AbstractSosServiceTest.ENCODING));
             }
 
             return req;
-        } catch (UnsupportedEncodingException ex) {
+        } catch (final UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
         }
     }
