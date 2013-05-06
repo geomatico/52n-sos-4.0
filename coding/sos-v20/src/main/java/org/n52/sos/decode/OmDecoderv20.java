@@ -201,11 +201,12 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
             TimeInstant timeInstant = new TimeInstant();
             timeInstant.setIndeterminateValue((String) phenomenonTime.getNilReason());
             return timeInstant;
-        } else {
+        } else if (phenomenonTime.isSetAbstractTimeObject()) {
             Object decodedObject = CodingHelper.decodeXmlObject(phenomenonTime.getAbstractTimeObject());
             if (decodedObject instanceof ITime) {
                 return (ITime) decodedObject;
             }
+            // FIXME else
         }
         throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
                 .withMessage("The requested phenomenonTime type is not supported by this service!");
@@ -230,11 +231,14 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
             TimeInstant timeInstant = new TimeInstant();
             timeInstant.setIndeterminateValue((String) omObservation.getResultTime().getNilReason());
             return timeInstant;
-        } else {
+        } else if (omObservation.getResultTime().isSetTimeInstant()) {
             Object decodedObject = CodingHelper.decodeXmlObject(omObservation.getResultTime().getTimeInstant());
             if (decodedObject instanceof TimeInstant) {
                 return (TimeInstant) decodedObject;
             }
+            throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
+                    .withMessage("The requested resultTime type is not supported by this service!");
+        } else {
             throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
                     .withMessage("The requested resultTime type is not supported by this service!");
         }
