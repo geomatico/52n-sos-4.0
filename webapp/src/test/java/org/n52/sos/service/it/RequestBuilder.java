@@ -125,23 +125,27 @@ public class RequestBuilder {
             }
 
             final StringBuilder queryString = new StringBuilder();
-            boolean first = true;
-            for (final String key : query.keySet()) {
-                final Set<String> values = query.get(key);
-                req.addParameter(key, values.toArray(new String[values.size()]));
-                if (first) {
-                    queryString.append("?");
-                    first = false;
-                } else {
-                    queryString.append("&");
-                }
-                queryString.append(key).append("=").append(StringHelper.join(",", values));
+            if (query != null && !query.isEmpty())
+            {
+            	boolean first = true;
+            	for (final String key : query.keySet()) {
+            		final Set<String> values = query.get(key);
+            		req.addParameter(key, values.toArray(new String[values.size()]));
+            		if (first) {
+            			queryString.append("?");
+            			first = false;
+            		} else {
+            			queryString.append("&");
+            		}
+            		queryString.append(key).append("=").append(StringHelper.join(",", values));
+            	}
+            	req.setQueryString(queryString.toString());
             }
-            req.setQueryString(queryString.toString());
+            req.setRequestURI(path + queryString.toString());
+            
             if (path == null) {
                 path = "/";
             }
-            req.setRequestURI(path + queryString.toString());
             req.setPathInfo(path);
             if (content != null) {
                 req.setContent(content.getBytes(AbstractSosServiceTest.ENCODING));
