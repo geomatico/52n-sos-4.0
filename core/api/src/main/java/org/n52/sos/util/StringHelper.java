@@ -28,8 +28,8 @@ import java.util.Iterator;
 
 public final class StringHelper {
 
-    public static StringBuffer join(CharSequence sep, StringBuffer buff, Iterable<?> src) {
-        Iterator<?> it = src.iterator();
+    public static StringBuffer join(final CharSequence sep, final StringBuffer buff, final Iterable<?> src) {
+        final Iterator<?> it = src.iterator();
         if (it.hasNext()) {
             buff.append(it.next());
         }
@@ -39,15 +39,15 @@ public final class StringHelper {
         return buff;
     }
 
-    public static String join(CharSequence sep, Iterable<?> src) {
+    public static String join(final CharSequence sep, final Iterable<?> src) {
         return join(sep, new StringBuffer(), src).toString();
     }
 
-    public static StringBuffer join(CharSequence sep, StringBuffer buff, Object... src) {
+    public static StringBuffer join(final CharSequence sep, final StringBuffer buff, final Object... src) {
         return join(sep, buff, Arrays.asList(src));
     }
 
-    public static String join(CharSequence sep, Object... src) {
+    public static String join(final CharSequence sep, final Object... src) {
         return join(sep, Arrays.asList(src));
     }
 
@@ -57,7 +57,7 @@ public final class StringHelper {
      * @return a normalized String for use in a file path, i.e. all
      *         [\,/,:,*,?,",<,>,;] characters are replaced by '_'.
      */
-    public static String normalize(String toNormalize) {
+    public static String normalize(final String toNormalize) {
         // toNormalize = toNormalize.replaceAll("ä", "ae");
         // toNormalize = toNormalize.replaceAll("ö", "oe");
         // toNormalize = toNormalize.replaceAll("ü", "ue");
@@ -76,10 +76,21 @@ public final class StringHelper {
      * 
      * @return empty or not
      */
-    public static boolean isNotEmpty(String string) {
+    public static boolean isNotEmpty(final String string) {
         return string != null && !string.isEmpty();
     }
 
     private StringHelper() {
     }
+
+	/**
+	 * Check if string is null or empty
+	 * 
+	 * @param string string to check
+	 * @return <tt>true</tt>, if the string is null or empty
+	 */
+	public static boolean isNullOrEmpty(final String string)
+	{
+		return string == null || string.isEmpty();
+	}
 }
