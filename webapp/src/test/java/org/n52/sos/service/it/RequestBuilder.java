@@ -109,7 +109,7 @@ public class RequestBuilder {
         return this;
     }
 
-    RequestBuilder context(final ServletContext context) {
+    public RequestBuilder context(final ServletContext context) {
         this.context = context;
         return this;
     }
