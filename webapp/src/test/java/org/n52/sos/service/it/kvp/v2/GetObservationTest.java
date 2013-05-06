@@ -42,7 +42,7 @@ public class GetObservationTest extends AbstractSosServiceTest {
 
     @Test
     public void invalidServiceParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
                 .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetObservation)
                 .query(OWSConstants.RequestParams.service, "INVALID")
                 .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)
@@ -52,7 +52,7 @@ public class GetObservationTest extends AbstractSosServiceTest {
 
     @Test
     public void emptyServiceParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
                 .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetObservation)
                 .query(OWSConstants.RequestParams.service, "")
                 .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)

@@ -44,9 +44,9 @@ public class ServiceEndpointTest extends AbstractSosServiceTest {
 	@Test
 	public void should_redirect_to_capabilities_resource_with_status_and_location_header()
 	{
-		final MockHttpServletResponse response = execute(RequestBuilder.get("/sos/rest")
+		final MockHttpServletResponse response = execute(RequestBuilder.get("/rest")
 						.accept("application/gml+xml"));
 		assertThat(response.getStatus(), is(HttpServletResponse.SC_SEE_OTHER));
-		assertThat(response.getHeader("Location"), endsWith("/sos/rest/capabilities"));
+		assertThat(response.getHeader("Location"), endsWith("/rest/capabilities"));
 	}
 }

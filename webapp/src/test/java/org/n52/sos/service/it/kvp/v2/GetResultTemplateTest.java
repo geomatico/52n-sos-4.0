@@ -42,7 +42,7 @@ import org.w3c.dom.Node;
 public class GetResultTemplateTest extends AbstractSosServiceTest {
     @Test
     public void invalidServiceParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
                 .query(OWSConstants.RequestParams.request, Sos2Constants.Operations.GetResultTemplate)
                 .query(OWSConstants.RequestParams.service, "INVALID")
                 .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)
@@ -52,7 +52,7 @@ public class GetResultTemplateTest extends AbstractSosServiceTest {
 
     @Test
     public void emptyServiceParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
                 .query(OWSConstants.RequestParams.request, Sos2Constants.Operations.GetResultTemplate)
                 .query(OWSConstants.RequestParams.service, "")
                 .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)

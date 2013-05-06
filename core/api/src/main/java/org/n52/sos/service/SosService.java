@@ -287,8 +287,7 @@ public class SosService extends ConfiguratedHttpServlet {
 	 */
 	private Binding getBinding(final HttpServletRequest req) throws HTTPException {
 		Binding bindingOperator = null;
-
-		final String requestURI = req.getRequestURI().replace(req.getContextPath(), "").replace("/" + SosConstants.SOS.toLowerCase(),"");
+        final String requestURI = req.getPathInfo();
 
 		for (final String bindingOperatorKey : Configurator.getInstance().getBindingRepository().getBindings().keySet()) {
 

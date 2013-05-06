@@ -67,6 +67,7 @@ public class SosNamespaceContext implements NamespaceContext {
         namespaceForPrefix.put(FilterConstants.NS_FES_2_PREFIX, FilterConstants.NS_FES_2);
         namespaceForPrefix.put(W3CConstants.NS_XSI_PREFIX, W3CConstants.NS_XSI);
         namespaceForPrefix.put("sosREST", "http://www.opengis.net/sosREST/1.0");
+        namespaceForPrefix.put("xml", "http://www.w3.org/XML/1998/namespace");
         prefixForNamespace = CollectionHelper.reverse(namespaceForPrefix);
 
     }

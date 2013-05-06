@@ -43,7 +43,7 @@ public class DescribeSensorTest extends AbstractSosServiceTest {
 
     @Test
     public void invalidServiceParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
                 .query(OWSConstants.RequestParams.request, SosConstants.Operations.DescribeSensor)
                 .query(OWSConstants.RequestParams.service, "INVALID")
                 .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)
@@ -53,7 +53,7 @@ public class DescribeSensorTest extends AbstractSosServiceTest {
 
     @Test
     public void emptyServiceParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
                 .query(OWSConstants.RequestParams.request, SosConstants.Operations.DescribeSensor)
                 .query(OWSConstants.RequestParams.service, "")
                 .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)

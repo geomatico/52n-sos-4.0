@@ -139,7 +139,7 @@ public class RequestBuilder {
             }
             req.setQueryString(queryString.toString());
             if (path == null) {
-            	path = "/";
+                path = "/";
             }
             req.setRequestURI(path + queryString.toString());
             req.setPathInfo(path);

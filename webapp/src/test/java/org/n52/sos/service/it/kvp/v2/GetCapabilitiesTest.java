@@ -54,7 +54,7 @@ public class GetCapabilitiesTest extends AbstractSosServiceTest {
 
     @Test
     public void missingServiceParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
                 .query(OWSConstants.RequestParams.request,
                        SosConstants.Operations.GetCapabilities)
                 .accept(SosConstants.CONTENT_TYPE_XML)));
@@ -63,7 +63,7 @@ public class GetCapabilitiesTest extends AbstractSosServiceTest {
 
     @Test
     public void emptyServiceParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
                 .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetCapabilities)
                 .query(OWSConstants.RequestParams.service, "")
                 .accept(SosConstants.CONTENT_TYPE_XML)));
@@ -72,7 +72,7 @@ public class GetCapabilitiesTest extends AbstractSosServiceTest {
 
     @Test
     public void invalidSectionParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
                 .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetCapabilities)
                 .query(OWSConstants.RequestParams.service, SosConstants.SOS)
                 .query(SosConstants.GetCapabilitiesParams.Sections, "INVALID")
@@ -84,7 +84,7 @@ public class GetCapabilitiesTest extends AbstractSosServiceTest {
     @Test
     @Ignore
     public void emptySectionParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
                 .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetCapabilities)
                 .query(OWSConstants.RequestParams.service, SosConstants.SOS)
                 .query(SosConstants.GetCapabilitiesParams.Sections, "")
@@ -95,7 +95,7 @@ public class GetCapabilitiesTest extends AbstractSosServiceTest {
 
     @Test
     public void invalidServiceParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
                 .query(OWSConstants.RequestParams.request,
                        SosConstants.Operations.GetCapabilities)
                 .query(OWSConstants.RequestParams.service,
@@ -147,7 +147,7 @@ public class GetCapabilitiesTest extends AbstractSosServiceTest {
     }
 
     protected Element getCapabilities() {
-        return getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+        return getResponseAsNode(execute(RequestBuilder.get("/kvp")
                 .query(OWSConstants.RequestParams.request,
                        SosConstants.Operations.GetCapabilities)
                 .query(OWSConstants.RequestParams.service,
