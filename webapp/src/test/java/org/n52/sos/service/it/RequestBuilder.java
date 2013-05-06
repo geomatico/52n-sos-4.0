@@ -24,6 +24,7 @@
 
 package org.n52.sos.service.it;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -38,7 +39,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class RequestBuilder {
-
     public static RequestBuilder get(String path) {
         return new RequestBuilder("GET", path);
     }
@@ -67,6 +67,7 @@ public class RequestBuilder {
     private SetMultiMap<String, String> query = MultiMaps.newSetMultiMap();
     private String method = null;
     private String path = null;
+    private String content = null;
 
     private RequestBuilder(String method, String path) {
         this.method = method;
@@ -103,37 +104,48 @@ public class RequestBuilder {
         return query(key, value.name());
     }
 
+    public RequestBuilder entity(String content) {
+        this.content = content;
+        return this;
+    }
+
     RequestBuilder context(ServletContext context) {
         this.context = context;
         return this;
     }
 
     public HttpServletRequest build() {
-        MockHttpServletRequest req = new MockHttpServletRequest(context);
-        req.setMethod(method);
-        for (String header : headers.keySet()) {
-            for (String value : headers.get(header)) {
-                req.addHeader(header, value);
+        try {
+            MockHttpServletRequest req = new MockHttpServletRequest(context);
+            req.setMethod(method);
+            for (String header : headers.keySet()) {
+                for (String value : headers.get(header)) {
+                    req.addHeader(header, value);
+                }
             }
-        }
 
-        StringBuilder queryString = new StringBuilder();
-        boolean first = true;
-        for (String key : query.keySet()) {
-            Set<String> values = query.get(key);
-            req.addParameter(key, values.toArray(new String[values.size()]));
-            if (first) {
-                queryString.append("?");
-                first = false;
-            } else {
-                queryString.append("&");
+            StringBuilder queryString = new StringBuilder();
+            boolean first = true;
+            for (String key : query.keySet()) {
+                Set<String> values = query.get(key);
+                req.addParameter(key, values.toArray(new String[values.size()]));
+                if (first) {
+                    queryString.append("?");
+                    first = false;
+                } else {
+                    queryString.append("&");
+                }
+                queryString.append(key).append("=").append(StringHelper.join(",", values));
             }
-            queryString.append(key).append("=").append(StringHelper.join(",", values));
-        }
-        req.setQueryString(queryString.toString());
-        req.setRequestURI((path == null ? "/" : path) + queryString.toString());
+            req.setQueryString(queryString.toString());
+            req.setRequestURI((path == null ? "/" : path) + queryString.toString());
 
-        return req;
+            req.setContent(content.getBytes(AbstractSosServiceTest.ENCODING));
+
+            return req;
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
 }
