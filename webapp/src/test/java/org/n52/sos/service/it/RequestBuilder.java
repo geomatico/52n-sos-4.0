@@ -139,8 +139,9 @@ public class RequestBuilder {
             }
             req.setQueryString(queryString.toString());
             req.setRequestURI((path == null ? "/" : path) + queryString.toString());
-
-            req.setContent(content.getBytes(AbstractSosServiceTest.ENCODING));
+            if (content != null) {
+                req.setContent(content.getBytes(AbstractSosServiceTest.ENCODING));
+            }
 
             return req;
         } catch (UnsupportedEncodingException ex) {
