@@ -22,7 +22,7 @@
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
 
-package org.n52.sos.service.it.soap.v2;
+package org.n52.sos.service.it;
 
 import static org.hamcrest.Matchers.*;
 
@@ -32,9 +32,6 @@ import org.apache.xmlbeans.XmlObject;
 import org.hamcrest.Matcher;
 import org.n52.sos.exception.ows.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.service.it.AbstractSosServiceTest;
-import org.n52.sos.service.it.RequestBuilder;
-import org.n52.sos.service.it.SosNamespaceContext;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.w3.x2003.x05.soapEnvelope.EnvelopeDocument;
 import org.w3c.dom.Node;

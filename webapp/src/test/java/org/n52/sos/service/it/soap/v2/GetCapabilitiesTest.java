@@ -24,6 +24,7 @@
 
 package org.n52.sos.service.it.soap.v2;
 
+import org.n52.sos.service.it.AbstractSoapTest;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 

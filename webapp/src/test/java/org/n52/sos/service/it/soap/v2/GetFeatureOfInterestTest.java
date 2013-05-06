@@ -24,9 +24,10 @@
 
 package org.n52.sos.service.it.soap.v2;
 
+import org.n52.sos.service.it.AbstractSoapTest;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.soap.v2.AbstractSoapTest.invalidServiceParameterValueExceptionFault;
+import static org.n52.sos.service.it.AbstractSoapTest.invalidServiceParameterValueExceptionFault;
 
 import net.opengis.sos.x20.GetFeatureOfInterestDocument;
 import net.opengis.sos.x20.GetFeatureOfInterestType;

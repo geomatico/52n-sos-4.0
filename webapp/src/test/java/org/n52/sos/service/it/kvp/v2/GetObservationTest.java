@@ -23,6 +23,7 @@
  */
 package org.n52.sos.service.it.kvp.v2;
 
+import org.n52.sos.service.it.AbstractKvpTest;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.n52.sos.service.it.AbstractSosServiceTest.missingServiceParameterValueException;
@@ -31,32 +32,28 @@ import org.junit.Test;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.service.it.AbstractSosServiceTest;
-import org.n52.sos.service.it.RequestBuilder;
 import org.w3c.dom.Node;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class GetObservationTest extends AbstractSosServiceTest {
+public class GetObservationTest extends AbstractKvpTest {
 
     @Test
     public void invalidServiceParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
+        Node node = getResponseAsNode(execute(builder()
                 .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetObservation)
                 .query(OWSConstants.RequestParams.service, "INVALID")
-                .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)
-                .accept(SosConstants.CONTENT_TYPE_XML)));
+                .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)));
         assertThat(node, is(invalidServiceParameterValueException("INVALID")));
     }
 
     @Test
     public void emptyServiceParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
+        Node node = getResponseAsNode(execute(builder()
                 .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetObservation)
                 .query(OWSConstants.RequestParams.service, "")
-                .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)
-                .accept(SosConstants.CONTENT_TYPE_XML)));
+                .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)));
         assertThat(node, is(missingServiceParameterValueException()));
     }
 }

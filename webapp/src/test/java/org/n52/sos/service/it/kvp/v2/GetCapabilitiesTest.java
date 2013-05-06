@@ -24,6 +24,7 @@
 
 package org.n52.sos.service.it.kvp.v2;
 
+import org.n52.sos.service.it.AbstractKvpTest;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.n52.sos.ogc.ows.SosServiceIdentificationFactorySettings.*;
@@ -39,44 +40,37 @@ import org.n52.sos.exception.ows.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.GetCapabilitiesParams;
-import org.n52.sos.service.it.AbstractSosServiceTest;
-import org.n52.sos.service.it.RequestBuilder;
 import org.n52.sos.service.it.SosNamespaceContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * TODO JavaDoc
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class GetCapabilitiesTest extends AbstractSosServiceTest {
+public class GetCapabilitiesTest extends AbstractKvpTest {
     private NamespaceContext ctx = new SosNamespaceContext();
 
     @Test
     public void missingServiceParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
-                .query(OWSConstants.RequestParams.request,
-                       SosConstants.Operations.GetCapabilities)
-                .accept(SosConstants.CONTENT_TYPE_XML)));
+        Node node = getResponseAsNode(execute(builder()
+                .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetCapabilities)));
         assertThat(node, hasXPath("//sos:Capabilities", ctx));
     }
 
     @Test
     public void emptyServiceParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
+        Node node = getResponseAsNode(execute(builder()
                 .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetCapabilities)
-                .query(OWSConstants.RequestParams.service, "")
-                .accept(SosConstants.CONTENT_TYPE_XML)));
+                .query(OWSConstants.RequestParams.service, "")));
         assertThat(node, is(missingServiceParameterValueException()));
     }
 
     @Test
     public void invalidSectionParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
+        Node node = getResponseAsNode(execute(builder()
                 .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetCapabilities)
                 .query(OWSConstants.RequestParams.service, SosConstants.SOS)
-                .query(SosConstants.GetCapabilitiesParams.Sections, "INVALID")
-                .accept(SosConstants.CONTENT_TYPE_XML)));
+                .query(SosConstants.GetCapabilitiesParams.Sections, "INVALID")));
         assertThat(node, is(exception(OwsExceptionCode.InvalidParameterValue, GetCapabilitiesParams.Section,
                                       "The requested section 'INVALID' does not exist or is not supported!")));
     }
@@ -84,23 +78,19 @@ public class GetCapabilitiesTest extends AbstractSosServiceTest {
     @Test
     @Ignore
     public void emptySectionParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
+        Node node = getResponseAsNode(execute(builder()
                 .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetCapabilities)
                 .query(OWSConstants.RequestParams.service, SosConstants.SOS)
-                .query(SosConstants.GetCapabilitiesParams.Sections, "")
-                .accept(SosConstants.CONTENT_TYPE_XML)));
+                .query(SosConstants.GetCapabilitiesParams.Sections, "")));
         assertThat(node, is(exception(OwsExceptionCode.MissingParameterValue, GetCapabilitiesParams.Sections,
                                       "The value for the parameter 'sections' is missing in the request!")));
     }
 
     @Test
     public void invalidServiceParameter() {
-        Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
-                .query(OWSConstants.RequestParams.request,
-                       SosConstants.Operations.GetCapabilities)
-                .query(OWSConstants.RequestParams.service,
-                       "INVALID")
-                .accept(SosConstants.CONTENT_TYPE_XML)));
+        Node node = getResponseAsNode(execute(builder()
+                .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetCapabilities)
+                .query(OWSConstants.RequestParams.service, "INVALID")));
         assertThat(node, is(invalidServiceParameterValueException("INVALID")));
     }
 
@@ -147,11 +137,8 @@ public class GetCapabilitiesTest extends AbstractSosServiceTest {
     }
 
     protected Element getCapabilities() {
-        return getResponseAsNode(execute(RequestBuilder.get("/kvp")
-                .query(OWSConstants.RequestParams.request,
-                       SosConstants.Operations.GetCapabilities)
-                .query(OWSConstants.RequestParams.service,
-                       SosConstants.SOS)
-                .accept(SosConstants.CONTENT_TYPE_XML)));
+        return getResponseAsNode(execute(builder()
+                .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetCapabilities)
+                .query(OWSConstants.RequestParams.service, SosConstants.SOS)));
     }
 }

@@ -31,7 +31,6 @@ import static org.n52.sos.service.it.AbstractSosServiceTest.missingServiceParame
 import org.junit.Test;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.it.AbstractSosServiceTest;
 import org.n52.sos.service.it.RequestBuilder;
 import org.w3c.dom.Node;
@@ -45,8 +44,7 @@ public class GetResultTemplateTest extends AbstractSosServiceTest {
         Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
                 .query(OWSConstants.RequestParams.request, Sos2Constants.Operations.GetResultTemplate)
                 .query(OWSConstants.RequestParams.service, "INVALID")
-                .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)
-                .accept(SosConstants.CONTENT_TYPE_XML)));
+                .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)));
         assertThat(node, is(invalidServiceParameterValueException("INVALID")));
     }
 
@@ -55,8 +53,7 @@ public class GetResultTemplateTest extends AbstractSosServiceTest {
         Node node = getResponseAsNode(execute(RequestBuilder.get("/kvp")
                 .query(OWSConstants.RequestParams.request, Sos2Constants.Operations.GetResultTemplate)
                 .query(OWSConstants.RequestParams.service, "")
-                .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)
-                .accept(SosConstants.CONTENT_TYPE_XML)));
+                .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)));
         assertThat(node, is(missingServiceParameterValueException()));
     }
 }
