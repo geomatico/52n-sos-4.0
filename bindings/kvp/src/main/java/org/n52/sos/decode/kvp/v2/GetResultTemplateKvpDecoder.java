@@ -42,6 +42,7 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetResultTemplateRequest;
 import org.n52.sos.util.KvpHelper;
 
+@Deprecated
 public class GetResultTemplateKvpDecoder extends AbstractKvpDecoder {
 
      private static final DecoderKey KVP_DECODER_KEY_TYPE 
