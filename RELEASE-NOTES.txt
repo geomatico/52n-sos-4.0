@@ -6,23 +6,8 @@ RELEASE NOTES
  SensorML instance document), and information about the sensor mounting platform 
  (SensorML as well). 
  
- Changes since last release
-===========================
 
---- New features ---
-
-   * 
-
---- Changes ---
-
-   * 
-
---- Fixed bugs ---
-  
-   * 
-
- 
-Release 52n-sos-webapp-4.0.0-Beta2
+Release 52n-sos-4.0.0-Beta2
 ===================================
 
 

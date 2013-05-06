@@ -11,7 +11,7 @@ CITE testing [4] in December of 2012.
 Contents
 ========
    * /src : The source files of 52°North SOS modules
-   * /bin : Executable binaries of 52°North SOS modules
+   * /bin : Executable binary of 52°North SOS webapp module
    * LICENSE : The license of 52°North SOS
    * README : This file
    * RELEASE-NOTES : The release notes of the 52°North SOS
