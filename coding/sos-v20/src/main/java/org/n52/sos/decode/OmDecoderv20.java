@@ -131,7 +131,10 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
                 observationConstallation.setFeatureOfInterest(checkFeatureWithMap(featureOfInterest, featureMap));
             }
         } catch (OwsExceptionReport e) {
-            if (sosObservation.getValue().getPhenomenonTime().getIndeterminateValue().equals("template")) {
+            if (sosObservation.getValue() != null &&
+                sosObservation.getValue().getPhenomenonTime() != null &&
+                sosObservation.getPhenomenonTime().isSetIndeterminateValue() &&
+                sosObservation.getValue().getPhenomenonTime().getIndeterminateValue().equals("template")) {
                 for (CodedException exception : e.getExceptions()) {
                     if (exception.getCode().equals(OwsExceptionCode.InvalidParameterValue)) {
                         throw new InvalidParameterValueException().at(exception.getLocator())
