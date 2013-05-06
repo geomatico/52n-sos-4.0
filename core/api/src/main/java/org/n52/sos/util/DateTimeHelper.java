@@ -74,7 +74,7 @@ public final class DateTimeHelper {
      * @throws DateTimeException
      *             IF an error occurs.
      */
-    public static DateTime parseIsoString2DateTime(String timeString) throws DateTimeParseException {
+    public static DateTime parseIsoString2DateTime(final String timeString) throws DateTimeParseException {
         checkForValidity(timeString);
         if (timeString == null || timeString.isEmpty()) {
             return null;
@@ -86,12 +86,12 @@ public final class DateTimeHelper {
             } else {
                 return ISODateTimeFormat.dateOptionalTimeParser().withZone(DateTimeZone.UTC).parseDateTime(timeString);
             }
-        } catch (Throwable uoe) {
+        } catch (final RuntimeException uoe) {
             throw new DateTimeParseException(timeString, uoe);
         }
     }
 
-    private static void checkForValidity(String timeString) throws DateTimeParseException {
+    private static void checkForValidity(final String timeString) throws DateTimeParseException {
         if (!(timeString.length() == 4 || timeString.length() == 7 || timeString.length() >= 10)) {
             throw new DateTimeParseException(timeString);
         }
@@ -108,7 +108,7 @@ public final class DateTimeHelper {
      *             types.
      * @see {@link #formatDateTime2IsoString}
      */
-    public static String format(ITime time) {
+    public static String format(final ITime time) {
         if (time != null) {
             if (time instanceof TimeInstant) {
                 return formatDateTime2IsoString(((TimeInstant) time).getValue());
@@ -117,7 +117,7 @@ public final class DateTimeHelper {
                                      formatDateTime2IsoString(((TimePeriod) time).getEnd()));
             }
         }
-        String exceptionMsg =
+        final String exceptionMsg =
                 String.format("Given ITime object is not valid: %s", time);
         LOGGER.debug(exceptionMsg);
         throw new IllegalArgumentException(exceptionMsg);
@@ -130,7 +130,7 @@ public final class DateTimeHelper {
      *            Time object
      * @return ISO-8601 formatted time String
      */
-    public static String formatDateTime2IsoString(DateTime dateTime) {
+    public static String formatDateTime2IsoString(final DateTime dateTime) {
         if (dateTime == null) {
             return new DateTime(0000, 01, 01, 00, 00, 00, 000, DateTimeZone.UTC).toString().replace("Z", "+00:00");
         }
@@ -146,11 +146,11 @@ public final class DateTimeHelper {
      *
      * @throws DateTimeFormatException If an error occurs.
      */
-    public static String formatDateTime2ResponseString(DateTime dateTime) throws DateTimeFormatException {
+    public static String formatDateTime2ResponseString(final DateTime dateTime) throws DateTimeFormatException {
         return formatDateTime2FormattedString(dateTime, responseFormat);
     }
 
-    public static String formatDateTime2String(DateTime dateTime, TimeFormat timeFormat) throws DateTimeFormatException {
+    public static String formatDateTime2String(final DateTime dateTime, final TimeFormat timeFormat) throws DateTimeFormatException {
         switch (timeFormat) {
         case Y:
             return formatDateTime2YearDateString(dateTime);
@@ -174,7 +174,7 @@ public final class DateTimeHelper {
      *
      * @throws DateTimeFormatException If an error occurs.
      */
-    public static String formatDateTime2FormattedString(DateTime dateTime, String dateFormat) throws DateTimeFormatException {
+    public static String formatDateTime2FormattedString(final DateTime dateTime, final String dateFormat) throws DateTimeFormatException {
         try {
             if (dateFormat == null || dateFormat.isEmpty()) {
                 return formatDateTime2IsoString(dateTime);
@@ -185,7 +185,7 @@ public final class DateTimeHelper {
                 }
                 return dateTime.toString(DateTimeFormat.forPattern(dateFormat)).replace("Z", "+00:00");
             }
-        } catch (IllegalArgumentException iae) {
+        } catch (final IllegalArgumentException iae) {
             throw new DateTimeFormatException(dateTime, iae);
         }
     }
@@ -199,7 +199,7 @@ public final class DateTimeHelper {
      *
      * @throws DateTimeFormatException
      */
-    public static String formatDateTime2YearMonthDayDateStringYMD(DateTime dateTime) throws DateTimeFormatException {
+    public static String formatDateTime2YearMonthDayDateStringYMD(final DateTime dateTime) throws DateTimeFormatException {
         try {
             DateTime result;
             if (dateTime == null) {
@@ -208,7 +208,7 @@ public final class DateTimeHelper {
                 result = new DateTime(dateTime.getMillis(), DateTimeZone.UTC);
             }
             return result.toString(DateTimeFormat.forPattern(ymdResponseFormat));
-        } catch (IllegalArgumentException iae) {
+        } catch (final IllegalArgumentException iae) {
             throw new DateTimeFormatException(dateTime, iae);
         }
     }
@@ -222,7 +222,7 @@ public final class DateTimeHelper {
      *
      * @throws DateTimeFormatException
      */
-    public static String formatDateTime2YearMonthDateString(DateTime dateTime) throws DateTimeFormatException {
+    public static String formatDateTime2YearMonthDateString(final DateTime dateTime) throws DateTimeFormatException {
         try {
             DateTime result;
             if (dateTime == null) {
@@ -231,7 +231,7 @@ public final class DateTimeHelper {
                 result = new DateTime(dateTime.getMillis(), DateTimeZone.UTC);
             }
             return result.toString(DateTimeFormat.forPattern(ymResponseFormat));
-        } catch (IllegalArgumentException iae) {
+        } catch (final IllegalArgumentException iae) {
             throw new DateTimeFormatException(dateTime, iae);
         }
     }
@@ -245,7 +245,7 @@ public final class DateTimeHelper {
      *
      * @throws DateTimeFormatException
      */
-    public static String formatDateTime2YearDateString(DateTime dateTime) throws DateTimeFormatException {
+    public static String formatDateTime2YearDateString(final DateTime dateTime) throws DateTimeFormatException {
         try {
             DateTime result;
             if (dateTime == null) {
@@ -254,7 +254,7 @@ public final class DateTimeHelper {
                 result = new DateTime(dateTime.getMillis(), DateTimeZone.UTC);
             }
             return result.toString(DateTimeFormat.forPattern(yResponseFormat));
-        } catch (IllegalArgumentException iae) {
+        } catch (final IllegalArgumentException iae) {
             throw new DateTimeFormatException(dateTime, iae);
         }
     }
@@ -269,7 +269,7 @@ public final class DateTimeHelper {
      *            Length of the time object
      * @return Modified time object.
      */
-    public static DateTime setDateTime2EndOfDay4RequestedEndPosition(DateTime dateTime, int isoTimeLength) {
+    public static DateTime setDateTime2EndOfDay4RequestedEndPosition(final DateTime dateTime, final int isoTimeLength) {
         switch (isoTimeLength) {
             // year
             case 4:
@@ -301,7 +301,7 @@ public final class DateTimeHelper {
      *            Duration as String
      * @return Period object of duration
      */
-    public static Period parseDuration(String stringDuration) {
+    public static Period parseDuration(final String stringDuration) {
         return ISOPeriodFormat.standard().parsePeriod(stringDuration);
     }
 
@@ -312,7 +312,7 @@ public final class DateTimeHelper {
      *            Time object
      * @return Expire time
      */
-    public static DateTime calculateExpiresDateTime(DateTime start) {
+    public static DateTime calculateExpiresDateTime(final DateTime start) {
         return start.plusMinutes(lease);
     }
 
@@ -322,7 +322,7 @@ public final class DateTimeHelper {
      * @param responseFormat
      *            Defined response format
      */
-    public static void setResponseFormat(String responseFormat) {
+    public static void setResponseFormat(final String responseFormat) {
         DateTimeHelper.responseFormat = responseFormat;
     }
 
@@ -332,7 +332,7 @@ public final class DateTimeHelper {
      * @param lease
      *            Defined lease value
      */
-    public static void setLease(int lease) {
+    public static void setLease(final int lease) {
         DateTimeHelper.lease = lease;
     }
 
