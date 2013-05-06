@@ -28,14 +28,17 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.n52.sos.ogc.ows.SosServiceIdentificationFactorySettings.*;
 import static org.n52.sos.ogc.ows.SosServiceProviderFactorySettings.*;
-import static org.n52.sos.service.it.AbstractSosServiceTest.missingServiceParameterValue;
+import static org.n52.sos.service.it.AbstractSosServiceTest.exception;
+import static org.n52.sos.service.it.AbstractSosServiceTest.missingServiceParameterValueException;
 
 import javax.xml.namespace.NamespaceContext;
 
+import org.junit.Ignore;
 import org.junit.Test;
+import org.n52.sos.exception.ows.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.sos.SosConstants.GetCapabilitiesParams;
 import org.n52.sos.service.it.AbstractSosServiceTest;
 import org.n52.sos.service.it.RequestBuilder;
 import org.n52.sos.service.it.SosNamespaceContext;
@@ -63,9 +66,31 @@ public class GetCapabilitiesTest extends AbstractSosServiceTest {
         Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
                 .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetCapabilities)
                 .query(OWSConstants.RequestParams.service, "")
-                .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)
                 .accept(SosConstants.CONTENT_TYPE_XML)));
-        assertThat(node, is(missingServiceParameterValue()));
+        assertThat(node, is(missingServiceParameterValueException()));
+    }
+
+    @Test
+    public void invalidSectionParameter() {
+        Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+                .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetCapabilities)
+                .query(OWSConstants.RequestParams.service, SosConstants.SOS)
+                .query(SosConstants.GetCapabilitiesParams.Sections, "INVALID")
+                .accept(SosConstants.CONTENT_TYPE_XML)));
+        assertThat(node, is(exception(OwsExceptionCode.InvalidParameterValue, GetCapabilitiesParams.Section,
+                                      "The requested section 'INVALID' does not exist or is not supported!")));
+    }
+
+    @Test
+    @Ignore
+    public void emptySectionParameter() {
+        Node node = getResponseAsNode(execute(RequestBuilder.get("/sos/kvp")
+                .query(OWSConstants.RequestParams.request, SosConstants.Operations.GetCapabilities)
+                .query(OWSConstants.RequestParams.service, SosConstants.SOS)
+                .query(SosConstants.GetCapabilitiesParams.Sections, "")
+                .accept(SosConstants.CONTENT_TYPE_XML)));
+        assertThat(node, is(exception(OwsExceptionCode.MissingParameterValue, GetCapabilitiesParams.Sections,
+                                      "The value for the parameter 'sections' is missing in the request!")));
     }
 
     @Test

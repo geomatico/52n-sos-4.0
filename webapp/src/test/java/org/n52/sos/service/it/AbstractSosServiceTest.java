@@ -68,6 +68,7 @@ public class AbstractSosServiceTest {
     private static final ServletContext servletContext = new MockServletContext();
     private static final ServletConfig servletConfig = new MockServletConfig(servletContext);
     private static final NamespaceContext namespaceContext = new SosNamespaceContext();
+    public static final String ENCODING = "UTF-8";
 
     @BeforeClass
     public static void setUp() throws ServletException, IOException {
@@ -81,7 +82,13 @@ public class AbstractSosServiceTest {
                          "The value of the mandatory parameter 'service' must be 'SOS'. Delivered value was: " + value);
     }
 
-    public static Matcher<Node> missingServiceParameterValue() {
+    public static Matcher<Node> missingParameterValueException(Enum<?> parameter) {
+        return exception(OwsExceptionCode.MissingParameterValue, parameter,
+                         "The value for the parameter 'service' is missing in the request!");
+    }
+
+
+    public static Matcher<Node> missingServiceParameterValueException() {
         return exception(OwsExceptionCode.MissingParameterValue, OWSConstants.RequestParams.service,
                          "The value for the parameter 'service' is missing in the request!");
     }

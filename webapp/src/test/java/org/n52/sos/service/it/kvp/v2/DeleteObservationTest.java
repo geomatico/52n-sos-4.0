@@ -58,6 +58,6 @@ public class DeleteObservationTest extends AbstractSosServiceTest {
                 .query(OWSConstants.RequestParams.service, "")
                 .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)
                 .accept(SosConstants.CONTENT_TYPE_XML)));
-        assertThat(node, is(missingServiceParameterValue()));
+        assertThat(node, is(missingServiceParameterValueException()));
     }
 }

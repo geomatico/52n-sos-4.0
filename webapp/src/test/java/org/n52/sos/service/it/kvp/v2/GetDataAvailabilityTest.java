@@ -26,7 +26,7 @@ package org.n52.sos.service.it.kvp.v2;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.AbstractSosServiceTest.missingServiceParameterValue;
+import static org.n52.sos.service.it.AbstractSosServiceTest.missingServiceParameterValueException;
 
 import org.junit.Test;
 import org.n52.sos.gda.GetDataAvailabilityConstants;
@@ -58,6 +58,6 @@ public class GetDataAvailabilityTest extends AbstractSosServiceTest {
                 .query(OWSConstants.RequestParams.service, "")
                 .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)
                 .accept(SosConstants.CONTENT_TYPE_XML)));
-        assertThat(node, is(missingServiceParameterValue()));
+        assertThat(node, is(missingServiceParameterValueException()));
     }
 }
