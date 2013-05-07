@@ -70,7 +70,8 @@ import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
 
 @Configurable
-public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<AbstractInsertSensorDAO, InsertSensorRequest> {
+public class SosInsertSensorOperatorV20 extends
+        AbstractV2RequestOperator<AbstractInsertSensorDAO, InsertSensorRequest> {
 
     private static final String OPERATION_NAME = Sos2Constants.Operations.InsertSensor.name();
 
@@ -78,14 +79,13 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
             ConformanceClasses.SOS_V2_INSERTION_CAPABILITIES, ConformanceClasses.SOS_V2_SENSOR_INSERTION);
 
     private String defaultOfferingPrefix;
-    
+
     private String defaultProcedurePrefix;
-    
-    
+
     public SosInsertSensorOperatorV20() {
         super(OPERATION_NAME, InsertSensorRequest.class);
     }
-    
+
     public String getDefaultOfferingPrefix() {
         return this.defaultOfferingPrefix;
     }
@@ -94,7 +94,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
     public void setDefaultOfferingPrefix(String prefix) {
         this.defaultOfferingPrefix = prefix;
     }
-    
+
     public String getDefaultProcedurePrefix() {
         return this.defaultProcedurePrefix;
     }
@@ -103,7 +103,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
     public void setDefaultProcedurePrefix(String prefix) {
         this.defaultProcedurePrefix = prefix;
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
@@ -187,6 +187,9 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
             } catch (OwsExceptionReport owse) {
                 exceptions.add(owse);
             }
+        } else {
+            exceptions.add(new MissingParameterValueException(Sos2Constants.InsertSensorParams.observationType));
+            exceptions.add(new MissingParameterValueException(Sos2Constants.InsertSensorParams.featureOfInterestType));
         }
         exceptions.throwIfNotEmpty();
     }
@@ -222,8 +225,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
             CompositeOwsException exceptions = new CompositeOwsException();
             for (String observationType : observationTypes) {
                 try {
-                    checkObservationType(observationType,
-                            Sos2Constants.InsertSensorParams.observationType.name());
+                    checkObservationType(observationType, Sos2Constants.InsertSensorParams.observationType.name());
                 } catch (OwsExceptionReport e) {
                     exceptions.add(e);
                 }
@@ -236,7 +238,8 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
         if (request.getProcedureDescription().isSetIdentifier()) {
             request.setAssignedProcedureIdentifier(request.getProcedureDescription().getIdentifier());
         } else {
-            request.setAssignedProcedureIdentifier(getDefaultProcedurePrefix() + JavaHelper.generateID(request.getProcedureDescription().toString()));
+            request.setAssignedProcedureIdentifier(getDefaultProcedurePrefix()
+                    + JavaHelper.generateID(request.getProcedureDescription().toString()));
         }
     }
 
@@ -261,12 +264,12 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
             }
         }
         if (request.getProcedureDescription().isSetParentProcedures()) {
-            
+
         }
         // check if offering is valid
         if (sosOfferings == null || sosOfferings.isEmpty()) {
             sosOfferings = new ArrayList<SosOffering>(0);
-            sosOfferings.add(new SosOffering(getDefaultOfferingPrefix()+ request.getAssignedProcedureIdentifier()));
+            sosOfferings.add(new SosOffering(getDefaultOfferingPrefix() + request.getAssignedProcedureIdentifier()));
         }
         request.setAssignedOfferings(sosOfferings);
     }
@@ -274,22 +277,24 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
     private void checkProcedureAndOfferingCombination(InsertSensorRequest request) throws OwsExceptionReport {
         for (SosOffering offering : request.getAssignedOfferings()) {
             if (getCache().getOfferings().contains(offering.getOfferingIdentifier())) {
-                throw new InvalidParameterValueException().at(Sos2Constants.InsertSensorParams.offeringIdentifier)
-                        .withMessage("The offering with the identifier '%s' still exists in this service and it is not allowed to insert more than one procedure to an offering!",
-                                     offering.getOfferingIdentifier());
+                throw new InvalidParameterValueException()
+                        .at(Sos2Constants.InsertSensorParams.offeringIdentifier)
+                        .withMessage(
+                                "The offering with the identifier '%s' still exists in this service and it is not allowed to insert more than one procedure to an offering!",
+                                offering.getOfferingIdentifier());
             }
         }
     }
-    
+
     private void getParentProcedures() {
         // checkParentProcedures if exist, else exception
         // insert proc as hidden child to parents
         // insert proc with new offering if set
         // set relation in sensor_system
     }
-    
+
     private void getChildProcedures() {
-        // add parent offerings 
+        // add parent offerings
         // insert if not exist and proc is encoded, else Exception
         // insert as hidden child
         // set relation in sensor_system
@@ -297,8 +302,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
 
     private void getOfferingsForParentProcedures(Set<String> set) {
         // TODO Auto-generated method stub
-        
+
     }
-    
-   
+
 }
