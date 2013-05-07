@@ -37,6 +37,7 @@ import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.ows.OWSConstants;
+import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.swe.SWEConstants;
@@ -48,42 +49,43 @@ import org.n52.sos.util.W3CConstants;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class SosNamespaceContext implements NamespaceContext {
-    private Map<String, String> prefixForNamespace;
-    private Map<String, String> namespaceForPrefix;
+    private final Map<String, String> prefixForNamespace;
+    private final Map<String, String> namespaceForPrefix;
 
     public SosNamespaceContext() {
         namespaceForPrefix = new HashMap<String, String>(15);
+        namespaceForPrefix.put(FilterConstants.NS_FES_2_PREFIX, FilterConstants.NS_FES_2);
         namespaceForPrefix.put(GMLConstants.NS_GML_PREFIX, GMLConstants.NS_GML_32);
         namespaceForPrefix.put(OMConstants.NS_OM_PREFIX, OMConstants.NS_OM_2);
         namespaceForPrefix.put(OWSConstants.NS_OWS_PREFIX, OWSConstants.NS_OWS);
         namespaceForPrefix.put(SFConstants.NS_SAMS_PREFIX, SFConstants.NS_SAMS);
         namespaceForPrefix.put(SFConstants.NS_SA_PREFIX, SFConstants.NS_SA);
         namespaceForPrefix.put(SFConstants.NS_SF_PREFIX, SFConstants.NS_SF);
+        namespaceForPrefix.put(SensorMLConstants.NS_SML_PREFIX, SensorMLConstants.NS_SML);
         namespaceForPrefix.put("soap", SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE);
         namespaceForPrefix.put(SosConstants.NS_SOS_PREFIX, Sos2Constants.NS_SOS_20);
+        namespaceForPrefix.put("sosREST", "http://www.opengis.net/sosREST/1.0");
         namespaceForPrefix.put(SWEConstants.NS_SWE_PREFIX, SWEConstants.NS_SWE_20);
         namespaceForPrefix.put(SWEConstants.NS_SWES_PREFIX, SWEConstants.NS_SWES_20);
         namespaceForPrefix.put(W3CConstants.NS_XLINK_PREFIX, W3CConstants.NS_XLINK);
-        namespaceForPrefix.put(FilterConstants.NS_FES_2_PREFIX, FilterConstants.NS_FES_2);
         namespaceForPrefix.put(W3CConstants.NS_XSI_PREFIX, W3CConstants.NS_XSI);
-        namespaceForPrefix.put("sosREST", "http://www.opengis.net/sosREST/1.0");
         namespaceForPrefix.put("xml", "http://www.w3.org/XML/1998/namespace");
         prefixForNamespace = CollectionHelper.reverse(namespaceForPrefix);
 
     }
 
     @Override
-    public String getNamespaceURI(String prefix) {
+    public String getNamespaceURI(final String prefix) {
         return namespaceForPrefix.get(prefix);
     }
 
     @Override
-    public String getPrefix(String namespaceURI) {
+    public String getPrefix(final String namespaceURI) {
         return prefixForNamespace.get(namespaceURI);
     }
 
     @Override
-    public Iterator<String> getPrefixes(String namespaceURI) {
+    public Iterator<String> getPrefixes(final String namespaceURI) {
         return Collections.singleton(getPrefix(namespaceURI)).iterator();
     }
 
