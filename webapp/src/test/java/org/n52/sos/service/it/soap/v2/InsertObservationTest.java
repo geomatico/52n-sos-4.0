@@ -26,61 +26,28 @@ package org.n52.sos.service.it.soap.v2;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.AbstractSoapTest.invalidServiceParameterValueExceptionFault;
-
-import javax.xml.namespace.QName;
-
-import net.opengis.gml.x32.TimeInstantDocument;
-import net.opengis.gml.x32.TimeInstantType;
-import net.opengis.om.x20.OMObservationType;
 import net.opengis.sos.x20.InsertObservationDocument;
-import net.opengis.sos.x20.InsertObservationType;
 
 import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlObject;
-import org.apache.xmlbeans.XmlString;
 import org.junit.Test;
-import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.it.AbstractSoapTest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class InsertObservationTest extends AbstractSoapTest {
 
     @Test
     public void invalidServiceParameter() throws XmlException {
-        InsertObservationDocument insertObservationDocument = getMinimalRequest();
+        final InsertObservationDocument insertObservationDocument = getInsertObservationMinimalDocument();
         insertObservationDocument.getInsertObservation().setService("INVALID");
-        MockHttpServletResponse res = execute(insertObservationDocument);
+        final MockHttpServletResponse res = execute(insertObservationDocument);
         assertThat(res.getStatus(), is(400));
         assertThat(getResponseAsNode(res), is(invalidServiceParameterValueExceptionFault("INVALID")));
-    }
-
-    protected InsertObservationDocument getMinimalRequest() {
-        InsertObservationDocument insertObservationDocument = InsertObservationDocument.Factory.newInstance();
-        InsertObservationType insertObservationType = insertObservationDocument.addNewInsertObservation();
-        insertObservationType.setVersion(Sos2Constants.SERVICEVERSION);
-        insertObservationType.setService(SosConstants.SOS);
-        insertObservationType.addOffering("offering");
-        OMObservationType observation = insertObservationType.addNewObservation().addNewOMObservation();
-        observation.setId("id");
-        TimeInstantDocument timeInstantDocument = TimeInstantDocument.Factory.newInstance();
-        TimeInstantType timeInstantType = timeInstantDocument.addNewTimeInstant();
-        timeInstantType.setId("phenomenonTime");
-        timeInstantType.addNewTimePosition().setObjectValue("2000-01-01T00:00:00Z");
-        observation.addNewPhenomenonTime().set(timeInstantDocument);
-        observation.addNewResultTime().setHref("#phenomenonTime");
-        observation.addNewProcedure();
-        observation.addNewObservedProperty();
-        observation.addNewFeatureOfInterest().setHref("featureOfInterest");
-        XmlObject result = observation.addNewResult();
-        result = result.substitute(new QName(OMConstants.NS_OM_2, OMConstants.EN_RESULT), XmlString.type);
-        result.set(XmlString.Factory.newValue("value"));
-        return insertObservationDocument;
     }
 }

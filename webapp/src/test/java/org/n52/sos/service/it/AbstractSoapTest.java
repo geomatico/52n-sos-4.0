@@ -38,17 +38,20 @@ import org.w3c.dom.Node;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
-public class AbstractSoapTest extends AbstractSosServiceTest {
+public class AbstractSoapTest extends AbstractTransactionalTestv2{
     protected static final NamespaceContext CTX = new SosNamespaceContext();
 
-    public static Matcher<Node> invalidServiceParameterValueExceptionFault(String parameter) {
+    public static Matcher<Node> invalidServiceParameterValueExceptionFault(final String parameter) {
         return soapFault(OwsExceptionCode.InvalidParameterValue, OWSConstants.RequestParams.service,
                          "The value of the mandatory parameter 'service' must be 'SOS'. Delivered value was: " +
                          parameter);
     }
 
-    public static Matcher<Node> soapFault(Enum<?> code, Enum<?> locator, String text) {
+    public static Matcher<Node> soapFault(final Enum<?> code, final Enum<?> locator, final String text) {
         return allOf(hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Code/soap:Subcode/soap:Value",
                               CTX, endsWith(":" + code.name())),
                      hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Reason/soap:Text[@xml:lang='en']",
@@ -61,14 +64,14 @@ public class AbstractSoapTest extends AbstractSosServiceTest {
                               CTX, is(text)));
     }
 
-    protected XmlObject envelope(XmlObject r) {
-        EnvelopeDocument envDoc = EnvelopeDocument.Factory.newInstance();
+    protected XmlObject envelope(final XmlObject r) {
+        final EnvelopeDocument envDoc = EnvelopeDocument.Factory.newInstance();
         envDoc.addNewEnvelope().addNewBody().set(r);
         return envDoc;
     }
 
 
-    protected MockHttpServletResponse execute(XmlObject doc) {
+    protected MockHttpServletResponse execute(final XmlObject doc) {
         return execute(RequestBuilder.post("/soap")
                 .accept("application/soap+xml")
                 .contentType("application/soap+xml")

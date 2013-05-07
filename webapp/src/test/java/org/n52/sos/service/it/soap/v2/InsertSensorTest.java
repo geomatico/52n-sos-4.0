@@ -24,53 +24,29 @@
 
 package org.n52.sos.service.it.soap.v2;
 
-import org.n52.sos.service.it.AbstractSoapTest;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.AbstractSoapTest.invalidServiceParameterValueExceptionFault;
-
-import net.opengis.sensorML.x101.SensorMLDocument;
-import net.opengis.sensorML.x101.SensorMLDocument.SensorML;
-import net.opengis.sensorML.x101.SystemDocument;
-import net.opengis.sensorML.x101.SystemType;
 import net.opengis.swes.x20.InsertSensorDocument;
-import net.opengis.swes.x20.InsertSensorType;
 
 import org.apache.xmlbeans.XmlException;
 import org.junit.Test;
-import org.n52.sos.ogc.sensorML.SensorMLConstants;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.service.it.AbstractSoapTest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class InsertSensorTest extends AbstractSoapTest {
     @Test
     public void invalidServiceParameter() throws XmlException {
-        InsertSensorDocument insertSensorDocument = getMinimalRequest();
+        final InsertSensorDocument insertSensorDocument = getInsertSensorMinimalDocument();
         insertSensorDocument.getInsertSensor().setService("INVALID");
-        MockHttpServletResponse res = execute(insertSensorDocument);
+        final MockHttpServletResponse res = execute(insertSensorDocument);
         assertThat(res.getStatus(), is(400));
         assertThat(getResponseAsNode(res), is(invalidServiceParameterValueExceptionFault("INVALID")));
-    }
-
-    protected InsertSensorDocument getMinimalRequest() {
-        InsertSensorDocument insertSensorDocument = InsertSensorDocument.Factory.newInstance();
-        InsertSensorType insertSensorType = insertSensorDocument.addNewInsertSensor();
-        insertSensorType.setVersion(Sos2Constants.SERVICEVERSION);
-        insertSensorType.setService(SosConstants.SOS);
-        insertSensorType.setProcedureDescriptionFormat(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
-        SensorMLDocument sensorMLDocument = SensorMLDocument.Factory.newInstance();
-        SensorML sensorML = sensorMLDocument.addNewSensorML();
-        sensorML.setVersion(SensorMLConstants.VERSION_V101);
-        SystemDocument systemDocument = SystemDocument.Factory.newInstance();
-        SystemType systemType = systemDocument.addNewSystem();
-        sensorML.addNewMember().set(systemDocument);
-        insertSensorType.addNewProcedureDescription().set(sensorMLDocument);
-        insertSensorType.addNewObservableProperty();
-        return insertSensorDocument;
     }
 
 }

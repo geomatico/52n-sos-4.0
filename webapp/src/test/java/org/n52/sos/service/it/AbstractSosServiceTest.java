@@ -24,11 +24,7 @@
 
 package org.n52.sos.service.it;
 
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.hasXPath;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
@@ -62,7 +58,7 @@ import org.xml.sax.SAXException;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class AbstractSosServiceTest {
+public abstract class AbstractSosServiceTest {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractSosServiceTest.class);
     private static SosService service;
     private static final ServletContext servletContext = new MockServletContext();
@@ -77,12 +73,12 @@ public class AbstractSosServiceTest {
         service.init(servletConfig);
     }
 
-    public static Matcher<Node> invalidServiceParameterValueException(String value) {
+    public static Matcher<Node> invalidServiceParameterValueException(final String value) {
         return exception(OwsExceptionCode.InvalidParameterValue, OWSConstants.RequestParams.service,
                          "The value of the mandatory parameter 'service' must be 'SOS'. Delivered value was: " + value);
     }
 
-    public static Matcher<Node> missingParameterValueException(Enum<?> parameter) {
+    public static Matcher<Node> missingParameterValueException(final Enum<?> parameter) {
         return exception(OwsExceptionCode.MissingParameterValue, parameter,
                          "The value for the parameter 'service' is missing in the request!");
     }
@@ -93,43 +89,43 @@ public class AbstractSosServiceTest {
                          "The value for the parameter 'service' is missing in the request!");
     }
 
-    public static Matcher<Node> exception(Enum<?> code, Enum<?> locator, String text) {
+    public static Matcher<Node> exception(final Enum<?> code, final Enum<?> locator, final String text) {
         return allOf(hasXPath("//ows:ExceptionReport/ows:Exception/@exceptionCode", namespaceContext, is(code.name())),
                      hasXPath("//ows:ExceptionReport/ows:Exception/@locator", namespaceContext, is(locator.name())),
                      hasXPath("//ows:ExceptionReport/ows:Exception/ows:ExceptionText", namespaceContext, is(text)));
     }
 
-    protected MockHttpServletResponse execute(RequestBuilder b) {
+    protected MockHttpServletResponse execute(final RequestBuilder b) {
         try {
-            MockHttpServletResponse res = new MockHttpServletResponse();
-            HttpServletRequest req = b.context(servletContext).build();
+            final MockHttpServletResponse res = new MockHttpServletResponse();
+            final HttpServletRequest req = b.context(servletContext).build();
             service.service(req, res);
             return res;
-        } catch (ServletException ex) {
+        } catch (final ServletException ex) {
             LOG.error("Error in servlet", ex);
             throw new AssertionError("Error in servlet");
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             LOG.error("Error in servlet", ex);
             throw new AssertionError("Error in servlet");
         }
     }
 
-    protected Element getResponseAsNode(MockHttpServletResponse res) {
+    protected Element getResponseAsNode(final MockHttpServletResponse res) {
         try {
             assertThat(res, is(not(nullValue())));
-            byte[] response = res.getContentAsByteArray();
+            final byte[] response = res.getContentAsByteArray();
             assertThat(response, is(not(nullValue())));
             assertThat(response.length, is(not(0)));
-            Element node = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+            final Element node = DocumentBuilderFactory.newInstance().newDocumentBuilder()
                     .parse(new ByteArrayInputStream(response)).getDocumentElement();
             return node;
-        } catch (ParserConfigurationException ex) {
+        } catch (final ParserConfigurationException ex) {
             LOG.error("Error parsing response", ex);
             throw new AssertionError("Error parsing response");
-        } catch (SAXException ex) {
+        } catch (final SAXException ex) {
             LOG.error("Error parsing response", ex);
             throw new AssertionError("Error parsing response");
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             LOG.error("Error parsing response", ex);
             throw new AssertionError("Error parsing response");
         }
