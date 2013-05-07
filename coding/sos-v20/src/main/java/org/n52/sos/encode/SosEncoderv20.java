@@ -578,17 +578,17 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
                     }
                 }
 
-//                xbContType.addNewOffering().setAbstractOffering(xbObsOff);
-                Offering addNewOffering = xbContType.addNewOffering();
-                addNewOffering.addNewAbstractOffering().set(xbObsOff);
-                XmlHelper.substituteElement(addNewOffering.getAbstractOffering(), xbObsOff);
+                xbContType.addNewOffering().setAbstractOffering(xbObsOff);
+//                Offering addNewOffering = xbContType.addNewOffering();
+//                addNewOffering.addNewAbstractOffering().set(xbObsOff);
+//                XmlHelper.substituteElement(addNewOffering.getAbstractOffering(), xbObsOff);
             }
         }
         // FIXME: change swes:AbstractOffering to sos:ObservationOffering and
         // the namespace prefix ns to sos due to
         // XMLBeans problems with substitution
         // (http://www.mail-archive.com/dev%40xmlbeans.apache.org/msg00962.html).
-//        renameContentsElementNames(xbContents);
+        renameContentsElementNames(xbContents);
     }
 
     /**
