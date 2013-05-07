@@ -23,11 +23,14 @@
  */
 package org.n52.sos.service.it.rest;
 
+import static org.n52.sos.service.it.RequestBuilder.get;
+
 import javax.xml.namespace.NamespaceContext;
 
 import org.n52.sos.binding.rest.Constants;
 import org.n52.sos.service.it.AbstractSosServiceTest;
 import org.n52.sos.service.it.SosNamespaceContext;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
@@ -50,5 +53,10 @@ public class RestBindingTest extends AbstractSosServiceTest {
 				" and " + 
 				"@type='" + CONTENT_TYPE + "'" +		
 				"]";
+	}
+
+	protected MockHttpServletResponse getResource(final String resType)
+	{
+		return execute(	get(REST_URL + "/" + resType).accept(CONTENT_TYPE));
 	}
 }
