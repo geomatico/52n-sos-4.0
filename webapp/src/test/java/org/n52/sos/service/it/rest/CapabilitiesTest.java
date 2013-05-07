@@ -27,7 +27,6 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.xml.HasXPath.hasXPath;
 import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.RequestBuilder.get;
 
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -38,7 +37,7 @@ import org.w3c.dom.Node;
  *
  * @since 4.0.0
  */
-public class CapabilitiesTest extends RestBindingTest{
+public class CapabilitiesTest extends RestBindingTest {
 	
 	@Test
 	public void should_return_status_okay()
@@ -144,9 +143,9 @@ public class CapabilitiesTest extends RestBindingTest{
 	
 	private MockHttpServletResponse getCapabilities()
 	{
-		return execute(	get(REST_URL + "/" + CONFIG.getResourceCapabilities()).accept(CONTENT_TYPE));
+		return getResource(CONFIG.getResourceCapabilities());
 	}
-	
+
 	private String capabilitiesLink(final String relType, final String resType)
 	{
 		return "//sosREST:Capabilities/" + link(relType,resType);
