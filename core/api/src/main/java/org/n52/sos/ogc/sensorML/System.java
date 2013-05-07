@@ -33,44 +33,46 @@ public class System extends AbstractComponent {
 
     private EngineeringCRS spatialReferenceFrame;
 
-    private List<SosSMLComponent> components = new ArrayList<SosSMLComponent>(0);
+    private final List<SosSMLComponent> components = new ArrayList<SosSMLComponent>(0);
 
     public List<SosSMLComponent> getComponents() {
         return components;
     }
 
     @Deprecated
-    public void setComponents(List<SosSMLComponent> components) {
+    public void setComponents(final List<SosSMLComponent> components) {
         this.components.addAll(components);
     }
 
-    public void addComponents(List<SosSMLComponent> components) {
+    public System addComponents(final List<SosSMLComponent> components) {
         if (components != null) {
             checkAndSetChildProcedures(components);
             this.components.addAll(components);
         }
+        return this;
     }
 
-    public void addComponent(SosSMLComponent component) {
+    public System addComponent(final SosSMLComponent component) {
         if (component != null) {
             checkAndSetChildProcedures(component);
             components.add(component);
         }
+        return this;
     }
 
     public boolean isSetComponents() {
         return components != null && !components.isEmpty();
     }
 
-    private void checkAndSetChildProcedures(List<SosSMLComponent> components) {
+    private void checkAndSetChildProcedures(final List<SosSMLComponent> components) {
         if (components != null) {
-            for (SosSMLComponent component : components) {
+            for (final SosSMLComponent component : components) {
                 checkAndSetChildProcedures(component);
             }
         }
     }
 
-    private void checkAndSetChildProcedures(SosSMLComponent component) {
+    private void checkAndSetChildProcedures(final SosSMLComponent component) {
         if (component != null && component.isSetName()
                 && component.getName().contains(SensorMLConstants.ELEMENT_NAME_CHILD_PROCEDURES)) {
             addChildProcedures(component.getProcess());

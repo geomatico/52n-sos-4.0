@@ -34,12 +34,13 @@ public abstract class SosProcedureDescription {
     private String identifier;
     private String sensorDescriptionXmlString;
     private String descriptionFormat;
-    private Set<String> featureOfInterest = CollectionHelper.set();
-    private Set<String> parentProcedure = CollectionHelper.set();
-    private Set<SosProcedureDescription> childProcedure = CollectionHelper.set();
+    private final Set<String> featureOfInterest = CollectionHelper.set();
+    private final Set<String> parentProcedure = CollectionHelper.set();
+    private final Set<SosProcedureDescription> childProcedure = CollectionHelper.set();
 
-    public void setIdentifier(String identifier) {
+    public SosProcedureDescription setIdentifier(final String identifier) {
         this.identifier = identifier;
+        return this;
     }
 
     public String getIdentifier() {
@@ -58,8 +59,9 @@ public abstract class SosProcedureDescription {
         return sensorDescriptionXmlString;
     }
 
-    public void setSensorDescriptionXmlString(String sensorDescriptionXmlString) {
+    public SosProcedureDescription setSensorDescriptionXmlString(final String sensorDescriptionXmlString) {
         this.sensorDescriptionXmlString = sensorDescriptionXmlString;
+        return this;
     }
 
     public boolean isSetSensorDescriptionXmlString() {
@@ -70,17 +72,20 @@ public abstract class SosProcedureDescription {
         return descriptionFormat;
     }
 
-    public void setDescriptionFormat(String descriptionFormat) {
+    public SosProcedureDescription setDescriptionFormat(final String descriptionFormat) {
         this.descriptionFormat = descriptionFormat;
+        return this;
     }
 
    
-    public void addFeatureOfInterest(Collection<String> feature) {
-        this.featureOfInterest.addAll(feature);
+    public SosProcedureDescription addFeatureOfInterest(final Collection<String> feature) {
+        featureOfInterest.addAll(feature);
+        return this;
     }
 
-    public void addFeatureOfInterest(String featureIdentifier) {
-        this.featureOfInterest.add(featureIdentifier);
+    public SosProcedureDescription addFeatureOfInterest(final String featureIdentifier) {
+        featureOfInterest.add(featureIdentifier);
+        return this;
     }
 
     public Set<String> getFeatureOfInterest() {
@@ -91,12 +96,14 @@ public abstract class SosProcedureDescription {
         return featureOfInterest != null && !featureOfInterest.isEmpty();
     } 
 
-    public void addParentProcedures(Collection<String> parentProcedures) {
+    public SosProcedureDescription addParentProcedures(final Collection<String> parentProcedures) {
         parentProcedure.addAll( parentProcedures);
+        return this;
     }
     
-    public void addParentProcedures(String parentProcedureIdentifier) {
+    public SosProcedureDescription addParentProcedures(final String parentProcedureIdentifier) {
         parentProcedure.add(parentProcedureIdentifier);
+        return this;
     }
 
     public Set<String> getParentProcedures() {
@@ -107,14 +114,16 @@ public abstract class SosProcedureDescription {
         return parentProcedure != null && !parentProcedure.isEmpty();
     } 
 
-    public void addChildProcedures(Collection<SosProcedureDescription> childProcedures) {
+    public SosProcedureDescription addChildProcedures(final Collection<SosProcedureDescription> childProcedures) {
         if (childProcedures != null) {
-            this.childProcedure.addAll(childProcedures);
+            childProcedure.addAll(childProcedures);
         }
+        return this;
     }
     
-    public void addChildProcedures(SosProcedureDescription childProcedure) {
+    public SosProcedureDescription addChildProcedures(final SosProcedureDescription childProcedure) {
         this.childProcedure.add(childProcedure);
+        return this;
     }
 
     public Set<SosProcedureDescription> getChildProcedures() {
@@ -133,7 +142,7 @@ public abstract class SosProcedureDescription {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -141,9 +150,9 @@ public abstract class SosProcedureDescription {
             return false;
         }
         final SosProcedureDescription other = (SosProcedureDescription) obj;
-        if ((this.getIdentifier() == null)
+        if ((getIdentifier() == null)
             ? (other.getIdentifier() != null)
-            : !this.getIdentifier().equals(other.getIdentifier())) {
+            : !getIdentifier().equals(other.getIdentifier())) {
             return false;
         }
         return true;

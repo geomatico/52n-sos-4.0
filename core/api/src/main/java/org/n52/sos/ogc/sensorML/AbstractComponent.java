@@ -33,8 +33,9 @@ public class AbstractComponent extends AbstractProcess {
         return position;
     }
 
-    public void setPosition(SosSMLPosition position) {
+    public AbstractComponent setPosition(final SosSMLPosition position) {
         this.position = position;
+        return this;
     }
     
     public boolean isSetPosition() {

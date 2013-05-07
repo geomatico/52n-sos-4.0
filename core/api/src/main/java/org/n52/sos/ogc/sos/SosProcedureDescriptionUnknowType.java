@@ -33,10 +33,10 @@ public class SosProcedureDescriptionUnknowType extends SosProcedureDescription {
 	private List<SosOffering> offerings = new ArrayList<SosOffering>(0);
     
     
-    public SosProcedureDescriptionUnknowType(String identifier, String procedureDescriptionFormat, String xmlDescription) {
+    public SosProcedureDescriptionUnknowType(final String identifier, final String procedureDescriptionFormat, final String xmlDescription) {
         setIdentifier(identifier);
-        this.setDescriptionFormat(procedureDescriptionFormat);
-        this.setSensorDescriptionXmlString(xmlDescription);
+        setDescriptionFormat(procedureDescriptionFormat);
+        setSensorDescriptionXmlString(xmlDescription);
     }
 
     @Override
@@ -44,13 +44,15 @@ public class SosProcedureDescriptionUnknowType extends SosProcedureDescription {
         return offerings;
     }
 
-	public void setOfferingIdentifiers(List<SosOffering> sosOfferings)
+	public SosProcedureDescriptionUnknowType setOfferingIdentifiers(final List<SosOffering> sosOfferings)
 	{
-		this.offerings = sosOfferings;
+		offerings = sosOfferings;
+        return this;
 	}
 
-    public void addOfferingIdentifier(SosOffering sosOffering) {
-        this.offerings.add(sosOffering);
+    public SosProcedureDescriptionUnknowType addOfferingIdentifier(final SosOffering sosOffering) {
+        offerings.add(sosOffering);
+        return this;
     }
 
     @Override

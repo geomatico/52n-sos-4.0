@@ -31,7 +31,8 @@ public class ProcessModel extends AbstractProcess {
         return method;
     }
 
-    public void setMethod(ProcessMethod method) {
+    public ProcessModel setMethod(final ProcessMethod method) {
         this.method = method;
+        return this;
     }
 }

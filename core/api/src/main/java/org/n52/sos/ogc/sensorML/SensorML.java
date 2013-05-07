@@ -35,7 +35,7 @@ public class SensorML extends AbstractSensorML {
 
     private String version;
 
-    private List<AbstractProcess> members = new LinkedList<AbstractProcess>();
+    private final List<AbstractProcess> members = new LinkedList<AbstractProcess>();
 
     /**
      * default constructor
@@ -47,25 +47,28 @@ public class SensorML extends AbstractSensorML {
         return version;
     }
 
-    public void setVersion(String version) {
+    public SensorML setVersion(final String version) {
         this.version = version;
+        return this;
     }
 
     public List<AbstractProcess> getMembers() {
         return members;
     }
 
-    public void setMembers(List<AbstractProcess> members) {
-        for (AbstractProcess member : members) {
+    public SensorML setMembers(final List<AbstractProcess> members) {
+        for (final AbstractProcess member : members) {
             addMember(member);
         }
+        return this;
     }
 
-    public void addMember(AbstractProcess member) {
+    public SensorML addMember(final AbstractProcess member) {
         if (isEmpty() && !isSetIdentifier() && member.isSetIdentifier()) {
            setIdentifier(member.getIdentifier()); 
         }
         members.add(member);
+        return this;
     }
     
     /**
@@ -91,12 +94,12 @@ public class SensorML extends AbstractSensorML {
 
     @Override
     public List<SosOffering> getOfferingIdentifiers() {
-        List<SosOffering> sosOfferings = super.getOfferingIdentifiers();
+        final List<SosOffering> sosOfferings = super.getOfferingIdentifiers();
         if (isWrapper() && getMembers() != null && !getMembers().isEmpty()) {
-            for (AbstractProcess member : getMembers()) {
+            for (final AbstractProcess member : getMembers()) {
                 final List<SosOffering> offeringIdentifiers = member.getOfferingIdentifiers();
                 if (offeringIdentifiers != null && !offeringIdentifiers.isEmpty()) {
-                    for (SosOffering sosOffering : offeringIdentifiers) {
+                    for (final SosOffering sosOffering : offeringIdentifiers) {
                         if (!sosOfferings.contains(sosOffering)) {
                             sosOfferings.add(sosOffering);
                         }

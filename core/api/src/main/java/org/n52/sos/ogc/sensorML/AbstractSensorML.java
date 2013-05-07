@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.sensorML;
 
-import static org.n52.sos.ogc.OGCConstants.*;
+import static org.n52.sos.ogc.OGCConstants.URN_OFFERING_ID;
 import static org.n52.sos.ogc.sensorML.SensorMLConstants.ELEMENT_NAME_OFFERING;
 
 import java.util.ArrayList;
@@ -61,138 +61,156 @@ public class AbstractSensorML extends SosProcedureDescription {
     private String history;
 
     @Override
-    public void setIdentifier(final String identifier) {
+    public SosProcedureDescription setIdentifier(final String identifier) {
         super.setIdentifier(identifier);
+        return this;
     }
 
     public List<String> getKeywords() {
         return keywords;
     }
 
-    public void setKeywords(final List<String> keywords) {
+    public AbstractSensorML setKeywords(final List<String> keywords) {
         this.keywords = keywords;
+        return this;
     }
 
     public List<SosSMLIdentifier> getIdentifications() {
         return identifications;
     }
 
-    public void setIdentifications(final List<SosSMLIdentifier> identifications) {
+    public AbstractSensorML setIdentifications(final List<SosSMLIdentifier> identifications) {
         if (this.identifications.isEmpty()) {
             this.identifications = identifications;
         } else {
             this.identifications.addAll(identifications);
         }
+        return this;
     }
 
     public List<SosSMLClassifier> getClassifications() {
         return classifications;
     }
 
-    public void setClassifications(final List<SosSMLClassifier> classifications) {
+    public AbstractSensorML setClassifications(final List<SosSMLClassifier> classifications) {
         if (isSetClassifications()) {
             this.classifications.addAll(classifications);
         }
         this.classifications = classifications;
+        return this;
     }
 
-    public void addClassification(final SosSMLClassifier classifier) {
+    public AbstractSensorML addClassification(final SosSMLClassifier classifier) {
         classifications.add(classifier);
+        return this;
     }
 
     public ITime getValidTime() {
         return validTime;
     }
 
-    public void setValidTime(final ITime validTime) {
+    public AbstractSensorML setValidTime(final ITime validTime) {
         this.validTime = validTime;
+        return this;
     }
 
     public List<SosSMLCharacteristics> getCharacteristics() {
         return characteristics;
     }
 
-    public void setCharacteristics(final List<SosSMLCharacteristics> characteristics) {
+    public AbstractSensorML setCharacteristics(final List<SosSMLCharacteristics> characteristics) {
         if (isSetCharacteristics()) {
             this.characteristics.addAll(characteristics);
         } else {
             this.characteristics = characteristics;
         }
+        return this;
     }
 
-    public void addCharacteristic(final SosSMLCharacteristics characteristic) {
+    public AbstractSensorML addCharacteristic(final SosSMLCharacteristics characteristic) {
         characteristics.add(characteristic);
+        return this;
     }
 
     public List<SosSMLCapabilities> getCapabilities() {
         return capabilities;
     }
 
+    // FIXME add javadoc to deprecated method explained what else to use!
     @Deprecated
-    public void setCapabilities(final List<SosSMLCapabilities> capabilities) {
+    public AbstractSensorML setCapabilities(final List<SosSMLCapabilities> capabilities) {
         if (isSetCapabilities()) {
             this.capabilities.addAll(capabilities);
         } else {
             this.capabilities = capabilities;
         }
+        return this;
     }
     
-    public void addCapabilities(final List<SosSMLCapabilities> capabilities) {
+    public AbstractSensorML addCapabilities(final List<SosSMLCapabilities> capabilities) {
         if (capabilities != null) {
             checkAndSetParentProcedures(capabilities);
             this.capabilities.addAll(capabilities);
         }
+        return this;
     }
 
-    public void addCapabilities(final SosSMLCapabilities capabilities) {
+    public AbstractSensorML addCapabilities(final SosSMLCapabilities capabilities) {
         if (capabilities != null) {
             checkAndSetParentProcedures(capabilities);
             this.capabilities.add(capabilities);
         }
+        return this;
     }
 
     public List<SmlContact> getContact() {
         return contacts;
     }
 
-    public void setContact(final List<SmlContact> contacts) {
+    public AbstractSensorML setContact(final List<SmlContact> contacts) {
         if (isSetContacts()) {
             this.contacts.addAll(contacts);
         } else {
             this.contacts = contacts;
         }
+        return this;
     }
 
     private boolean isSetContacts() {
         return contacts != null && !contacts.isEmpty();
     }
 
-    public void addContact(final SmlContact contact) {
+    public AbstractSensorML addContact(final SmlContact contact) {
         contacts.add(contact);
+        return this;
     }
 
     public List<AbstractSosSMLDocumentation> getDocumentation() {
         return documentations;
     }
 
-    public void setDocumentation(final List<AbstractSosSMLDocumentation> documentations) {
+    public AbstractSensorML setDocumentation(final List<AbstractSosSMLDocumentation> documentations) {
         this.documentations.addAll(documentations);
+        return this;
     }
 
-    public void addDocumentation(final AbstractSosSMLDocumentation documentation) {
+    public AbstractSensorML addDocumentation(final AbstractSosSMLDocumentation documentation) {
         documentations.add(documentation);
+        return this;
     }
 
     public String getHistory() {
         return history;
     }
 
-    public void setHistory(final String history) {
+    public AbstractSensorML setHistory(final String history) {
         this.history = history;
+        return this;
     }
 
-    public void addIdentifier(final SosSMLIdentifier identifier) {
+    public AbstractSensorML addIdentifier(final SosSMLIdentifier identifier) {
         identifications.add(identifier);
+        return this;
     }
 
     @Override
@@ -210,7 +228,7 @@ public class AbstractSensorML extends SosProcedureDescription {
     
     @Override
     public boolean isSetOffering() {
-        List<SosOffering> offeringIdentifiers = getOfferingIdentifiers();
+        final List<SosOffering> offeringIdentifiers = getOfferingIdentifiers();
         return offeringIdentifiers != null && !offeringIdentifiers.isEmpty();
     }
 
@@ -256,21 +274,21 @@ public class AbstractSensorML extends SosProcedureDescription {
         return history != null && !history.isEmpty();
     }
     
-    private void checkAndSetParentProcedures(List<SosSMLCapabilities> capabilities) {
+    private void checkAndSetParentProcedures(final List<SosSMLCapabilities> capabilities) {
         if (capabilities != null) {
-            for (SosSMLCapabilities sosSMLCapabilities : capabilities) {
+            for (final SosSMLCapabilities sosSMLCapabilities : capabilities) {
                 checkAndSetParentProcedures(sosSMLCapabilities);
             }
         }
     }
 
-    private void checkAndSetParentProcedures(SosSMLCapabilities sosSmlCapabilities) {
+    private void checkAndSetParentProcedures(final SosSMLCapabilities sosSmlCapabilities) {
         if (sosSmlCapabilities != null && sosSmlCapabilities.isSetName()
                 && sosSmlCapabilities.getName().equals(SensorMLConstants.ELEMENT_NAME_PARENT_PROCEDURES)) {
             if (sosSmlCapabilities.isSetAbstractDataRecord() && sosSmlCapabilities.getDataRecord().isSetFields()) {
-                for (SosSweField sosSweField : sosSmlCapabilities.getDataRecord().getFields()) {
+                for (final SosSweField sosSweField : sosSmlCapabilities.getDataRecord().getFields()) {
                     if (sosSweField.getElement() instanceof SosSweText) {
-                        SosSweText sosSweText = (SosSweText) sosSweField.getElement();
+                        final SosSweText sosSweText = (SosSweText) sosSweField.getElement();
                         if (sosSweText.isSetValue()) {
                             addParentProcedures(sosSweText.getValue());
                         }

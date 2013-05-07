@@ -45,44 +45,50 @@ public class AbstractProcess extends AbstractSensorML {
         return descriptions;
     }
 
-    public void setDescriptions(List<String> descriptions) {
+    public AbstractProcess setDescriptions(final List<String> descriptions) {
         this.descriptions = descriptions;
+        return this;
     }
 
-    public void addDescription(String description) {
-        this.descriptions.add(description);
+    public AbstractProcess addDescription(final String description) {
+        descriptions.add(description);
+        return this;
     }
 
     public List<CodeType> getNames() {
         return names;
     }
 
-    public void setNames(List<CodeType> names) {
+    public AbstractProcess setNames(final List<CodeType> names) {
         this.names = names;
+        return this;
     }
 
     public List<SosSMLIo<?>> getInputs() {
         return inputs;
     }
 
-    public void setInputs(List<SosSMLIo<?>> inputs) {
+    public AbstractProcess setInputs(final List<SosSMLIo<?>> inputs) {
         this.inputs = inputs;
+        return this;
     }
 
     public List<SosSMLIo<?>> getOutputs() {
         return outputs;
     }
 
-    public void setOutputs(List<SosSMLIo<?>> outputs) {
+    public AbstractProcess setOutputs(final List<SosSMLIo<?>> outputs) {
         this.outputs = outputs;
+        return this;
     }
 
     public List<String> getParameters() {
         return parameters;
     }
 
-    public void setParameters(List<String> parameters) {
+    public AbstractProcess setParameters(final List<String> parameters) {
         this.parameters = parameters;
+        return this;
     }
     
     public boolean isSetDescriptions() {
@@ -105,8 +111,9 @@ public class AbstractProcess extends AbstractSensorML {
         return parameters != null && !parameters.isEmpty();
     }
 
-    public void addName(CodeType name) {
+    public AbstractProcess addName(final CodeType name) {
        names.add(name);
+        return this;
     }
 
 }
