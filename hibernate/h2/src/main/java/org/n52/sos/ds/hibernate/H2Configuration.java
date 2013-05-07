@@ -29,11 +29,18 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.jdbc.Work;
+import org.hibernate.mapping.Table;
 import org.hibernate.spatial.dialect.h2geodb.GeoDBDialect;
 import org.n52.sos.cache.ctrl.ScheduledContentCacheControllerSettings;
 import org.n52.sos.config.sqlite.SQLiteSessionFactory;
@@ -55,6 +62,7 @@ public class H2Configuration {
     private static final String H2_CONNECTION_URL = "jdbc:h2:mem:sos;DB_CLOSE_DELAY=-1";
     private static final Properties PROPERTIES = new Properties() {
         private static final long serialVersionUID = 3109256773218160485L;
+
         {
             put(HIBERNATE_CONNECTION_URL, H2_CONNECTION_URL);
             put(HIBERNATE_CONNECTION_DRIVER_CLASS, H2_DRIVER);
@@ -94,8 +102,98 @@ public class H2Configuration {
             Configurator.getInstance().getDataConnectionProvider().returnConnection(session);
         }
     }
-    private File tempDir;
 
+    public static void recreate() {
+        synchronized (lock) {
+            if (instance == null) {
+                throw new IllegalStateException("Database is not initialized");
+            }
+            Session session = null;
+            Transaction transaction = null;
+            try {
+                session = getSession();
+                transaction = session.beginTransaction();
+                session.doWork(new Work() {
+                    @Override
+                    public void execute(Connection connection) throws SQLException {
+                        Statement stmt = null;
+                        try {
+                            stmt = connection.createStatement();
+                            for (String cmd : instance.getDropScript()) {
+                                stmt.addBatch(cmd);
+                            }
+                            for (String cmd : instance.getCreateScript()) {
+                                stmt.addBatch(cmd);
+                            }
+                            stmt.executeBatch();
+                        } finally {
+                            if (stmt != null) {
+                                stmt.close();
+                            }
+                        }
+                    }
+                });
+                transaction.commit();
+            } catch (HibernateException e) {
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                throw e;
+            } finally {
+                returnSession(session);
+            }
+        }
+    }
+
+    public static void truncate() {
+        synchronized (lock) {
+            if (instance == null) {
+                throw new IllegalStateException("Database is not initialized");
+            }
+            Iterator<Table> tableMappings = instance.getConfiguration().getTableMappings();
+            final List<String> tableNames = new LinkedList<String>();
+            while (tableMappings.hasNext()) {
+                tableNames.add(tableMappings.next().getName());
+            }
+            Session session = null;
+            Transaction transaction = null;
+            try {
+                session = getSession();
+                transaction = session.beginTransaction();
+                session.doWork(new Work() {
+                    @Override
+                    public void execute(Connection connection) throws SQLException {
+                        Statement stmt = null;
+                        try {
+                            stmt = connection.createStatement();
+                            stmt.addBatch("SET REFERENTIAL_INTEGRITY FALSE");
+                            for (String table : tableNames) {
+                                stmt.addBatch("DELETE FROM " + table);
+                            }
+                            stmt.addBatch("SET REFERENTIAL_INTEGRITY TRUE");
+                            stmt.executeBatch();
+                        } finally {
+                            if (stmt != null) {
+                                stmt.close();
+                            }
+                        }
+                    }
+                });
+                transaction.commit();
+            } catch (HibernateException e) {
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                throw e;
+            } finally {
+                returnSession(session);
+            }
+        }
+    }
+    private File tempDir;
+    private Configuration configuration;
+    private String[] createScript;
+    private String[] dropScript;
 
     private H2Configuration() throws IOException, OwsExceptionReport, ConnectionProviderException {
         init();
@@ -144,6 +242,7 @@ public class H2Configuration {
         FileUtils.forceMkdir(getTempDir());
         SosContextListener.setPath(getTempDir().getAbsolutePath());
     }
+
     private void createConfigurator() throws ConfigurationException {
         Configurator.createInstance(PROPERTIES, getTempDir().getAbsolutePath());
     }
@@ -158,9 +257,11 @@ public class H2Configuration {
             String cmd = "create domain geometry as blob";
             LOG.debug("Executing {}", cmd);
             stmt.execute(cmd);
-            Configuration configuration = new Configuration().configure("/sos-hibernate.cfg.xml");
-            String[] ddl = configuration.generateSchemaCreationScript(new GeoDBDialect());
-            for (String s : ddl) {
+            configuration = new Configuration().configure("/sos-hibernate.cfg.xml");
+            GeoDBDialect dialect = new GeoDBDialect();
+            createScript = configuration.generateSchemaCreationScript(dialect);
+            dropScript = configuration.generateDropSchemaScript(dialect);
+            for (String s : createScript) {
                 LOG.debug("Executing {}", s);
                 stmt.execute(s);
             }
@@ -189,5 +290,17 @@ public class H2Configuration {
         createTempDir();
         prepareDatabase();
         createConfigurator();
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public String[] getCreateScript() {
+        return createScript;
+    }
+
+    public String[] getDropScript() {
+        return dropScript;
     }
 }
