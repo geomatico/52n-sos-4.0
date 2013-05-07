@@ -187,9 +187,6 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
             } catch (OwsExceptionReport owse) {
                 exceptions.add(owse);
             }
-        } else {
-            exceptions.add(new MissingParameterValueException(Sos2Constants.InsertSensorParams.observationType));
-            exceptions.add(new MissingParameterValueException(Sos2Constants.InsertSensorParams.featureOfInterestType));
         }
         exceptions.throwIfNotEmpty();
     }
