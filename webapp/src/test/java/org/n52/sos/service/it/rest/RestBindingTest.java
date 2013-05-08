@@ -28,7 +28,8 @@ import static org.n52.sos.service.it.RequestBuilder.get;
 import javax.xml.namespace.NamespaceContext;
 
 import org.n52.sos.binding.rest.Constants;
-import org.n52.sos.service.it.AbstractSosServiceTest;
+import org.n52.sos.service.Configurator;
+import org.n52.sos.service.it.AbstractTransactionalTestv2;
 import org.n52.sos.service.it.SosNamespaceContext;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -37,12 +38,13 @@ import org.springframework.mock.web.MockHttpServletResponse;
  *
  * @since 4.0.0
  */
-public class RestBindingTest extends AbstractSosServiceTest {
+public class RestBindingTest extends AbstractTransactionalTestv2{
 
 	protected static final String REST_URL = "/rest";
 	protected static final String CONTENT_TYPE = "application/gml+xml";
 	protected static final NamespaceContext NS_CTXT = new SosNamespaceContext();
 	protected static final Constants CONFIG = Constants.getInstance();
+	protected static final Configurator SOS_CONFIG = Configurator.getInstance();
 	
 	protected String link(final String relType, final String resType)
 	{
