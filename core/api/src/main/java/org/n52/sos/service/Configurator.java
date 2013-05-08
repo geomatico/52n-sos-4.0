@@ -75,7 +75,7 @@ public class Configurator implements Cleanupable {
     private static final Lock initLock = new ReentrantLock();
 
     /**
-     * @return Returns the instance of the SosConfigurator. Null will be returned if the parameterized getInstance
+     * @return Returns the instance of the SosConfigurator. <tt>null</tt> will be returned if the parameterized {@link #createInstance(Properties, String)}
      *         method was not invoked before. Usually this will be done in the SOS.
      * <p/>
      * @see Configurator#createInstance(Properties, String)
