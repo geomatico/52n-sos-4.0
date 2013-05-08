@@ -53,8 +53,9 @@ public class SosSweObservableProperty extends SosSweAbstractSimpleType<String> {
     }
 
     @Override
-    public void setValue(String value) {
+    public SosSweObservableProperty setValue(final String value) {
         this.value = value;
+        return this;
     }
     @Override
     public String getStringValue() {

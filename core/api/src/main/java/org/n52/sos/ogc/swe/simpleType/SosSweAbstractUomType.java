@@ -49,9 +49,11 @@ public abstract class SosSweAbstractUomType<T> extends SosSweAbstractSimpleType<
      * 
      * @param uom
      *            the uom to set
+     * @return 
      */
-    public void setUom(String uom) {
+    public SosSweAbstractUomType<T> setUom(final String uom) {
         this.uom = uom;
+        return this;
     }
     
     /**

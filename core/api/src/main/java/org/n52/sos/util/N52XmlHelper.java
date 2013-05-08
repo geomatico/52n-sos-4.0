@@ -221,7 +221,7 @@ public final class N52XmlHelper {
      * @return QName of schema location
      */
     public static String getSchemaLocationForSWE101() {
-        return SWEConstants.NS_SWE + " " + SWEConstants.SCHEMA_LOCATION_SWE;
+        return SWEConstants.NS_SWE_101 + " " + SWEConstants.SCHEMA_LOCATION_SWE_101;
     }
 
     /**

@@ -30,7 +30,7 @@ import java.util.List;
  * SOS internal representation of SWE dataRecord
  * 
  */
-public class SosSweDataRecord extends SosSweAbstractDataComponent implements AbstractDataRecord {
+public class SosSweDataRecord extends SosSweAbstractDataComponent implements DataRecord {
 
     /**
      * DataRecord fields
@@ -43,16 +43,18 @@ public class SosSweDataRecord extends SosSweAbstractDataComponent implements Abs
     }
 
     @Override
-    public void setFields(List<SosSweField> fields) {
+    public SosSweDataRecord setFields(final List<SosSweField> fields) {
         this.fields = fields;
+        return this;
     }
 
     @Override
-    public void addField(SosSweField field) {
+    public SosSweDataRecord addField(final SosSweField field) {
         if (fields == null) {
             fields = new ArrayList<SosSweField>();
         }
-        this.fields.add(field);
+        fields.add(field);
+        return this;
     }
 
     @Override
@@ -60,12 +62,12 @@ public class SosSweDataRecord extends SosSweAbstractDataComponent implements Abs
         final int prime = 53;
         int hash = 7;
         hash = prime * hash + super.hashCode();
-        hash = prime * hash + (this.getFields() != null ? this.getFields().hashCode() : 0);
+        hash = prime * hash + (getFields() != null ? getFields().hashCode() : 0);
         return hash;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -73,7 +75,7 @@ public class SosSweDataRecord extends SosSweAbstractDataComponent implements Abs
             return false;
         }
         final SosSweDataRecord other = (SosSweDataRecord) obj;
-        if (this.getFields() != other.getFields() && (this.getFields() == null || !this.getFields().equals(other.getFields()))) {
+        if (getFields() != other.getFields() && (getFields() == null || !getFields().equals(other.getFields()))) {
             return false;
         }
         return super.equals(obj);
@@ -84,6 +86,4 @@ public class SosSweDataRecord extends SosSweAbstractDataComponent implements Abs
         return fields != null && !fields.isEmpty();
     }
     
-    
-
 }

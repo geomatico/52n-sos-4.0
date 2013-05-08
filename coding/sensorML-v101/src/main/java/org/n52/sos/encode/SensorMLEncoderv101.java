@@ -471,7 +471,13 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
 
         setCapabilitiesForFeaturesOfInterest(sosAbstractProcess, abstractProcess);
         setCapabilitiesForParentProcedures(sosAbstractProcess, abstractProcess);
-
+        if (sosAbstractProcess.isSetCapabilities())
+        {
+        	for (final SosSMLCapabilities sosCapability : sosAbstractProcess.getCapabilities()) {
+        		abstractProcess.addNewCapabilities().set(createCapability(sosCapability));
+			}
+        }
+        
         // set description
         if (sosAbstractProcess.isSetDescriptions()) {
             if (!abstractProcess.isSetDescription()) {
@@ -506,7 +512,21 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         }
     }
 
-    private void addSystemValues(final SystemType xbSystem, final System system) throws OwsExceptionReport {
+	private XmlObject createCapability(final SosSMLCapabilities capabilities) throws OwsExceptionReport
+	{
+		final Capabilities xbCapabilities = Capabilities.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+		if (capabilities.isSetName())
+		{
+			xbCapabilities.setName(capabilities.getName());
+		}
+		if (capabilities.isSetAbstractDataRecord() && capabilities.getDataRecord().isSetFields())
+		{
+			xbCapabilities.addNewAbstractDataRecord().set(CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE_101, capabilities.getDataRecord()));
+		}
+		return xbCapabilities;
+	}
+
+	private void addSystemValues(final SystemType xbSystem, final System system) throws OwsExceptionReport {
         // set inputs
         if (system.isSetInputs()) {
             xbSystem.setInputs(createInputs(system.getInputs()));
@@ -746,7 +766,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             if (coordinate.getValue().getValue() != null
                     && (!coordinate.getValue().isSetValue() || !coordinate.getValue().getValue().equals(Double.NaN))) {
                 // FIXME: SWE Common NS
-                xbVector.addNewCoordinate().set(CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, coordinate));
+                xbVector.addNewCoordinate().set(CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE_101, coordinate));
             }
         }
         return xbPosition;
@@ -792,7 +812,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         final OutputList outputList = outputs.addNewOutputList();
         final Set<String> definitions = new HashSet<String>();
         int counter = 1;
-        Set<String> outputNames = CollectionHelper.set();
+        final Set<String> outputNames = CollectionHelper.set();
         for (final SosSMLIo<?> sosSMLIo : sosOutputs) {
             if (!definitions.contains(sosSMLIo.getIoValue().getDefinition())) {
                 if (!sosSMLIo.isSetName() || outputNames.contains(sosSMLIo.getIoName())) {
@@ -806,7 +826,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         return outputs;
     }
 
-    private String getValidOutputName(int counter, Set<String> outputNames) {
+    private String getValidOutputName(int counter, final Set<String> outputNames) {
         String outputName = OUTPUT_PREFIX + counter;
         while (outputNames.contains(outputName)) {
             outputName =  OUTPUT_PREFIX + (++counter);
@@ -902,7 +922,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             final SosSweAbstractDataComponent sosSweData) throws OwsExceptionReport {
         final Encoder<?, SosSweAbstractDataComponent> encoder =
                 Configurator.getInstance().getCodingRepository()
-                        .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE, SosSweDataArray.class));
+                        .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE_101, SosSweDataArray.class));
         if (encoder != null) {
             final XmlObject encoded = (XmlObject) encoder.encode(sosSweData);
             if (sosSweData instanceof SosSweAbstractSimpleType) {
@@ -956,7 +976,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
     private void addIoComponentPropertyType(final IoComponentPropertyType ioComponentPopertyType,
             final SosSMLIo<?> sosSMLIO) throws OwsExceptionReport {
         ioComponentPopertyType.setName(sosSMLIO.getIoName());
-        final XmlObject encodeObjectToXml = CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, sosSMLIO.getIoValue());
+        final XmlObject encodeObjectToXml = CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE_101, sosSMLIO.getIoValue());
         switch (sosSMLIO.getIoValue().getSimpleType()) {
         case Boolean:
             ioComponentPopertyType.addNewBoolean().set(encodeObjectToXml);
@@ -1014,6 +1034,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             if (sosSmlCapabilities.getName() != null) {
                 xbCapabilities.setName(sosSmlCapabilities.getName());
             }
+            // FIXME move to swe encoder and call it here
             final SimpleDataRecordType xbSimpleDataRecord =
                     (SimpleDataRecordType) xbCapabilities.addNewAbstractDataRecord().substitute(
                             SWEConstants.QN_SIMPLEDATARECORD_SWE_101, SimpleDataRecordType.type);
@@ -1085,7 +1106,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                 try {
                     if (Configurator.getInstance().getBindingRepository()
                             .isBindingSupported(BindingConstants.KVP_BINDING_ENDPOINT)) {
-                        String version =
+                        final String version =
                                 Configurator.getInstance().getServiceOperatorRepository()
                                         .getSupportedVersions(SosConstants.SOS).contains(Sos2Constants.SERVICEVERSION) ? Sos2Constants.SERVICEVERSION
                                         : Sos1Constants.SERVICEVERSION;

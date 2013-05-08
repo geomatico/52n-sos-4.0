@@ -25,10 +25,7 @@ package org.n52.sos.ogc.swe;
 
 import java.util.List;
 
-/*
- * FIXME rename as it is not abstract
- */
-public interface AbstractDataRecord {
+public interface DataRecord {
 
     /**
      * @return the fields
@@ -39,7 +36,7 @@ public interface AbstractDataRecord {
      * @param fields
      *            the fields to set
      */
-    void setFields(List<SosSweField> fields);
+    DataRecord setFields(List<SosSweField> fields);
 
     /**
      * Adds field to field list
@@ -47,7 +44,7 @@ public interface AbstractDataRecord {
      * @param field
      *            Field to add
      */
-    void addField(SosSweField field);
+    DataRecord addField(SosSweField field);
 
     /**
      * Check if there are field elements

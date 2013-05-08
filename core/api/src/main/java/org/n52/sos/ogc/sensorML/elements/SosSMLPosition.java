@@ -61,7 +61,7 @@ public class SosSMLPosition extends SosSweAbstractDataComponent {
      * @param position
      *            Position coordinates
      */
-    public SosSMLPosition(String name, boolean fixed, String referenceFrame, List<SosSweCoordinate<?>> position) {
+    public SosSMLPosition(final String name, final boolean fixed, final String referenceFrame, final List<SosSweCoordinate<?>> position) {
         super();
         this.name = name;
         this.fixed = fixed;
@@ -80,7 +80,7 @@ public class SosSMLPosition extends SosSweAbstractDataComponent {
      * @param name
      *            the name to set
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -94,9 +94,11 @@ public class SosSMLPosition extends SosSweAbstractDataComponent {
     /**
      * @param fixed
      *            the fixed to set
+     * @return 
      */
-    public void setFixed(boolean fixed) {
+    public SosSMLPosition setFixed(final boolean fixed) {
         this.fixed = fixed;
+        return this;
     }
 
     /**
@@ -109,9 +111,11 @@ public class SosSMLPosition extends SosSweAbstractDataComponent {
     /**
      * @param referenceFrame
      *            the referenceFrame to set
+     * @return 
      */
-    public void setReferenceFrame(String referenceFrame) {
+    public SosSMLPosition setReferenceFrame(final String referenceFrame) {
         this.referenceFrame = referenceFrame;
+        return this;
     }
 
     /**
@@ -124,9 +128,11 @@ public class SosSMLPosition extends SosSweAbstractDataComponent {
     /**
      * @param position
      *            the position to set
+     * @return 
      */
-    public void setPosition(List<SosSweCoordinate<?>> position) {
+    public SosSMLPosition setPosition(final List<SosSweCoordinate<?>> position) {
         this.position = position;
+        return this;
     }
 
 }

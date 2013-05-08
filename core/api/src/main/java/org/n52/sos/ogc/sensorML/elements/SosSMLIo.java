@@ -63,9 +63,11 @@ public class SosSMLIo<T> {
     /**
      * @param inputName
      *            the inputName to set
+     * @return 
      */
-    public void setIoName(final String inputName) {
+    public SosSMLIo<T> setIoName(final String inputName) {
         this.ioName = inputName;
+        return this;
     }
 
     /**
@@ -78,9 +80,11 @@ public class SosSMLIo<T> {
     /**
      * @param ioValue
      *            the input to set
+     * @return 
      */
-    public void setIoValue(final SosSweAbstractSimpleType<T> ioValue) {
+    public SosSMLIo<T> setIoValue(final SosSweAbstractSimpleType<T> ioValue) {
         this.ioValue = ioValue;
+        return this;
     }
 
     public boolean isSetName() {

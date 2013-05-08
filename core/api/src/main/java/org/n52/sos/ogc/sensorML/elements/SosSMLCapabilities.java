@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.n52.sos.ogc.gml.GmlMetaDataProperty;
-import org.n52.sos.ogc.swe.AbstractDataRecord;
+import org.n52.sos.ogc.swe.DataRecord;
 
 /**
  * SOS internal representation of SensorML capabilities
@@ -37,7 +37,7 @@ public class SosSMLCapabilities {
 
     private String name;
 
-    private AbstractDataRecord abstractDataRecord;
+    private DataRecord dataRecord;
 
     private List<GmlMetaDataProperty> gmlMetaDataProperties;
 
@@ -52,13 +52,13 @@ public class SosSMLCapabilities {
      * constructor
      * 
      * @param name               Type
-     * @param abstractDataRecord
-     *            AbstractDataRecord
+     * @param dataRecord
+     *            DataRecord
      */
-    public SosSMLCapabilities(String name, AbstractDataRecord abstractDataRecord) {
+    public SosSMLCapabilities(String name, DataRecord dataRecord) {
         super();
         this.setName(name);
-        this.abstractDataRecord = abstractDataRecord;
+        this.dataRecord = dataRecord;
     }
 
     public String getName() {
@@ -70,18 +70,18 @@ public class SosSMLCapabilities {
     }
 
     /**
-     * @return the abstractDataRecord
+     * @return the dataRecord
      */
-    public AbstractDataRecord getDataRecord() {
-        return abstractDataRecord;
+    public DataRecord getDataRecord() {
+        return dataRecord;
     }
 
     /**
-     * @param abstractDataRecord
-     *            the abstractDataRecord to set
+     * @param dataRecord
+     *            the dataRecord to set
      */
-    public void setDataRecord(AbstractDataRecord abstractDataRecord) {
-        this.abstractDataRecord = abstractDataRecord;
+    public void setDataRecord(DataRecord dataRecord) {
+        this.dataRecord = dataRecord;
     }
 
     public List<GmlMetaDataProperty> getMetaDataProperties() {
@@ -100,7 +100,7 @@ public class SosSMLCapabilities {
     }
     
     public boolean isSetAbstractDataRecord() {
-        return abstractDataRecord != null;
+        return dataRecord != null;
     }
 
     public boolean isSetName() {

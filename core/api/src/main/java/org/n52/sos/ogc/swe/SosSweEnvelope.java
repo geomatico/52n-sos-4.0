@@ -32,7 +32,7 @@ public class SosSweEnvelope extends SosSweAbstractDataComponent {
     private SosSweVector lowerCorner;
     private SosSweTimeRange time;
 
-    public SosSweEnvelope(String referenceFrame, SosSweVector upperCorner, SosSweVector lowerCorner) {
+    public SosSweEnvelope(final String referenceFrame, final SosSweVector upperCorner, final SosSweVector lowerCorner) {
         this(referenceFrame, upperCorner, lowerCorner, null);
     }
 
@@ -41,8 +41,8 @@ public class SosSweEnvelope extends SosSweAbstractDataComponent {
         this(null, null, null, null);
     }
 
-    public SosSweEnvelope(String referenceFrame, SosSweVector upperCorner, SosSweVector lowerCorner,
-                          SosSweTimeRange time) {
+    public SosSweEnvelope(final String referenceFrame, final SosSweVector upperCorner, final SosSweVector lowerCorner,
+                          final SosSweTimeRange time) {
         this.referenceFrame = referenceFrame;
         this.upperCorner = upperCorner;
         this.lowerCorner = lowerCorner;
@@ -57,8 +57,9 @@ public class SosSweEnvelope extends SosSweAbstractDataComponent {
         return getReferenceFrame() != null;
     }
 
-    public void setReferenceFrame(String referenceFrame) {
+    public SosSweEnvelope setReferenceFrame(final String referenceFrame) {
         this.referenceFrame = referenceFrame;
+        return this;
     }
 
     public SosSweVector getUpperCorner() {
@@ -69,8 +70,9 @@ public class SosSweEnvelope extends SosSweAbstractDataComponent {
         return getUpperCorner() != null;
     }
 
-    public void setUpperCorner(SosSweVector upperCorner) {
+    public SosSweEnvelope setUpperCorner(final SosSweVector upperCorner) {
         this.upperCorner = upperCorner;
+        return this;
     }
 
     public SosSweVector getLowerCorner() {
@@ -81,8 +83,9 @@ public class SosSweEnvelope extends SosSweAbstractDataComponent {
         return getLowerCorner() != null;
     }
 
-    public void setLowerCorner(SosSweVector lowerCorner) {
+    public SosSweEnvelope setLowerCorner(final SosSweVector lowerCorner) {
         this.lowerCorner = lowerCorner;
+        return this;
     }
 
     public SosSweTimeRange getTime() {
@@ -93,8 +96,9 @@ public class SosSweEnvelope extends SosSweAbstractDataComponent {
         return getTime() != null;
     }
 
-    public void setTime(SosSweTimeRange time) {
+    public SosSweEnvelope setTime(final SosSweTimeRange time) {
         this.time = time;
+        return this;
     }
 
     @Override
@@ -106,15 +110,15 @@ public class SosSweEnvelope extends SosSweAbstractDataComponent {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 31 * hash + (this.referenceFrame != null ? this.referenceFrame.hashCode() : 0);
-        hash = 31 * hash + (this.upperCorner != null ? this.upperCorner.hashCode() : 0);
-        hash = 31 * hash + (this.lowerCorner != null ? this.lowerCorner.hashCode() : 0);
-        hash = 31 * hash + (this.time != null ? this.time.hashCode() : 0);
+        hash = 31 * hash + (referenceFrame != null ? referenceFrame.hashCode() : 0);
+        hash = 31 * hash + (upperCorner != null ? upperCorner.hashCode() : 0);
+        hash = 31 * hash + (lowerCorner != null ? lowerCorner.hashCode() : 0);
+        hash = 31 * hash + (time != null ? time.hashCode() : 0);
         return hash;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -122,19 +126,19 @@ public class SosSweEnvelope extends SosSweAbstractDataComponent {
             return false;
         }
         final SosSweEnvelope other = (SosSweEnvelope) obj;
-        if ((this.referenceFrame == null) ? (other.referenceFrame != null)
-            : !this.referenceFrame.equals(other.referenceFrame)) {
+        if ((referenceFrame == null) ? (other.referenceFrame != null)
+            : !referenceFrame.equals(other.referenceFrame)) {
             return false;
         }
-        if (this.upperCorner != other.upperCorner && (this.upperCorner == null || !this.upperCorner
+        if (upperCorner != other.upperCorner && (upperCorner == null || !upperCorner
                 .equals(other.upperCorner))) {
             return false;
         }
-        if (this.lowerCorner != other.lowerCorner && (this.lowerCorner == null || !this.lowerCorner
+        if (lowerCorner != other.lowerCorner && (lowerCorner == null || !lowerCorner
                 .equals(other.lowerCorner))) {
             return false;
         }
-        if (this.time != other.time && (this.time == null || !this.time.equals(other.time))) {
+        if (time != other.time && (time == null || !time.equals(other.time))) {
             return false;
         }
         return true;

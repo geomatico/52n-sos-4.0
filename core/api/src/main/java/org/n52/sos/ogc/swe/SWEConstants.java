@@ -33,7 +33,7 @@ import javax.xml.namespace.QName;
 public interface SWEConstants {
 
     // namespaces and schema locations
-    String NS_SWE = "http://www.opengis.net/swe/1.0.1";
+    String NS_SWE_101 = "http://www.opengis.net/swe/1.0.1";
 
     String NS_SWE_20 = "http://www.opengis.net/swe/2.0";
 
@@ -43,7 +43,7 @@ public interface SWEConstants {
 
     String NS_SWES_PREFIX = "swes";
 
-    String SCHEMA_LOCATION_SWE = "http://schemas.opengis.net/sweCommon/1.0.1/swe.xsd";
+    String SCHEMA_LOCATION_SWE_101 = "http://schemas.opengis.net/sweCommon/1.0.1/swe.xsd";
 
     String SCHEMA_LOCATION_SWE_200 = "http://schemas.opengis.net/sweCommon/2.0/swe.xsd";
     
@@ -105,21 +105,21 @@ public interface SWEConstants {
     // QNames for elements
     QName QN_ABSTRACT_OFFERING = new QName(NS_SWES_20, EN_ABSTRACT_OFFERING, NS_SWES_PREFIX);
 
-    QName QN_BOOLEAN_SWE_101 = new QName(NS_SWE, EN_BOOLEAN, NS_SWE_PREFIX);
+    QName QN_BOOLEAN_SWE_101 = new QName(NS_SWE_101, EN_BOOLEAN, NS_SWE_PREFIX);
 
     QName QN_BOOLEAN_SWE_200 = new QName(NS_SWE_20, EN_BOOLEAN, NS_SWE_PREFIX);
 
-    QName QN_CATEGORY_SWE_101 = new QName(NS_SWE, EN_CATEGORY, NS_SWE_PREFIX);
+    QName QN_CATEGORY_SWE_101 = new QName(NS_SWE_101, EN_CATEGORY, NS_SWE_PREFIX);
 
     QName QN_CATEGORY_SWE_200 = new QName(NS_SWE_20, EN_CATEGORY, NS_SWE_PREFIX);
 
-    QName QN_COUNT_SWE_101 = new QName(NS_SWE, EN_COUNT, NS_SWE_PREFIX);
+    QName QN_COUNT_SWE_101 = new QName(NS_SWE_101, EN_COUNT, NS_SWE_PREFIX);
 
     QName QN_COUNT_SWE_200 = new QName(NS_SWE_20, EN_COUNT, NS_SWE_PREFIX);
 
-    QName QN_DATA_ARRAY_SWE_200 = new QName(NS_SWE, EN_DATA_ARRAY, NS_SWE_PREFIX);
+    QName QN_DATA_ARRAY_SWE_200 = new QName(NS_SWE_101, EN_DATA_ARRAY, NS_SWE_PREFIX);
 
-    QName QN_DATA_RECORD_SWE_200 = new QName(NS_SWE, EN_DATA_RECORD, NS_SWE_PREFIX);
+    QName QN_DATA_RECORD_SWE_200 = new QName(NS_SWE_101, EN_DATA_RECORD, NS_SWE_PREFIX);
 
     QName QN_DELETE_SENSOR = new QName(NS_SWES_20, EN_DELETE_SENSOR, NS_SWES_PREFIX);
 
@@ -139,27 +139,27 @@ public interface SWEConstants {
 
     QName QN_OFFERING = new QName(NS_SWES_20, EN_OFFERING, NS_SWES_PREFIX);
 
-    QName QN_QUANTITY_SWE_101 = new QName(NS_SWE, EN_QUANTITY, NS_SWE_PREFIX);
+    QName QN_QUANTITY_SWE_101 = new QName(NS_SWE_101, EN_QUANTITY, NS_SWE_PREFIX);
 
     QName QN_QUANTITY_SWE_200 = new QName(NS_SWE_20, EN_QUANTITY, NS_SWE_PREFIX);
 
-    QName QN_SIMPLEDATARECORD_SWE_101 = new QName(NS_SWE, EN_SIMPLEDATARECORD, NS_SWE_PREFIX);
-    QName QN_DATA_RECORD_SWE_101 = new QName(NS_SWE, EN_DATA_RECORD, NS_SWE_PREFIX);
+    QName QN_SIMPLEDATARECORD_SWE_101 = new QName(NS_SWE_101, EN_SIMPLEDATARECORD, NS_SWE_PREFIX);
+    QName QN_DATA_RECORD_SWE_101 = new QName(NS_SWE_101, EN_DATA_RECORD, NS_SWE_PREFIX);
 
-    QName QN_TEXT_ENCODING_SWE_101 = new QName(NS_SWE, EN_TEXT_ENCODING, NS_SWE_PREFIX);
+    QName QN_TEXT_ENCODING_SWE_101 = new QName(NS_SWE_101, EN_TEXT_ENCODING, NS_SWE_PREFIX);
 
     QName QN_TEXT_ENCODING_SWE_200 = new QName(NS_SWE_20, EN_TEXT_ENCODING, NS_SWE_PREFIX);
 
-    QName QN_TEXT_SWE_101 = new QName(NS_SWE, EN_TEXT, NS_SWE_PREFIX);
+    QName QN_TEXT_SWE_101 = new QName(NS_SWE_101, EN_TEXT, NS_SWE_PREFIX);
 
     QName QN_TEXT_SWE_200 = new QName(NS_SWE_20, EN_TEXT, NS_SWE_PREFIX);
 
-    QName QN_TIME_RANGE_SWE_101 = new QName(NS_SWE, EN_TIME_RANGE, NS_SWE_PREFIX);
+    QName QN_TIME_RANGE_SWE_101 = new QName(NS_SWE_101, EN_TIME_RANGE, NS_SWE_PREFIX);
 
     QName QN_TIME_RANGE_SWE_200 = new QName(NS_SWE_20, EN_TIME_RANGE, NS_SWE_PREFIX);
 
-    QName QN_TIME_SWE_101 = new QName(NS_SWE, EN_TIME, NS_SWE_PREFIX);
-    QName QN_ENVELOPE_SWE_101 = new QName(NS_SWE, EN_ENVELOPE, NS_SWE_PREFIX);
+    QName QN_TIME_SWE_101 = new QName(NS_SWE_101, EN_TIME, NS_SWE_PREFIX);
+    QName QN_ENVELOPE_SWE_101 = new QName(NS_SWE_101, EN_ENVELOPE, NS_SWE_PREFIX);
 
     QName QN_TIME_SWE_200 = new QName(NS_SWE_20, EN_TIME, NS_SWE_PREFIX);
 

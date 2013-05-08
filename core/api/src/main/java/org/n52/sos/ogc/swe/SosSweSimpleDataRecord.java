@@ -26,7 +26,7 @@ package org.n52.sos.ogc.swe;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SosSweSimpleDataRecord extends SosSweAbstractDataComponent implements AbstractDataRecord {
+public class SosSweSimpleDataRecord extends SosSweAbstractDataComponent implements DataRecord {
     /**
      * SimpleDataRecord fields
      */
@@ -38,16 +38,18 @@ public class SosSweSimpleDataRecord extends SosSweAbstractDataComponent implemen
     }
 
     @Override
-    public void setFields(List<SosSweField> fields) {
+    public SosSweSimpleDataRecord setFields(final List<SosSweField> fields) {
         this.fields = fields;
+        return this;
     }
 
     @Override
-    public void addField(SosSweField field) {
+    public SosSweSimpleDataRecord addField(final SosSweField field) {
         if (fields == null) {
             fields = new ArrayList<SosSweField>();
         }
-        this.fields.add(field);
+        fields.add(field);
+        return this;
     }
 
     @Override
@@ -55,12 +57,12 @@ public class SosSweSimpleDataRecord extends SosSweAbstractDataComponent implemen
         final int prime = 53;
         int hash = 7;
         hash = prime * hash + super.hashCode();
-        hash = prime * hash + (this.getFields() != null ? this.getFields().hashCode() : 0);
+        hash = prime * hash + (getFields() != null ? getFields().hashCode() : 0);
         return hash;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -68,7 +70,7 @@ public class SosSweSimpleDataRecord extends SosSweAbstractDataComponent implemen
             return false;
         }
         final SosSweDataRecord other = (SosSweDataRecord) obj;
-        if (this.getFields() != other.getFields() && (this.getFields() == null || !this.getFields().equals(other.getFields()))) {
+        if (getFields() != other.getFields() && (getFields() == null || !getFields().equals(other.getFields()))) {
             return false;
         }
         return super.equals(obj);

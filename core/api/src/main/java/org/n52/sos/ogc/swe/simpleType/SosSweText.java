@@ -55,9 +55,11 @@ public class SosSweText extends SosSweAbstractSimpleType<String> {
     }
 
     @Override
-    public void setValue(String value) {
+    public SosSweText setValue(final String value) {
         this.value = value;
+        return this;
     }
+    
     @Override
     public String getStringValue() {
         return value;

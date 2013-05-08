@@ -34,8 +34,6 @@ public class SosSweCategory extends SosSweAbstractUomType<String> {
 
     private String value;
 
-    private String codeSpace;
-
     @Override
     public SweSimpleType getSimpleType() {
         return SweSimpleType.Category;
@@ -53,23 +51,23 @@ public class SosSweCategory extends SosSweAbstractUomType<String> {
     }
 
     public SosSweCategory setCodeSpace(final String codeSpace) {
-        this.codeSpace = codeSpace;
+    	setUom(codeSpace);
         return this;
     }
 
     public String getCodeSpace() {
-        return codeSpace;
+        return getUom();
     }
     
     public boolean isSetCodeSpace() 
     {
-    	return codeSpace != null && !codeSpace.isEmpty();
+    	return isSetUom();
     }
 
     @Override
     public String toString() {
         return String.format("SosSweCategory [quality=%s, value=%s, codeSpace=%s, simpleType=%s]", getQuality(),
-                value, codeSpace, getSimpleType());
+                value, getUom(), getSimpleType());
     }
 
     @Override

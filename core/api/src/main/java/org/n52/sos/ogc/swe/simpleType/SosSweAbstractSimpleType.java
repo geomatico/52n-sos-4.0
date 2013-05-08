@@ -58,9 +58,11 @@ public abstract class SosSweAbstractSimpleType<T> extends SosSweAbstractDataComp
      * 
      * @param quality
      *            quality information to set
+     * @return 
      */
-    public void setQuality(SosSweQuality quality) {
+    public SosSweAbstractSimpleType<T> setQuality(final SosSweQuality quality) {
     	this.quality = quality;        
+        return this;
     }
     
     /**
@@ -89,7 +91,7 @@ public abstract class SosSweAbstractSimpleType<T> extends SosSweAbstractDataComp
      * @param value
      *            value to set
      */
-    public abstract void setValue(T value);
+    public abstract SosSweAbstractSimpleType<T> setValue(T value);
 
 	@Override
 	public String toString()

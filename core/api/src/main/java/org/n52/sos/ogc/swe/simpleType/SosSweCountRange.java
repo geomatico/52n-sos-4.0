@@ -41,8 +41,9 @@ public class SosSweCountRange extends SosSweAbstractSimpleType<RangeValue<Intege
     }
 
     @Override
-    public void setValue(RangeValue<Integer> value) {
+    public SosSweCountRange setValue(final RangeValue<Integer> value) {
         this.value = value;
+        return this;
     }
 
     @Override

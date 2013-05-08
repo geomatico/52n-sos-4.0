@@ -24,6 +24,7 @@
 package org.n52.sos.ogc.swe;
 
 
+
 /**
  * SOS internal representation of SWE field
  * 
@@ -48,7 +49,7 @@ public class SosSweField extends SosSweAbstractDataComponent{
      * @param element
      *            Field element
      */
-    public SosSweField(String name, SosSweAbstractDataComponent element) {
+    public SosSweField(final String name, final SosSweAbstractDataComponent element) {
         super();
         this.name = name;
         this.element = element;
@@ -60,13 +61,15 @@ public class SosSweField extends SosSweAbstractDataComponent{
     public String getName() {
         return name;
     }
-
+    
     /**
      * @param name
      *            the name to set
+     * @return 
      */
-    public void setName(String name) {
+    public SosSweField setName(final String name) {
         this.name = name;
+        return this;
     }
 
     /**
@@ -79,9 +82,11 @@ public class SosSweField extends SosSweAbstractDataComponent{
     /**
      * @param element
      *            the element to set
+     * @return 
      */
-    public void setElement(SosSweAbstractDataComponent element) {
+    public SosSweField setElement(final SosSweAbstractDataComponent element) {
         this.element = element;
+        return this;
     }
 
     @Override
@@ -89,13 +94,13 @@ public class SosSweField extends SosSweAbstractDataComponent{
         final int prime = 67;
         int hash = 3;
         hash = prime * hash + super.hashCode();
-        hash = prime * hash + (this.getName() != null ? this.getName().hashCode() : 0);
-        hash = prime * hash + (this.getElement() != null ? this.getElement().hashCode() : 0);
+        hash = prime * hash + (getName() != null ? getName().hashCode() : 0);
+        hash = prime * hash + (getElement() != null ? getElement().hashCode() : 0);
         return hash;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -103,10 +108,10 @@ public class SosSweField extends SosSweAbstractDataComponent{
             return false;
         }
         final SosSweField other = (SosSweField) obj;
-        if ((this.getName() == null) ? (other.getName() != null) : !this.getName().equals(other.getName())) {
+        if ((getName() == null) ? (other.getName() != null) : !getName().equals(other.getName())) {
             return false;
         }
-        if (this.getElement() != other.getElement() && (this.getElement() == null || !this.getElement().equals(other.getElement()))) {
+        if (getElement() != other.getElement() && (getElement() == null || !getElement().equals(other.getElement()))) {
             return false;
         }
         return super.equals(obj);

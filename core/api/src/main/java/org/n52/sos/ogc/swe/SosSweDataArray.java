@@ -66,9 +66,11 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
      *
      * @param values
      *            the values to set
+     * @return 
      */
-    public void setValues(List<List<String>> values) {
+    public SosSweDataArray setValues(final List<List<String>> values) {
         this.values = values;
+        return this;
     }
 
     /**
@@ -81,9 +83,11 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
     /**
      * @param elementType
      *            the elementType to set
+     * @return 
      */
-    public void setElementType(SosSweAbstractDataComponent elementType) {
+    public SosSweDataArray setElementType(final SosSweAbstractDataComponent elementType) {
         this.elementType = elementType;
+        return this;
     }
 
     public SosSweCount getElementCount() {
@@ -106,9 +110,10 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
         return encoding;
     }
 
-    public void setEncoding(SosSweAbstractEncoding encoding)
+    public SosSweDataArray setEncoding(final SosSweAbstractEncoding encoding)
     {
         this.encoding = encoding;
+        return this;
     }
     
     /**
@@ -118,7 +123,7 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
     {
         if (values != null && !values.isEmpty()) {
             if (values.size() == 1) {
-                List<String> list = values.get(0);
+                final List<String> list = values.get(0);
                 return list != null && !list.isEmpty();
             }
             return true;
@@ -132,7 +137,7 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
      * @return <tt>true</tt> (as specified by {@link Collection#add}) <br />
      *          <tt>false</tt> if block could not be added
      */
-    public boolean add(List<String> blockOfTokensToAddAtTheEnd)
+    public boolean add(final List<String> blockOfTokensToAddAtTheEnd)
     {
         if (values == null)
         {
@@ -146,14 +151,14 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
         final int prime = 23;
         int hash = 7;
         hash = prime * hash + super.hashCode();
-        hash = prime * hash + (this.getValues() != null ? this.getValues().hashCode() : 0);
-        hash = prime * hash + (this.getElementType() != null ? this.getElementType().hashCode() : 0);
-        hash = prime * hash + (this.getEncoding() != null ? this.getEncoding().hashCode() : 0);
+        hash = prime * hash + (getValues() != null ? getValues().hashCode() : 0);
+        hash = prime * hash + (getElementType() != null ? getElementType().hashCode() : 0);
+        hash = prime * hash + (getEncoding() != null ? getEncoding().hashCode() : 0);
         return hash;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -161,13 +166,13 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
             return false;
         }
         final SosSweDataArray other = (SosSweDataArray) obj;
-        if (this.getValues() != other.getValues() && (this.getValues() == null || !this.getValues().equals(other.getValues()))) {
+        if (getValues() != other.getValues() && (getValues() == null || !getValues().equals(other.getValues()))) {
             return false;
         }
-        if (this.getElementType() != other.getElementType() && (this.getElementType() == null || !this.getElementType().equals(other.getElementType()))) {
+        if (getElementType() != other.getElementType() && (getElementType() == null || !getElementType().equals(other.getElementType()))) {
             return false;
         }
-        if (this.getEncoding() != other.getEncoding() && (this.getEncoding() == null || !this.getEncoding().equals(other.getEncoding()))) {
+        if (getEncoding() != other.getEncoding() && (getEncoding() == null || !getEncoding().equals(other.getEncoding()))) {
             return false;
         }
         return super.equals(obj);
@@ -181,8 +186,9 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
         return encoding != null;
     }
 
-    public void setElementCount(SosSweCount elementCount) {
+    public SosSweDataArray setElementCount(final SosSweCount elementCount) {
         this.elementCount = elementCount;
+        return this;
     }
     
     public boolean isSetElementCount() {

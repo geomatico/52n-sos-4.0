@@ -101,7 +101,7 @@ public interface OMConstants {
     String PHEN_UOM_ISO8601 = "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian";
     String PHEN_FEATURE_OF_INTEREST =
            "http://www.opengis.net/def/property/OGC/0/FeatureOfInterest";
-    String EN_ABSTRACT_DATA_RECORD = "AbstractDataRecord";
+    String EN_ABSTRACT_DATA_RECORD = "DataRecord";
     String EN_SIMPLE_DATA_RECORD = "SimpleDataRecord";
     String ATTR_SRS_NAME = "srsName";
     // observation types

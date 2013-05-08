@@ -40,8 +40,9 @@ public class SosSweBoolean extends SosSweAbstractSimpleType<Boolean> {
     }
 
     @Override
-    public void setValue(Boolean value) {
+    public SosSweBoolean setValue(final Boolean value) {
         this.value = value;
+        return this;
     }
 
     @Override

@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.sensorML.elements;
 
-import org.n52.sos.ogc.swe.AbstractDataRecord;
+import org.n52.sos.ogc.swe.DataRecord;
 
 /**
  * SOS internal representation of SensorML characteristics
@@ -33,7 +33,7 @@ public class SosSMLCharacteristics {
 
     private String typeDefinition;
 
-    private AbstractDataRecord abstractDataRecord;
+    private DataRecord dataRecord;
 
     /**
      * default constructor
@@ -47,12 +47,12 @@ public class SosSMLCharacteristics {
      * 
      * @param characteristicsType
      *            type
-     * @param abstractDataRecord
-     *            abstractDataRecord
+     * @param dataRecord
+     *            dataRecord
      */
-    public SosSMLCharacteristics( AbstractDataRecord abstractDataRecord) {
+    public SosSMLCharacteristics( DataRecord dataRecord) {
         super();
-        this.abstractDataRecord = abstractDataRecord;
+        this.dataRecord = dataRecord;
     }
 
     /**
@@ -71,22 +71,22 @@ public class SosSMLCharacteristics {
     }
 
     /**
-     * @return the abstractDataRecord
+     * @return the dataRecord
      */
-    public AbstractDataRecord getDataRecord() {
-        return abstractDataRecord;
+    public DataRecord getDataRecord() {
+        return dataRecord;
     }
 
     /**
-     * @param abstractDataRecord
-     *            the abstractDataRecord to set
+     * @param dataRecord
+     *            the dataRecord to set
      */
-    public void setDataRecord(AbstractDataRecord abstractDataRecord) {
-        this.abstractDataRecord = abstractDataRecord;
+    public void setDataRecord(DataRecord dataRecord) {
+        this.dataRecord = dataRecord;
     }
 
     public boolean isSetAbstractDataRecord() {
-        return abstractDataRecord != null;
+        return dataRecord != null;
     }
     
     public boolean isSetTypeDefinition() {

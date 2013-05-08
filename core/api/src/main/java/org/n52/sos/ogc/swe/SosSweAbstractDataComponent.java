@@ -63,28 +63,33 @@ public abstract class SosSweAbstractDataComponent {
         return identifier;
     }
 
-    public void setDefinition(String definition) {
+    public SosSweAbstractDataComponent setDefinition(final String definition) {
         this.definition = definition;
+        return this;
     }
 
-    public void setDescription(String description) {
+    public SosSweAbstractDataComponent setDescription(final String description) {
         this.description = description;
+        return this;
     }
     
-    public void setLabel(String label) {
+    public SosSweAbstractDataComponent setLabel(final String label) {
         this.label = label;
+        return this;
     }
 
-    public void setIdentifier(String identifier) {
+    public SosSweAbstractDataComponent setIdentifier(final String identifier) {
         this.identifier = identifier;
+        return this;
     }
 
     public String getXml() {
         return xml;
     }
 
-    public void setXml(String xml) {
+    public SosSweAbstractDataComponent setXml(final String xml) {
         this.xml = xml;
+        return this;
     }
     
     public boolean isSetDefinition() {
@@ -118,7 +123,7 @@ public abstract class SosSweAbstractDataComponent {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -126,13 +131,13 @@ public abstract class SosSweAbstractDataComponent {
             return false;
         }
         final SosSweAbstractDataComponent other = (SosSweAbstractDataComponent) obj;
-        if ((this.getDefinition() == null) ? (other.getDefinition() != null) : !this.getDefinition().equals(other.getDefinition())) {
+        if ((getDefinition() == null) ? (other.getDefinition() != null) : !getDefinition().equals(other.getDefinition())) {
             return false;
         }
-        if ((this.getDescription() == null) ? (other.getDescription() != null) : !this.getDescription().equals(other.getDescription())) {
+        if ((getDescription() == null) ? (other.getDescription() != null) : !getDescription().equals(other.getDescription())) {
             return false;
         }
-        if ((this.getIdentifier() == null) ? (other.getIdentifier() != null) : !this.getIdentifier().equals(other.getIdentifier())) {
+        if ((getIdentifier() == null) ? (other.getIdentifier() != null) : !getIdentifier().equals(other.getIdentifier())) {
             return false;
         }
         return true;

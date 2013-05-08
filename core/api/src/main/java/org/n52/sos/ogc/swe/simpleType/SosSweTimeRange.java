@@ -40,7 +40,7 @@ public class SosSweTimeRange extends SosSweAbstractUomType<RangeValue<DateTime>>
     /**
      * SWE simple type type
      */
-    private SweSimpleType simpleType = SweSimpleType.TimeRange;
+    private final SweSimpleType simpleType = SweSimpleType.TimeRange;
 
     @Override
     public SweSimpleType getSimpleType() {
@@ -63,8 +63,9 @@ public class SosSweTimeRange extends SosSweAbstractUomType<RangeValue<DateTime>>
     }
 
     @Override
-    public void setValue(RangeValue<DateTime> value) {
+    public SosSweTimeRange setValue(final RangeValue<DateTime> value) {
         this.value = value;
+        return this;
     }
 
 }

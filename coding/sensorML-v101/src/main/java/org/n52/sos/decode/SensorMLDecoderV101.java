@@ -87,7 +87,7 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLComponent;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
-import org.n52.sos.ogc.swe.AbstractDataRecord;
+import org.n52.sos.ogc.swe.DataRecord;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
@@ -430,8 +430,8 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
         final SosSMLCharacteristics sosCharacteristics = new SosSMLCharacteristics();
         for (final Characteristics xbCharacteristics : characteristicsArray) {
             final Object decodedObject = CodingHelper.decodeXmlElement(xbCharacteristics.getAbstractDataRecord());
-            if (decodedObject instanceof AbstractDataRecord) {
-                sosCharacteristics.setDataRecord((AbstractDataRecord) decodedObject);
+            if (decodedObject instanceof DataRecord) {
+                sosCharacteristics.setDataRecord((DataRecord) decodedObject);
             } else {
                 throw new InvalidParameterValueException()
                         .at(XmlHelper.getLocalName(xbCharacteristics))
@@ -461,8 +461,8 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
         final SosSMLCapabilities sosCapabilities = new SosSMLCapabilities();
         for (final Capabilities xbCpabilities : capabilitiesArray) {
             final Object decodedObject = CodingHelper.decodeXmlElement(xbCpabilities.getAbstractDataRecord());
-            if (decodedObject instanceof AbstractDataRecord) {
-                sosCapabilities.setDataRecord((AbstractDataRecord) decodedObject);
+            if (decodedObject instanceof DataRecord) {
+                sosCapabilities.setDataRecord((DataRecord) decodedObject);
             } else {
                 throw new InvalidParameterValueException()
                         .at(XmlHelper.getLocalName(xbCpabilities))

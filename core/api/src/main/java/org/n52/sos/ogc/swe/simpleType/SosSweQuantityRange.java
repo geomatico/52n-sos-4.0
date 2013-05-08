@@ -71,10 +71,12 @@ public class SosSweQuantityRange extends SosSweAbstractUomType<RangeValue<Double
 	 * 
 	 * @param axisID
 	 *            the axisID to set
+	 * @return 
 	 */
-	public void setAxisID(String axisID)
+	public SosSweQuantityRange setAxisID(final String axisID)
 	{
 		this.axisID = axisID;
+        return this;
 	}
 
 	@Override
@@ -84,9 +86,10 @@ public class SosSweQuantityRange extends SosSweAbstractUomType<RangeValue<Double
 	}
 
 	@Override
-	public void setValue(RangeValue<Double> value)
+	public SosSweQuantityRange setValue(final RangeValue<Double> value)
 	{
 		this.value = value;
+        return this;
 	}
 
 	    @Override
@@ -94,12 +97,12 @@ public class SosSweQuantityRange extends SosSweAbstractUomType<RangeValue<Double
 	        final int prime = 97;
 	        int hash = 7;
 	        hash = prime * hash + super.hashCode();
-	        hash = prime * hash + (this.axisID != null ? this.axisID.hashCode() : 0);
+	        hash = prime * hash + (axisID != null ? axisID.hashCode() : 0);
 	        return hash;
 	    }
 
 	    @Override
-	    public boolean equals(Object obj) {
+	    public boolean equals(final Object obj) {
 	        if (obj == null) {
 	            return false;
 	        }
@@ -107,7 +110,7 @@ public class SosSweQuantityRange extends SosSweAbstractUomType<RangeValue<Double
 	            return false;
 	        }
 	        final SosSweQuantityRange other = (SosSweQuantityRange) obj;
-	        if ((this.getAxisID() == null) ? (other.getAxisID() != null) : !this.getAxisID().equals(other.getAxisID())) {
+	        if ((getAxisID() == null) ? (other.getAxisID() != null) : !getAxisID().equals(other.getAxisID())) {
 	            return false;
 	        }
 	        return super.equals(obj);

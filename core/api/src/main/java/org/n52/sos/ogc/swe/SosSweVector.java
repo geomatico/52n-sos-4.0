@@ -32,7 +32,7 @@ public class SosSweVector extends SosSweAbstractDataComponent {
     private List<SosSweCoordinate<?>> coordinates;
 
     public SosSweVector(
-            List<SosSweCoordinate<?>> coordinates) {
+            final List<SosSweCoordinate<?>> coordinates) {
         this.coordinates = coordinates;
     }
 
@@ -44,8 +44,9 @@ public class SosSweVector extends SosSweAbstractDataComponent {
         return coordinates;
     }
 
-    public void setCoordinates(List<SosSweCoordinate<?>> coordinates) {
+    public SosSweVector setCoordinates(final List<SosSweCoordinate<?>> coordinates) {
         this.coordinates = coordinates;
+        return this;
     }
 
     public boolean isSetCoordinates() {
@@ -60,12 +61,12 @@ public class SosSweVector extends SosSweAbstractDataComponent {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 23 * hash + (this.coordinates != null ? this.coordinates.hashCode() : 0);
+        hash = 23 * hash + (coordinates != null ? coordinates.hashCode() : 0);
         return hash;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -73,7 +74,7 @@ public class SosSweVector extends SosSweAbstractDataComponent {
             return false;
         }
         final SosSweVector other = (SosSweVector) obj;
-        if (this.coordinates != other.coordinates && (this.coordinates == null || !this.coordinates
+        if (coordinates != other.coordinates && (coordinates == null || !coordinates
                 .equals(other.coordinates))) {
             return false;
         }

@@ -40,8 +40,9 @@ public class SosSweCount extends SosSweAbstractSimpleType<Integer> {
     }
 
     @Override
-    public void setValue(Integer value) {
+    public SosSweCount setValue(final Integer value) {
         this.value = value;
+        return this;
     }
 
     @Override

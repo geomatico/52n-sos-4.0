@@ -49,8 +49,9 @@ public class SosSweTime extends SosSweAbstractUomType<DateTime> {
     }
 
     @Override
-    public void setValue(DateTime value) {
+    public SosSweTime setValue(final DateTime value) {
         this.value = value;
+        return this;
     }
 
     @Override
