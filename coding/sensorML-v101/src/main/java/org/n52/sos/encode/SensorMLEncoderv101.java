@@ -521,7 +521,9 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
 		}
 		if (capabilities.isSetAbstractDataRecord() && capabilities.getDataRecord().isSetFields())
 		{
-			xbCapabilities.addNewAbstractDataRecord().set(CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE_101, capabilities.getDataRecord()));
+			final XmlObject encodedDataRecord = CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE_101, capabilities.getDataRecord());
+			final XmlObject substituteElement = XmlHelper.substituteElement(xbCapabilities.addNewAbstractDataRecord(), encodedDataRecord);
+			substituteElement.set(encodedDataRecord);
 		}
 		return xbCapabilities;
 	}
