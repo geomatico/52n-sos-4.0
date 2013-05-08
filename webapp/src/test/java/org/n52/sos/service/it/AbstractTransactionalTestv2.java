@@ -38,6 +38,8 @@ import net.opengis.swes.x20.InsertSensorType;
 
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
+import org.junit.After;
+import org.n52.sos.ds.hibernate.H2Configuration;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -50,6 +52,11 @@ import org.n52.sos.ogc.sos.SosConstants;
  *
  */
 public abstract class AbstractTransactionalTestv2 extends AbstractSosServiceTest {
+	
+    @After
+    public void cleanUpDB() {
+    	H2Configuration.recreate();
+    }
 
 	protected InsertSensorDocument getInsertSensorMinimalDocument()
 	{
