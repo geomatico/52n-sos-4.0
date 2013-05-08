@@ -46,94 +46,95 @@ import org.n52.sos.service.Configurator;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * TODO implement encodeToXml(Object o) using a Map from o.getClass().getName() -> namespaces
  */
 public final class CodingHelper {
     
-    public static Object decodeXmlElement(XmlObject x) throws OwsExceptionReport {
+    public static Object decodeXmlElement(final XmlObject x) throws OwsExceptionReport {
         return decodeXmlObject(x);
     }
 
-    public static <T> XmlObject encodeObjectToXml(String namespace, T o,
-                                                  Map<SosConstants.HelperValues, String> helperValues)
+    public static <T> XmlObject encodeObjectToXml(final String namespace, final T o,
+                                                  final Map<SosConstants.HelperValues, String> helperValues)
             throws OwsExceptionReport {
         return getEncoder(namespace, o).encode(o, helperValues);
     }
     
-    public static <T> Encoder<XmlObject, T> getEncoder(String namespace, T o) throws OwsExceptionReport {
-        EncoderKey key = getEncoderKey(namespace, o);
-        Encoder<XmlObject, T> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
+    public static <T> Encoder<XmlObject, T> getEncoder(final String namespace, final T o) throws OwsExceptionReport {
+        final EncoderKey key = getEncoderKey(namespace, o);
+        final Encoder<XmlObject, T> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
         if (encoder == null) {
             throw new NoEncoderForKeyException(key);
         }
         return encoder;
     }
 
-    public static XmlObject encodeObjectToXml(String namespace, Object o) throws OwsExceptionReport {
+    public static XmlObject encodeObjectToXml(final String namespace, final Object o) throws OwsExceptionReport {
         return encodeObjectToXml(namespace, o, CollectionHelper.<SosConstants.HelperValues, String>map());
     }
 
-    public static Set<DecoderKey> decoderKeysForElements(String namespace, Class<?>... elements) {
-        HashSet<DecoderKey> keys = new HashSet<DecoderKey>(elements.length);
-        for (Class<?> x : elements) {
+    public static Set<DecoderKey> decoderKeysForElements(final String namespace, final Class<?>... elements) {
+        final HashSet<DecoderKey> keys = new HashSet<DecoderKey>(elements.length);
+        for (final Class<?> x : elements) {
             keys.add(new XmlNamespaceDecoderKey(namespace, x));
         }
         return keys;
     }
     
-     public static Set<DecoderKey> xmlDecoderKeysForOperation(String service, String version, Enum<?>... operations) {
-        HashSet<DecoderKey> set = new HashSet<DecoderKey>(operations.length);
-        for (Enum<?> o : operations) {
+     public static Set<DecoderKey> xmlDecoderKeysForOperation(final String service, final String version, final Enum<?>... operations) {
+        final HashSet<DecoderKey> set = new HashSet<DecoderKey>(operations.length);
+        for (final Enum<?> o : operations) {
             set.add(new XmlOperationDecoderKey(service, version, o.name()));
         }
         return set;
     }
      
-     public static Set<DecoderKey> xmlDecoderKeysForOperation(String service, String version, String... operations) {
-        HashSet<DecoderKey> set = new HashSet<DecoderKey>(operations.length);
-        for (String o : operations) {
+     public static Set<DecoderKey> xmlDecoderKeysForOperation(final String service, final String version, final String... operations) {
+        final HashSet<DecoderKey> set = new HashSet<DecoderKey>(operations.length);
+        for (final String o : operations) {
             set.add(new XmlOperationDecoderKey(service, version, o));
         }
         return set;
     }
 
     @Deprecated
-    public static boolean hasXmlEncoderForOperation(OperationDecoderKey k) {
+    public static boolean hasXmlEncoderForOperation(final OperationDecoderKey k) {
         return Configurator.getInstance().getCodingRepository().getDecoder(new XmlOperationDecoderKey(k)) != null;
     }
 
-    public static Set<EncoderKey> encoderKeysForElements(String namespace, Class<?>... elements) {
-        HashSet<EncoderKey> keys = new HashSet<EncoderKey>(elements.length);
-        for (Class<?> x : elements) {
+    public static Set<EncoderKey> encoderKeysForElements(final String namespace, final Class<?>... elements) {
+        final HashSet<EncoderKey> keys = new HashSet<EncoderKey>(elements.length);
+        for (final Class<?> x : elements) {
             keys.add(new XmlEncoderKey(namespace, x));
         }
         return keys;
     }
 
-    public static EncoderKey getEncoderKey(String namespace, Object o) {
+    public static EncoderKey getEncoderKey(final String namespace, final Object o) {
         return new XmlEncoderKey(namespace, o.getClass());
     }
 
-    public static DecoderKey getDecoderKey(XmlObject doc) {
+    public static DecoderKey getDecoderKey(final XmlObject doc) {
         return new XmlNamespaceDecoderKey(XmlHelper.getNamespace(doc), doc.getClass());
     }
 
-    public static <T extends XmlObject> DecoderKey getDecoderKey(T[] doc) {
+    public static <T extends XmlObject> DecoderKey getDecoderKey(final T[] doc) {
         return new XmlNamespaceDecoderKey(XmlHelper.getNamespace(doc[0]), doc.getClass());
     }
 
-    public static Object decodeXmlObject(XmlObject xbObject) throws OwsExceptionReport {
-        DecoderKey key = getDecoderKey(xbObject);
-        Decoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository().getDecoder(key);
+    public static Object decodeXmlObject(final XmlObject xbObject) throws OwsExceptionReport {
+        final DecoderKey key = getDecoderKey(xbObject);
+        final Decoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository().getDecoder(key);
         if (decoder == null) {
             throw new NoDecoderForKeyException(key);
         }
         return decoder.decode(xbObject);
     }
 
-    public static Object decodeXmlObject(String xmlString) throws OwsExceptionReport {
+    public static Object decodeXmlObject(final String xmlString) throws OwsExceptionReport {
         try {
             return decodeXmlObject(XmlObject.Factory.parse(xmlString));
-        } catch (XmlException e) {
+        } catch (final XmlException e) {
             throw new XmlDecodingException("XML string", xmlString, e);
         }
     }
