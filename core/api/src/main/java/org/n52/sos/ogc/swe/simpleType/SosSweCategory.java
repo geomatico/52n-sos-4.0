@@ -47,16 +47,23 @@ public class SosSweCategory extends SosSweAbstractUomType<String> {
     }
 
     @Override
-    public void setValue(String value) {
+    public SosSweCategory setValue(final String value) {
         this.value = value;
+        return this;
     }
 
-    public void setCodeSpace(String codeSpace) {
+    public SosSweCategory setCodeSpace(final String codeSpace) {
         this.codeSpace = codeSpace;
+        return this;
     }
 
     public String getCodeSpace() {
         return codeSpace;
+    }
+    
+    public boolean isSetCodeSpace() 
+    {
+    	return codeSpace != null && !codeSpace.isEmpty();
     }
 
     @Override
