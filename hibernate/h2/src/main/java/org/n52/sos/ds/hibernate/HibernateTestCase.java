@@ -24,8 +24,8 @@
 
 package org.n52.sos.ds.hibernate;
 
-import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -33,7 +33,7 @@ import org.junit.BeforeClass;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class HibernateTestCase extends CoreMatchers {
+public class HibernateTestCase extends Matchers {
     @BeforeClass
     public static void init() {
         H2Configuration.assertInitialized();
