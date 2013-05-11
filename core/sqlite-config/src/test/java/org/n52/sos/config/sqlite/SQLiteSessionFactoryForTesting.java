@@ -7,6 +7,12 @@ import org.n52.sos.config.sqlite.SQLiteSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * When testing, make the sqlite config database a temp file and delete on cleanup.
+ * 
+ * @author Shane StClair
+ *
+ */
 public class SQLiteSessionFactoryForTesting extends SQLiteSessionFactory {
     private static final Logger LOG = LoggerFactory.getLogger(SQLiteSessionFactoryForTesting.class); 
     protected static final String TESTING_DATABASE_NAME = "testing-configuration";
