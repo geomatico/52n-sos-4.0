@@ -288,11 +288,11 @@ public abstract class Binding implements ConformanceClass {
     }
 
     protected <F, T> Decoder<F, T> getDecoder(final DecoderKey key) {
-        return Configurator.getInstance().getCodingRepository().getDecoder(key);
+        return CodingRepository.getInstance().getDecoder(key);
     }
 
     protected <F, T> Encoder<F, T> getEncoder(final EncoderKey key) {
-        return Configurator.getInstance().getCodingRepository().getEncoder(key);
+        return CodingRepository.getInstance().getEncoder(key);
     }
     
     protected ServiceResponse encodeOwsExceptionReport(final OwsExceptionReport oer, final boolean setStatusFromException) throws OwsExceptionReportEncodingFailedException
@@ -301,7 +301,7 @@ public abstract class Binding implements ConformanceClass {
             ServiceResponse serviceResponse = null;
             SosEventBus.fire(new ExceptionEvent(oer));
             final EncoderKey key = new XmlEncoderKey(oer.getNamespace(), oer.getClass());
-            final Encoder<?, OwsExceptionReport> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
+            final Encoder<?, OwsExceptionReport> encoder = CodingRepository.getInstance().getEncoder(key);
             if (encoder == null)
             {
             	throw createOEREFException(null);

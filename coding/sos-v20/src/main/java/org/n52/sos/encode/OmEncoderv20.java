@@ -72,6 +72,7 @@ import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosSweDataArray;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.service.profile.Profile;
@@ -206,12 +207,8 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
             observationID = xbObs.getId().replace("o_", "");
         }
         if (sosObservation.getIdentifier() != null && sosObservation.getIdentifier().isSetValue()) {
-            Encoder<?, CodeWithAuthority> encoder =
-                    Configurator
-                            .getInstance()
-                            .getCodingRepository()
-                            .getEncoder(
-                                    CodingHelper.getEncoderKey(GMLConstants.NS_GML_32, sosObservation.getIdentifier()));
+            Encoder<?, CodeWithAuthority> encoder = CodingRepository.getInstance().getEncoder(
+            		CodingHelper.getEncoderKey(GMLConstants.NS_GML_32, sosObservation.getIdentifier()));
             if (encoder != null) {
                 XmlObject xmlObject = (XmlObject) encoder.encode(sosObservation.getIdentifier());
                 xbObs.addNewIdentifier().set(xmlObject);
@@ -333,9 +330,8 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
 
     private void addPhenomenonTime(TimeObjectPropertyType timeObjectPropertyType, ITime iTime)
             throws OwsExceptionReport {
-        Encoder<?, ITime> encoder =
-                          Configurator.getInstance().getCodingRepository()
-                        .getEncoder(CodingHelper.getEncoderKey(GMLConstants.NS_GML_32, iTime));
+        Encoder<?, ITime> encoder = CodingRepository.getInstance().getEncoder(
+        		CodingHelper.getEncoderKey(GMLConstants.NS_GML_32, iTime));
         if (encoder != null) {
             XmlObject xmlObject = (XmlObject) encoder.encode(iTime);
             XmlObject substitution =

@@ -41,7 +41,7 @@ import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.n52.sos.exception.swes.InvalidRequestException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.service.SoapHeader;
 import org.n52.sos.soap.SoapRequest;
@@ -129,8 +129,8 @@ public abstract class AbstractSoapDecoder implements Decoder<SoapRequest, XmlObj
         Map<String, SoapHeader> soapHeaders = new HashMap<String, SoapHeader>();
         for (String namespace : headersByNamespace.keySet()) {
             try {
-                Decoder<?, List<SOAPHeaderElement>> decoder = Configurator.getInstance().getCodingRepository()
-                        .getDecoder(new NamespaceDecoderKey(namespace, SOAPHeaderElement.class));
+                Decoder<?, List<SOAPHeaderElement>> decoder = CodingRepository.getInstance().getDecoder(
+                		new NamespaceDecoderKey(namespace, SOAPHeaderElement.class));
                 if (decoder != null) {
                     Object header = decoder.decode(headersByNamespace.get(namespace));
                     if (header instanceof SoapHeader) {

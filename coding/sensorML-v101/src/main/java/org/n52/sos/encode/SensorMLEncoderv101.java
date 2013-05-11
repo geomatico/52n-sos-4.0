@@ -124,8 +124,10 @@ import org.n52.sos.ogc.swe.SosSweField;
 import org.n52.sos.ogc.swe.SosSweSimpleDataRecord;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.service.operator.ServiceOperatorRepository;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.HTTPConstants.StatusCode;
@@ -922,9 +924,8 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
      */
     private void addSweSimpleTypeToField(final AnyScalarPropertyType xbField,
             final SosSweAbstractDataComponent sosSweData) throws OwsExceptionReport {
-        final Encoder<?, SosSweAbstractDataComponent> encoder =
-                Configurator.getInstance().getCodingRepository()
-                        .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE_101, SosSweDataArray.class));
+        final Encoder<?, SosSweAbstractDataComponent> encoder = CodingRepository.getInstance()
+        		.getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE_101, SosSweDataArray.class));
         if (encoder != null) {
             final XmlObject encoded = (XmlObject) encoder.encode(sosSweData);
             if (sosSweData instanceof SosSweAbstractSimpleType) {
@@ -1108,9 +1109,8 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                 try {
                     if (Configurator.getInstance().getBindingRepository()
                             .isBindingSupported(BindingConstants.KVP_BINDING_ENDPOINT)) {
-                        final String version =
-                                Configurator.getInstance().getServiceOperatorRepository()
-                                        .getSupportedVersions(SosConstants.SOS).contains(Sos2Constants.SERVICEVERSION) ? Sos2Constants.SERVICEVERSION
+                        final String version = ServiceOperatorRepository.getInstance()
+                        		.getSupportedVersions(SosConstants.SOS).contains(Sos2Constants.SERVICEVERSION) ? Sos2Constants.SERVICEVERSION
                                         : Sos1Constants.SERVICEVERSION;
 
                         component.setHref(SosHelper.getDescribeSensorUrl(version, Configurator.getInstance()

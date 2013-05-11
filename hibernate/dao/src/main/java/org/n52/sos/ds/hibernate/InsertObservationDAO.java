@@ -65,6 +65,7 @@ import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.response.InsertObservationResponse;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.HTTPConstants.StatusCode;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -192,8 +193,7 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
 
         if (dataArray.getElementType().getXml() == null) {
             final EncoderKey key = CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, dataArray.getElementType());
-            final Encoder<XmlObject, SosSweAbstractDataComponent> encoder =
-                    getConfigurator().getCodingRepository().getEncoder(key);
+            final Encoder<XmlObject, SosSweAbstractDataComponent> encoder = CodingRepository.getInstance().getEncoder(key);
             if (encoder == null) {
                 throw new NoEncoderForKeyException(key);
             }
@@ -210,8 +210,7 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
         }
         if (dataArray.getEncoding().getXml() == null) {
             final EncoderKey key = CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, dataArray.getEncoding());
-            final Encoder<XmlObject, SosSweAbstractEncoding> encoder =
-                    getConfigurator().getCodingRepository().getEncoder(key);
+            final Encoder<XmlObject, SosSweAbstractEncoding> encoder = CodingRepository.getInstance().getEncoder(key);
             if (encoder == null) {
                 throw new NoEncoderForKeyException(key);
             }

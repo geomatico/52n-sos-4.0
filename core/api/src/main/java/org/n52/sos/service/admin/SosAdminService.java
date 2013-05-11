@@ -166,7 +166,7 @@ public class SosAdminService extends ConfiguratedHttpServlet {
         try {
             
             EncoderKey key = new XmlEncoderKey(owsExceptionReport.getNamespace(), owsExceptionReport.getClass());
-            Encoder<?, OwsExceptionReport> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
+            Encoder<?, OwsExceptionReport> encoder = CodingRepository.getInstance().getEncoder(key);
             if (encoder != null) {
                 Object encodedObject = encoder.encode(owsExceptionReport);
                 if (encodedObject instanceof XmlObject) {

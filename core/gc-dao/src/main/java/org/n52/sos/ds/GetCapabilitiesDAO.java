@@ -66,7 +66,10 @@ import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.ogc.sos.SosObservationOffering;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
+import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.response.GetCapabilitiesResponse;
+import org.n52.sos.service.CodingRepository;
+import org.n52.sos.service.operator.ServiceOperatorRepository;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.MultiMaps;
 import org.n52.sos.util.SetMultiMap;
@@ -194,13 +197,13 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         if (!request.isSetVersion()) {
             if (request.isSetAcceptVersions()) {
                 for (final String acceptedVersion : request.getAcceptVersions()) {
-                    if (getConfigurator().getServiceOperatorRepository().isVersionSupported(request.getService(),
+                    if (ServiceOperatorRepository.getInstance().isVersionSupported(request.getService(),
                             acceptedVersion)) {
                         return acceptedVersion;
                     }
                 }
             } else {
-                for (final String supportedVersion : getConfigurator().getServiceOperatorRepository()
+                for (final String supportedVersion : ServiceOperatorRepository.getInstance()
                         .getSupportedVersions(request.getService())) {
                     return supportedVersion;
                 }
@@ -227,15 +230,15 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         for (final Binding bindig : getConfigurator().getBindingRepository().getBindings().values()) {
             profiles.addAll(bindig.getConformanceClasses());
         }
-        for (final RequestOperatorKeyType k : getConfigurator().getRequestOperatorRepository()
+        for (final RequestOperatorKeyType k : RequestOperatorRepository.getInstance()
                 .getActiveRequestOperatorKeyTypes()) {
-            profiles.addAll(getConfigurator().getRequestOperatorRepository().getRequestOperator(k)
+            profiles.addAll(RequestOperatorRepository.getInstance().getRequestOperator(k)
                     .getConformanceClasses());
         }
-        for (final Decoder<?, ?> decoder : getConfigurator().getCodingRepository().getDecoders()) {
+        for (final Decoder<?, ?> decoder : CodingRepository.getInstance().getDecoders()) {
             profiles.addAll(decoder.getConformanceClasses());
         }
-        for (final Encoder<?, ?> encoder : getConfigurator().getCodingRepository().getEncoders()) {
+        for (final Encoder<?, ?> encoder : CodingRepository.getInstance().getEncoders()) {
             profiles.addAll(encoder.getConformanceClasses());
         }
         return CollectionHelper.asSet(profiles);
@@ -261,17 +264,17 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         operationsMetadata.addCommonValue(OWSConstants.RequestParams.service.name(),
                 new OWSParameterValuePossibleValues(SosConstants.SOS));
         operationsMetadata.addCommonValue(OWSConstants.RequestParams.version.name(),
-                new OWSParameterValuePossibleValues(getConfigurator().getServiceOperatorRepository()
+                new OWSParameterValuePossibleValues(ServiceOperatorRepository.getInstance()
                         .getSupportedVersions(service)));
 
         // FIXME: OpsMetadata for InsertSensor, InsertObservation SOS 2.0
         final Set<RequestOperatorKeyType> requestOperatorKeyTypes =
-                getConfigurator().getRequestOperatorRepository().getActiveRequestOperatorKeyTypes();
+                RequestOperatorRepository.getInstance().getActiveRequestOperatorKeyTypes();
         final List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>(requestOperatorKeyTypes.size());
         for (final RequestOperatorKeyType requestOperatorKeyType : requestOperatorKeyTypes) {
             if (requestOperatorKeyType.getServiceOperatorKeyType().getVersion().equals(version)) {
                 final OWSOperation operationMetadata =
-                        getConfigurator().getRequestOperatorRepository().getRequestOperator(requestOperatorKeyType)
+                        RequestOperatorRepository.getInstance().getRequestOperator(requestOperatorKeyType)
                                 .getOperationMetadata(service, version);
                 if (operationMetadata != null) {
                     opsMetadata.add(operationMetadata);
@@ -321,9 +324,8 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
             final Collection<String> procedures = getProceduresForOffering(offering, version);
             final SosEnvelope envelopeForOffering = getCache().getEnvelopeForOffering(offering);
             final Set<String> featuresForoffering = getFOI4offering(offering);
-            final Collection<String> responseFormats =
-                    getConfigurator().getCodingRepository().getSupportedResponseFormats(SosConstants.SOS,
-                            Sos1Constants.SERVICEVERSION);
+            final Collection<String> responseFormats = CodingRepository.getInstance()
+            		.getSupportedResponseFormats(SosConstants.SOS,Sos1Constants.SERVICEVERSION);
             if (checkOfferingValues(envelopeForOffering, featuresForoffering, responseFormats)) {
                 final SosObservationOffering sosOffering = new SosObservationOffering();
                 sosOffering.setOffering(offering);
@@ -656,13 +658,12 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private List<SwesExtension> getAndMergeExtensions() throws OwsExceptionReport {
-        final Set<RequestOperatorKeyType> requestOperators =
-                getConfigurator().getRequestOperatorRepository().getActiveRequestOperatorKeyTypes();
+        final Set<RequestOperatorKeyType> requestOperators = RequestOperatorRepository.getInstance()        		
+        		.getActiveRequestOperatorKeyTypes();
         final List<SwesExtension> extensions = new ArrayList<SwesExtension>(requestOperators.size());
         final HashMap<String, MergableExtension> map = new HashMap<String, MergableExtension>(requestOperators.size());
         for (final RequestOperatorKeyType k : requestOperators) {
-            final SwesExtension extension =
-                    getConfigurator().getRequestOperatorRepository().getRequestOperator(k).getExtension();
+            final SwesExtension extension = RequestOperatorRepository.getInstance().getRequestOperator(k).getExtension();
             if (extension != null) {
                 if (extension instanceof MergableExtension) {
                     final MergableExtension me = (MergableExtension) extension;
@@ -770,8 +771,8 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
     }
 
     protected void setUpResponseFormatForOffering(final String version, final SosObservationOffering sosOffering) {
-        final Collection<String> responseFormats =
-                getConfigurator().getCodingRepository().getSupportedResponseFormats(SosConstants.SOS, version);
+        final Collection<String> responseFormats = CodingRepository.getInstance()
+        		.getSupportedResponseFormats(SosConstants.SOS, version);
         sosOffering.setResponseFormats(responseFormats);
         // TODO set as property
         responseFormats.add(SosConstants.CONTENT_TYPE_ZIP);

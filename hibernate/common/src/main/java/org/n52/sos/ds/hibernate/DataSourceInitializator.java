@@ -42,6 +42,7 @@ import org.n52.sos.ds.DataSourceInitializer;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.Util4Exceptions;
@@ -95,10 +96,10 @@ public class DataSourceInitializator implements DataSourceInitializer {
 
     private Map<SupportedTypeKey, Set<String>> getTypeMap() {
         List<Map<SupportedTypeKey, Set<String>>> list = new LinkedList<Map<SupportedTypeKey, Set<String>>>();
-        for (Decoder<?,?> decoder : Configurator.getInstance().getCodingRepository().getDecoders()) {
+        for (Decoder<?,?> decoder : CodingRepository.getInstance().getDecoders()) {
             list.add(decoder.getSupportedTypes());
         }
-        for (Encoder<?,?> encoder : Configurator.getInstance().getCodingRepository().getEncoders()) {
+        for (Encoder<?,?> encoder : CodingRepository.getInstance().getEncoders()) {
             list.add(encoder.getSupportedTypes());
         }
         

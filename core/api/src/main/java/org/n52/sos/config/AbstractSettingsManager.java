@@ -311,7 +311,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         LOG.debug("Setting status of {} to {}", rfkt, active);
         setResponseFormatStatus(rfkt, active);
         if (Configurator.getInstance() != null) {
-            Configurator.getInstance().getCodingRepository().setActive(rfkt, active);
+        	CodingRepository.getInstance().setActive(rfkt, active);
         }
     }
 
@@ -320,7 +320,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         LOG.debug("Setting status of {} to {}", pdf, active);
         setProcedureDescriptionFormatStatus(pdf, active);
         if (Configurator.getInstance() != null) {
-            Configurator.getInstance().getCodingRepository().setActive(pdf, active);
+        	CodingRepository.getInstance().setActive(pdf, active);
         }
     }
 

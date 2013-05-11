@@ -28,7 +28,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.JSONConstants;
@@ -73,8 +73,7 @@ public class AdminOperationController extends AbstractAdminController {
                     produces = ControllerConstants.MEDIA_TYPE_APPLICATION_JSON)
     public String getAll() throws JSONException, ConnectionProviderException {
         JSONArray array = new JSONArray();
-        for (RequestOperatorKeyType key : Configurator.getInstance()
-                .getRequestOperatorRepository().getAllRequestOperatorKeyTypes()) {
+        for (RequestOperatorKeyType key : RequestOperatorRepository.getInstance().getAllRequestOperatorKeyTypes()) {
             array.put(new JSONObject()
                     .put(JSONConstants.SERVICE_KEY, key.getServiceOperatorKeyType().getService())
                     .put(JSONConstants.VERSION_KEY, key.getServiceOperatorKeyType().getVersion())

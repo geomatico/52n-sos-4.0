@@ -66,7 +66,7 @@ import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.request.UpdateSensorRequest;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
@@ -187,7 +187,7 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
                     XmlObject.Factory.parse(getNodeFromNodeList(xbInsertSensor.getProcedureDescription()
                             .getDomNode().getChildNodes()));
             
-            Decoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository()
+            Decoder<?, XmlObject> decoder = CodingRepository.getInstance()
                     .getDecoder(CodingHelper.getDecoderKey(xmlObject));
             if (decoder == null) {
                 throw new InvalidParameterValueException()
@@ -238,7 +238,7 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
                 XmlObject xmlObject =
                         XmlObject.Factory.parse(getNodeFromNodeList(description.getSensorDescription()
                                 .getData().getDomNode().getChildNodes()));
-                Decoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository()
+                Decoder<?, XmlObject> decoder = CodingRepository.getInstance()
                         .getDecoder(CodingHelper.getDecoderKey(xmlObject));
                 if (decoder == null) {
                     throw new InvalidParameterValueException().at(UpdateSensorDescriptionParams.procedureDescriptionFormat)

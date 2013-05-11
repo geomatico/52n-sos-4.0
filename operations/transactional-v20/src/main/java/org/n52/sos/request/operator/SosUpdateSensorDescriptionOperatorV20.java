@@ -45,6 +45,7 @@ import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.UpdateSensorRequest;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.response.UpdateSensorResponse;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -71,8 +72,8 @@ public class SosUpdateSensorDescriptionOperatorV20 extends AbstractV2RequestOper
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            Encoder<?, UpdateSensorResponse> encoder = Configurator.getInstance().getCodingRepository()
-                    .getEncoder(CodingHelper.getEncoderKey(SWEConstants.NS_SWES_20, response));
+            Encoder<?, UpdateSensorResponse> encoder = CodingRepository.getInstance().getEncoder(
+            		CodingHelper.getEncoderKey(SWEConstants.NS_SWES_20, response));
             if (encoder != null) {
                 // TODO valid response object
                 Object encodedObject = encoder.encode(response);

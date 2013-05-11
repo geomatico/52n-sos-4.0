@@ -107,6 +107,7 @@ import org.n52.sos.response.InsertObservationResponse;
 import org.n52.sos.response.InsertResultResponse;
 import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.service.profile.Profile;
@@ -722,18 +723,16 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
 
     private void createTemporalFilter(final net.opengis.sos.x20.GetResultType.TemporalFilter temporalFilter,
             final TemporalFilter sosTemporalFilter) throws OwsExceptionReport {
-        final Encoder<XmlObject, TemporalFilter> encoder =
-                Configurator.getInstance().getCodingRepository()
-                        .getEncoder(CodingHelper.getEncoderKey(FilterConstants.NS_FES_2, sosTemporalFilter));
+        final Encoder<XmlObject, TemporalFilter> encoder = CodingRepository.getInstance().getEncoder(
+        		CodingHelper.getEncoderKey(FilterConstants.NS_FES_2, sosTemporalFilter));
         final XmlObject encodedObject = encoder.encode(sosTemporalFilter);
         temporalFilter.set(encodedObject);
     }
 
     private void createSpatialFilter(final SpatialFilter spatialFilter, final org.n52.sos.ogc.filter.SpatialFilter sosSpatialFilter)
             throws OwsExceptionReport {
-        final Encoder<XmlObject, org.n52.sos.ogc.filter.SpatialFilter> encoder =
-                Configurator.getInstance().getCodingRepository()
-                        .getEncoder(CodingHelper.getEncoderKey(FilterConstants.NS_FES_2, sosSpatialFilter));
+        final Encoder<XmlObject, org.n52.sos.ogc.filter.SpatialFilter> encoder = CodingRepository.getInstance()
+        		.getEncoder(CodingHelper.getEncoderKey(FilterConstants.NS_FES_2, sosSpatialFilter));
         final XmlObject encodedObject = encoder.encode(sosSpatialFilter);
         spatialFilter.set(encodedObject);
     }
@@ -753,12 +752,8 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
                         "ResultEncoding element encoding is not supported!");
             }
         } else {
-            final Encoder<XmlObject, Object> encoder =
-                    Configurator
-                            .getInstance()
-                            .getCodingRepository()
-                            .getEncoder(
-                                    CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, sosResultEncoding.getEncoding()));
+            final Encoder<XmlObject, Object> encoder = CodingRepository.getInstance().getEncoder(
+            		CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, sosResultEncoding.getEncoding()));
             if (encoder == null) {
                 throw new NoApplicableCodeException().withMessage("Missing encoder for ResultEncoding!");
             }
@@ -789,13 +784,8 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
                         .withMessage("ResultStructure element encoding is not supported!");
             }
         } else {
-            final Encoder<XmlObject, Object> encoder =
-                    Configurator
-                            .getInstance()
-                            .getCodingRepository()
-                            .getEncoder(
-                                    CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20,
-                                            sosResultStructure.getResultStructure()));
+            final Encoder<XmlObject, Object> encoder = CodingRepository.getInstance().getEncoder(
+            		CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20,sosResultStructure.getResultStructure()));
             if (encoder == null) {
                 throw new NoApplicableCodeException().withMessage("Missing encoder for ResultStructure!");
             }

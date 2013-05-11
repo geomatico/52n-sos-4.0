@@ -568,7 +568,7 @@ public class SosHelper {
      */
     @Deprecated
 public static Collection<String> getSupportedResponseFormats(final String service, final String version) {
-        return Configurator.getInstance().getCodingRepository().getSupportedResponseFormats(service, version);
+        return CodingRepository.getInstance().getSupportedResponseFormats(service, version);
     }
     
     /**
@@ -717,7 +717,7 @@ public static Collection<String> getSupportedResponseFormats(final String servic
         }
 
         protected Set<Encoder<?, ?>> getEncoders() {
-            return Configurator.getInstance().getCodingRepository().getEncoders();
+            return CodingRepository.getInstance().getEncoders();
         }
 
         protected Collection<Binding> getBindings() {

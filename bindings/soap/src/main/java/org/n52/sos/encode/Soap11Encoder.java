@@ -41,7 +41,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.SoapHeader;
 import org.n52.sos.soap.SoapHelper;
 import org.n52.sos.soap.SoapResponse;
@@ -101,9 +101,8 @@ public class Soap11Encoder extends AbstractSoapEncoder {
                         wsa.setActionValue(action);
                     }
                     try {
-                        Encoder<Map<QName, String>, SoapHeader> encoder =
-                                                                Configurator.getInstance().getCodingRepository()
-                                .getEncoder(CodingHelper.getEncoderKey(namespace, header));
+                        Encoder<Map<QName, String>, SoapHeader> encoder = CodingRepository.getInstance().getEncoder(
+                        		CodingHelper.getEncoderKey(namespace, header));
                         if (encoder != null) {
                             Map<QName, String> headerElements = encoder.encode(header);
                             for (QName qName : headerElements.keySet()) {

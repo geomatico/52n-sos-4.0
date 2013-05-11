@@ -32,13 +32,10 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetCapabilitiesDAO;
 import org.n52.sos.encode.Encoder;
-import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.exception.ows.concrete.EncoderResponseUnsupportedException;
 import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
 import org.n52.sos.exception.ows.concrete.VersionNotSupportedException;
-import org.n52.sos.ogc.ows.CapabilitiesExtension;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -46,7 +43,7 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -89,9 +86,8 @@ public class SosGetCapabilitiesOperatorV20 extends
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         // XmlOptions xmlOptions;
         try {
-            Encoder<?, GetCapabilitiesResponse> encoder =
-                    Configurator.getInstance().getCodingRepository()
-                            .getEncoder(CodingHelper.getEncoderKey(Sos2Constants.NS_SOS_20, response));
+            Encoder<?, GetCapabilitiesResponse> encoder = CodingRepository.getInstance().getEncoder(
+            		CodingHelper.getEncoderKey(Sos2Constants.NS_SOS_20, response));
             if (encoder != null) {
                 Object encodedObject = encoder.encode(response);
                 if (encodedObject instanceof XmlObject) {

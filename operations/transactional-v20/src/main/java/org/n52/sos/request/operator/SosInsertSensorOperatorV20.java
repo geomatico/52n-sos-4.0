@@ -59,6 +59,7 @@ import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.InsertSensorResponse;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.MiscSettings;
 import org.n52.sos.util.CodingHelper;
@@ -122,9 +123,8 @@ public class SosInsertSensorOperatorV20 extends
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            Encoder<?, InsertSensorResponse> encoder =
-                    Configurator.getInstance().getCodingRepository()
-                            .getEncoder(CodingHelper.getEncoderKey(SWEConstants.NS_SWES_20, response));
+            Encoder<?, InsertSensorResponse> encoder = CodingRepository.getInstance().getEncoder(
+            		CodingHelper.getEncoderKey(SWEConstants.NS_SWES_20, response));
             if (encoder != null) {
                 // TODO valid or validate (?) response object
                 Object encodedObject = encoder.encode(response);

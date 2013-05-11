@@ -126,10 +126,10 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
                     ServiceOperatorRepository.getInstance().update();
                     builder.append("Configuration");
                 } else if (parameter.equalsIgnoreCase(UPDATE_DECODER)) {
-                    Configurator.getInstance().getCodingRepository().updateDecoders();
+                	CodingRepository.getInstance().updateDecoders();
                     builder.append("Decoder");
                 } else if (parameter.equalsIgnoreCase(UPDATE_ENCODER)) {
-                    Configurator.getInstance().getCodingRepository().updateEncoders();
+                	CodingRepository.getInstance().updateEncoders();
                     builder.append("Encoder");
                 } else if (parameter.equalsIgnoreCase(UPDATE_OPERATIONS)) { 
                 	RequestOperatorRepository.getInstance().update();
@@ -203,8 +203,7 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             EncoderKey key = new XmlEncoderKey(Sos2Constants.NS_SOS_20, GetCapabilitiesResponse.class);
-            Encoder<?, GetCapabilitiesResponse> encoder = Configurator.getInstance().getCodingRepository()
-                    .getEncoder(key);
+            Encoder<?, GetCapabilitiesResponse> encoder = CodingRepository.getInstance().getEncoder(key);
             if (encoder != null) {
                 Object encodedObject = encoder.encode(response);
                 if (encodedObject instanceof XmlObject) {

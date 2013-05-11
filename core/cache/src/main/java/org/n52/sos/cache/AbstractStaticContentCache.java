@@ -25,7 +25,7 @@ package org.n52.sos.cache;
 
 import java.util.Set;
 
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.CodingRepository;
 
 /**
  * Readable content cache that gets static information from the configurator (or its delegates).
@@ -37,21 +37,21 @@ public abstract class AbstractStaticContentCache implements ContentCache {
     private static final long serialVersionUID = -3494345412582194615L;
     @Override
     public Set<String> getObservationTypes() {
-        return Configurator.getInstance().getCodingRepository().getObservationTypes();
+        return CodingRepository.getInstance().getObservationTypes();
     }
 
     @Override
     public Set<String> getProcedureDescriptionFormats() {
-        return Configurator.getInstance().getCodingRepository().getProcedureDescriptionFormats();
+        return CodingRepository.getInstance().getProcedureDescriptionFormats();
     }
 
     @Override
     public Set<String> getSweTypes() {
-        return Configurator.getInstance().getCodingRepository().getSweTypes();
+        return CodingRepository.getInstance().getSweTypes();
     }
 
     @Override
     public Set<String> getFeatureOfInterestTypes() {
-        return Configurator.getInstance().getCodingRepository().getFeatureOfInterestTypes();
+        return CodingRepository.getInstance().getFeatureOfInterestTypes();
     }
 }

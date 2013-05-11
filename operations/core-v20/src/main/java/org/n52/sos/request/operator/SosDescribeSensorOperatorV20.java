@@ -48,7 +48,7 @@ import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.response.DescribeSensorResponse;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -100,8 +100,8 @@ public class SosDescribeSensorOperatorV20 extends AbstractV2RequestOperator<Abst
             } else {
                 throw new VersionNotSupportedException();
             }
-            Encoder<?, DescribeSensorResponse> encoder = Configurator.getInstance().getCodingRepository()
-                    .getEncoder(CodingHelper.getEncoderKey(namespace, response));
+            Encoder<?, DescribeSensorResponse> encoder = CodingRepository.getInstance().getEncoder(
+            		CodingHelper.getEncoderKey(namespace, response));
             if (encoder != null) {
                 Object encodedObject = encoder.encode(response);
                 if (encodedObject instanceof XmlObject) {

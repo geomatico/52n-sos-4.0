@@ -53,6 +53,7 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.SosHelper;
@@ -300,7 +301,7 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<Abs
             if (zipCompression) {
                 request.setResponseFormat(OMConstants.CONTENT_TYPE_OM);
             } else {
-                Collection<String> supportedResponseFormats = Configurator.getInstance().getCodingRepository()
+                Collection<String> supportedResponseFormats = CodingRepository.getInstance()
                         .getSupportedResponseFormats(request.getService(), request.getVersion());
                 if (!supportedResponseFormats.contains(request.getResponseFormat())) {
                     throw new InvalidResponseFormatParameterException(request.getResponseFormat());

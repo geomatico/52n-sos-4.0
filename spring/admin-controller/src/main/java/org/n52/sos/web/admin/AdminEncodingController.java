@@ -32,7 +32,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.encode.ResponseFormatKeyType;
 import org.n52.sos.exception.ConfigurationException;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.JSONConstants;
@@ -103,7 +103,7 @@ public class AdminEncodingController extends AbstractAdminController {
     protected JSONArray getObservationEncodings() throws ConnectionProviderException, ConfigurationException,
                                                          JSONException {
         JSONArray joes = new JSONArray();
-        final Map<ServiceOperatorKeyType, Set<String>> oes = Configurator.getInstance().getCodingRepository()
+        final Map<ServiceOperatorKeyType, Set<String>> oes = CodingRepository.getInstance()
                 .getAllSupportedResponseFormats();
         for (ServiceOperatorKeyType sokt : oes.keySet()) {
             for (String responseFormat : oes.get(sokt)) {
@@ -121,7 +121,7 @@ public class AdminEncodingController extends AbstractAdminController {
     protected JSONArray getProcedureEncodings() throws JSONException, ConnectionProviderException,
                                                        ConfigurationException {
         JSONArray jpes = new JSONArray();
-        final Set<String> pes = Configurator.getInstance().getCodingRepository().getAllProcedureDescriptionFormats();
+        final Set<String> pes = CodingRepository.getInstance().getAllProcedureDescriptionFormats();
         for (String pe : pes) {
             jpes.put(new JSONObject()
                     .put(JSONConstants.PROCEDURE_DESCRIPTION_FORMAT_KEY, pe)

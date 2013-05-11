@@ -30,12 +30,10 @@ import java.util.Map;
 import java.util.Set;
 
 import net.opengis.gml.FeaturePropertyType;
-import net.opengis.gml.LocationPropertyType;
 import net.opengis.sampling.x10.SamplingCurveDocument;
 import net.opengis.sampling.x10.SamplingCurveType;
 import net.opengis.sampling.x10.SamplingFeatureCollectionDocument;
 import net.opengis.sampling.x10.SamplingFeatureCollectionType;
-import net.opengis.sampling.x10.SamplingFeatureDocument;
 import net.opengis.sampling.x10.SamplingFeaturePropertyType;
 import net.opengis.sampling.x10.SamplingFeatureType;
 import net.opengis.sampling.x10.SamplingPointDocument;
@@ -57,14 +55,13 @@ import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -201,7 +198,7 @@ public class SamplingEncoderv100 implements Encoder<XmlObject, SosAbstractFeatur
     }
 
     private XmlObject getEncodedGeometry(Geometry geometry, String gmlId) throws UnsupportedEncoderInputException, OwsExceptionReport {
-        Encoder<XmlObject, Geometry> encoder = Configurator.getInstance().getCodingRepository()
+        Encoder<XmlObject, Geometry> encoder = CodingRepository.getInstance()
                 .getEncoder(CodingHelper.getEncoderKey(GMLConstants.NS_GML, geometry));
         if (encoder != null) {
             Map<HelperValues, String> additionalValues = new EnumMap<HelperValues, String>(HelperValues.class);

@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.n52.sos.request.operator.RequestOperatorKeyType;
+import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.MultiMaps;
 import org.n52.sos.util.SetMultiMap;
@@ -51,8 +52,8 @@ public class ClientController extends AbstractController {
             Map<String, SetMultiMap<String, String>> operationsByServiceAndVersion =
                                                      new HashMap<String, SetMultiMap<String, String>>();
             Set<String> bindings = Configurator.getInstance().getBindingRepository().getBindings().keySet();
-            Set<RequestOperatorKeyType> rokts = Configurator.getInstance()
-                    .getRequestOperatorRepository().getActiveRequestOperatorKeyTypes();
+            Set<RequestOperatorKeyType> rokts = RequestOperatorRepository.getInstance()
+                    .getActiveRequestOperatorKeyTypes();
 
             for (RequestOperatorKeyType rokt : rokts) {
                 String service = rokt.getServiceOperatorKeyType().getService();

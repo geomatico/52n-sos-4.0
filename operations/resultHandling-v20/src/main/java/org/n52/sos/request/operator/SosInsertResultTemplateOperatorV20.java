@@ -50,6 +50,7 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -78,7 +79,7 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            Encoder<?, InsertResultTemplateResponse> encoder = Configurator.getInstance().getCodingRepository()
+            Encoder<?, InsertResultTemplateResponse> encoder = CodingRepository.getInstance()
                     .getEncoder(CodingHelper.getEncoderKey(Sos2Constants.NS_SOS_20, response));
             if (encoder != null) {
                 Object encodedObject = encoder.encode(response);
