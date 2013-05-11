@@ -32,7 +32,9 @@ import net.opengis.swe.x101.SimpleDataRecordType;
 
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
+import org.junit.AfterClass;
 import org.junit.Test;
+import org.n52.sos.config.SettingsManager;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.swe.SosSweField;
@@ -51,6 +53,10 @@ import org.n52.sos.ogc.swe.simpleType.SosSweTime;
  * @since 4.0.0
  */
 public class SweCommonEncoderv101Test {
+	@AfterClass
+	public static final void cleanUp(){
+		SettingsManager.getInstance().cleanup();
+	}
 
 	@Test
 	public final void should_encode_simpleDataRecord() throws OwsExceptionReport

@@ -45,6 +45,8 @@ import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.SettingsChangeEvent;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
+import org.n52.sos.request.operator.RequestOperatorRepository;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceSettings;
 import org.n52.sos.util.HashSetMultiMap;
@@ -300,7 +302,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         LOG.debug("Setting status of {} to {}", rokt, active);
         setOperationStatus(rokt, active);
         if (Configurator.getInstance() != null) {
-            Configurator.getInstance().getRequestOperatorRepository().setActive(rokt, active);
+        	RequestOperatorRepository.getInstance().setActive(rokt, active);
         }
     }
 

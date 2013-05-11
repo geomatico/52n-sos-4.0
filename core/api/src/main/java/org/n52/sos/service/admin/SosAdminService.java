@@ -41,6 +41,7 @@ import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.ConfiguratedHttpServlet;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.XmlOptionsHelper;

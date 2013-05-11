@@ -187,10 +187,7 @@ public class Configurator implements Cleanupable {
     private AdminServiceOperator adminServiceOperator;
     private Producer<SosServiceIdentification> serviceIdentificationFactory;
     private Producer<SosServiceProvider> serviceProviderFactory;
-    private CodingRepository codingRepository;
-    private ServiceOperatorRepository serviceOperatorRepository;
     private OperationDAORepository operationDaoRepository;
-    private RequestOperatorRepository requestOperatorRepository;
     private BindingRepository bindingRepository;
     private ConverterRepository converterRepository;
     private AdminRequestOperatorRepository adminRequestOperatorRepository;
@@ -240,12 +237,9 @@ public class Configurator implements Cleanupable {
         serviceIdentificationFactory = new SosServiceIdentificationFactory();
         serviceProviderFactory = new SosServiceProviderFactory();
         operationDaoRepository = new OperationDAORepository();
-        serviceOperatorRepository = new ServiceOperatorRepository();
-        codingRepository = new CodingRepository();
         featureQueryHandler = loadAndConfigure(FeatureQueryHandler.class, false);
         cacheFeederDAO = loadAndConfigure(CacheFeederDAO.class, false);
         converterRepository = new ConverterRepository();
-        requestOperatorRepository = new RequestOperatorRepository();
         bindingRepository = new BindingRepository();
         adminServiceOperator = loadAndConfigure(AdminServiceOperator.class, false);
         adminRequestOperatorRepository = new AdminRequestOperatorRepository();
@@ -350,26 +344,34 @@ public class Configurator implements Cleanupable {
         // TODO update converters
         getBindingRepository().update();
         getOperationDaoRepository().update();
-        getCodingRepository().updateDecoders();
-        getCodingRepository().updateEncoders();
-        getServiceOperatorRepository().update();
-        getRequestOperatorRepository().update();
     }
 
+    /**
+     * @deprecated use RequestOperatorRepository.getInstance() instead
+     */
+    @Deprecated
     public RequestOperatorRepository getRequestOperatorRepository() {
-        return requestOperatorRepository;
+        return RequestOperatorRepository.getInstance();
     }
 
+    /**
+     * @deprecated Use CodingRepository.getInstance() instead
+     */
+    @Deprecated
     public CodingRepository getCodingRepository() {
-        return codingRepository;
+        return CodingRepository.getInstance();
     }
 
     public OperationDAORepository getOperationDaoRepository() {
         return operationDaoRepository;
     }
 
+    /**
+     * @deprecated Use ServiceOperatorRepository.getInstance() instead
+     */
+    @Deprecated
     public ServiceOperatorRepository getServiceOperatorRepository() {
-        return serviceOperatorRepository;
+        return ServiceOperatorRepository.getInstance();
     }
 
     public BindingRepository getBindingRepository() {
@@ -385,19 +387,19 @@ public class Configurator implements Cleanupable {
     }
 
     /**
-     * @deprecated use getCodingRepository().updateDecoders();
+     * @deprecated use CodingRepository.getInstance().updateDecoders();
      */
     @Deprecated
     public void updateDecoder() throws ConfigurationException {
-        getCodingRepository().updateDecoders();
+        CodingRepository.getInstance().updateDecoders();
     }
 
     /**
-     * @deprecated use getCodingRepository().updateEncoders();
+     * @deprecated use CodingRepository.getInstance().updateEncoders();
      */
     @Deprecated
     public void updateEncoder() throws ConfigurationException {
-        getCodingRepository().updateEncoders();
+    	CodingRepository.getInstance().updateEncoders();
     }
 
     /**
@@ -409,11 +411,11 @@ public class Configurator implements Cleanupable {
     }
 
     /**
-     * @deprecated use getServiceOperatorRepository().update();
+     * @deprecated use ServiceOperatorRepository.getInstance().update();
      */
     @Deprecated
     public void updateServiceOperators() throws ConfigurationException {
-        getServiceOperatorRepository().update();
+    	ServiceOperatorRepository.getInstance().update();
     }
 
     /**
@@ -433,11 +435,11 @@ public class Configurator implements Cleanupable {
     }
 
     /**
-     * @deprecated use getRequestOperatorRepository().update();
+     * @deprecated use RequestOperatorRepository.getInstance().update();
      */
     @Deprecated
     public void updateRequestOperator() throws ConfigurationException {
-        getRequestOperatorRepository().update();
+    	RequestOperatorRepository.getInstance().update();
     }
 
     public ProfileHandler getProfileHandler() {

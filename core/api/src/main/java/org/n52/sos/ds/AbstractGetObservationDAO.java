@@ -40,7 +40,7 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.MinMax;
 import org.n52.sos.util.SosHelper;
@@ -65,8 +65,7 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
         opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.offering, getCache().getOfferings());
         opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());
         opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.responseFormat,
-                                           Configurator.getInstance().getCodingRepository()
-                .getSupportedResponseFormats(SosConstants.SOS, version));
+        		CodingRepository.getInstance().getSupportedResponseFormats(SosConstants.SOS, version));
 
         if (getConfigurator().getProfileHandler().getActiveProfile().isShowFullOperationsMetadataForObservations()) {
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCache()

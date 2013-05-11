@@ -52,11 +52,14 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.admin.AdministratorConstants.AdministratorParams;
 import org.n52.sos.service.admin.request.AdminRequest;
+import org.n52.sos.service.operator.ServiceOperatorRepository;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 
@@ -118,6 +121,9 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
                     builder.append("Bindings");
                 } else if (parameter.equalsIgnoreCase(UPDATE_CONFIGURATION)) {
                     Configurator.getInstance().updateConfiguration();
+                    CodingRepository.getInstance().updateDecoders();
+                    CodingRepository.getInstance().updateEncoders();
+                    ServiceOperatorRepository.getInstance().update();
                     builder.append("Configuration");
                 } else if (parameter.equalsIgnoreCase(UPDATE_DECODER)) {
                     Configurator.getInstance().getCodingRepository().updateDecoders();
@@ -125,11 +131,11 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
                 } else if (parameter.equalsIgnoreCase(UPDATE_ENCODER)) {
                     Configurator.getInstance().getCodingRepository().updateEncoders();
                     builder.append("Encoder");
-                } else if (parameter.equalsIgnoreCase(UPDATE_OPERATIONS)) {
-                    Configurator.getInstance().getRequestOperatorRepository().update();
+                } else if (parameter.equalsIgnoreCase(UPDATE_OPERATIONS)) { 
+                	RequestOperatorRepository.getInstance().update();
                     builder.append("Supported Operations");
                 } else if (parameter.equalsIgnoreCase(UPDATE_SERVICES)) {
-                    Configurator.getInstance().getServiceOperatorRepository().update();
+                	ServiceOperatorRepository.getInstance().update();
                     builder.append("Supported Services");
                 } else {
                     exceptions.add(new InvalidParameterValueException(AdministratorParams.parameter, parameter));

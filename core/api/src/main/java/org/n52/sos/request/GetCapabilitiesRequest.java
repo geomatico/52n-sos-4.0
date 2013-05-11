@@ -29,8 +29,8 @@ import java.util.List;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.service.operator.ServiceOperatorRepository;
 
 /**
  * SOS GetCapabilities request
@@ -197,7 +197,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
                 }
             } else {
                 serviceOperatorKeyTypes = new ServiceOperatorKeyType[1];
-                setVersion(Collections.max(Configurator.getInstance().getServiceOperatorRepository().getSupportedVersions(getService())));
+                setVersion(Collections.max(ServiceOperatorRepository.getInstance().getSupportedVersions(getService())));
                 serviceOperatorKeyTypes[0] = new ServiceOperatorKeyType(getService(), getVersion());
             }
         }

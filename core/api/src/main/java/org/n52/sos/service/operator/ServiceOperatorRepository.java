@@ -31,7 +31,7 @@ import java.util.Set;
 
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
 import org.n52.sos.util.CollectionHelper;
 
@@ -39,7 +39,8 @@ import org.n52.sos.util.CollectionHelper;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class ServiceOperatorRepository extends AbstractConfiguringServiceLoaderRepository<ServiceOperator> {
-
+	private static ServiceOperatorRepository instance;
+	
     /**
      * Implemented ServiceOperator
      */
@@ -52,13 +53,20 @@ public class ServiceOperatorRepository extends AbstractConfiguringServiceLoaderR
     /** supported services */
     private final Set<String> supportedServices = new HashSet<String>(0);
 
+    public static ServiceOperatorRepository getInstance(){
+    	if (instance == null) {
+    		instance = new ServiceOperatorRepository();
+    	}
+    	return instance;
+    }
+    
     /**
      * Load implemented request listener
      * 
      * @throws ConfigurationException
      *             If no request listener is implemented
      */
-    public ServiceOperatorRepository() throws ConfigurationException {
+    private ServiceOperatorRepository() throws ConfigurationException {
         super(ServiceOperator.class, false);
         load(false);
     }
@@ -100,7 +108,7 @@ public class ServiceOperatorRepository extends AbstractConfiguringServiceLoaderR
      */
     @Override
     public void update() throws ConfigurationException {
-        Configurator.getInstance().getRequestOperatorRepository().update();
+    	RequestOperatorRepository.getInstance().update();
         super.update();
     }
 

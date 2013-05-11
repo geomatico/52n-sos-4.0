@@ -50,6 +50,7 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ConformanceClass;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
@@ -283,7 +284,7 @@ public abstract class Binding implements ConformanceClass {
     }
 
     protected ServiceOperatorRepository getServiceOperatorRepository() {
-        return Configurator.getInstance().getServiceOperatorRepository();
+        return ServiceOperatorRepository.getInstance();
     }
 
     protected <F, T> Decoder<F, T> getDecoder(final DecoderKey key) {

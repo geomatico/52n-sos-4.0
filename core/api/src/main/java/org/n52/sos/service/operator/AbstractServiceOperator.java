@@ -27,8 +27,8 @@ import org.n52.sos.exception.ows.OperationNotSupportedException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.operator.RequestOperator;
+import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.Configurator;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
@@ -49,8 +49,7 @@ public class AbstractServiceOperator implements ServiceOperator {
     @Override
     public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
         ServiceResponse response = null;
-        RequestOperator requestOperator =
-                Configurator.getInstance().getRequestOperatorRepository()
+        RequestOperator requestOperator = RequestOperatorRepository.getInstance()
 				.getRequestOperator(getServiceOperatorKeyType(), request.getOperationName());
         if (requestOperator != null) {
             response = requestOperator.receiveRequest(request);

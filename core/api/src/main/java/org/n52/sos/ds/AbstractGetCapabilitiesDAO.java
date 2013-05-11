@@ -34,6 +34,7 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.GetCapabilitiesResponse;
+import org.n52.sos.service.operator.ServiceOperatorRepository;
 
 /**
  * interface for getting capabilities for a passed GetCapabilities request from
@@ -70,7 +71,7 @@ public abstract class AbstractGetCapabilitiesDAO extends AbstractOperationDAO {
         opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.Sections, sectionsValues);
         opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptFormats, SosConstants.ACCEPT_FORMATS);
         opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptVersions,
-                                getConfigurator().getServiceOperatorRepository().getSupportedVersions(service));
+        		ServiceOperatorRepository.getInstance().getSupportedVersions(service));
         opsMeta.addAnyParameterValue(SosConstants.GetCapabilitiesParams.updateSequence);
     }
     

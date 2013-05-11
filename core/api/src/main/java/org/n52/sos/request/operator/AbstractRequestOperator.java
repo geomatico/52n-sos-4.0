@@ -55,6 +55,7 @@ import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.service.operator.ServiceOperatorRepository;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;
@@ -156,7 +157,7 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
         List<String> validVersions = new LinkedList<String>();
         if (versions != null) {
             final Set<String> supportedVersions =
-                    Configurator.getInstance().getServiceOperatorRepository().getSupportedVersions(service);
+            		ServiceOperatorRepository.getInstance().getSupportedVersions(service);
             for (String version : versions) {
                 if (supportedVersions.contains(version)) {
                     validVersions.add(version);
@@ -187,12 +188,12 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
 
         // if version is incorrect, throw exception
         if (request.getVersion() == null
-                || !Configurator.getInstance().getServiceOperatorRepository()
+                || !ServiceOperatorRepository.getInstance()
                         .isVersionSupported(request.getService(), request.getVersion())) {
             throw new InvalidParameterValueException().at(OWSConstants.RequestParams.version).withMessage(
                     "The parameter '%s' does not contain version(s) supported by this Service: '%s'!",
                     OWSConstants.RequestParams.version.name(),
-                    StringHelper.join("', '", Configurator.getInstance().getServiceOperatorRepository()
+                    StringHelper.join("', '", ServiceOperatorRepository.getInstance()
                             .getSupportedVersions(request.getService())));
         }
     }

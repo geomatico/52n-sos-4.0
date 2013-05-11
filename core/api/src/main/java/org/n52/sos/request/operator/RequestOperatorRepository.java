@@ -43,10 +43,22 @@ import org.slf4j.LoggerFactory;
  */
 public class RequestOperatorRepository extends AbstractConfiguringServiceLoaderRepository<RequestOperator> {
     private static final Logger LOG = LoggerFactory.getLogger(RequestOperatorRepository.class);
+    private static RequestOperatorRepository instance;
     private final Map<RequestOperatorKeyType, Activatable<RequestOperator>> requestOperators =
                                                                             new HashMap<RequestOperatorKeyType, Activatable<RequestOperator>>(0);
 
-    public RequestOperatorRepository() throws ConfigurationException {
+    public static RequestOperatorRepository getInstance() {
+    	if (instance == null) {
+    		instance = new RequestOperatorRepository();
+    	}
+    	return instance;
+    }
+
+    /**
+     * private constructor for singleton
+     * @throws ConfigurationException
+     */
+    private RequestOperatorRepository() throws ConfigurationException {
         super(RequestOperator.class, false);
         load(false);
     }

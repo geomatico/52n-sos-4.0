@@ -60,7 +60,7 @@ public class WSDLFactory implements Producer<String> {
         if (Configurator.getInstance() != null) {
             final Map<String, Binding> bindings = Configurator.getInstance()
                     .getBindingRepository().getBindings();
-            final RequestOperatorRepository repo = Configurator.getInstance().getRequestOperatorRepository();
+            final RequestOperatorRepository repo = RequestOperatorRepository.getInstance();
 
             final Set<RequestOperatorKeyType> requestOperators = repo.getActiveRequestOperatorKeyTypes();
 

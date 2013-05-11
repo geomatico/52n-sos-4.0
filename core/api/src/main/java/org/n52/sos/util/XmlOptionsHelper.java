@@ -34,7 +34,7 @@ import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.CodingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,12 +77,8 @@ public final class XmlOptionsHelper {
         prefixMap.put(W3CConstants.NS_XLINK, W3CConstants.NS_XLINK_PREFIX);
         prefixMap.put(W3CConstants.NS_XSI, W3CConstants.NS_XSI_PREFIX);
         prefixMap.put(W3CConstants.NS_XS, W3CConstants.NS_XS_PREFIX);
-        if (Configurator.getInstance() != null) {
-            for (Encoder<?, ?> encoder : Configurator.getInstance().getCodingRepository().getEncoders()) {
-                encoder.addNamespacePrefixToMap(prefixMap);
-            }
-        } else {
-            LOGGER.debug("No Configurator instance available!");
+        for (Encoder<?, ?> encoder : CodingRepository.getInstance().getEncoders()) {
+            encoder.addNamespacePrefixToMap(prefixMap);
         }
         return prefixMap;
     }

@@ -42,7 +42,7 @@ import org.n52.sos.exception.ows.concrete.NoEncoderForKeyException;
 import org.n52.sos.exception.ows.concrete.XmlDecodingException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.CodingRepository;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
@@ -62,7 +62,7 @@ public final class CodingHelper {
     
     public static <T> Encoder<XmlObject, T> getEncoder(final String namespace, final T o) throws OwsExceptionReport {
         final EncoderKey key = getEncoderKey(namespace, o);
-        final Encoder<XmlObject, T> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
+        final Encoder<XmlObject, T> encoder = CodingRepository.getInstance().getEncoder(key);
         if (encoder == null) {
             throw new NoEncoderForKeyException(key);
         }
@@ -99,7 +99,7 @@ public final class CodingHelper {
 
     @Deprecated
     public static boolean hasXmlEncoderForOperation(final OperationDecoderKey k) {
-        return Configurator.getInstance().getCodingRepository().getDecoder(new XmlOperationDecoderKey(k)) != null;
+        return CodingRepository.getInstance().getDecoder(new XmlOperationDecoderKey(k)) != null;
     }
 
     public static Set<EncoderKey> encoderKeysForElements(final String namespace, final Class<?>... elements) {
@@ -124,7 +124,7 @@ public final class CodingHelper {
 
     public static Object decodeXmlObject(final XmlObject xbObject) throws OwsExceptionReport {
         final DecoderKey key = getDecoderKey(xbObject);
-        final Decoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository().getDecoder(key);
+        final Decoder<?, XmlObject> decoder = CodingRepository.getInstance().getDecoder(key);
         if (decoder == null) {
             throw new NoDecoderForKeyException(key);
         }

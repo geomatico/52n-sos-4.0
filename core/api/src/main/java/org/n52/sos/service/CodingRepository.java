@@ -48,6 +48,7 @@ import org.n52.sos.encode.ResponseFormatKeyType;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.service.operator.ServiceOperatorRepository;
 import org.n52.sos.util.Activatable;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.SetMultiMap;
@@ -60,6 +61,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CodingRepository {
     private static final Logger LOG = LoggerFactory.getLogger(CodingRepository.class);
+    private static CodingRepository instance;
     @SuppressWarnings("rawtypes")
     private final ServiceLoader<Decoder> serviceLoaderDecoder;
     @SuppressWarnings("rawtypes")
@@ -73,7 +75,20 @@ public class CodingRepository {
     private final Map<String, Map<String, Set<String>>> responseFormats = map();
     private final Map<ResponseFormatKeyType, Boolean> responseFormatStatus = map();
 
-    public CodingRepository() {
+    /**
+     * @return Returns a singleton instance of the CodingRepository.
+     */
+    public static CodingRepository getInstance() {
+    	if (instance == null) {
+    		instance = new CodingRepository();
+    	}
+    	return instance;
+    }    
+    
+    /**
+     * private constructor for singleton
+     */
+    private CodingRepository() {
         this.serviceLoaderDecoder = ServiceLoader.load(Decoder.class);
         this.serviceLoaderEncoder = ServiceLoader.load(Encoder.class);
         this.decoders = CollectionHelper.asSet(loadDecoders());
@@ -143,8 +158,8 @@ public class CodingRepository {
     private void generateResponseFormatMaps() {
         this.responseFormatStatus.clear();
         this.responseFormats.clear();
-        final Set<ServiceOperatorKeyType> serviceOperatorKeyTypes = Configurator.getInstance()
-                .getServiceOperatorRepository().getServiceOperatorKeyTypes();
+        final Set<ServiceOperatorKeyType> serviceOperatorKeyTypes = ServiceOperatorRepository.getInstance()
+                .getServiceOperatorKeyTypes();
         for (Encoder<?, ?> e : getEncoders()) {
             if (e instanceof ObservationEncoder) {
                 final ObservationEncoder<?, ?> oe = (ObservationEncoder<?, ?>) e;
@@ -433,7 +448,7 @@ public class CodingRepository {
 
     public Map<ServiceOperatorKeyType, Set<String>> getSupportedResponseFormats() {
         Map<ServiceOperatorKeyType, Set<String>> map = map();
-        for (ServiceOperatorKeyType sokt : Configurator.getInstance().getServiceOperatorRepository()
+        for (ServiceOperatorKeyType sokt : ServiceOperatorRepository.getInstance()
                 .getServiceOperatorKeyTypes()) {
             map.put(sokt, getSupportedResponseFormats(sokt));
         }
@@ -442,7 +457,7 @@ public class CodingRepository {
 
     public Map<ServiceOperatorKeyType, Set<String>> getAllSupportedResponseFormats() {
         Map<ServiceOperatorKeyType, Set<String>> map = map();
-        for (ServiceOperatorKeyType sokt : Configurator.getInstance().getServiceOperatorRepository()
+        for (ServiceOperatorKeyType sokt : ServiceOperatorRepository.getInstance()
                 .getServiceOperatorKeyTypes()) {
             map.put(sokt, getAllSupportedResponseFormats(sokt));
         }

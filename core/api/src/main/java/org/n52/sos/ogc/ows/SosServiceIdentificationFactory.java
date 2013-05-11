@@ -34,7 +34,7 @@ import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.operator.ServiceOperatorRepository;
 import org.n52.sos.util.LazyThreadSafeProducer;
 import org.n52.sos.util.Validation;
 import org.n52.sos.util.XmlHelper;
@@ -135,8 +135,7 @@ public class SosServiceIdentificationFactory extends LazyThreadSafeProducer<SosS
             serviceIdentification.setFees(this.fees);
             serviceIdentification.setServiceType(this.serviceType);
             serviceIdentification.setTitle(this.title);
-            serviceIdentification.setVersions(Configurator.getInstance()
-                    .getServiceOperatorRepository()
+            serviceIdentification.setVersions(ServiceOperatorRepository.getInstance()
                     .getSupportedVersions(SosConstants.SOS));
             serviceIdentification.setKeywords(Arrays.asList(this.keywords));
         }
