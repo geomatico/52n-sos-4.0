@@ -23,7 +23,10 @@
  */
 package org.n52.sos.config;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
@@ -97,18 +100,43 @@ public abstract class SettingsManager {
      * @throws ConfigurationException if no implementation can be found
      */
     private static SettingsManager createInstance() throws ConfigurationException {
-        ServiceLoader<SettingsManager> serviceLoader = ServiceLoader.load(SettingsManager.class);
-        Iterator<SettingsManager> i = serviceLoader.iterator();
-        while (i.hasNext()) {
+        List<SettingsManager> settingsManagers = new ArrayList<SettingsManager>();
+        for (SettingsManager sm : ServiceLoader.load(SettingsManager.class)){
+        	settingsManagers.add(sm);
+        }
+        Collections.sort(settingsManagers, new SettingsManagerComparator());
+        for (SettingsManager smManager : settingsManagers) {
             try {
-                return i.next();
+                return smManager;
             } catch (ServiceConfigurationError e) {
                 LOG.error("Could not instantiate SettingsManager", e);
-            }
+            }        	
         }
         throw new ConfigurationException("No SettingsManager implementation loaded");
     }
 
+    /**
+     * Order SettingsManagers by examining class inheritance, so that SettingsManagers
+     * that inherit from other SettingsManagers are used first
+     */
+    private static class SettingsManagerComparator implements Comparator<SettingsManager> {
+        @Override
+        public int compare(SettingsManager o1, SettingsManager o2) {
+        	if (o1 == null ^ o2 == null) {
+        		return (o1 == null) ? -1 : 1;
+        	}
+        	if (o1 == null && o2 == null){
+        		return 0;
+        	}
+    		if( o1.getClass().isAssignableFrom(o2.getClass()) ){
+    			return 1;
+    		} else if ( o2.getClass().isAssignableFrom(o1.getClass()) ){
+    			return -1;
+        	}            	
+    		return 0;
+        }
+    }    
+    
     /**
      * Configure {@code o} with the required settings. All changes to a setting required by the object will be applied.
      * <p/>
