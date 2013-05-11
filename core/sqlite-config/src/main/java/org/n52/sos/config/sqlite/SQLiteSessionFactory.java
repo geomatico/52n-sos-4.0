@@ -77,14 +77,14 @@ public class SQLiteSessionFactory implements ConnectionProvider {
     public static final String THREAD_LOCAL_SESSION_CONTEXT = "thread";
     
     private static final int SQLITE_CONNECTION_POOL_SIZE = 1;
-    private static final String CONNECTION_URL_TEMPLATE = "jdbc:sqlite:%s.db";
-    private static final String DEFAULT_DATABASE_NAME = "configuration";
+    protected static final String CONNECTION_URL_TEMPLATE = "jdbc:sqlite:%s.db";
+    protected static final String DEFAULT_DATABASE_NAME = "configuration";
     private static final String SQLITE_HIBERNATE_DIALECT = HibernateSQLiteDialect.class.getName();
     private static final String UPDATE_SCHEMA_VALUE = "update";
     private static final String SQLITE_JDBC_DRIVER = "org.sqlite.JDBC";
     public static final String EMPTY = "";
     
-    private static final Properties DEFAULT_PROPERTIES = new Properties() {
+    private final Properties DEFAULT_PROPERTIES = new Properties() {
         private static final long serialVersionUID = 3109256773218160485L;
         {
             put(HIBERNATE_CONNECTION_URL, getFilename());
@@ -99,7 +99,7 @@ public class SQLiteSessionFactory implements ConnectionProvider {
         }
     };
 
-    protected static String getFilename() {
+    protected String getFilename() {
         String path = null;
         try {
             path = SosContextListener.getPath();

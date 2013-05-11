@@ -69,8 +69,8 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     private static final Pattern SETTINGS_TYPE_CHANGED = Pattern.compile(
             ".*Abort due to constraint violation \\(column .* is not unique\\)");
     public static final SettingValueFactory SQLITE_SETTING_FACTORY = new SqliteSettingFactory();
-    private ConnectionProvider connectionProvider;
-    private final ReentrantLock lock = new ReentrantLock();
+    protected ConnectionProvider connectionProvider;
+    protected final ReentrantLock lock = new ReentrantLock();
 
     public SQLiteSettingsManager() throws ConfigurationException {
         super();
