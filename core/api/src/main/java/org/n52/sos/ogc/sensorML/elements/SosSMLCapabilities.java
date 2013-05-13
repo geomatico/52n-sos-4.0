@@ -23,10 +23,6 @@
  */
 package org.n52.sos.ogc.sensorML.elements;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.n52.sos.ogc.gml.GmlMetaDataProperty;
 import org.n52.sos.ogc.swe.DataRecord;
 
 /**
@@ -38,8 +34,6 @@ public class SosSMLCapabilities {
     private String name;
 
     private DataRecord dataRecord;
-
-    private List<GmlMetaDataProperty> gmlMetaDataProperties;
 
     /**
      * default constructor
@@ -84,21 +78,6 @@ public class SosSMLCapabilities {
         this.dataRecord = dataRecord;
     }
 
-    public List<GmlMetaDataProperty> getMetaDataProperties() {
-        return gmlMetaDataProperties;
-    }
-
-    public void setMetaDataProperties(List<GmlMetaDataProperty> gmlMetaDataProperties) {
-        this.gmlMetaDataProperties = gmlMetaDataProperties;
-    }
-
-    public void addMetaDataProperties(GmlMetaDataProperty gmlMetaDataProperty) {
-        if (gmlMetaDataProperties == null) {
-            gmlMetaDataProperties = new ArrayList<GmlMetaDataProperty>();
-        }
-        gmlMetaDataProperties.add(gmlMetaDataProperty);
-    }
-    
     public boolean isSetAbstractDataRecord() {
         return dataRecord != null;
     }

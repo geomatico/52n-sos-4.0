@@ -25,8 +25,11 @@ package org.n52.sos.decode;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -63,11 +66,13 @@ import net.opengis.sensorML.x101.ValidTimeDocument.ValidTime;
 
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractComponent;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
@@ -88,7 +93,9 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
 import org.n52.sos.ogc.swe.DataRecord;
+import org.n52.sos.ogc.swe.SosSweField;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
@@ -109,13 +116,11 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
             .singleton(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
 
     private static final Set<String> REMOVABLE_CAPABILITIES_NAMES = CollectionHelper.set(
-            SensorMLConstants.ELEMENT_NAME_PARENT_PROCEDURES, SensorMLConstants.ELEMENT_NAME_FEATURE_OF_INTEREST);
+            SensorMLConstants.ELEMENT_NAME_PARENT_PROCEDURES, SensorMLConstants.ELEMENT_NAME_FEATURES_OF_INTEREST,
+            SensorMLConstants.ELEMENT_NAME_OFFERINGS);
 
     private static final Set<String> REMOVABLE_COMPONENTS_ROLES = Collections
             .singleton(SensorMLConstants.ELEMENT_NAME_CHILD_PROCEDURES);
-
-    private static final Set<String> REMOVABLE_IDENTIFIERS = Collections
-            .singleton(SensorMLConstants.ELEMENT_NAME_OFFERING);
 
     public SensorMLDecoderV101() {
         LOGGER.debug("Decoder for the following keys initialized successfully: {}!",
@@ -188,14 +193,7 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
     private void parseAbstractProcess(final AbstractProcessType xbAbstractProcess,
             final AbstractProcess abstractProcess) throws OwsExceptionReport {
         if (xbAbstractProcess.getIdentificationArray() != null) {
-        	final IdentificationsAndIdentifier idsAndId = parseIdentifications(xbAbstractProcess.getIdentificationArray());
-        	abstractProcess.setIdentifier(idsAndId.getIdentifier());
-            abstractProcess.setIdentifications(idsAndId.getIdentifications());
-            final List<Integer> identificationsToRemove =
-                    checkIdentificationsForRemoval(xbAbstractProcess.getIdentificationArray());
-            for (final Integer integer : identificationsToRemove) {
-                xbAbstractProcess.removeIdentification(integer);
-            }
+        	parseIdentifications(abstractProcess, xbAbstractProcess.getIdentificationArray());
         }
         if (xbAbstractProcess.getClassificationArray() != null) {
             abstractProcess.setClassifications(parseClassification(xbAbstractProcess.getClassificationArray()));
@@ -204,7 +202,7 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
             abstractProcess.setCharacteristics(parseCharacteristics(xbAbstractProcess.getCharacteristicsArray()));
         }
         if (xbAbstractProcess.getCapabilitiesArray() != null) {
-            abstractProcess.addCapabilities(parseCapabilities(xbAbstractProcess.getCapabilitiesArray()));
+            parseCapabilities(abstractProcess, xbAbstractProcess.getCapabilitiesArray());
             final List<Integer> capsToRemove = checkCapabilitiesForRemoval(xbAbstractProcess.getCapabilitiesArray());
             for (final Integer integer : capsToRemove) {
                 xbAbstractProcess.removeCapabilities(integer);
@@ -335,62 +333,42 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
 		// TODO add other options if required
 		return rulesDefinition;
 	}
-
-	private class IdentificationsAndIdentifier{
-    	private final List<SosSMLIdentifier> identifications;
-    	private String identifier;
-    	
-    	public IdentificationsAndIdentifier( final int identificationsLength ){
-    		identifications = new ArrayList<SosSMLIdentifier>( identificationsLength );
-    	}
-		public String getIdentifier() {
-			return identifier;
-		}		
-		public void setIdentifier(final String identifier) {
-			this.identifier = identifier;
-		}
-		public List<SosSMLIdentifier> getIdentifications() {
-			return identifications;
-		}
-    }
     
     /**
-     * Parses the identification
-     * 
+     * Parses the identifications and sets the AbstractProcess' identifiers 
+     * @param abstractProcess
+     *            The AbstractProcess to which identifiers are added 
      * @param identificationArray
      *            XML identification
-     * @return SOS identifications and identifier
      */
-    private IdentificationsAndIdentifier parseIdentifications(final Identification[] identificationArray) {
-    	final IdentificationsAndIdentifier idsAndId = new IdentificationsAndIdentifier(identificationArray.length);
+    private void parseIdentifications(final AbstractProcess abstractProcess, final Identification[] identificationArray) {
         for (final Identification xbIdentification : identificationArray) {
         	if (xbIdentification.getIdentifierList() != null) {
 	            for (final Identifier xbIdentifier : xbIdentification.getIdentifierList().getIdentifierArray()) {
 	            	if (xbIdentifier.getName() != null && xbIdentifier.getTerm() != null){
-		            	final SosSMLIdentifier identification = new SosSMLIdentifier(xbIdentifier.getName(),
+		            	final SosSMLIdentifier identifier = new SosSMLIdentifier(xbIdentifier.getName(),
 		                        xbIdentifier.getTerm().getDefinition(), xbIdentifier.getTerm().getValue());
-		            	idsAndId.getIdentifications().add(identification);
-		            	if(isIdentificationProcedureIdentifier(identification)){
-		            		idsAndId.setIdentifier(identification.getValue());
+		            	abstractProcess.addIdentifier(identifier);
+		            	if(isIdentificationProcedureIdentifier(identifier)){
+		            		abstractProcess.setIdentifier(identifier.getValue());
 		            	}
 	            	}
 	            }
         	}
         }
-        return idsAndId;
     }
 
     /**
      * Determine if an SosSMLIdentifier is the unique identifier for a procedure
-     * @param identification SosSMLIdentifier to example for unique identifier
+     * @param identifier SosSMLIdentifier to example for unique identifier
      * @return whether the SosSMLIdentifier contains the unique identifier
      */
-    protected boolean isIdentificationProcedureIdentifier(final SosSMLIdentifier identification) {
-    	return (identification.getName() != null && identification.getName().equals(OGCConstants.URN_UNIQUE_IDENTIFIER_END))
-          || (identification.getDefinition() != null && (identification.getDefinition().equals(
+    protected boolean isIdentificationProcedureIdentifier(final SosSMLIdentifier identifier) {
+    	return (identifier.getName() != null && identifier.getName().equals(OGCConstants.URN_UNIQUE_IDENTIFIER_END))
+          || (identifier.getDefinition() != null && (identifier.getDefinition().equals(
         		  OGCConstants.URN_UNIQUE_IDENTIFIER)
-                  || identification.getDefinition().equals(OGCConstants.URN_IDENTIFIER_IDENTIFICATION) || (identification
-                  .getDefinition().startsWith(OGCConstants.URN_UNIQUE_IDENTIFIER_START) && identification.getDefinition()
+                  || identifier.getDefinition().equals(OGCConstants.URN_IDENTIFIER_IDENTIFICATION) || (identifier
+                  .getDefinition().startsWith(OGCConstants.URN_UNIQUE_IDENTIFIER_START) && identifier.getDefinition()
                   .contains(OGCConstants.URN_UNIQUE_IDENTIFIER_END))));
     }    
     
@@ -444,35 +422,78 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
     }
 
     /**
-     * Parses the capabilities
-     * 
+     * Parses the capabilities, processing and removing special insertion metadata
+     * @param abstractProcess
+     *            The AbstractProcess to which capabilities and insertion metadata are added 
      * @param capabilitiesArray
      *            XML capabilities
-     * @return SOS capabilities
-     * 
      * 
      * @throws OwsExceptionReport
      *             * if an error occurs
      */
-    private List<SosSMLCapabilities> parseCapabilities(final Capabilities[] capabilitiesArray)
-            throws OwsExceptionReport {
-        final List<SosSMLCapabilities> sosCapabilitiesList =
-                new ArrayList<SosSMLCapabilities>(capabilitiesArray.length);
-        final SosSMLCapabilities sosCapabilities = new SosSMLCapabilities();
-        for (final Capabilities xbCpabilities : capabilitiesArray) {
-            final Object decodedObject = CodingHelper.decodeXmlElement(xbCpabilities.getAbstractDataRecord());
+    private void parseCapabilities(final AbstractProcess abstractProcess,
+    		final Capabilities[] capabilitiesArray) throws OwsExceptionReport {
+        for (final Capabilities xbCapabilities : capabilitiesArray) {
+            final Object decodedObject = CodingHelper.decodeXmlElement(xbCapabilities.getAbstractDataRecord());
             if (decodedObject instanceof DataRecord) {
-                sosCapabilities.setDataRecord((DataRecord) decodedObject);
+            	DataRecord dataRecord = (DataRecord) decodedObject;
+            	//check if this capabilities is insertion metadata and should be parsed and removed
+            	if (REMOVABLE_CAPABILITIES_NAMES.contains(xbCapabilities.getName())) {
+            		Map<String,String> metadata = parseCapabilitiesMetadata(dataRecord, xbCapabilities);
+            		if (SensorMLConstants.ELEMENT_NAME_FEATURES_OF_INTEREST.equals(xbCapabilities.getName())) {
+            			abstractProcess.addFeaturesOfInterest(metadata.keySet());
+            		} else if (SensorMLConstants.ELEMENT_NAME_OFFERINGS.equals(xbCapabilities.getName())) {
+            			Set<SosOffering> offerings = new HashSet<SosOffering>();
+            			for (Entry<String,String> offeringEntry : metadata.entrySet()) {
+            				offerings.add(new SosOffering(offeringEntry.getKey(), offeringEntry.getValue()));
+            			}
+            			abstractProcess.addOfferings(offerings);
+            		} else if (SensorMLConstants.ELEMENT_NAME_PARENT_PROCEDURES.equals(xbCapabilities.getName())) {
+            			abstractProcess.addParentProcedures(metadata.keySet());
+            		} else {
+            			throw new UnsupportedDecoderInputException(this, xbCapabilities).withMessage(
+            					"Removable capabilities element %s is not supported", xbCapabilities.getName());
+            		}
+            	} else {
+            		//normal capabilities element, just parse
+                	SosSMLCapabilities sosSmlCapabilities = new SosSMLCapabilities();
+                	sosSmlCapabilities.setDataRecord(dataRecord);
+                	abstractProcess.addCapabilities(sosSmlCapabilities);            		
+            	}
             } else {
                 throw new InvalidParameterValueException()
-                        .at(XmlHelper.getLocalName(xbCpabilities))
+                        .at(XmlHelper.getLocalName(xbCapabilities))
                         .withMessage(
                                 "Error while parsing the capabilities of the SensorML (the capabilities data record is not of type DataRecordPropertyType)!");
             }
         }
-        sosCapabilitiesList.add(sosCapabilities);
-        return sosCapabilitiesList;
     }
+
+    /**
+     * Process standard formatted capabilities insertion metadata into a map (key=identifier, value=name)
+     * @param dataRecord The DataRecord to examine
+     * @param xbCapabilities The original capabilites xml object, used for exception throwing
+     * @return Map of insertion metadata (key=identifier, value=name)
+     * @throws CodedException thrown if the DataRecord fields are in an incorrect format
+     */
+    private Map<String,String> parseCapabilitiesMetadata(final DataRecord dataRecord, Capabilities xbCapabilities)
+    		throws CodedException {
+    	Map<String,String> metadataMap = new HashMap<String,String>();
+    	for (SosSweField sosSweField : dataRecord.getFields()) {
+    		if (!(sosSweField.getElement() instanceof SosSweText)) {
+    			throw new UnsupportedDecoderInputException(this, xbCapabilities).withMessage(
+    					"Removable capabilities element %s contains a non-Text field", xbCapabilities.getName());    			    		
+    		}
+    		SosSweText sosSweText = (SosSweText) sosSweField.getElement();
+    		if (!sosSweText.isSetValue()) {
+    			throw new UnsupportedDecoderInputException(this, xbCapabilities).withMessage(
+    					"Removable capabilities element %s contains a field with no value", xbCapabilities.getName());    			    		    			
+    		}
+    		metadataMap.put(sosSweText.getValue(), sosSweField.getName());
+    	}
+    	return metadataMap;
+    }
+
 
     /**
      * Parses the position
@@ -701,16 +722,6 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
             }
         }
         return removeableComponents;
-    }
-
-    private List<Integer> checkIdentificationsForRemoval(final Identification[] identifications) {
-        final List<Integer> removeableIdentification = new ArrayList<Integer>(identifications.length);
-        for (int i = 0; i < identifications.length; i++) {
-            if (identifications[i].getTitle() != null && REMOVABLE_IDENTIFIERS.contains(identifications[i].getTitle())) {
-                removeableIdentification.add(i);
-            }
-        }
-        return removeableIdentification;
     }
 
     private void checkAndRemoveEmptyComponents(final SystemType system) {

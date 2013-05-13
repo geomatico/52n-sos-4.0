@@ -27,7 +27,7 @@ package org.n52.sos.ogc.om;
  * class represents an offering in the SOS database
  * 
  */
-public class SosOffering {
+public class SosOffering implements Comparable<SosOffering> {
 
     /** identifier of this offering */
     private String offeringIdentifier;
@@ -98,5 +98,19 @@ public class SosOffering {
     public boolean isSetOfferingName() {
         return offeringName != null && !offeringName.isEmpty();
     }
+
+	@Override
+	public int compareTo(SosOffering o) {
+		if (o == null){
+			throw new NullPointerException();
+		}
+		if (getOfferingIdentifier() == null ^ o.getOfferingIdentifier() == null) {
+	        return (getOfferingIdentifier() == null) ? -1 : 1;
+	    }
+		if (getOfferingIdentifier() == null && o.getOfferingIdentifier() == null) {
+			return 0;			
+		}
+		return getOfferingIdentifier().compareTo(o.getOfferingIdentifier());
+	}
 
 }

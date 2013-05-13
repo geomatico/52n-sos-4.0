@@ -28,8 +28,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
@@ -245,17 +245,17 @@ public class SosInsertSensorOperatorV20 extends
 
     private void checkAndSetAssignedOffering(InsertSensorRequest request) {
         // if procedureDescription is SensorML
-        List<SosOffering> sosOfferings = null;
-        if (request.getProcedureDescription().isSetOffering()) {
-            sosOfferings = request.getProcedureDescription().getOfferingIdentifiers();
+        Set<SosOffering> sosOfferings = null;
+        if (request.getProcedureDescription().isSetOfferings()) {
+            sosOfferings = request.getProcedureDescription().getOfferings();
         } else {
             if (request.getProcedureDescription() instanceof SensorML) {
                 SensorML sensorML = (SensorML) request.getProcedureDescription();
                 // if SensorML is a wrapper and member size is 1
                 if (sensorML.isWrapper() && sensorML.getMembers().size() == 1) {
                     AbstractProcess process = sensorML.getMembers().get(0);
-                    if (process.isSetOffering()) {
-                        sosOfferings = process.getOfferingIdentifiers();
+                    if (process.isSetOfferings()) {
+                        sosOfferings = process.getOfferings();
                     }
                     if (process.isSetParentProcedures()) {
                         getOfferingsForParentProcedures(process.getParentProcedures());
@@ -268,10 +268,10 @@ public class SosInsertSensorOperatorV20 extends
         }
         // check if offering is valid
         if (sosOfferings == null || sosOfferings.isEmpty()) {
-            sosOfferings = new ArrayList<SosOffering>(0);
+            sosOfferings = new HashSet<SosOffering>(0);
             sosOfferings.add(new SosOffering(getDefaultOfferingPrefix() + request.getAssignedProcedureIdentifier()));
         }
-        request.setAssignedOfferings(sosOfferings);
+        request.setAssignedOfferings(new ArrayList<SosOffering>(sosOfferings));
     }
 
     private void checkProcedureAndOfferingCombination(InsertSensorRequest request) throws OwsExceptionReport {

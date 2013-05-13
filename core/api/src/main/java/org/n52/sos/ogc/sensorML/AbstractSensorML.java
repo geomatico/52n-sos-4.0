@@ -23,22 +23,17 @@
  */
 package org.n52.sos.ogc.sensorML;
 
-import static org.n52.sos.ogc.OGCConstants.URN_OFFERING_ID;
-import static org.n52.sos.ogc.sensorML.SensorMLConstants.ELEMENT_NAME_OFFERING;
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.n52.sos.ogc.gml.time.ITime;
-import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.sensorML.elements.AbstractSosSMLDocumentation;
 import org.n52.sos.ogc.sensorML.elements.SosSMLCapabilities;
 import org.n52.sos.ogc.sensorML.elements.SosSMLCharacteristics;
 import org.n52.sos.ogc.sensorML.elements.SosSMLClassifier;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
-import org.n52.sos.ogc.swe.SosSweField;
-import org.n52.sos.ogc.swe.simpleType.SosSweText;
 
 public class AbstractSensorML extends SosProcedureDescription {
 
@@ -138,18 +133,13 @@ public class AbstractSensorML extends SosProcedureDescription {
 
     public AbstractSensorML addCapabilities(final List<SosSMLCapabilities> capabilities) {
         if (capabilities != null) {
-            checkAndSetParentProcedures(capabilities);
             this.capabilities.addAll(capabilities);
         }
         return this;
     }
 
     public AbstractSensorML addCapabilities(final SosSMLCapabilities capabilities) {
-        if (capabilities != null) {
-            checkAndSetParentProcedures(capabilities);
-            this.capabilities.add(capabilities);
-        }
-        return this;
+    	return addCapabilities(Collections.singletonList(capabilities));
     }
 
     public List<SmlContact> getContact() {
@@ -202,31 +192,6 @@ public class AbstractSensorML extends SosProcedureDescription {
         return this;
     }
 
-    @Override
-    public List<SosOffering> getOfferingIdentifiers() {
-        final List<SosOffering> sosOfferings = new ArrayList<SosOffering>(0);
-        if (isSetIdentifications()) {
-            for (final SosSMLIdentifier identification : identifications) {
-                if (isIdentificationHoldingAnOfferingId(identification)) {
-                    sosOfferings.add(new SosOffering(identification.getValue(), identification.getName()));
-                }
-            }
-        }
-        return sosOfferings;
-    }
-    
-    @Override
-    public boolean isSetOffering() {
-        final List<SosOffering> offeringIdentifiers = getOfferingIdentifiers();
-        return offeringIdentifiers != null && !offeringIdentifiers.isEmpty();
-    }
-
-    private boolean isIdentificationHoldingAnOfferingId(final SosSMLIdentifier identification) {
-        return identification.getDefinition() != null
-                && (identification.getDefinition().equals(URN_OFFERING_ID) || identification.getDefinition().contains(
-                        ELEMENT_NAME_OFFERING));
-    }
-
     public boolean isSetKeywords() {
         return keywords != null && !keywords.isEmpty();
     }
@@ -261,29 +226,5 @@ public class AbstractSensorML extends SosProcedureDescription {
 
     public boolean isSetHistory() {
         return history != null && !history.isEmpty();
-    }
-    
-    private void checkAndSetParentProcedures(final List<SosSMLCapabilities> capabilities) {
-        if (capabilities != null) {
-            for (final SosSMLCapabilities sosSMLCapabilities : capabilities) {
-                checkAndSetParentProcedures(sosSMLCapabilities);
-            }
-        }
-    }
-
-    private void checkAndSetParentProcedures(final SosSMLCapabilities sosSmlCapabilities) {
-        if (sosSmlCapabilities != null && sosSmlCapabilities.isSetName()
-                && sosSmlCapabilities.getName().equals(SensorMLConstants.ELEMENT_NAME_PARENT_PROCEDURES)) {
-            if (sosSmlCapabilities.isSetAbstractDataRecord() && sosSmlCapabilities.getDataRecord().isSetFields()) {
-                for (final SosSweField sosSweField : sosSmlCapabilities.getDataRecord().getFields()) {
-                    if (sosSweField.getElement() instanceof SosSweText) {
-                        final SosSweText sosSweText = (SosSweText) sosSweField.getElement();
-                        if (sosSweText.isSetValue()) {
-                            addParentProcedures(sosSweText.getValue());
-                        }
-                    }
-                }
-            }
-        }
     }
 }

@@ -28,36 +28,10 @@ import java.util.List;
 
 import org.n52.sos.ogc.om.SosOffering;
 
-public class SosProcedureDescriptionUnknowType extends SosProcedureDescription {
-    
-	private List<SosOffering> offerings = new ArrayList<SosOffering>(0);
-    
-    
+public class SosProcedureDescriptionUnknowType extends SosProcedureDescription {    
     public SosProcedureDescriptionUnknowType(final String identifier, final String procedureDescriptionFormat, final String xmlDescription) {
         setIdentifier(identifier);
         setDescriptionFormat(procedureDescriptionFormat);
         setSensorDescriptionXmlString(xmlDescription);
-    }
-
-    @Override
-    public List<SosOffering> getOfferingIdentifiers() {
-        return offerings;
-    }
-
-	public SosProcedureDescriptionUnknowType setOfferingIdentifiers(final List<SosOffering> sosOfferings)
-	{
-		offerings = sosOfferings;
-        return this;
-	}
-
-    public SosProcedureDescriptionUnknowType addOfferingIdentifier(final SosOffering sosOffering) {
-        offerings.add(sosOffering);
-        return this;
-    }
-
-    @Override
-    public boolean isSetOffering() {
-        return offerings != null && !offerings.isEmpty();
-    }
-    
+    }    
 }

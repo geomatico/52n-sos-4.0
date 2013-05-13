@@ -81,7 +81,7 @@ public class SensorInsertionUpdate extends InMemoryCacheUpdate {
         cache.addOfferingForProcedure(procedure, offering);
 
         // offering name
-        for (SosOffering sosOffering : request.getProcedureDescription().getOfferingIdentifiers()) {
+        for (SosOffering sosOffering : request.getProcedureDescription().getOfferings()) {
             if (sosOffering.isSetOfferingName()) {
                 cache.setNameForOffering(sosOffering.getOfferingIdentifier(), sosOffering.getOfferingName());
             }

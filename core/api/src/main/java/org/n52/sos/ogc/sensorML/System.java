@@ -71,7 +71,7 @@ public class System extends AbstractComponent {
     private void checkAndSetChildProcedures(final SosSMLComponent component) {
         if (component != null && component.isSetName()
                 && component.getName().contains(SensorMLConstants.ELEMENT_NAME_CHILD_PROCEDURES)) {
-            addChildProcedures(component.getProcess());
+            addChildProcedure(component.getProcess());
         }
     }
 

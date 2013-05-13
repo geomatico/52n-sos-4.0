@@ -24,7 +24,6 @@
 package org.n52.sos.ogc.sos;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import org.n52.sos.ogc.om.SosOffering;
@@ -34,9 +33,10 @@ public abstract class SosProcedureDescription {
     private String identifier;
     private String sensorDescriptionXmlString;
     private String descriptionFormat;
-    private final Set<String> featureOfInterest = CollectionHelper.set();
-    private final Set<String> parentProcedure = CollectionHelper.set();
-    private final Set<SosProcedureDescription> childProcedure = CollectionHelper.set();
+    private final Set<SosOffering> offerings = CollectionHelper.set();
+    private final Set<String> featuresOfInterest = CollectionHelper.set();
+    private final Set<String> parentProcedures = CollectionHelper.set();
+    private final Set<SosProcedureDescription> childProcedures = CollectionHelper.set();
 
     public SosProcedureDescription setIdentifier(final String identifier) {
         this.identifier = identifier;
@@ -51,9 +51,23 @@ public abstract class SosProcedureDescription {
         return identifier != null && !identifier.isEmpty();
     }
 
-    public abstract List<SosOffering> getOfferingIdentifiers();
+    public Set<SosOffering> getOfferings(){
+    	return offerings;
+    }
 
-    public abstract boolean isSetOffering();
+    public SosProcedureDescription addOfferings(final Collection<SosOffering> offerings) {
+        this.offerings.addAll(offerings);
+        return this;
+    }
+
+    public SosProcedureDescription addOffering(final SosOffering offering) {
+        this.offerings.add(offering);
+        return this;
+    }    
+    
+    public boolean isSetOfferings(){
+    	return offerings != null && !offerings.isEmpty();
+    }
 
     public String getSensorDescriptionXmlString() {
         return sensorDescriptionXmlString;
@@ -78,60 +92,60 @@ public abstract class SosProcedureDescription {
     }
 
    
-    public SosProcedureDescription addFeatureOfInterest(final Collection<String> feature) {
-        featureOfInterest.addAll(feature);
+    public SosProcedureDescription addFeaturesOfInterest(final Collection<String> features) {
+        featuresOfInterest.addAll(features);
         return this;
     }
 
     public SosProcedureDescription addFeatureOfInterest(final String featureIdentifier) {
-        featureOfInterest.add(featureIdentifier);
+        featuresOfInterest.add(featureIdentifier);
         return this;
     }
 
-    public Set<String> getFeatureOfInterest() {
-        return featureOfInterest;
+    public Set<String> getFeaturesOfInterest() {
+        return featuresOfInterest;
     }
 
-    public boolean isSetFeatureOfInterest() {
-        return featureOfInterest != null && !featureOfInterest.isEmpty();
+    public boolean isSetFeaturesOfInterest() {
+        return featuresOfInterest != null && !featuresOfInterest.isEmpty();
     } 
 
     public SosProcedureDescription addParentProcedures(final Collection<String> parentProcedures) {
-        parentProcedure.addAll( parentProcedures);
+        this.parentProcedures.addAll(parentProcedures);
         return this;
     }
     
-    public SosProcedureDescription addParentProcedures(final String parentProcedureIdentifier) {
-        parentProcedure.add(parentProcedureIdentifier);
+    public SosProcedureDescription addParentProcedure(final String parentProcedureIdentifier) {
+        this.parentProcedures.add(parentProcedureIdentifier);
         return this;
     }
 
     public Set<String> getParentProcedures() {
-        return parentProcedure;
+        return parentProcedures;
     }
 
     public boolean isSetParentProcedures() {
-        return parentProcedure != null && !parentProcedure.isEmpty();
+        return parentProcedures != null && !parentProcedures.isEmpty();
     } 
 
     public SosProcedureDescription addChildProcedures(final Collection<SosProcedureDescription> childProcedures) {
         if (childProcedures != null) {
-            childProcedure.addAll(childProcedures);
+            this.childProcedures.addAll(childProcedures);
         }
         return this;
     }
     
-    public SosProcedureDescription addChildProcedures(final SosProcedureDescription childProcedure) {
-        this.childProcedure.add(childProcedure);
+    public SosProcedureDescription addChildProcedure(final SosProcedureDescription childProcedure) {
+        this.childProcedures.add(childProcedure);
         return this;
     }
 
     public Set<SosProcedureDescription> getChildProcedures() {
-        return childProcedure;
+        return childProcedures;
     }
 
     public boolean isSetChildProcedures() {
-        return childProcedure != null && !childProcedure.isEmpty();
+        return childProcedures != null && !childProcedures.isEmpty();
     } 
 
     @Override

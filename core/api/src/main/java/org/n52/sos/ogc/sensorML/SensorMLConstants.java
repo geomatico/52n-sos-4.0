@@ -63,9 +63,12 @@ public interface SensorMLConstants {
     String VERSION_V101 = "1.0.1";
 
 	/**
-	 * Name of a SensorML element describing the offering, a procedure/sensor is related to, or should be inserted into
+	 * Name of a SensorML element describing the offerings a procedure/sensor is related to or should be inserted into
 	 */
-    String ELEMENT_NAME_OFFERING = "offering";
+    String ELEMENT_NAME_OFFERINGS = "offerings";
+
+    // FIXME use a proper URI/URN for this, e.g. from settings
+    String OFFERING_FIELD_DEFINITION = "http://www.opengis.net/def/offering/identifier";
     
     /**
      * name of System capabilities containing parent procedures
@@ -73,23 +76,23 @@ public interface SensorMLConstants {
     String ELEMENT_NAME_PARENT_PROCEDURES = "parentProcedures";
     
     // FIXME use a proper URI/URN for this, e.g. from settings
-    String PARENT_PROCEDURES_FIELD_DEFINITION = "http://www.opengis.net/def/procedure/identifier";
+    String PARENT_PROCEDURE_FIELD_DEFINITION = "http://www.opengis.net/def/procedure/identifier";
     
-    String PARENT_PROCEDURES_FIELD_NAME = "ParentProcedureID";
-    
-    /**
-     * name of System capabilities containing featureOfInterest
-     */
-    String ELEMENT_NAME_FEATURE_OF_INTEREST = "featureOfInterest";
-    
+    String PARENT_PROCEDURE_FIELD_NAME = "parentProcedureID";
+        
     /**
      * name of System components containing child procedures
      */
     String ELEMENT_NAME_CHILD_PROCEDURES = "childProcedure";
     
+    /**
+     * name of System capabilities containing featureOfInterest
+     */
+    String ELEMENT_NAME_FEATURES_OF_INTEREST = "featuresOfInterest";
+    
     // FIXME use a proper URI/URN for this, e.g. from settings
     String FEATURE_OF_INTEREST_FIELD_DEFINITION = "http://www.opengis.net/def/featureOfInterest/identifier";
 
-    String FEATURE_OF_INTEREST_FIELD_NAME = "FeatureOfInterestID";
+    String FEATURE_OF_INTEREST_FIELD_NAME = "featureOfInterestID";
 
 }

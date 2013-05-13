@@ -26,8 +26,6 @@ package org.n52.sos.ogc.sensorML;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.n52.sos.ogc.om.SosOffering;
-
 /**
  * SOS internal representation of a sensor description
  */
@@ -91,23 +89,4 @@ public class SensorML extends AbstractSensorML {
     public boolean isSetMembers() {
         return members != null && !members.isEmpty();
     }
-
-    @Override
-    public List<SosOffering> getOfferingIdentifiers() {
-        final List<SosOffering> sosOfferings = super.getOfferingIdentifiers();
-        if (isWrapper() && getMembers() != null && !getMembers().isEmpty()) {
-            for (final AbstractProcess member : getMembers()) {
-                final List<SosOffering> offeringIdentifiers = member.getOfferingIdentifiers();
-                if (offeringIdentifiers != null && !offeringIdentifiers.isEmpty()) {
-                    for (final SosOffering sosOffering : offeringIdentifiers) {
-                        if (!sosOfferings.contains(sosOffering)) {
-                            sosOfferings.add(sosOffering);
-                        }
-                    }
-                }
-            }
-        }
-        return sosOfferings;
-    }
-
 }
