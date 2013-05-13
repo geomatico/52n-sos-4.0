@@ -75,7 +75,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.sos.SosEnvelope;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.DateTimeHelper;
@@ -558,11 +558,11 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
         MinMax<String> minmax = SosHelper.getMinMaxFromEnvelope(sosEnvelope.getEnvelope());
         envelopeType.addNewLowerCorner().setStringValue(minmax.getMinimum());
         envelopeType.addNewUpperCorner().setStringValue(minmax.getMaximum());
-        envelopeType.setSrsName(Configurator.getInstance().getSrsNamePrefix() + sosEnvelope.getSrid());
+        envelopeType.setSrsName(ServiceConfiguration.getInstance().getSrsNamePrefix() + sosEnvelope.getSrid());
         return envelopeType;
     }
 
     protected String getSrsName(Geometry geom) {
-        return Configurator.getInstance().getSrsNamePrefix() + geom.getSRID();
+        return ServiceConfiguration.getInstance().getSrsNamePrefix() + geom.getSRID();
     }
 }

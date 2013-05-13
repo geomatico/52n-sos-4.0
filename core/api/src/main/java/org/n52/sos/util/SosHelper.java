@@ -60,6 +60,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -540,11 +541,11 @@ public class SosHelper {
         }
 
         protected String getSrsNamePrefix() {
-            return Configurator.getInstance().getSrsNamePrefix();
+            return ServiceConfiguration.getInstance().getSrsNamePrefix();
         }
 
         protected String getSrsNamePrefixSosV2() {
-            return Configurator.getInstance().getSrsNamePrefixSosV2();
+            return ServiceConfiguration.getInstance().getSrsNamePrefixSosV2();
         }
 
         protected Set<Encoder<?, ?>> getEncoders() {

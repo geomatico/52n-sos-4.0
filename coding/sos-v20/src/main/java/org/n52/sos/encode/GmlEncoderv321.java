@@ -72,7 +72,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.sos.SosEnvelope;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.DateTimeHelper;
@@ -601,6 +601,6 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
     }
 
     protected String getSrsName(int srid) {
-        return Configurator.getInstance().getSrsNamePrefixSosV2() + srid;
+        return ServiceConfiguration.getInstance().getSrsNamePrefixSosV2() + srid;
     }
 }

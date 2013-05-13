@@ -33,6 +33,7 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.binding.BindingRepository;
+import org.n52.sos.ds.OperationDAORepository;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.XmlEncoderKey;
@@ -57,7 +58,7 @@ import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.CodingRepository;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.service.admin.AdministratorConstants.AdministratorParams;
 import org.n52.sos.service.admin.request.AdminRequest;
 import org.n52.sos.service.operator.ServiceOperatorRepository;
@@ -121,7 +122,8 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
                     BindingRepository.getInstance().update();
                     builder.append("Bindings");
                 } else if (parameter.equalsIgnoreCase(UPDATE_CONFIGURATION)) {
-                    Configurator.getInstance().updateConfiguration();
+                	BindingRepository.getInstance().update();
+                	OperationDAORepository.getInstance().update();
                     CodingRepository.getInstance().updateDecoders();
                     CodingRepository.getInstance().updateEncoders();
                     ServiceOperatorRepository.getInstance().update();
@@ -183,9 +185,8 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
     }
 
     private Map<String, Set<DCP>> getDCP() {
-        return Collections.singletonMap(SosConstants.HTTP_GET,
-                                        Collections.singleton(new DCP(Configurator.getInstance().getServiceURL() +
-                                                                      "/admin?")));
+        return Collections.singletonMap(SosConstants.HTTP_GET, Collections.singleton(
+        		new DCP(ServiceConfiguration.getInstance().getServiceURL() + "/admin?")));
     }
 
     private ServiceResponse createServiceResponse(String string) throws OwsExceptionReport {

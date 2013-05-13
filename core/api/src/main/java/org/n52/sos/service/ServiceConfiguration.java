@@ -23,11 +23,25 @@
  */
 package org.n52.sos.service;
 
-import static org.n52.sos.service.MiscSettings.*;
-import static org.n52.sos.service.ServiceSettings.*;
+import static org.n52.sos.service.MiscSettings.CHARACTER_ENCODING;
+import static org.n52.sos.service.MiscSettings.DEFAULT_FEATURE_PREFIX;
+import static org.n52.sos.service.MiscSettings.DEFAULT_OBSERVABLEPROPERTY_PREFIX;
+import static org.n52.sos.service.MiscSettings.DEFAULT_OFFERING_PREFIX;
+import static org.n52.sos.service.MiscSettings.DEFAULT_PROCEDURE_PREFIX;
+import static org.n52.sos.service.MiscSettings.GML_DATE_FORMAT;
+import static org.n52.sos.service.MiscSettings.HTTP_STATUS_CODE_USE_IN_KVP_POX_BINDING;
+import static org.n52.sos.service.MiscSettings.SRS_NAME_PREFIX_SOS_V1;
+import static org.n52.sos.service.MiscSettings.SRS_NAME_PREFIX_SOS_V2;
+import static org.n52.sos.service.ServiceSettings.ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR;
+import static org.n52.sos.service.ServiceSettings.MINIMUM_GZIP_SIZE;
+import static org.n52.sos.service.ServiceSettings.SENSOR_DIRECTORY;
+import static org.n52.sos.service.ServiceSettings.SERVICE_URL;
+import static org.n52.sos.service.ServiceSettings.SUPPORTS_QUALITY;
+import static org.n52.sos.service.ServiceSettings.USE_DEFAULT_PREFIXES;
 
 import java.net.URI;
 
+import org.n52.sos.config.SettingsManager;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.exception.ConfigurationException;
@@ -43,6 +57,8 @@ import org.n52.sos.util.XmlOptionsHelper;
  */
 @Configurable
 public class ServiceConfiguration {
+	private static ServiceConfiguration instance;
+	
     /**
      * character encoding for responses.
      */
@@ -54,6 +70,23 @@ public class ServiceConfiguration {
     private boolean useDefaultPrefixes;
     private boolean encodeFullChildrenInDescribeSensor;
     private boolean useHttpStatusCodesInKvpAndPoxBinding;
+
+    /**
+     * @return Returns a singleton instance of the ServiceConfiguration.
+     */
+    public static ServiceConfiguration getInstance() {
+    	if (instance == null) {
+    		instance = new ServiceConfiguration();
+    	}
+    	return instance;
+    }    
+    
+    /**
+     * private constructor for singleton
+     */
+    private ServiceConfiguration() {
+    	SettingsManager.getInstance().configure(instance = this);
+    }
 
     /**
      * date format of gml.

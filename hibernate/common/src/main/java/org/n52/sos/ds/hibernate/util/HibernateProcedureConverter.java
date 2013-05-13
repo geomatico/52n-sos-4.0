@@ -420,7 +420,7 @@ public class HibernateProcedureConverter {
     }
 
     protected ServiceConfiguration getServiceConfig() {
-        return Configurator.getInstance().getServiceConfiguration();
+        return ServiceConfiguration.getInstance();
     }
 
     private SensorDescriptionGenerationSettings generationSettings() {
@@ -492,7 +492,7 @@ public class HibernateProcedureConverter {
         final StringBuilder builder = new StringBuilder();
         if (filename.startsWith("standard")) {
             filename = filename.replace("standard", "");
-            builder.append(Configurator.getInstance().getSensorDir());
+            builder.append(ServiceConfiguration.getInstance().getSensorDir());
             builder.append("/");
         }
         builder.append(filename);

@@ -24,6 +24,7 @@
 package org.n52.sos.util;
 
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConfiguration;
 
 public final class CacheHelper {
 
@@ -32,57 +33,57 @@ public final class CacheHelper {
     }
 
     public static String addPrefixOrGetOfferingIdentifier(String offering) {
-        if (getConfigurator().isUseDefaultPrefixes()) {
-            return getConfigurator().getDefaultOfferingPrefix() +  offering;
+        if (ServiceConfiguration.getInstance().isUseDefaultPrefixes()) {
+            return ServiceConfiguration.getInstance().getDefaultOfferingPrefix() +  offering;
         } 
         return offering;
     }
     
     public static String removePrefixAndGetOfferingIdentifier(String offering) {
-        if (getConfigurator().isUseDefaultPrefixes()) {
-            return offering.replace(getConfigurator().getDefaultOfferingPrefix(), "");
+        if (ServiceConfiguration.getInstance().isUseDefaultPrefixes()) {
+            return offering.replace(ServiceConfiguration.getInstance().getDefaultOfferingPrefix(), "");
         } 
         return offering;
     }
 
     public static String addPrefixOrGetProcedureIdentifier(String procedure) {
-        if (getConfigurator().isUseDefaultPrefixes()) {
-            return getConfigurator().getDefaultProcedurePrefix() +  procedure;
+        if (ServiceConfiguration.getInstance().isUseDefaultPrefixes()) {
+            return ServiceConfiguration.getInstance().getDefaultProcedurePrefix() +  procedure;
         } 
         return procedure;
     }
     
     public static String removePrefixAndGetProcedureIdentifier(String procedure) {
-        if (getConfigurator().isUseDefaultPrefixes()) {
-            return procedure.replace(getConfigurator().getDefaultProcedurePrefix(), "");
+        if (ServiceConfiguration.getInstance().isUseDefaultPrefixes()) {
+            return procedure.replace(ServiceConfiguration.getInstance().getDefaultProcedurePrefix(), "");
         } 
         return procedure;
     }
 
     public static String addPrefixOrGetFeatureIdentifier(String feature) {
-        if (getConfigurator().isUseDefaultPrefixes()) {
-            return getConfigurator().getDefaultFeaturePrefix() +  feature;
+        if (ServiceConfiguration.getInstance().isUseDefaultPrefixes()) {
+            return ServiceConfiguration.getInstance().getDefaultFeaturePrefix() +  feature;
         } 
         return feature;
     }
     
     public static String removePrefixAndGetFeatureIdentifier(String feature) {
-        if (getConfigurator().isUseDefaultPrefixes()) {
-            return feature.replace(getConfigurator().getDefaultFeaturePrefix(), "");
+        if (ServiceConfiguration.getInstance().isUseDefaultPrefixes()) {
+            return feature.replace(ServiceConfiguration.getInstance().getDefaultFeaturePrefix(), "");
         } 
         return feature;
     }
 
     public static String addPrefixOrGetObservablePropertyIdentifier(String observableProperty) {
-        if (getConfigurator().isUseDefaultPrefixes()) {
-            return getConfigurator().getDefaultObservablePropertyPrefix() +  observableProperty;
+        if (ServiceConfiguration.getInstance().isUseDefaultPrefixes()) {
+            return ServiceConfiguration.getInstance().getDefaultObservablePropertyPrefix() +  observableProperty;
         } 
         return observableProperty;
     }
     
     public static String removePrefixAndGetObservablePropertyIdentifier(String observableProperty) {
-        if (getConfigurator().isUseDefaultPrefixes()) {
-            return observableProperty.replace(getConfigurator().getDefaultObservablePropertyPrefix(), "");
+        if (ServiceConfiguration.getInstance().isUseDefaultPrefixes()) {
+            return observableProperty.replace(ServiceConfiguration.getInstance().getDefaultObservablePropertyPrefix(), "");
         } 
         return observableProperty;
     }

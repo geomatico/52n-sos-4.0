@@ -46,7 +46,7 @@ import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.service.ServiceConstants;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
@@ -194,11 +194,11 @@ public abstract class AbstractKvpDecoder implements Decoder<AbstractServiceReque
     }
 
     protected String getSrsNamePrefix() {
-        return Configurator.getInstance().getSrsNamePrefix();
+        return ServiceConfiguration.getInstance().getSrsNamePrefix();
     }
 
     protected String getSrsNamePrefixSosV2() {
-        return Configurator.getInstance().getSrsNamePrefixSosV2();
+        return ServiceConfiguration.getInstance().getSrsNamePrefixSosV2();
     }
 
 }

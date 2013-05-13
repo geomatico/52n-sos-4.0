@@ -209,7 +209,7 @@ public class SosService extends ConfiguratedHttpServlet {
 				final int contentLength = sosResponse.getContentLength();
 				resp.setContentType(contentType);
 				if (sosResponse.getApplyGzipCompression() || (clientAcceptsGzip
-						&& (contentLength > Configurator.getInstance().getMinimumGzipSize()))) {
+						&& (contentLength > ServiceConfiguration.getInstance().getMinimumGzipSize()))) {
 					if (clientAcceptsGzip) {
 						resp.addHeader(CONTENT_ENCODING, GZIP);
 					}

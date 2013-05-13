@@ -164,7 +164,6 @@ public class Configurator implements Cleanupable {
      * base path for configuration files.
      */
     private final String basepath;
-    private ServiceConfiguration configuration;
     private final Properties dataConnectionProviderProperties;
     private Properties featureConnectionProviderProperties;
     private FeatureQueryHandler featureQueryHandler;
@@ -215,7 +214,8 @@ public class Configurator implements Cleanupable {
     private void initialize() throws ConfigurationException {
         LOGGER.info("\n******\n Configurator initialization started\n******\n");
 
-        SettingsManager.getInstance().configure(configuration = new ServiceConfiguration());
+        SettingsManager.getInstance();
+        ServiceConfiguration.getInstance();
 
         initializeConnectionProviders();
         
@@ -312,12 +312,6 @@ public class Configurator implements Cleanupable {
         return adminServiceOperator;
     }
 
-    public void updateConfiguration() throws ConfigurationException {
-        // TODO update converters
-        getBindingRepository().update();
-        getOperationDaoRepository().update();
-    }
-
     @Deprecated
     public OperationDAORepository getOperationDaoRepository() {
         return OperationDAORepository.getInstance();
@@ -346,90 +340,133 @@ public class Configurator implements Cleanupable {
      * Returns the default token seperator for results.
      * <p/>
      * @return the tokenSeperator.
+     * @deprecated Use ServiceConfiguration.getInstance().getTokenSeparator()
      */
+    @Deprecated 
     public String getTokenSeparator() {
-        return getServiceConfiguration().getTokenSeparator();
+        return ServiceConfiguration.getInstance().getTokenSeparator();
     }
 
+    /**
+     * @deprecated Use ServiceConfiguration.getInstance().getTupleSeparator()
+     */
+    @Deprecated
     public String getTupleSeparator() {
-        return getServiceConfiguration().getTupleSeparator();
+        return ServiceConfiguration.getInstance().getTupleSeparator();
     }
-
 
     /**
      * Returns the minimum size a response has to hvae to be compressed.
      * <p/>
      * @return the minimum threshold
+     * @deprecated Use ServiceConfiguration.getInstance().getMinimumGzipSize()
      */
+    @Deprecated
     public int getMinimumGzipSize() {
-        return getServiceConfiguration().getMinimumGzipSize();
+        return ServiceConfiguration.getInstance().getMinimumGzipSize();
     }
 
+    /**
+     * @deprecated Use ServiceConfiguration.getInstance().getDefaultOfferingPrefix()
+     */
+    @Deprecated
     public String getDefaultOfferingPrefix() {
-        return getServiceConfiguration().getDefaultOfferingPrefix();
-    }
-    
-    public String getDefaultProcedurePrefix() {
-        return getServiceConfiguration().getDefaultProcedurePrefix();
-    }
-    
-    public String getDefaultFeaturePrefix() {
-        return getServiceConfiguration().getDefaultFeaturePrefix();
-    }
-    
-    public String getDefaultObservablePropertyPrefix() {
-        return getServiceConfiguration().getDefaultObservablePropertyPrefix();
-    }
-    
-    public boolean isUseDefaultPrefixes() {
-        return getServiceConfiguration().isUseDefaultPrefixes();
+        return ServiceConfiguration.getInstance().getDefaultOfferingPrefix();
     }
 
+    /**
+     * @deprecated Use ServiceConfiguration.getInstance().getDefaultProcedurePrefix()
+     */
+    @Deprecated
+    public String getDefaultProcedurePrefix() {
+        return ServiceConfiguration.getInstance().getDefaultProcedurePrefix();
+    }
+
+    /**
+     * @deprecated Use ServiceConfiguration.getInstance().getDefaultFeaturePrefix()
+     */
+    @Deprecated    
+    public String getDefaultFeaturePrefix() {
+        return ServiceConfiguration.getInstance().getDefaultFeaturePrefix();
+    }
+
+    /**
+     * @deprecated Use ServiceConfiguration.getInstance().getDefaultObservablePropertyPrefix()
+     */
+    @Deprecated
+    public String getDefaultObservablePropertyPrefix() {
+        return ServiceConfiguration.getInstance().getDefaultObservablePropertyPrefix();
+    }
+
+    /**
+     * @deprecated Use ServiceConfiguration.getInstance().isUseDefaultPrefixes()
+     */
+    @Deprecated
+    public boolean isUseDefaultPrefixes() {
+        return ServiceConfiguration.getInstance().isUseDefaultPrefixes();
+    }
+
+    /**
+     * @deprecated Use ServiceConfiguration.getInstance().isEncodeFullChildrenInDescribeSensor()
+     */    
+    @Deprecated
     public boolean isEncodeFullChildrenInDescribeSensor() {
-    	return getServiceConfiguration().isEncodeFullChildrenInDescribeSensor();
+    	return ServiceConfiguration.getInstance().isEncodeFullChildrenInDescribeSensor();
 	}
 
     /**
      * @return the supportsQuality
+     * @deprecated Use ServiceConfiguration.getInstance().isSupportsQuality()
      */
-    //HibernateObservationUtilities
+    @Deprecated    
     public boolean isSupportsQuality() {
-        return getServiceConfiguration().isSupportsQuality();
+        return ServiceConfiguration.getInstance().isSupportsQuality();
     }
 
     /**
      * @return Returns the sensor description directory
+     * @deprecated Use ServiceConfiguration.getInstance().getSensorDir() 
      */
-    //HibernateProcedureUtilities
+    @Deprecated
     public String getSensorDir() {
-        return getServiceConfiguration().getSensorDir();
+        return ServiceConfiguration.getInstance().getSensorDir();
     }
 
     /**
      * Get service URL.
      *
      * @return the service URL
+     * @deprecated Use ServiceConfiguration.getInstance().getServiceURL()
      */
+    @Deprecated    
     public String getServiceURL() {
-        return getServiceConfiguration().getServiceURL();
+        return ServiceConfiguration.getInstance().getServiceURL();
     }
 
     /**
      * @return prefix URN for the spatial reference system
+     * @deprecated Use ServiceConfiguration.getInstance().getSrsNamePrefix() 
      */
+    @Deprecated    
     public String getSrsNamePrefix() {
-        return getServiceConfiguration().getSrsNamePrefix();
+        return ServiceConfiguration.getInstance().getSrsNamePrefix();
     }
 
     /**
      * @return prefix URN for the spatial reference system
+     * @deprecated Use ServiceConfiguration.getInstance().getSrsNamePrefixSosV2()
      */
+    @Deprecated    
     public String getSrsNamePrefixSosV2() {
-        return getServiceConfiguration().getSrsNamePrefixSosV2();
+        return ServiceConfiguration.getInstance().getSrsNamePrefixSosV2();
     }
 
+    /** 
+     * @deprecated Use ServiceConfiguration.getInstance() instead
+     */
+    @Deprecated
     public ServiceConfiguration getServiceConfiguration() {
-        return configuration;
+        return ServiceConfiguration.getInstance();
     }
 
     protected void initializeConnectionProviders() throws ConfigurationException {

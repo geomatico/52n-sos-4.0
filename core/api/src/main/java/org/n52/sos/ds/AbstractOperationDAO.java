@@ -37,6 +37,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.util.MultiMaps;
 import org.n52.sos.util.SetMultiMap;
 import org.slf4j.Logger;
@@ -100,7 +101,7 @@ public abstract class AbstractOperationDAO implements OperationDAO {
      */
     protected Map<String, Set<DCP>> getDCP(OperationDecoderKey decoderKey) throws OwsExceptionReport {
         SetMultiMap<String, DCP> dcps = MultiMaps.newSetMultiMap();
-        String serviceURL = Configurator.getInstance().getServiceURL();
+        String serviceURL = ServiceConfiguration.getInstance().getServiceURL();
         try {
             for (Binding binding : BindingRepository.getInstance().getBindings().values()) {
                 String url = serviceURL + binding.getUrlPattern();

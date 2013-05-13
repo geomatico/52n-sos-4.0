@@ -64,7 +64,7 @@ import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetObservationRequest;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.OMHelper;
@@ -150,7 +150,7 @@ public class ITRequestEncoder {
                 xb_getObs.setSrsName(SosConstants.PARAMETER_NOT_SET);
             }
             else {
-                xb_getObs.setSrsName(Configurator.getInstance().getSrsNamePrefix() + req.getSrid());
+                xb_getObs.setSrsName(ServiceConfiguration.getInstance().getSrsNamePrefix() + req.getSrid());
             }
 
             if (req.getOfferings() != null) {
@@ -440,7 +440,7 @@ public class ITRequestEncoder {
 
         int srid = mp.getSRID();
         EnvelopeType xb_env = xb_bbox.addNewEnvelope();
-        xb_env.setSrsName(Configurator.getInstance().getSrsNamePrefix() + srid);
+        xb_env.setSrsName(ServiceConfiguration.getInstance().getSrsNamePrefix() + srid);
         xb_env.addNewLowerCorner().setStringValue(JTSHelper.getCoordinatesString((Point) mp.getGeometryN(0)));
         xb_env.addNewUpperCorner().setStringValue(JTSHelper.getCoordinatesString((Point) mp.getGeometryN(1)));
         return xb_bbox;

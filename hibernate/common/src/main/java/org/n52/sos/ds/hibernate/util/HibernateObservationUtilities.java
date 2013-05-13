@@ -96,6 +96,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.SosHelper;
@@ -585,17 +586,17 @@ public class HibernateObservationUtilities {
     protected static class Configuration {
 
         /**
-         * @see Configurator#getTupleSeparator()
+         * @see ServiceConfiguration#getTupleSeparator()
          */
         protected String getTupleSeparator() {
-            return Configurator.getInstance().getTupleSeparator();
+            return ServiceConfiguration.getInstance().getTupleSeparator();
         }
 
         /**
-         * @see Configurator#getTokenSeparator()
+         * @see ServiceConfiguration#getTokenSeparator()
          */
         protected String getTokenSeparator() {
-            return Configurator.getInstance().getTokenSeparator();
+            return ServiceConfiguration.getInstance().getTokenSeparator();
         }
 
         /**
@@ -620,10 +621,10 @@ public class HibernateObservationUtilities {
         }
 
         /**
-         * @see Configurator#isSupportsQuality()
+         * @see ServiceConfiguration#isSupportsQuality()
          */
         protected boolean isSupportsQuality() {
-            return Configurator.getInstance().isSupportsQuality();
+            return ServiceConfiguration.getInstance().isSupportsQuality();
         }
     }
 }

@@ -40,6 +40,7 @@ import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.request.operator.WSDLAwareRequestOperator;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.util.Producer;
 
 /**
@@ -64,7 +65,7 @@ public class WSDLFactory implements Producer<String> {
 
             final Set<RequestOperatorKeyType> requestOperators = repo.getActiveRequestOperatorKeyTypes();
 
-            final String serviceUrl = Configurator.getInstance().getServiceURL();
+            final String serviceUrl = ServiceConfiguration.getInstance().getServiceURL();
             
             if (bindings.containsKey(BindingConstants.SOAP_BINDING_ENDPOINT)) {
                 builder.setSoapEndpoint(URI.create(serviceUrl + BindingConstants.SOAP_BINDING_ENDPOINT));

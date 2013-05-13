@@ -127,7 +127,7 @@ import org.n52.sos.ogc.swe.SosSweSimpleDataRecord;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.service.CodingRepository;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.service.operator.ServiceOperatorRepository;
 import org.n52.sos.util.CodingHelper;
@@ -1086,7 +1086,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             final SosSMLComponent component = new SosSMLComponent("component" + childCount);
             component.setTitle(childProcedure.getIdentifier());
 
-            if (Configurator.getInstance().isEncodeFullChildrenInDescribeSensor()
+            if (ServiceConfiguration.getInstance().isEncodeFullChildrenInDescribeSensor()
                     && childProcedure instanceof AbstractSensorML) {
                 component.setProcess((AbstractSensorML) childProcedure);
             } else {
@@ -1097,7 +1097,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                         		.getSupportedVersions(SosConstants.SOS).contains(Sos2Constants.SERVICEVERSION) ? Sos2Constants.SERVICEVERSION
                                         : Sos1Constants.SERVICEVERSION;
 
-                        component.setHref(SosHelper.getDescribeSensorUrl(version, Configurator.getInstance()
+                        component.setHref(SosHelper.getDescribeSensorUrl(version, ServiceConfiguration.getInstance()
                                 .getServiceURL(), childProcedure.getIdentifier(),
                                 BindingConstants.KVP_BINDING_ENDPOINT));
                     } else {

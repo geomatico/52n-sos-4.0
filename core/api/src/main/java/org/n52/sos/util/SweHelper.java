@@ -56,7 +56,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweObservableProperty;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
-import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -192,12 +192,12 @@ public final class SweHelper {
         if (sosObservation.isSetTupleSeparator()) {
             sosTextEncoding.setBlockSeparator(sosObservation.getTupleSeparator());
         } else {
-            sosTextEncoding.setBlockSeparator(Configurator.getInstance().getTupleSeparator());
+            sosTextEncoding.setBlockSeparator(ServiceConfiguration.getInstance().getTupleSeparator());
         }
         if (sosObservation.isSetTokenSeparator()) {
             sosTextEncoding.setTokenSeparator(sosObservation.getTokenSeparator());
         } else {
-            sosTextEncoding.setTokenSeparator(Configurator.getInstance().getTokenSeparator());
+            sosTextEncoding.setTokenSeparator(ServiceConfiguration.getInstance().getTokenSeparator());
         }
         return sosTextEncoding;
     }
