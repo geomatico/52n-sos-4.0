@@ -331,11 +331,6 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
         f.setGeom(switchCoordinateAxisOrderIfNeeded(ssf.getGeometry()));
     }
 
-    @Deprecated
-    protected void processGeometryPostLoad(Geometry geometry, SosSamplingFeature ssf) throws OwsExceptionReport {
-        ssf.setGeometry(switchCoordinateAxisOrderIfNeeded(geometry));
-    }
-
     protected Geometry switchCoordinateAxisOrderIfNeeded(Geometry geom) throws OwsExceptionReport {
         if (geom != null && isAxisOrderSwitchRequired(geom.getSRID() == 0 ? getDefaultEPSG() : geom.getSRID())) {
             return JTSHelper.switchCoordinateAxisOrder(geom);

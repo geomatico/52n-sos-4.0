@@ -229,12 +229,6 @@ public class ContentCacheControllerImpl extends AbstractSchedulingContentCacheCo
     }
 
     @Override
-    @Deprecated
-    public void updateCacheFromDatasource() throws OwsExceptionReport {
-        update();
-    }
-
-    @Override
     public void update() throws OwsExceptionReport {
         update(new CompleteCacheUpdate());
     }

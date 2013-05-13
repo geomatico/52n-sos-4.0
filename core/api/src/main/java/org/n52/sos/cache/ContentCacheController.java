@@ -36,15 +36,6 @@ public interface ContentCacheController extends Cleanupable {
     ContentCache getCache();
 
     /**
-     * Update the cache from the underlying datasource.
-     *
-     * @throws OwsExceptionReport if an error occurs
-     * @deprecated use {@link #update()}
-     */
-    @Deprecated
-    void updateCacheFromDatasource() throws OwsExceptionReport;
-
-    /**
      * Update the content cache with the specified update.
      *
      * @param update the update

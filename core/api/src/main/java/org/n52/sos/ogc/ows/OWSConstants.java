@@ -117,15 +117,4 @@ public interface OWSConstants {
             return false;
         }
     }
-
-    /**
-     * Exception levels
-     *
-     * @deprecated not found in spec or used in code
-     */
-    @Deprecated
-    enum ExceptionLevel {
-        PlainExceptions, DetailedExceptions
-    }
-
 }

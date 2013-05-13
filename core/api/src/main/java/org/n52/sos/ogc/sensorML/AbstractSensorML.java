@@ -136,17 +136,6 @@ public class AbstractSensorML extends SosProcedureDescription {
         return capabilities;
     }
 
-    // FIXME add javadoc to deprecated method explained what else to use!
-    @Deprecated
-    public AbstractSensorML setCapabilities(final List<SosSMLCapabilities> capabilities) {
-        if (isSetCapabilities()) {
-            this.capabilities.addAll(capabilities);
-        } else {
-            this.capabilities = capabilities;
-        }
-        return this;
-    }
-    
     public AbstractSensorML addCapabilities(final List<SosSMLCapabilities> capabilities) {
         if (capabilities != null) {
             checkAndSetParentProcedures(capabilities);

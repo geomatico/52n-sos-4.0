@@ -27,9 +27,6 @@ import static org.n52.sos.service.MiscSettings.*;
 import static org.n52.sos.service.ServiceSettings.*;
 
 import java.net.URI;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
@@ -50,13 +47,6 @@ public class ServiceConfiguration {
      * character encoding for responses.
      */
     private String characterEncoding;
-    /**
-     * Map with indicator and name of additional config files for modules.
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    private final Map<String, String> configFileMap = new HashMap<String, String>(0);
     private String defaultOfferingPrefix;
     private String defaultProcedurePrefix;
     private String defaultObservablePropertyPrefix;
@@ -64,17 +54,11 @@ public class ServiceConfiguration {
     private boolean useDefaultPrefixes;
     private boolean encodeFullChildrenInDescribeSensor;
     private boolean useHttpStatusCodesInKvpAndPoxBinding;
-    private int maxGetObsResults;
 
     /**
      * date format of gml.
      */
     private String gmlDateFormat;
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    private int lease;
     /**
      * minimum size to gzip responses.
      */
@@ -83,14 +67,6 @@ public class ServiceConfiguration {
      * URL of this service.
      */
     private String serviceURL;
-    /**
-     * boolean, indicates if duplicate observation should be silently ignored during insertion If set to false,
-     * duplicate observations trigger an exception.
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    private boolean skipDuplicateObservations = false;
     /**
      * directory of sensor descriptions in SensorML format.
      */
@@ -116,14 +92,6 @@ public class ServiceConfiguration {
      */
     private String tupleSeparator;
     /**
-     * decimal separator for result element.
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    private String decimalSeparator;
-
-    /**
      * Returns the default token seperator for results.
      * <p/>
      * @return the tokenSeperator.
@@ -148,71 +116,11 @@ public class ServiceConfiguration {
         tupleSeparator = separator;
     }
 
-    /**
-     * @return the characterEncoding
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public String getCharacterEncoding() {
-        return characterEncoding;
-    }
-
     @Setting(CHARACTER_ENCODING)
     public void setCharacterEncoding(final String encoding) throws ConfigurationException {
         Validation.notNullOrEmpty("Character Encoding", encoding);
         characterEncoding = encoding;
         XmlOptionsHelper.getInstance().setCharacterEncoding(characterEncoding);
-    }
-
-    /**
-     * @return the configFileMap
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public Map<String, String> getConfigFileMap() {
-        return Collections.unmodifiableMap(configFileMap);
-    }
-
-    /**
-     * @param configurationFiles
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    @Setting(CONFIGURATION_FILES)
-    public void setConfigurationFiles(final String configurationFiles) {
-        if ((configurationFiles != null) && !configurationFiles.isEmpty()) {
-            for (final String kvp : configurationFiles.split(";")) {
-                final String[] keyValue = kvp.split(" ");
-                configFileMap.put(keyValue[0], keyValue[1]);
-            }
-        } else {
-            configFileMap.clear();
-        }
-    }
-
-    /**
-     * Returns the default decimal seperator for results.
-     * <p/>
-     * @return decimal separator.
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public String getDecimalSeparator() {
-        return decimalSeparator;
-    }
-
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    @Setting(DECIMAL_SEPARATOR)
-    public void setDecimalSeperator(final String seperator) throws ConfigurationException {
-        Validation.notNullOrEmpty("Decimal seperator", seperator);
-        decimalSeparator = seperator;
     }
 
     /**
@@ -227,24 +135,6 @@ public class ServiceConfiguration {
     @Setting(MINIMUM_GZIP_SIZE)
     public void setMinimumGzipSize(final int size) {
         minimumGzipSize = size;
-    }
-
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public int getMaxGetObsResults() {
-        return maxGetObsResults;
-    }
-
-    /**
-     * @param maxResults
-     *
-     * @param max results for GetObservation (0 for unlimited)
-     */
-    @Setting(MAX_GET_OBSERVATION_RESULTS)
-    public void setMaxGetObservationResults(final int maxResults) {
-        maxGetObsResults = maxResults;
     }
 
     public String getDefaultOfferingPrefix() {
@@ -302,50 +192,6 @@ public class ServiceConfiguration {
     }    
    
     /**
-     * @return Returns the lease for the getResult template (in minutes).
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public int getLease() {
-        return lease;
-    }
-
-    /**
-     * @param lease
-     *
-     * @throws ConfigurationException
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    @Setting(LEASE)
-    public void setLease(final int lease) throws ConfigurationException {
-        Validation.greaterZero("Lease", lease);
-        this.lease = lease;
-    }
-
-    /**
-     * @return true if duplicate observations should be skipped during insertion
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public boolean isSkipDuplicateObservations() {
-        return skipDuplicateObservations;
-    }
-
-    /**
-     * @param skip
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    @Setting(SKIP_DUPLICATE_OBSERVATIONS)
-    public void setSkipDuplicateObservations(final boolean skip) {
-        skipDuplicateObservations = skip;
-    }
-
-    /**
      * @return the supportsQuality
      */
     //HibernateObservationUtilities
@@ -356,16 +202,6 @@ public class ServiceConfiguration {
     @Setting(SUPPORTS_QUALITY)
     public void setSupportsQuality(final boolean supportsQuality) {
         this.supportsQuality = supportsQuality;
-    }
-
-    /**
-     * @return Returns the gmlDateFormat.
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public String getGmlDateFormat() {
-        return gmlDateFormat;
     }
 
     @Setting(GML_DATE_FORMAT)

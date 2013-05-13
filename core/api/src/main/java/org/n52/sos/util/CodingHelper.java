@@ -31,7 +31,6 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.decode.Decoder;
 import org.n52.sos.decode.DecoderKey;
-import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.decode.XmlNamespaceDecoderKey;
 import org.n52.sos.decode.XmlOperationDecoderKey;
 import org.n52.sos.encode.Encoder;
@@ -95,11 +94,6 @@ public final class CodingHelper {
             set.add(new XmlOperationDecoderKey(service, version, o));
         }
         return set;
-    }
-
-    @Deprecated
-    public static boolean hasXmlEncoderForOperation(final OperationDecoderKey k) {
-        return CodingRepository.getInstance().getDecoder(new XmlOperationDecoderKey(k)) != null;
     }
 
     public static Set<EncoderKey> encoderKeysForElements(final String namespace, final Class<?>... elements) {

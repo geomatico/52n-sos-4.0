@@ -115,9 +115,6 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
             SosConstants.SOS,
             Collections.singletonMap(Sos2Constants.SERVICEVERSION, Collections.singleton(OMConstants.NS_OM_2)));
 
-    @Deprecated
-    private boolean supported = true;
-
     public OmEncoderv20() {
         LOGGER.debug("Encoder for the following keys initialized successfully: {}!",
                 StringHelper.join(", ", ENCODER_KEYS));
@@ -150,23 +147,11 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
 
     @Override
     public Set<String> getSupportedResponseFormats(String service, String version) {
-        if (supported && SUPPORTED_RESPONSE_FORMATS.get(service) != null &&
+        if (SUPPORTED_RESPONSE_FORMATS.get(service) != null &&
                  SUPPORTED_RESPONSE_FORMATS.get(service).get(version) != null) {
             return SUPPORTED_RESPONSE_FORMATS.get(service).get(version);
         }
         return new HashSet<String>(0);
-    }
-
-    @Override
-    @Deprecated
-    public boolean isSupported() {
-        return supported;
-    }
-
-    @Override
-    @Deprecated
-    public void setSupported(boolean supported) {
-        this.supported = supported;
     }
 
     @Override

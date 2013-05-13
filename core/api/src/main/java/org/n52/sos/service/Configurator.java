@@ -26,7 +26,6 @@ package org.n52.sos.service;
 import static org.n52.sos.util.ConfiguringSingletonServiceLoader.loadAndConfigure;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -49,12 +48,9 @@ import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.ows.SosServiceIdentificationFactory;
 import org.n52.sos.ogc.ows.SosServiceProvider;
 import org.n52.sos.ogc.ows.SosServiceProviderFactory;
-import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.service.admin.operator.AdminServiceOperator;
 import org.n52.sos.service.admin.request.operator.AdminRequestOperatorRepository;
-import org.n52.sos.service.operator.ServiceOperatorRepository;
 import org.n52.sos.service.profile.DefaultProfileHandler;
-import org.n52.sos.service.profile.Profile;
 import org.n52.sos.service.profile.ProfileHandler;
 import org.n52.sos.tasking.Tasking;
 import org.n52.sos.util.Cleanupable;
@@ -142,15 +138,6 @@ public class Configurator implements Cleanupable {
             instance = null;
         }
         throw t;
-    }
-
-    private static void cleanup(final Producer<? extends Cleanupable> p) {
-        if (p != null) {
-            final Cleanupable c = p.get();
-            if (c != null) {
-                c.cleanup();
-            }
-        }
     }
 
     private static void cleanup(final Cleanupable c) {
@@ -283,26 +270,10 @@ public class Configurator implements Cleanupable {
     }
 
     /**
-     * @deprecated use {@link #getCache()}
-     */
-    @Deprecated
-    public ContentCache getCapabilitiesCache() {
-        return getCache();
-    }
-
-    /**
      * @return the current contentCacheController
      */
     public ContentCacheController getCacheController() {
         return contentCacheController;
-    }
-
-    /**
-     * @deprecated use {@link getCacheController()}
-     */
-    @Deprecated
-    public ContentCacheController getCapabilitiesCacheController() {
-        return getCacheController();
     }
 
     /**
@@ -346,32 +317,8 @@ public class Configurator implements Cleanupable {
         getOperationDaoRepository().update();
     }
 
-    /**
-     * @deprecated use RequestOperatorRepository.getInstance() instead
-     */
-    @Deprecated
-    public RequestOperatorRepository getRequestOperatorRepository() {
-        return RequestOperatorRepository.getInstance();
-    }
-
-    /**
-     * @deprecated Use CodingRepository.getInstance() instead
-     */
-    @Deprecated
-    public CodingRepository getCodingRepository() {
-        return CodingRepository.getInstance();
-    }
-
     public OperationDAORepository getOperationDaoRepository() {
         return operationDaoRepository;
-    }
-
-    /**
-     * @deprecated Use ServiceOperatorRepository.getInstance() instead
-     */
-    @Deprecated
-    public ServiceOperatorRepository getServiceOperatorRepository() {
-        return ServiceOperatorRepository.getInstance();
     }
 
     public BindingRepository getBindingRepository() {
@@ -386,80 +333,8 @@ public class Configurator implements Cleanupable {
         return adminRequestOperatorRepository;
     }
 
-    /**
-     * @deprecated use CodingRepository.getInstance().updateDecoders();
-     */
-    @Deprecated
-    public void updateDecoder() throws ConfigurationException {
-        CodingRepository.getInstance().updateDecoders();
-    }
-
-    /**
-     * @deprecated use CodingRepository.getInstance().updateEncoders();
-     */
-    @Deprecated
-    public void updateEncoder() throws ConfigurationException {
-    	CodingRepository.getInstance().updateEncoders();
-    }
-
-    /**
-     * @deprecated use getOperationDaoRepository().update();
-     */
-    @Deprecated
-    public void updateOperationDaos() throws ConfigurationException {
-        getOperationDaoRepository().update();
-    }
-
-    /**
-     * @deprecated use ServiceOperatorRepository.getInstance().update();
-     */
-    @Deprecated
-    public void updateServiceOperators() throws ConfigurationException {
-    	ServiceOperatorRepository.getInstance().update();
-    }
-
-    /**
-     * @deprecated use getBindingRepository().update();
-     */
-    @Deprecated
-    public void updateBindings() throws ConfigurationException {
-        getBindingRepository().update();
-    }
-
-    /**
-     * @deprecated use getConverterRepository().update();
-     */
-    @Deprecated
-    public void updateConverter() throws ConfigurationException {
-        getConverterRepository().update();
-    }
-
-    /**
-     * @deprecated use RequestOperatorRepository.getInstance().update();
-     */
-    @Deprecated
-    public void updateRequestOperator() throws ConfigurationException {
-    	RequestOperatorRepository.getInstance().update();
-    }
-
     public ProfileHandler getProfileHandler() {
         return profileHandler;
-    }
-
-    /**
-     * @deprecated use getProfileHandler().getActiveProfile()
-     */
-    @Deprecated
-    public Profile getActiveProfile() {
-        return getProfileHandler().getActiveProfile();
-    }
-
-    /**
-     * @deprecated use #getTokenSeparator()
-     */
-    @Deprecated
-    public String getTokenSeperator() {
-        return getServiceConfiguration().getTokenSeparator();
     }
 
     /**
@@ -471,49 +346,10 @@ public class Configurator implements Cleanupable {
         return getServiceConfiguration().getTokenSeparator();
     }
 
-    /**
-     * @deprecated use #getTupleSeparator();
-     */
-    @Deprecated
-    public String getTupleSeperator() {
-        return getServiceConfiguration().getTupleSeparator();
-    }
-
     public String getTupleSeparator() {
         return getServiceConfiguration().getTupleSeparator();
     }
 
-    /**
-     * @return the characterEncoding
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public String getCharacterEncoding() {
-        return getServiceConfiguration().getCharacterEncoding();
-    }
-
-    /**
-     * @return the configFileMap
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public Map<String, String> getConfigFileMap() {
-        return getServiceConfiguration().getConfigFileMap();
-    }
-
-    /**
-     * Returns the default decimal seperator for results.
-     * <p/>
-     * @return decimal separator.
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public String getDecimalSeparator() {
-        return getServiceConfiguration().getDecimalSeparator();
-    }
 
     /**
      * Returns the minimum size a response has to hvae to be compressed.
@@ -522,10 +358,6 @@ public class Configurator implements Cleanupable {
      */
     public int getMinimumGzipSize() {
         return getServiceConfiguration().getMinimumGzipSize();
-    }
-
-    public int getMaxGetObsResults() {
-        return getServiceConfiguration().getMaxGetObsResults();
     }
 
     public String getDefaultOfferingPrefix() {
@@ -553,41 +385,11 @@ public class Configurator implements Cleanupable {
 	}
 
     /**
-     * @return Returns the lease for the getResult template (in minutes).
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public int getLease() {
-        return getServiceConfiguration().getLease();
-    }
-
-    /**
-     * @return true if duplicate observations should be skipped during insertion
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public boolean isSkipDuplicateObservations() {
-        return getServiceConfiguration().isSkipDuplicateObservations();
-    }
-
-    /**
      * @return the supportsQuality
      */
     //HibernateObservationUtilities
     public boolean isSupportsQuality() {
         return getServiceConfiguration().isSupportsQuality();
-    }
-
-    /**
-     * @return Returns the gmlDateFormat.
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public String getGmlDateFormat() {
-        return getServiceConfiguration().getGmlDateFormat();
     }
 
     /**

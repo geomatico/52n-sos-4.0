@@ -38,15 +38,12 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.hibernate.entities.BlobValue;
-import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.CategoryValue;
 import org.n52.sos.ds.hibernate.entities.Codespace;
 import org.n52.sos.ds.hibernate.entities.CompositePhenomenon;
-import org.n52.sos.ds.hibernate.entities.CountValue;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
 import org.n52.sos.ds.hibernate.entities.GeometryValue;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasIdentifier;
 import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
@@ -377,31 +374,6 @@ public class HibernateCriteriaQueryUtilities {
     }
 
     /**
-     * Get identifier parameter for a alias prefix
-     * 
-     * @param prefix
-     *            Alias prefix, can be null
-     * @return identifier parameter
-     */
-    @Deprecated
-    public static String getIdentifierParameter(String prefix) {
-        return getParameterWithPrefix(HasIdentifier.IDENTIFIER, prefix);
-    }
-
-    @Deprecated
-    public static String getParameterWithPrefix(String parameter, String prefix) {
-        if (prefix != null && !prefix.isEmpty()) {
-            StringBuilder builder = new StringBuilder();
-            builder.append(prefix);
-            builder.append(".");
-            builder.append(parameter);
-            return builder.toString();
-        }
-
-        return parameter;
-    }
-
-    /**
      * Get procedure identifiers for FOI
      *
      * @param session Hibernate session
@@ -440,17 +412,6 @@ public class HibernateCriteriaQueryUtilities {
                     .add(Restrictions.in(FeatureOfInterest.IDENTIFIER, featureOfInterestIDs)).list();
         }
         return Collections.emptyList();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Deprecated
-    public static List<FeatureOfInterest> getFeatureOfInterestObjectsForOffering(String offeringID, Session session) {
-        return session.createCriteria(Observation.class)
-                .add(Restrictions.eq(Observation.DELETED, false))
-                .setProjection(Projections.distinct(Projections.property(Observation.FEATURE_OF_INTEREST)))
-                .createCriteria(Observation.OFFERINGS)
-                .add(Restrictions.eq(Offering.IDENTIFIER, offeringID))
-                .list();
     }
 
     /**
@@ -567,12 +528,6 @@ public class HibernateCriteriaQueryUtilities {
                 .add(Restrictions.eq(FeatureOfInterest.IDENTIFIER, identifier)).uniqueResult();
     }
 
-    @Deprecated
-    public static BooleanValue getBooleanValue(Boolean value, Session session) {
-        return (BooleanValue) session.createCriteria(BooleanValue.class)
-                .add(Restrictions.eq(BooleanValue.VALUE, value)).uniqueResult();
-    }
-
     public static BlobValue getBlobValue(Object value, Session session) {
         return (BlobValue) session.createCriteria(BlobValue.class)
                 .add(Restrictions.eq(BlobValue.VALUE, value)).uniqueResult();
@@ -581,12 +536,6 @@ public class HibernateCriteriaQueryUtilities {
     public static CategoryValue getCategoryValue(String value, Session session) {
         return (CategoryValue) session.createCriteria(CategoryValue.class)
                 .add(Restrictions.eq(CategoryValue.VALUE, value)).uniqueResult();
-    }
-
-    @Deprecated
-    public static CountValue getCountValue(Integer value, Session session) {
-        return (CountValue) session.createCriteria(CountValue.class)
-                .add(Restrictions.eq(CountValue.VALUE, value)).uniqueResult();
     }
 
     public static GeometryValue getGeometryValue(Geometry value, Session session) {

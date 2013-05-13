@@ -98,17 +98,6 @@ public class RequestOperatorRepository extends AbstractConfiguringServiceLoaderR
         }
     }
 
-    /**
-     * @return null
-     *
-     * @deprecated use {@link #getActiveRequestOperatorKeyTypes()} and
-     * {@link #getRequestOperator(org.n52.sos.request.operator.RequestOperatorKeyType)}
-     */
-    @Deprecated
-    public Map<RequestOperatorKeyType, RequestOperator> getRequestOperator() {
-        return Collections.emptyMap();
-    }
-
     public Set<RequestOperatorKeyType> getActiveRequestOperatorKeyTypes() {
         return Activatable.filter(this.requestOperators).keySet();
     }

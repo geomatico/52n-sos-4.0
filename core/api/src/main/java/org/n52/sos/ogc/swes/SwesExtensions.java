@@ -34,16 +34,6 @@ public class SwesExtensions {
 
     private Set<SwesExtension> extensions = new HashSet<SwesExtension>(0);
 
-    @Deprecated
-    public SwesExtensions(SwesExtension[] extensions) {
-        for (SwesExtension swesExtension : extensions) {
-            addSwesExtension(swesExtension);
-        }
-    }
-    
-    public SwesExtensions() {
-    }
-
     /**
      * 
      * @param extensionName

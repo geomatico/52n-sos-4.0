@@ -36,8 +36,6 @@ import org.n52.sos.config.settings.UriSettingDefinition;
 import org.n52.sos.util.CollectionHelper;
 
 /**
- * TODO JavaDoc
- *
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class ServiceSettings implements SettingDefinitionProvider {
@@ -50,20 +48,6 @@ public class ServiceSettings implements SettingDefinitionProvider {
     public static final String ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR = "service.encodeFullChildrenInDescribeSensor";
     public static final String MAX_GET_OBSERVATION_RESULTS = "service.maxGetObservationResults";
 
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public static final String LEASE = "service.lease";
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public static final String SKIP_DUPLICATE_OBSERVATIONS = "service.skipDuplicateObservations";
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated public static final String CONFIGURATION_FILES = "service.configurationFiles";
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
             .setTitle("Service").setOrder(2);
     
@@ -75,17 +59,6 @@ public class ServiceSettings implements SettingDefinitionProvider {
             .setDescription("The endpoint URL of this sos which will be shown in the GetCapabilities response "
                             + "(e.g. <code>http://localhost:8080/52nSOS/sos</code>). The path to a specific "
                             + "binding (like <code>/soap</code>) will appended to this URL.");
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public static final IntegerSettingDefinition LEASE_DEFINITION = new IntegerSettingDefinition()
-            .setGroup(GROUP)
-            .setOrder(2)
-            .setKey(LEASE)
-            .setDefaultValue(600)
-            .setTitle("Lease")
-            .setDescription("Time of lease for result template in GetResult operation in minutes.");
     public static final IntegerSettingDefinition MINIMUM_GZIP_SIZE_DEFINITION = new IntegerSettingDefinition()
             .setMinimum(0)
             .setOrder(3)
@@ -120,29 +93,6 @@ public class ServiceSettings implements SettingDefinitionProvider {
             .setDescription("The path to a directory with the sensor descriptions in SensorML format. "
                             + "It can be either an absolute path (like <code>/home/user/sosconfig/sensors</code>) "
                             + "or a path relative to the web application directory (e.g. <code>WEB-INF/sensors</code>).");
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public static final BooleanSettingDefinition SKIP_DUPLICATE_OBSERVATIONS_DEFINITION = new BooleanSettingDefinition()
-            .setGroup(GROUP)
-            .setOrder(9)
-            .setKey(SKIP_DUPLICATE_OBSERVATIONS)
-            .setDefaultValue(true)
-            .setTitle("Skip duplicate observations")
-            .setDescription("Skip duplicate observations silently when inserted by batch.");
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public static final StringSettingDefinition CONFIGURATION_FILES_DEFINITION = new StringSettingDefinition()
-            .setGroup(GROUP)
-            .setOrder(10)
-            .setKey(CONFIGURATION_FILES)
-            .setOptional(true)
-            .setTitle("Configuration Files")
-            .setDescription(
-            "Configuration files and their file identifier (List: IDENTIFIER FILENAME;IDENTIFIER2 FILENAME2; ...).");
 
     public static final BooleanSettingDefinition USE_DEFAULT_PREFIXES_DEFINITION = new BooleanSettingDefinition()
             .setGroup(GROUP)
@@ -163,13 +113,10 @@ public class ServiceSettings implements SettingDefinitionProvider {
     
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
             ServiceSettings.SERVICE_URL_DEFINITION,
-            ServiceSettings.LEASE_DEFINITION,
             ServiceSettings.MINIMUM_GZIP_SIZE_DEFINITION,
             ServiceSettings.MAX_GET_OBSERVATION_RESULTS_DEFINITION,
             ServiceSettings.SUPPORTS_QUALITY_DEFINITION,
             ServiceSettings.SENSOR_DIRECTORY_DEFINITION,
-            ServiceSettings.SKIP_DUPLICATE_OBSERVATIONS_DEFINITION,
-            ServiceSettings.CONFIGURATION_FILES_DEFINITION,
             ServiceSettings.USE_DEFAULT_PREFIXES_DEFINITION,
             ServiceSettings.ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR_DEFINITION);
 

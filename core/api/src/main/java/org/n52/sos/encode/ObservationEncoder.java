@@ -25,26 +25,11 @@ package org.n52.sos.encode;
 
 import java.util.Set;
 
-import org.n52.sos.config.SettingsManager;
-
 public interface ObservationEncoder<S, T> extends Encoder<S, T> {
     
     boolean isObservationAndMeasurmentV20Type();
     
     boolean shouldObservationsWithSameXBeMerged();
-    
-    /**
-     * @deprecated see {@link SettingsManager#isActive(org.n52.sos.encode.ResponseFormatKeyType)} and
-     * {@link SettingsManager#setActive(org.n52.sos.encode.ResponseFormatKeyType, boolean)}.
-     */
-    @Deprecated
-    boolean isSupported();
-
-    /**
-     * @deprecated see {@link #isSupported()}
-     */
-    @Deprecated
-    void setSupported(boolean supported);
     
     /**
      * Get the supported response formats for this {@linkplain ObservationEncoder} and the specified service and

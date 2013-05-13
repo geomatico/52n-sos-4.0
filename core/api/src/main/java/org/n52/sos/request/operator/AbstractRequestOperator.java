@@ -113,12 +113,6 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
     }
 
     @Override
-    @Deprecated
-    public boolean hasImplementedDAO() {
-        return true;
-    }
-
-    @Override
     public RequestOperatorKeyType getRequestOperatorKeyType() {
         return requestOperatorKeyType;
     }
@@ -320,26 +314,6 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
         }
         if (!getCache().hasFeatureOfInterest(featureOfInterest)) {
             throw new InvalidParameterValueException(parameterName, featureOfInterest);
-        }
-    }
-
-    @Deprecated
-    protected boolean isRelatedFetureIdentifier(String relatedFeature, Collection<String> validRelatedFeatures)
-            throws OwsExceptionReport {
-        if (relatedFeature == null || relatedFeature.isEmpty()) {
-            return false;
-        }
-        return validRelatedFeatures.contains(relatedFeature);
-    }
-
-    @Deprecated
-    protected void checkRelatedFeatureIdentifier(String relatedFeature, Collection<String> validRelatedFeatures,
-            String parameterName) throws OwsExceptionReport {
-        if (relatedFeature == null || relatedFeature.isEmpty()) {
-            throw new MissingParameterValueException(parameterName);
-        }
-        if (!validRelatedFeatures.contains(relatedFeature)) {
-            throw new InvalidParameterValueException(parameterName, relatedFeature);
         }
     }
 

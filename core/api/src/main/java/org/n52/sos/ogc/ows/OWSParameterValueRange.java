@@ -29,26 +29,14 @@ public class OWSParameterValueRange implements IOWSParameterValue {
 
     private String minValue;
     private String maxValue;
-    private String valueReference;
 
     public OWSParameterValueRange(String minValue, String maxValue) {
         this.minValue = minValue;
         this.maxValue = maxValue;
     }
     
-    public OWSParameterValueRange(String minValue, String maxValue, String valueReference) {
-        this.minValue = minValue;
-        this.maxValue = maxValue;
-        this.valueReference = valueReference;
-    }
-
     public OWSParameterValueRange(MinMax<String> mm) {
         this(mm.getMinimum(), mm.getMaximum());
-    }
-    
-    @Deprecated
-    public OWSParameterValueRange(MinMax<String> mm, String valueRefernce) {
-        this(mm.getMinimum(), mm.getMaximum(), valueRefernce);
     }
 
     public String getMinValue() {
@@ -67,17 +55,4 @@ public class OWSParameterValueRange implements IOWSParameterValue {
         this.maxValue = maxValue;
     }
 
-    @Deprecated
-    public String getValueReference() {
-        return valueReference;
-    }
-    @Deprecated
-    public void setValueReference(String valueReference) {
-        this.valueReference = valueReference;
-    }
-    @Deprecated
-    public boolean isSetValueReference() {
-        return valueReference != null && !valueReference.isEmpty();
-    }
-    
 }

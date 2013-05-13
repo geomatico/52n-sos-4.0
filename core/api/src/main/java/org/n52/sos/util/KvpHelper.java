@@ -33,9 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.MissingParameterValueException;
-import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.SosConstants;
 
 /**
  * Utility class for Key-Value-Pair (KVP) requests
@@ -107,30 +104,7 @@ public final class KvpHelper {
         return parameterValue == null || parameterValue.isEmpty();
     }
 
-    /**
-     * @deprecated moved to KvpBinding
-     */
-    @Deprecated
-    public static boolean checkForGetCapabilities(Map<String, String> parameterValueMap) throws OwsExceptionReport {
-        String requestValue = getRequestParameterValue(parameterValueMap);
-        if (requestValue != null && requestValue.equals(SosConstants.Operations.GetCapabilities.name())) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * @deprecated moved to KvpBinding
-     */
-    @Deprecated
-    public static String getRequestParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
-        String requestParameterValue = getParameterValue(RequestParams.request, parameterValueMap);
-        checkParameterValue(requestParameterValue, RequestParams.request);
-        return requestParameterValue;
-    }
-
-    @Deprecated
-    public static String getParameterValue(String parameterName, Map<String, String> parameterMap) {
+    private static String getParameterValue(String parameterName, Map<String, String> parameterMap) {
         for (String key : parameterMap.keySet()) {
             if (key.equalsIgnoreCase(parameterName)) {
                  return parameterMap.get(key);

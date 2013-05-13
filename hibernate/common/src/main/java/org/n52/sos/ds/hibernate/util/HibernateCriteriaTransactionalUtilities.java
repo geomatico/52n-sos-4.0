@@ -37,10 +37,8 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.hibernate.entities.BlobValue;
-import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.CategoryValue;
 import org.n52.sos.ds.hibernate.entities.Codespace;
-import org.n52.sos.ds.hibernate.entities.CountValue;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
 import org.n52.sos.ds.hibernate.entities.GeometryValue;
@@ -304,18 +302,6 @@ public class HibernateCriteriaTransactionalUtilities {
         return blobValue;
     }
 
-    @Deprecated
-    public static BooleanValue getOrInsertBooleanValue(Boolean value, Session session) {
-        BooleanValue booleanValue = HibernateCriteriaQueryUtilities.getBooleanValue(value, session);
-        if (booleanValue == null) {
-            booleanValue = new BooleanValue();
-            booleanValue.setValue(value);
-            session.save(booleanValue);
-            session.flush();
-        }
-        return booleanValue;
-    }
-
     public static CategoryValue getOrInsertCategoryValue(String value, Session session) {
         CategoryValue categoryValue = HibernateCriteriaQueryUtilities.getCategoryValue(value, session);
         if (categoryValue == null) {
@@ -325,18 +311,6 @@ public class HibernateCriteriaTransactionalUtilities {
             session.flush();
         }
         return categoryValue;
-    }
-
-    @Deprecated
-    public static CountValue getOrInsertCountValue(Integer value, Session session) {
-        CountValue countValue = HibernateCriteriaQueryUtilities.getCountValue(value, session);
-        if (countValue == null) {
-            countValue = new CountValue();
-            countValue.setValue(value);
-            session.save(countValue);
-            session.flush();
-        }
-        return countValue;
     }
 
     public static GeometryValue getOrInsertGeometryValue(Geometry value, Session session) {
@@ -372,16 +346,6 @@ public class HibernateCriteriaTransactionalUtilities {
         return textValue;
     }
 
-    /**
-     * Use {@link #getOrInsertFeatureOfInterestTypes(Set, Session)} or {@link #getOrInsertFeatureOfInterestType(String, Session)}
-     */
-    @Deprecated
-    public static void insertFeatureOfInterestTypes(Set<String> featureTypes, Session session) {
-        for (String featureType : featureTypes) {
-            getOrInsertFeatureOfInterestType(featureType, session);
-        }
-    }
-
     public static List<FeatureOfInterestType> getOrInsertFeatureOfInterestTypes(Set<String> featureOfInterestTypes,
             Session session) {
         List<FeatureOfInterestType> featureTypes = new LinkedList<FeatureOfInterestType>();
@@ -403,16 +367,6 @@ public class HibernateCriteriaTransactionalUtilities {
         return featureOfInterestType;
     }
 
-    /**
-     * Use {@link #getOrInsertObservationType(String, Session)} or {@link #getOrInsertObservationTypes(Set, Session)}
-     */
-    @Deprecated
-    public static void insertObservationTypes(Set<String> obsTypes, Session session) {
-        for (String obsType : obsTypes) {
-            getOrInsertObservationType(obsType, session);
-        }
-    }
-
     public static ObservationType getOrInsertObservationType(String obsType, Session session) {
         ObservationType observationType = HibernateCriteriaQueryUtilities.getObservationTypeObject(obsType, session);
         if (observationType == null) {
@@ -430,16 +384,6 @@ public class HibernateCriteriaTransactionalUtilities {
             obsTypes.add(getOrInsertObservationType(observationType, session));
         }
         return obsTypes;
-    }
-
-    /**
-     * Use {@link #getOrInsertProcedureDescriptionFormat(String, Session)}.
-     */
-    @Deprecated
-    public static void insertProcedureDescriptionsFormats(Set<String> procDescFormats, Session session) {
-        for (String procDescFormat : procDescFormats) {
-            getOrInsertProcedureDescriptionFormat(procDescFormat, session);
-        }
     }
 
     public static ProcedureDescriptionFormat getOrInsertProcedureDescriptionFormat(String procDescFormat,

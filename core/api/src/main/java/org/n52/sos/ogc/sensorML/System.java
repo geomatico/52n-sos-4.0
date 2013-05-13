@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.n52.sos.ogc.gml.EngineeringCRS;
+import org.n52.sos.ogc.sensorML.System;
 import org.n52.sos.ogc.sensorML.elements.SosSMLComponent;
 
 public class System extends AbstractComponent {
@@ -37,11 +38,6 @@ public class System extends AbstractComponent {
 
     public List<SosSMLComponent> getComponents() {
         return components;
-    }
-
-    @Deprecated
-    public void setComponents(final List<SosSMLComponent> components) {
-        this.components.addAll(components);
     }
 
     public System addComponents(final List<SosSMLComponent> components) {

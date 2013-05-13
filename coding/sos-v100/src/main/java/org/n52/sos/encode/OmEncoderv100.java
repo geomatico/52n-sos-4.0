@@ -44,6 +44,9 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlInteger;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -64,9 +67,6 @@ import org.n52.sos.ogc.om.values.GeometryValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
@@ -113,9 +113,6 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
             CodingHelper.encoderKeysForElements(OMConstants.NS_OM, SosObservation.class),
             CodingHelper.encoderKeysForElements(OMConstants.CONTENT_TYPE_OM, SosObservation.class));
 
-    @Deprecated
-    private boolean supported = true;
-
     public OmEncoderv100() {
         LOGGER.debug("Encoder for the following keys initialized successfully: {}!",
                 StringHelper.join(", ", ENCODER_KEYS));
@@ -148,24 +145,12 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
 
     @Override
     public Set<String> getSupportedResponseFormats(String service, String version) {
-        if (supported && SUPPORTED_RESPONSE_FORMATS.get(service) != null) {
+        if (SUPPORTED_RESPONSE_FORMATS.get(service) != null) {
             if (SUPPORTED_RESPONSE_FORMATS.get(service).get(version) != null) {
                 return SUPPORTED_RESPONSE_FORMATS.get(service).get(version);
             }
         }
         return Collections.emptySet();
-    }
-
-    @Override
-    @Deprecated
-    public boolean isSupported() {
-        return supported;
-    }
-
-    @Override
-    @Deprecated
-    public void setSupported(boolean supported) {
-        this.supported = supported;
     }
 
     @Override

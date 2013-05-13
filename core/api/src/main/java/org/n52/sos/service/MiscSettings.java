@@ -52,19 +52,10 @@ public class MiscSettings implements SettingDefinitionProvider {
     public static final String DEFAULT_OBSERVABLEPROPERTY_PREFIX = "misc.defaultObservablePropertyPrefix";
     public static final String DEFAULT_FEATURE_PREFIX = "misc.defaultFeaturePrefix";
     public static final String HTTP_STATUS_CODE_USE_IN_KVP_POX_BINDING = "misc.httpResponseCodeUseInKvpAndPoxBinding";
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public static final String DECIMAL_SEPARATOR = "misc.decimalSeperator";
     
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
             .setTitle("Miscellaneous").setOrder(3);
 
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
     public static final StringSettingDefinition TOKEN_SEPERATOR_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(0)
@@ -72,10 +63,6 @@ public class MiscSettings implements SettingDefinitionProvider {
             .setDefaultValue(",")
             .setTitle("Token separator")
             .setDescription("Token separator in result element (a character)");
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
     public static final StringSettingDefinition TUPLE_SEPERATOR_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(0)
@@ -83,17 +70,6 @@ public class MiscSettings implements SettingDefinitionProvider {
             .setDefaultValue(";")
             .setTitle("Tuple separator")
             .setDescription("Tuple separator in result element (a character)");
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public static final StringSettingDefinition DECIMAL_SEPARATOR_DEFINITION = new StringSettingDefinition()
-            .setGroup(GROUP)
-            .setOrder(0)
-            .setKey(DECIMAL_SEPARATOR)
-            .setDefaultValue(".")
-            .setTitle("Decimal separator")
-            .setDescription("Decimal separator in result element (a character)");
     public static final StringSettingDefinition GML_DATE_FORMAT_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(1)
@@ -166,7 +142,6 @@ public class MiscSettings implements SettingDefinitionProvider {
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
             TOKEN_SEPERATOR_DEFINITION,
             TUPLE_SEPERATOR_DEFINITION,
-            DECIMAL_SEPARATOR_DEFINITION,
             GML_DATE_FORMAT_DEFINITION,
             SRS_NAME_PREFIX_SOS_V1_DEFINITION,
             SRS_NAME_PREFIX_SOS_V2_DEFINITION,

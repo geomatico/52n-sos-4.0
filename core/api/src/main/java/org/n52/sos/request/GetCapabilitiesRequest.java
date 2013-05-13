@@ -104,19 +104,6 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
         return acceptVersions;
     }
 
-    /**
-     * Set accept versions
-     *
-     * @param acceptVersions
-     *            accept versions
-     */
-    @Deprecated
-    public void setAcceptVersions(String[] acceptVersions) {
-        for (String acceptVersion : acceptVersions) {
-            addAcceptVersion(acceptVersion);
-        }
-    }
-
     public void addAcceptVersion(String acceptVersion) {
         acceptVersions.add(acceptVersion);
     }

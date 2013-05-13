@@ -26,7 +26,6 @@ package org.n52.sos.util;
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -92,14 +91,6 @@ public final class JavaHelper {
             stringBuilder.append(message);
             stringBuilder.append("\n");
         }
-    }
-
-    /**
-     * @deprecated Use {@link CollectionHelper#asList(T, T[]) } instead
-     */
-    @Deprecated
-	public static List<String> createStringListWithValue(final String value) {
-        return CollectionHelper.asList(value);
     }
 
     /**
