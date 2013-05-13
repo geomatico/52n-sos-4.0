@@ -22,7 +22,7 @@
             <column name="description_url" />
         </property>
         <property name="descriptionXml" type="string">
-            <column name="description_xml" />
+            <column name="description_xml" sql-type="CLOB" />
         </property>
     </class>
 </hibernate-mapping>
