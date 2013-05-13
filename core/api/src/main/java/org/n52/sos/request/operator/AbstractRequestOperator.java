@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.n52.sos.cache.ContentCache;
 import org.n52.sos.ds.OperationDAO;
+import org.n52.sos.ds.OperationDAORepository;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.RequestEvent;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
@@ -86,7 +87,7 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
         this.requestOperatorKeyType =
                 new RequestOperatorKeyType(new ServiceOperatorKeyType(service, version), operationName);
         this.requestType = requestType;
-        this.dao = (D) Configurator.getInstance().getOperationDaoRepository().getOperationDAO(service, operationName);
+        this.dao = (D) OperationDAORepository.getInstance().getOperationDAO(service, operationName);
         if (this.dao == null) {
             throw new NullPointerException(String.format("OperationDAO for Operation %s has no implementation!",
                     operationName));

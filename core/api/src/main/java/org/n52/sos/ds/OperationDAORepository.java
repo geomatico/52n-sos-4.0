@@ -35,12 +35,18 @@ import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class OperationDAORepository extends AbstractConfiguringServiceLoaderRepository<OperationDAO> {
+    private static OperationDAORepository instance;
 
-    // TODO create key with service and operation name
-
+    /**
+     * @return Returns a singleton instance of the CodingRepository.
+     */
+    public static OperationDAORepository getInstance() {
+        if (instance == null) {
+            instance = new OperationDAORepository();
+        }
+        return instance;
+    }
     /** Implemented ISosOperationDAO */
-    // private final Map<String, OperationDAO> operationDaos = new
-    // HashMap<String, OperationDAO>(0);
     private final Map<OperationDAOKeyType, OperationDAO> operationDaos =
             new HashMap<OperationDAOKeyType, OperationDAO>(0);
 
@@ -67,27 +73,11 @@ public class OperationDAORepository extends AbstractConfiguringServiceLoaderRepo
         this.operationDaos.clear();
         for (OperationDAO dao : daos) {
                 operationDaos.put(dao.getOperationDAOKeyType(), dao);
-            // this.operationDaos.put(dao.getOperationName(), dao);
         }
     }
 
-    // /**
-    // * @return the implemented operation DAOs
-    // */
-    // public Map<String, OperationDAO> getOperationDAOs() {
-    // return Collections.unmodifiableMap(this.operationDaos);
-    // }
-    //
-    // /**
-    // * @param operationName the operation name
-    // * @return the implemented operation DAO
-    // */
-    // public OperationDAO getOperationDAO(String operationName) {
-    // return this.operationDaos.get(operationName);
-    // }
-
     /**
-     * // * @return the implemented operation DAOs //
+     * @return the implemented operation DAOs
      */
     public Map<OperationDAOKeyType, OperationDAO> getOperationDAOs() {
         return Collections.unmodifiableMap(this.operationDaos);

@@ -36,9 +36,17 @@ import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
  */
 @SuppressWarnings("rawtypes")
 public class ConverterRepository extends AbstractConfiguringServiceLoaderRepository<Converter> {
+    private static ConverterRepository instance;
+
+    public static ConverterRepository getInstance() {
+        if (instance == null) {
+            instance = new ConverterRepository();
+        }
+        return instance;
+    }
 	private final Map<ConverterKeyType, Converter<?, ?>> converter = new HashMap<ConverterKeyType, Converter<?, ?>>(0);
 
-	public ConverterRepository() throws ConfigurationException {
+	public ConverterRepository() {
 		super(Converter.class, false);
 		load(false);
 	}

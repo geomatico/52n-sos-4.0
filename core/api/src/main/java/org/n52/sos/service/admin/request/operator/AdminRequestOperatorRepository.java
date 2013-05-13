@@ -38,7 +38,15 @@ import org.slf4j.LoggerFactory;
  */
 public class AdminRequestOperatorRepository extends AbstractConfiguringServiceLoaderRepository<AdminRequestOperator> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AdminRequestOperatorRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AdminRequestOperatorRepository.class);
+    private static AdminRequestOperatorRepository instance;
+
+    public static AdminRequestOperatorRepository getInstance() {
+        if (instance == null) {
+            instance = new AdminRequestOperatorRepository();
+        }
+        return instance;
+    }
 	private Map<String, AdminRequestOperator> operators = new HashMap<String, AdminRequestOperator>(0);
 
 	public AdminRequestOperatorRepository() throws ConfigurationException {

@@ -24,7 +24,6 @@
 
 package org.n52.sos.service.it.soap.v2;
 
-import org.n52.sos.service.it.AbstractSoapTest;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.n52.sos.service.it.AbstractSoapTest.invalidServiceParameterValueExceptionFault;
@@ -42,11 +41,11 @@ import org.apache.xmlbeans.XmlException;
 import org.junit.Test;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.service.it.AbstractSoapTest;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
- * TODO JavaDoc
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class InsertResultTemplateTest extends AbstractSoapTest {

@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.n52.sos.binding.Binding;
+import org.n52.sos.binding.BindingRepository;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.ExceptionEvent;
 import org.n52.sos.exception.HTTPException;
@@ -289,10 +290,10 @@ public class SosService extends ConfiguratedHttpServlet {
 		Binding bindingOperator = null;
         final String requestURI = req.getPathInfo();
 
-		for (final String bindingOperatorKey : Configurator.getInstance().getBindingRepository().getBindings().keySet()) {
+        for (final String bindingOperatorKey : BindingRepository.getInstance().getBindings().keySet()) {
 
 			if (requestURI.startsWith(bindingOperatorKey)) {
-				bindingOperator = Configurator.getInstance().getBindingRepository().getBinding(bindingOperatorKey);
+                bindingOperator = BindingRepository.getInstance().getBinding(bindingOperatorKey);
 				break;
 			}
 		}

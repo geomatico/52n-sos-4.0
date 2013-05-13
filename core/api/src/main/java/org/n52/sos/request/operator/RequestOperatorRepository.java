@@ -30,8 +30,8 @@ import java.util.Set;
 
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
+import org.n52.sos.ds.OperationDAORepository;
 import org.n52.sos.exception.ConfigurationException;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
 import org.n52.sos.util.Activatable;
@@ -80,7 +80,7 @@ public class RequestOperatorRepository extends AbstractConfiguringServiceLoaderR
 
     @Override
     public void update() throws ConfigurationException {
-        Configurator.getInstance().getOperationDaoRepository().update();
+        OperationDAORepository.getInstance().update();
         super.update();
     }
 

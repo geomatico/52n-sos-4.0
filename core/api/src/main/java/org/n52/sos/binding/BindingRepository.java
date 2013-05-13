@@ -39,7 +39,15 @@ import org.slf4j.LoggerFactory;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class BindingRepository extends AbstractConfiguringServiceLoaderRepository<Binding> {
-	private static final Logger LOG = LoggerFactory.getLogger(BindingRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BindingRepository.class);
+    private static BindingRepository instance;
+
+    public static BindingRepository getInstance() {
+        if (instance == null) {
+            instance = new BindingRepository();
+        }
+        return instance;
+    }
     private final Map<String, Activatable<Binding>> bindings = new HashMap<String, Activatable<Binding>>(0);
 
     /**

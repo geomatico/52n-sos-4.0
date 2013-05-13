@@ -174,10 +174,6 @@ public class Configurator implements Cleanupable {
     private AdminServiceOperator adminServiceOperator;
     private Producer<SosServiceIdentification> serviceIdentificationFactory;
     private Producer<SosServiceProvider> serviceProviderFactory;
-    private OperationDAORepository operationDaoRepository;
-    private BindingRepository bindingRepository;
-    private ConverterRepository converterRepository;
-    private AdminRequestOperatorRepository adminRequestOperatorRepository;
     private Tasking tasking;
 
     /**
@@ -223,13 +219,13 @@ public class Configurator implements Cleanupable {
         
         serviceIdentificationFactory = new SosServiceIdentificationFactory();
         serviceProviderFactory = new SosServiceProviderFactory();
-        operationDaoRepository = new OperationDAORepository();
+        OperationDAORepository.getInstance();
         featureQueryHandler = loadAndConfigure(FeatureQueryHandler.class, false);
         cacheFeederDAO = loadAndConfigure(CacheFeederDAO.class, false);
-        converterRepository = new ConverterRepository();
-        bindingRepository = new BindingRepository();
+        ConverterRepository.getInstance();
+        BindingRepository.getInstance();
         adminServiceOperator = loadAndConfigure(AdminServiceOperator.class, false);
-        adminRequestOperatorRepository = new AdminRequestOperatorRepository();
+        AdminRequestOperatorRepository.getInstance();
         contentCacheController = loadAndConfigure(ContentCacheController.class, false);
         tasking = new Tasking();
         profileHandler = loadAndConfigure(ProfileHandler.class, false, new DefaultProfileHandler());
@@ -317,20 +313,24 @@ public class Configurator implements Cleanupable {
         getOperationDaoRepository().update();
     }
 
+    @Deprecated
     public OperationDAORepository getOperationDaoRepository() {
-        return operationDaoRepository;
+        return OperationDAORepository.getInstance();
     }
 
+    @Deprecated
     public BindingRepository getBindingRepository() {
-        return bindingRepository;
+        return BindingRepository.getInstance();
     }
 
+    @Deprecated
     public ConverterRepository getConverterRepository() {
-        return converterRepository;
+        return ConverterRepository.getInstance();
     }
 
+    @Deprecated
     public AdminRequestOperatorRepository getAdminRequestOperatorRepository() {
-        return adminRequestOperatorRepository;
+        return AdminRequestOperatorRepository.getInstance();
     }
 
     public ProfileHandler getProfileHandler() {

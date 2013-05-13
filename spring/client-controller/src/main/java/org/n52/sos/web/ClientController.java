@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.n52.sos.binding.BindingRepository;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.service.Configurator;
@@ -51,7 +52,7 @@ public class ClientController extends AbstractController {
             // service -> (version -> set<operation>)
             Map<String, SetMultiMap<String, String>> operationsByServiceAndVersion =
                                                      new HashMap<String, SetMultiMap<String, String>>();
-            Set<String> bindings = Configurator.getInstance().getBindingRepository().getBindings().keySet();
+            Set<String> bindings = BindingRepository.getInstance().getBindings().keySet();
             Set<RequestOperatorKeyType> rokts = RequestOperatorRepository.getInstance()
                     .getActiveRequestOperatorKeyTypes();
 

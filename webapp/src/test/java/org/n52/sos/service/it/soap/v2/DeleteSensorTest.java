@@ -38,7 +38,6 @@ import org.n52.sos.service.it.AbstractSoapTest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
- * TODO JavaDoc
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class DeleteSensorTest extends AbstractSoapTest {

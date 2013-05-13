@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.n52.sos.binding.Binding;
+import org.n52.sos.binding.BindingRepository;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
@@ -551,7 +552,7 @@ public class SosHelper {
         }
 
         protected Collection<Binding> getBindings() {
-            return Configurator.getInstance().getBindingRepository().getBindings().values();
+            return BindingRepository.getInstance().getBindings().values();
         }
     }
 

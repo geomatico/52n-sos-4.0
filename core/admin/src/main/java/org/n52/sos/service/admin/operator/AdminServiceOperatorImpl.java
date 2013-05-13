@@ -32,10 +32,10 @@ import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.service.admin.AdministratorConstants.AdministratorParams;
 import org.n52.sos.service.admin.request.AdminRequest;
 import org.n52.sos.service.admin.request.operator.AdminRequestOperator;
+import org.n52.sos.service.admin.request.operator.AdminRequestOperatorRepository;
 import org.n52.sos.util.KvpHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,7 @@ public class AdminServiceOperatorImpl extends AdminServiceOperator {
         }
         Map<String, String> parameterValueMap = KvpHelper.getKvpParameterValueMap(req);
         request = getRequestFromValues(parameterValueMap);
-        AdminRequestOperator requestOperator = Configurator.getInstance().getAdminRequestOperatorRepository()
+        AdminRequestOperator requestOperator = AdminRequestOperatorRepository.getInstance()
             				.getAdminRequestOperator(request.getService());
         if (requestOperator != null) {
             return requestOperator.receiveRequest(request);

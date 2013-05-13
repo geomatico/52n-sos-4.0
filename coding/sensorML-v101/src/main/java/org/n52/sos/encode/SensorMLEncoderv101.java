@@ -82,6 +82,7 @@ import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.binding.BindingConstants;
+import org.n52.sos.binding.BindingRepository;
 import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
@@ -1107,7 +1108,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                 component.setProcess((AbstractSensorML) childProcedure);
             } else {
                 try {
-                    if (Configurator.getInstance().getBindingRepository()
+                    if (BindingRepository.getInstance()
                             .isBindingSupported(BindingConstants.KVP_BINDING_ENDPOINT)) {
                         final String version = ServiceOperatorRepository.getInstance()
                         		.getSupportedVersions(SosConstants.SOS).contains(Sos2Constants.SERVICEVERSION) ? Sos2Constants.SERVICEVERSION

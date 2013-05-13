@@ -31,6 +31,7 @@ import javax.wsdl.WSDLException;
 
 import org.n52.sos.binding.Binding;
 import org.n52.sos.binding.BindingConstants;
+import org.n52.sos.binding.BindingRepository;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.exception.HTTPException;
@@ -58,8 +59,7 @@ public class WSDLFactory implements Producer<String> {
     private String getWSDL() throws HTTPException, WSDLException {
         final WSDLBuilder builder = new WSDLBuilder();
         if (Configurator.getInstance() != null) {
-            final Map<String, Binding> bindings = Configurator.getInstance()
-                    .getBindingRepository().getBindings();
+            final Map<String, Binding> bindings = BindingRepository.getInstance().getBindings();
             final RequestOperatorRepository repo = RequestOperatorRepository.getInstance();
 
             final Set<RequestOperatorKeyType> requestOperators = repo.getActiveRequestOperatorKeyTypes();

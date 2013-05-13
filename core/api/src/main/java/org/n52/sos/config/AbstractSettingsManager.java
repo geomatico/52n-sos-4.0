@@ -37,6 +37,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.n52.sos.binding.BindingKey;
+import org.n52.sos.binding.BindingRepository;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.ConnectionProviderException;
@@ -329,7 +330,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         LOG.debug("Setting status of {} to {}", bk, active);
         setBindingStatus(bk, active);
         if (Configurator.getInstance() != null) {
-            Configurator.getInstance().getBindingRepository().setActive(bk, active);
+            BindingRepository.getInstance().setActive(bk, active);
         }
     }
 

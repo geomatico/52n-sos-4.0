@@ -36,6 +36,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.n52.sos.binding.Binding;
+import org.n52.sos.binding.BindingRepository;
 import org.n52.sos.decode.Decoder;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
@@ -227,7 +228,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
 
     private Set<String> getProfiles() {
         final List<String> profiles = new LinkedList<String>();
-        for (final Binding bindig : getConfigurator().getBindingRepository().getBindings().values()) {
+        for (final Binding bindig : BindingRepository.getInstance().getBindings().values()) {
             profiles.addAll(bindig.getConformanceClasses());
         }
         for (final RequestOperatorKeyType k : RequestOperatorRepository.getInstance()

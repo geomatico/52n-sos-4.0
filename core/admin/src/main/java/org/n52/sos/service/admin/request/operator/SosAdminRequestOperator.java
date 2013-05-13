@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.binding.BindingRepository;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.XmlEncoderKey;
@@ -117,7 +118,7 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
             CompositeOwsException exceptions = new CompositeOwsException();
             for (String parameter : parameters) {
                 if (parameter.equalsIgnoreCase(UPDATE_BINDINGS)) {
-                    Configurator.getInstance().getBindingRepository().update();
+                    BindingRepository.getInstance().update();
                     builder.append("Bindings");
                 } else if (parameter.equalsIgnoreCase(UPDATE_CONFIGURATION)) {
                     Configurator.getInstance().updateConfiguration();

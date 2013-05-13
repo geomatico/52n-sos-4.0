@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.n52.sos.binding.Binding;
+import org.n52.sos.binding.BindingRepository;
 import org.n52.sos.cache.ContentCache;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
@@ -101,7 +102,7 @@ public abstract class AbstractOperationDAO implements OperationDAO {
         SetMultiMap<String, DCP> dcps = MultiMaps.newSetMultiMap();
         String serviceURL = Configurator.getInstance().getServiceURL();
         try {
-            for (Binding binding : Configurator.getInstance().getBindingRepository().getBindings().values()) {
+            for (Binding binding : BindingRepository.getInstance().getBindings().values()) {
                 String url = serviceURL + binding.getUrlPattern();
                 if (binding.checkOperationHttpGetSupported(decoderKey)) {
                     dcps.add(SosConstants.HTTP_GET, new DCP(binding.getEncoding(), url + "?"));
