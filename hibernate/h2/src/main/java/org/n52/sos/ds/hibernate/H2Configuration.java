@@ -76,14 +76,14 @@ public class H2Configuration {
     private String[] createScript;
     private String[] dropScript;
     
-    private final String[] initScript = {
-    		"INSERT INTO observation_type VALUES (1, 'http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CountObservation')",
-    		"INSERT INTO observation_type VALUES (2, 'http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement')",
-    		"INSERT INTO observation_type VALUES (3, 'http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_SWEArrayObservation')",
-    		"INSERT INTO observation_type VALUES (4, 'http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation')",
-    		"INSERT INTO observation_type VALUES (5, 'http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation')",
-    		"INSERT INTO observation_type VALUES (6, 'http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TextObservation')",
-    	};
+//    private final String[] initScript = {
+//    		"INSERT INTO observation_type VALUES ('http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CountObservation')",
+//    		"INSERT INTO observation_type VALUES ('http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement')",
+//    		"INSERT INTO observation_type VALUES ('http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_SWEArrayObservation')",
+//    		"INSERT INTO observation_type VALUES ('http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation')",
+//    		"INSERT INTO observation_type VALUES ('http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation')",
+//    		"INSERT INTO observation_type VALUES ('http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TextObservation')",
+//    	};
 
     public static void assertInitialized() {
         synchronized (lock) {
@@ -138,9 +138,9 @@ public class H2Configuration {
                             for (final String cmd : instance.getCreateScript()) {
                                 stmt.addBatch(cmd);
                             }
-                            for (final String cmd : instance.initScript) {
-                            	stmt.addBatch(cmd);
-                            }
+//                            for (final String cmd : instance.initScript) {
+//                            	stmt.addBatch(cmd);
+//                            }
                             stmt.executeBatch();
                         } finally {
                             if (stmt != null) {
@@ -186,9 +186,9 @@ public class H2Configuration {
                             for (final String table : tableNames) {
                                 stmt.addBatch("DELETE FROM " + table);
                             }
-                            for (final String cmd : instance.initScript) {
-                            	stmt.addBatch(cmd);
-                            }
+//                            for (final String cmd : instance.initScript) {
+//                            	stmt.addBatch(cmd);
+//                            }
                             stmt.addBatch("SET REFERENTIAL_INTEGRITY TRUE");
                             stmt.executeBatch();
                         } finally {
@@ -280,10 +280,10 @@ public class H2Configuration {
                 LOG.debug("Executing {}", s);
                 stmt.execute(s);
             }
-            for (final String cmd2 : initScript) {
-            	LOG.debug("Executing {}", cmd2);
-            	stmt.execute(cmd2);
-            }
+//            for (final String cmd2 : initScript) {
+//            	LOG.debug("Executing {}", cmd2);
+//            	stmt.execute(cmd2);
+//            }
         } catch (final ClassNotFoundException ex) {
             throw new RuntimeException(ex);
         } catch (final SQLException ex) {
