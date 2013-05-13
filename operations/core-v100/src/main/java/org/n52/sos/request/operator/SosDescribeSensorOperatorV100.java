@@ -25,7 +25,9 @@ package org.n52.sos.request.operator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
@@ -34,17 +36,18 @@ import org.n52.sos.encode.Encoder;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
 import org.n52.sos.exception.ows.concrete.InvalidOutputFormatException;
-import org.n52.sos.exception.ows.concrete.InvalidProcedureDescriptionFormatException;
 import org.n52.sos.exception.ows.concrete.MissingProcedureDescriptionFormatException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.response.DescribeSensorResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 
 /**
@@ -95,28 +98,25 @@ public class SosDescribeSensorOperatorV100 extends
         boolean applyZIPcomp = false;
 
         checkRequestedParameters(sosRequest);
-        if (sosRequest.getProcedureDescriptionFormat().equals(SosConstants.CONTENT_TYPE_ZIP)) {
-            applyZIPcomp = true;
-        }
-
         DescribeSensorResponse response = getDao().getSensorDescription(sosRequest);
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         try {
-            // TODO call SensorML encoder directly
-            String namespace = Sos1Constants.NS_SOS;
-//            String namespace = sosRequest.getProcedureDescriptionFormat();
-            Encoder<XmlObject, DescribeSensorResponse> encoder = CodingHelper.getEncoder(namespace, response);
+            response.getOutputFormat();
+            String namespace = sosRequest.getProcedureDescriptionFormat();
+            Encoder<XmlObject, SosProcedureDescription> encoder = CodingHelper.getEncoder(namespace, response.getSensorDescription());
             if (encoder != null) {
-                encoder.encode(response).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
+                contentType = encoder.getContentType();
+                XmlObject encodedObject = encoder.encode(response.getSensorDescription());
+                List<String> schemaLocations = new ArrayList<String>(3);
+                schemaLocations.add(N52XmlHelper.getSchemaLocationForSML101());
+                schemaLocations.add(N52XmlHelper.getSchemaLocationForSWE101());
+                N52XmlHelper.setSchemaLocationsToDocument(encodedObject, schemaLocations);
+                encodedObject.save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
                 return new ServiceResponse(baos, contentType, applyZIPcomp, true);
             } else {
-                if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
-                    throw new InvalidOutputFormatException(sosRequest.getProcedureDescriptionFormat());
-                } else {
-                    throw new InvalidProcedureDescriptionFormatException(sosRequest.getProcedureDescriptionFormat());
-                }
+               throw new InvalidOutputFormatException(sosRequest.getProcedureDescriptionFormat());
             }
         } catch (IOException ioe) {
             throw new ErrorWhileSavingResponseToOutputStreamException(ioe);

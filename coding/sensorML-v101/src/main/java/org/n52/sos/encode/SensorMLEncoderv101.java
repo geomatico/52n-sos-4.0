@@ -86,7 +86,6 @@ import org.n52.sos.binding.BindingRepository;
 import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
-import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
 import org.n52.sos.ogc.sensorML.AbstractSensorML;
@@ -146,16 +145,20 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             SupportedTypeKey.ProcedureDescriptionFormat,
             Collections.singleton(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL));
 
-    private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(SensorMLConstants.NS_SML,
-            SosProcedureDescription.class, AbstractSensorML.class);
+    @SuppressWarnings("unchecked")
+    private static final Set<EncoderKey> ENCODER_KEYS = CollectionHelper.union(
+            CodingHelper.encoderKeysForElements(SensorMLConstants.NS_SML,
+                    SosProcedureDescription.class, AbstractSensorML.class),
+            CodingHelper.encoderKeysForElements(SensorMLConstants.SENSORML_CONTENT_TYPE,
+                    SosProcedureDescription.class, AbstractSensorML.class));
+
+    private static final String OUTPUT_PREFIX = "output#";
 
     public SensorMLEncoderv101() {
         LOGGER.debug("Encoder for the following keys initialized successfully: {}!",
                 StringHelper.join(", ", ENCODER_KEYS));
     }
     
-    private static final String OUTPUT_PREFIX = "output#";
-
     @Override
     public Set<EncoderKey> getEncoderKeyType() {
         return Collections.unmodifiableSet(ENCODER_KEYS);
@@ -174,8 +177,6 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
     @Override
     public void addNamespacePrefixToMap(final Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(SensorMLConstants.NS_SML, SensorMLConstants.NS_SML_PREFIX);
-        // remove if GML 3.1.1 encoder is available
-        nameSpacePrefixMap.put(GMLConstants.NS_GML, GMLConstants.NS_GML_PREFIX);
     }
 
     @Override
