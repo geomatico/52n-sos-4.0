@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -44,7 +45,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class UserService implements AuthenticationProvider, Serializable {
     private static final long serialVersionUID = -3207103212342510378L;
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
-    
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -54,15 +54,30 @@ public class UserService implements AuthenticationProvider, Serializable {
         UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) authentication;
         AdministratorUser user = authenticate((String) auth.getPrincipal(),
                                               (String) auth.getCredentials());
-        return new UsernamePasswordAuthenticationToken(new AdministratorUserPrinciple(user), null,
-                                                       Collections.singleton(new AdministratorAuthority()));
+        return new UsernamePasswordAuthenticationToken(new AdministratorUserPrinciple(user, user instanceof DefaultAdministratorUser),
+                                                       null, Collections.singleton(new AdministratorAuthority()));
     }
 
-    public AdministratorUser authenticate(String username, String password) throws AuthenticationException {
+    public AdministratorUser authenticate(final String username, final String password) throws AuthenticationException {
         AdministratorUser user;
         
         if (username == null || password == null) {
             throw new BadCredentialsException("Bad Credentials");
+        }
+        try {
+            if (!getSettingsManager().hasAdminUser()) {
+                LOG.warn("No admin user is defined! Use the default credentials '{}:{}' " +
+                         "to authenticate and change the password as soon as possible!",
+                         DefaultAdministratorUser.DEFAULT_USERNAME,
+                         DefaultAdministratorUser.DEFAULT_PASSWORD);
+                if (username.equals(DefaultAdministratorUser.DEFAULT_USERNAME) &&
+                    password.equals(DefaultAdministratorUser.DEFAULT_PASSWORD)) {
+                    return new DefaultAdministratorUser();
+                }
+            }
+        } catch (ConnectionProviderException ex) {
+            LOG.error("Error querying admin", ex);
+            throw new AuthenticationServiceException("Can not query admin users", ex);
         }
 
         try {

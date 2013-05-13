@@ -24,34 +24,34 @@
 
 package org.n52.sos.web.auth;
 
-import java.io.Serializable;
-import java.security.Principal;
-
 import org.n52.sos.config.AdministratorUser;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class AdministratorUserPrinciple implements Principal, Serializable {
-    private static final long serialVersionUID = 8178359938656526381L;
-    private String username;
-    private boolean defaultAdmin;
+public class DefaultAdministratorUser implements AdministratorUser {
 
-    AdministratorUserPrinciple(AdministratorUser user) {
-        this(user, false);
-    }
+    public static final String DEFAULT_USERNAME = "admin";
+    public static final String DEFAULT_PASSWORD = "password";
 
-    AdministratorUserPrinciple(AdministratorUser user, boolean defaultAdmin) {
-        this.username = user.getUsername();
-        this.defaultAdmin = defaultAdmin;
+    @Override
+    public String getPassword() {
+        return DEFAULT_PASSWORD;
     }
 
     @Override
-    public String getName() {
-        return this.username;
+    public String getUsername() {
+        return DEFAULT_USERNAME;
     }
 
-    public boolean isDefaultAdmin() {
-        return defaultAdmin;
+    @Override
+    public AdministratorUser setPassword(String password) {
+        throw new UnsupportedOperationException();
     }
+
+    @Override
+    public AdministratorUser setUsername(String username) {
+        throw new UnsupportedOperationException();
+    }
+
 }

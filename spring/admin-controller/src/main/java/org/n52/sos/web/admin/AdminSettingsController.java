@@ -35,6 +35,7 @@ import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.codehaus.jettison.json.JSONObject;
 import org.n52.sos.config.AdministratorUser;
@@ -44,6 +45,7 @@ import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
+import org.n52.sos.web.auth.DefaultAdministratorUser;
 import org.n52.sos.web.auth.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +53,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -177,22 +180,31 @@ public class AdminSettingsController extends AbstractController {
         String password = request.getParameter(ControllerConstants.ADMIN_PASSWORD_REQUEST_PARAMETER);
         String username = request.getParameter(ControllerConstants.ADMIN_USERNAME_REQUEST_PARAMETER);
         String currentPassword = request.getParameter(ControllerConstants.ADMIN_CURRENT_PASSWORD_REQUEST_PARAMETER);
-        updateAdminUser(password, username, currentPassword, user.getName());
+        updateAdminUser(request, password, username, currentPassword, user.getName());
     }
 
-    private void updateAdminUser(String newPassword, String newUsername, String currentPassword, String currentUsername)
-            throws AuthenticationException, ConfigurationException {
+    private void updateAdminUser(HttpServletRequest req, String newPassword, String newUsername, String currentPassword,
+                                 String currentUsername) throws AuthenticationException, ConfigurationException {
         if ((newPassword != null && !newPassword.isEmpty())
             || (newUsername != null && !newUsername.isEmpty() && !newUsername.equals(currentUsername))) {
             if (currentPassword == null) {
                 throw new BadCredentialsException("You have to submit your current password.");
             }
             AdministratorUser loggedInAdmin = getUserService().authenticate(currentUsername, currentPassword);
-            if (newPassword != null && !newPassword.isEmpty() && !newPassword.equals(currentPassword)) {
-                getUserService().setAdminPassword(loggedInAdmin, newPassword);
-            }
-            if (newUsername != null && !newUsername.isEmpty() && !newUsername.equals(currentUsername)) {
-                getUserService().setAdminUserName(loggedInAdmin, newUsername);
+            if (loggedInAdmin instanceof DefaultAdministratorUser) {
+                getUserService().createAdmin(newUsername, newPassword);
+                HttpSession session = req.getSession(false);
+                if (session != null) {
+                    session.invalidate();
+                }
+                SecurityContextHolder.clearContext();
+            } else {
+                if (newPassword != null && !newPassword.isEmpty() && !newPassword.equals(currentPassword)) {
+                    getUserService().setAdminPassword(loggedInAdmin, newPassword);
+                }
+                if (newUsername != null && !newUsername.isEmpty() && !newUsername.equals(currentUsername)) {
+                    getUserService().setAdminUserName(loggedInAdmin, newUsername);
+                }
             }
         }
     }

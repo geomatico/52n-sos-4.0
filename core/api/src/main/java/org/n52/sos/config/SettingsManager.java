@@ -234,6 +234,15 @@ public abstract class SettingsManager {
     public abstract AdministratorUser getAdminUser(String username) throws ConnectionProviderException;
 
     /**
+     * Checks if a administrator user exists.
+     *
+     * @return {@code true} if there is a admin user, otherwise {@code false}.
+     *
+     * @throws ConnectionProviderException
+     */
+    public abstract boolean hasAdminUser() throws ConnectionProviderException;
+
+    /**
      * Creates a new {@code AdministratorUser}. This method will fail if the username is already used by another user.
      * <p/>
      * @param username the proposed username

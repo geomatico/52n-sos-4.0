@@ -30,8 +30,10 @@ import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.MetaDataHandler;
+import org.n52.sos.web.auth.AdministratorUserPrinciple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,14 +46,25 @@ public class AdminIndexController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView get() {
-        Map<String, String> model = new HashMap<String, String>(MetaDataHandler.Metadata.values().length);
+        boolean warn = false;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof AdministratorUserPrinciple) {
+            AdministratorUserPrinciple administratorUserPrinciple = (AdministratorUserPrinciple) principal;
+            if (administratorUserPrinciple.isDefaultAdmin()) {
+                warn = true;
+            }
+        }
+        Map<String, String> metadata = new HashMap<String, String>(MetaDataHandler.Metadata.values().length);
         try {
             for (MetaDataHandler.Metadata m : MetaDataHandler.Metadata.values()) {
-                model.put(m.name(), getMetaDataHandler().get(m));
+                metadata.put(m.name(), getMetaDataHandler().get(m));
             }
         } catch (ConfigurationException ex) {
             LOG.error("Error reading metadata properties", ex);
         }
+        Map<String, Object> model = new HashMap<String, Object>(2);
+        model.put("metadata", metadata);
+        model.put("warning", warn);
         return new ModelAndView(ControllerConstants.Views.ADMIN_INDEX, model);
     }
 }

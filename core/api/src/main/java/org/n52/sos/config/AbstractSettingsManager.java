@@ -220,6 +220,12 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     }
 
     @Override
+    public boolean hasAdminUser() throws ConnectionProviderException {
+        return !getAdminUsers().isEmpty();
+    }
+
+
+    @Override
     public void configure(Object object) throws ConfigurationException {
         LOG.debug("Configuring {}", object);
         Class<?> clazz = object.getClass();

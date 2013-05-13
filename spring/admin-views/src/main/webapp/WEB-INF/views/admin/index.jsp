@@ -35,7 +35,14 @@
 <p class="pull-right">
 <button type="button" id="reloadCapsCache" class="btn">Reload Capabilities Cache</button>
 </p>
-    
+
+<c:if test="${warning}">
+    <script type="text/javascript">
+    showMessage('<b>Warning!</b> You are used the default credentials to log in. Please change them \
+                   <a href="<c:url value="/admin/settings#credentials"/>">here</a> as soon as possible!');
+    </script>
+</c:if>
+
 <script type="text/javascript">
     $("#reloadCapsCache").click(function() {
         var $b = $(this);
@@ -56,18 +63,18 @@
 
 <div class="row">
     <div class="span12">
-        <c:if test="${not empty VERSION}">
-            <p><strong>Version:</strong> ${fn:escapeXml(VERSION)}</p>
+        <c:if test="${not empty metadata.VERSION}">
+            <p><strong>Version:</strong> ${fn:escapeXml(metadata.VERSION)}</p>
         </c:if>
-        <c:if test="${not empty SVN_VERSION}">
-            <p><strong>Revision:</strong> ${fn:escapeXml(SVN_VERSION)}</p>
-        </c:if>
-        <c:if test="${not empty BUILD_DATE}">
-            <p><strong>Build date:</strong> ${fn:escapeXml(BUILD_DATE)}</p>
-        </c:if>
-        <c:if test="${not empty INSTALL_DATE}">
-            <p><strong>Installation date:</strong> ${fn:escapeXml(INSTALL_DATE)}</p>
-        </c:if>
+            <c:if test="${not empty metadata.SVN_VERSION}">
+                <p><strong>Revision:</strong> ${fn:escapeXml(metadata.SVN_VERSION)}</p>
+            </c:if>
+            <c:if test="${not empty metadata.BUILD_DATE}">
+                <p><strong>Build date:</strong> ${fn:escapeXml(metadata.BUILD_DATE)}</p>
+            </c:if>
+            <c:if test="${not empty metadata.INSTALL_DATE}">
+                <p><strong>Installation date:</strong> ${fn:escapeXml(metadata.INSTALL_DATE)}</p>
+            </c:if>
     </div>
 </div>
     
