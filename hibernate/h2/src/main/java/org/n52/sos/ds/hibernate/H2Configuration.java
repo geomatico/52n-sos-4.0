@@ -61,7 +61,7 @@ public class H2Configuration {
     private static final String H2_DRIVER = "org.h2.Driver";
     private static final String H2_CONNECTION_URL = "jdbc:h2:mem:sos;DB_CLOSE_DELAY=-1";
     private static final Properties PROPERTIES = new Properties() {
-        private static final long serialVersionUID = 3109256773218160485L;
+    	private static final long serialVersionUID = 3109256773218160485L;
 
         {
             put(HIBERNATE_CONNECTION_URL, H2_CONNECTION_URL);
@@ -71,17 +71,30 @@ public class H2Configuration {
     };
     private static final Object lock = new Object();
     private static H2Configuration instance;
+    private File tempDir;
+    private Configuration configuration;
+    private String[] createScript;
+    private String[] dropScript;
+    
+    private final String[] initScript = {
+    		"INSERT INTO observation_type VALUES (1, 'http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CountObservation')",
+    		"INSERT INTO observation_type VALUES (2, 'http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement')",
+    		"INSERT INTO observation_type VALUES (3, 'http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_SWEArrayObservation')",
+    		"INSERT INTO observation_type VALUES (4, 'http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation')",
+    		"INSERT INTO observation_type VALUES (5, 'http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation')",
+    		"INSERT INTO observation_type VALUES (6, 'http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TextObservation')",
+    	};
 
     public static void assertInitialized() {
         synchronized (lock) {
             if (instance == null) {
                 try {
                     instance = new H2Configuration();
-                } catch (IOException ex) {
+                } catch (final IOException ex) {
                     throw new RuntimeException(ex);
-                } catch (OwsExceptionReport ex) {
+                } catch (final OwsExceptionReport ex) {
                     throw new RuntimeException(ex);
-                } catch (ConnectionProviderException ex) {
+                } catch (final ConnectionProviderException ex) {
                     throw new RuntimeException(ex);
                 }
             }
@@ -92,12 +105,12 @@ public class H2Configuration {
         H2Configuration.assertInitialized();
         try {
             return (Session) Configurator.getInstance().getDataConnectionProvider().getConnection();
-        } catch (ConnectionProviderException ex) {
+        } catch (final ConnectionProviderException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    protected static void returnSession(Session session) {
+    protected static void returnSession(final Session session) {
         if (session != null) {
             Configurator.getInstance().getDataConnectionProvider().returnConnection(session);
         }
@@ -115,15 +128,18 @@ public class H2Configuration {
                 transaction = session.beginTransaction();
                 session.doWork(new Work() {
                     @Override
-                    public void execute(Connection connection) throws SQLException {
+                    public void execute(final Connection connection) throws SQLException {
                         Statement stmt = null;
                         try {
                             stmt = connection.createStatement();
-                            for (String cmd : instance.getDropScript()) {
+                            for (final String cmd : instance.getDropScript()) {
                                 stmt.addBatch(cmd);
                             }
-                            for (String cmd : instance.getCreateScript()) {
+                            for (final String cmd : instance.getCreateScript()) {
                                 stmt.addBatch(cmd);
+                            }
+                            for (final String cmd : instance.initScript) {
+                            	stmt.addBatch(cmd);
                             }
                             stmt.executeBatch();
                         } finally {
@@ -134,7 +150,7 @@ public class H2Configuration {
                     }
                 });
                 transaction.commit();
-            } catch (HibernateException e) {
+            } catch (final HibernateException e) {
                 if (transaction != null) {
                     transaction.rollback();
                 }
@@ -150,7 +166,7 @@ public class H2Configuration {
             if (instance == null) {
                 throw new IllegalStateException("Database is not initialized");
             }
-            Iterator<Table> tableMappings = instance.getConfiguration().getTableMappings();
+            final Iterator<Table> tableMappings = instance.getConfiguration().getTableMappings();
             final List<String> tableNames = new LinkedList<String>();
             while (tableMappings.hasNext()) {
                 tableNames.add(tableMappings.next().getName());
@@ -162,13 +178,16 @@ public class H2Configuration {
                 transaction = session.beginTransaction();
                 session.doWork(new Work() {
                     @Override
-                    public void execute(Connection connection) throws SQLException {
+                    public void execute(final Connection connection) throws SQLException {
                         Statement stmt = null;
                         try {
                             stmt = connection.createStatement();
                             stmt.addBatch("SET REFERENTIAL_INTEGRITY FALSE");
-                            for (String table : tableNames) {
+                            for (final String table : tableNames) {
                                 stmt.addBatch("DELETE FROM " + table);
+                            }
+                            for (final String cmd : instance.initScript) {
+                            	stmt.addBatch(cmd);
                             }
                             stmt.addBatch("SET REFERENTIAL_INTEGRITY TRUE");
                             stmt.executeBatch();
@@ -180,7 +199,7 @@ public class H2Configuration {
                     }
                 });
                 transaction.commit();
-            } catch (HibernateException e) {
+            } catch (final HibernateException e) {
                 if (transaction != null) {
                     transaction.rollback();
                 }
@@ -190,10 +209,6 @@ public class H2Configuration {
             }
         }
     }
-    private File tempDir;
-    private Configuration configuration;
-    private String[] createScript;
-    private String[] dropScript;
 
     private H2Configuration() throws IOException, OwsExceptionReport, ConnectionProviderException {
         init();
@@ -211,7 +226,7 @@ public class H2Configuration {
             if (configurator != null) {
                 configurator.cleanup();
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             throw new RuntimeException(ex);
         }
         try {
@@ -219,7 +234,7 @@ public class H2Configuration {
             if (directory != null && directory.exists()) {
                 FileUtils.deleteDirectory(directory);
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -232,7 +247,7 @@ public class H2Configuration {
         return tempDir;
     }
 
-    private void setTempDir(File aTempDir) {
+    private void setTempDir(final File aTempDir) {
         tempDir = aTempDir;
     }
 
@@ -254,32 +269,36 @@ public class H2Configuration {
             Class.forName(H2_DRIVER);
             conn = DriverManager.getConnection(H2_CONNECTION_URL);
             stmt = conn.createStatement();
-            String cmd = "create domain geometry as blob";
+            final String cmd = "create domain geometry as blob";
             LOG.debug("Executing {}", cmd);
             stmt.execute(cmd);
             configuration = new Configuration().configure("/sos-hibernate.cfg.xml");
-            GeoDBDialect dialect = new GeoDBDialect();
+            final GeoDBDialect dialect = new GeoDBDialect();
             createScript = configuration.generateSchemaCreationScript(dialect);
             dropScript = configuration.generateDropSchemaScript(dialect);
-            for (String s : createScript) {
+            for (final String s : createScript) {
                 LOG.debug("Executing {}", s);
                 stmt.execute(s);
             }
-        } catch (ClassNotFoundException ex) {
+            for (final String cmd2 : initScript) {
+            	LOG.debug("Executing {}", cmd2);
+            	stmt.execute(cmd2);
+            }
+        } catch (final ClassNotFoundException ex) {
             throw new RuntimeException(ex);
-        } catch (SQLException ex) {
+        } catch (final SQLException ex) {
             throw new RuntimeException(ex);
         } finally {
             if (stmt != null) {
                 try {
                     stmt.close();
-                } catch (SQLException ex) {
+                } catch (final SQLException ex) {
                 }
             }
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException ex) {
+                } catch (final SQLException ex) {
                 }
             }
         }
