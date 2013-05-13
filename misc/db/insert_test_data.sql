@@ -1,4 +1,4 @@
-﻿--
+--
 -- Copyright (C) 2013
 -- by 52 North Initiative for Geospatial Open Source Software GmbH
 --
@@ -194,7 +194,7 @@ LANGUAGE 'sql';
 CREATE OR REPLACE FUNCTION insert_feature_of_interest(text, numeric, numeric, text) RETURNS bigint AS
 $$
 	INSERT INTO feature_of_interest(feature_of_interest_type_id, identifier, name, geom, description_xml) 
-	SELECT get_spatial_sampling_feature_type('Point'), $1, $1, ST_GeomFromText('POINT(' || $2 || ' ' || $3 || ')', 4326), 
+	SELECT get_spatial_sampling_feature_type('Point'), $1, $4, ST_GeomFromText('POINT(' || $2 || ' ' || $3 || ')', 4326), 
 '<sams:SF_SpatialSamplingFeature 
 	xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns:sams="http://www.opengis.net/samplingSpatial/2.0" 
