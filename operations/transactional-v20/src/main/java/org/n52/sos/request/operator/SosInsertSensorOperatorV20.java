@@ -169,7 +169,7 @@ public class SosInsertSensorOperatorV20 extends
             exceptions.add(owse);
         }
         checkAndSetAssignedProcedureID(request);
-        checkAndSetAssignedOffering(request);
+        checkAndSetAssignedOfferings(request);
         try {
             checkProcedureAndOfferingCombination(request);
         } catch (OwsExceptionReport owse) {
@@ -243,7 +243,7 @@ public class SosInsertSensorOperatorV20 extends
         }
     }
 
-    private void checkAndSetAssignedOffering(InsertSensorRequest request) {
+    private void checkAndSetAssignedOfferings(InsertSensorRequest request) {
         // if procedureDescription is SensorML
         Set<SosOffering> sosOfferings = null;
         if (request.getProcedureDescription().isSetOfferings()) {

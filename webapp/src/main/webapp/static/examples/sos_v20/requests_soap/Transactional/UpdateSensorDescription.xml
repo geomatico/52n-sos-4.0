@@ -46,18 +46,12 @@
 										<!-- Parsed and removed during InsertSensor/UpdateSensorDescription, added during DescribeSensor. -->
 										<!-- Offering is generated if not specified. -->						
 										<swe:SimpleDataRecord>
-											<!-- Newly created offering's name will be set to this field name -->
+											<!-- Field name is used for the offering's name -->
 											<swe:field name="Offering for sensor 9">
 												<swe:Text>
 													<swe:value>http://www.52north.org/test/offering/9</swe:value>
 												</swe:Text>
 											</swe:field>
-											<!-- Existing offering will ignore this field name -->
-											<swe:field name="Other offering">
-												<swe:Text>
-													<swe:value>http://www.52north.org/test/offering/1</swe:value>
-												</swe:Text>
-											</swe:field>							
 										</swe:SimpleDataRecord>
 									</sml:capabilities>
 									<sml:capabilities name="parentProcedures">
