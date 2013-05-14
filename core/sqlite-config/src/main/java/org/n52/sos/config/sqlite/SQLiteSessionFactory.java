@@ -185,6 +185,7 @@ public class SQLiteSessionFactory implements ConnectionProvider {
                 }
             }
         } finally {
+        	this.sessionFactory = null;
             lock.unlock();
         }
     }
