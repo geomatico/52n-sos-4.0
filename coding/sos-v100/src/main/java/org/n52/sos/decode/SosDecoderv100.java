@@ -318,7 +318,7 @@ public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObjec
             getObsRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM);
         }
         if (getObs.isSetResultModel()) {
-            getObsRequest.setResultModel(OMHelper.getObservationTypeForQName(getObs.getResultModel()));
+            getObsRequest.setResultModel(OMHelper.getObservationTypeFor(getObs.getResultModel()));
         }
 
         return getObsRequest;
@@ -363,7 +363,7 @@ public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObjec
         	getObsByIdRequest.setResponseMode(SosConstants.RESPONSE_MODE_INLINE);
         }
         if (getObsById.isSetResultModel()) {
-            getObsByIdRequest.setResultModel(OMHelper.getObservationTypeForQName(getObsById.getResultModel()));
+            getObsByIdRequest.setResultModel(OMHelper.getObservationTypeFor(getObsById.getResultModel()));
         }
         getObsByIdRequest.setObservationIdentifier(Arrays.asList(getObsById.getObservationId()));
         return getObsByIdRequest;

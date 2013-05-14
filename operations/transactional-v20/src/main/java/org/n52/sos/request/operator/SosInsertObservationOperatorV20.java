@@ -195,7 +195,7 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<A
 
     private void checkOrSetObservationType(SosObservation sosObservation) throws OwsExceptionReport {
         SosObservationConstellation observationConstellation = sosObservation.getObservationConstellation();
-        String obsTypeFromValue = OMHelper.getObservationTypeFromValue(sosObservation.getValue().getValue());
+        String obsTypeFromValue = OMHelper.getObservationTypeFor(sosObservation.getValue().getValue());
         if (observationConstellation.isSetObservationType()) {
             checkObservationType(observationConstellation.getObservationType(),
                                  Sos2Constants.InsertObservationParams.observationType.name());

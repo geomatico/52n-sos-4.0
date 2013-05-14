@@ -98,6 +98,7 @@ public interface OMConstants {
     String PHEN_SAMPLING_TIME = "http://www.opengis.net/def/property/OGC/0/SamplingTime";
     String PHENOMENON_TIME = "http://www.opengis.net/def/property/OGC/0/PhenomenonTime";
     String PHENOMENON_TIME_NAME = "phenomenonTime";
+    String SAMPLING_TIME_NAME = "samplingTime";
     String PHEN_UOM_ISO8601 = "http://www.opengis.net/def/uom/ISO-8601/0/Gregorian";
     String PHEN_FEATURE_OF_INTEREST =
            "http://www.opengis.net/def/property/OGC/0/FeatureOfInterest";

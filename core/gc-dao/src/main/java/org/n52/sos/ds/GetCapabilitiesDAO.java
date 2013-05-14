@@ -49,7 +49,6 @@ import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.CapabilitiesExtension;
 import org.n52.sos.ogc.ows.MergableExtension;
 import org.n52.sos.ogc.ows.OWSConstants;
@@ -73,6 +72,7 @@ import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.operator.ServiceOperatorRepository;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.MultiMaps;
+import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.SetMultiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -374,7 +374,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
 
                 // insert result models
                 final Collection<QName> resultModels =
-                        getQNamesForResultModel(getCache().getObservationTypesForOffering(offering));
+                        OMHelper.getQNamesForResultModel(getCache().getObservationTypesForOffering(offering));
                 sosOffering.setResultModels(resultModels);
 
                 // set response format
@@ -583,39 +583,6 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
             featureIDs.addAll(features);
         }
         return featureIDs;
-    }
-
-    /**
-     * Get the QName for resultModels from observationType constant
-     * 
-     * @param resultModels4Offering
-     *            Observation types
-     * @return QNames for resultModel parameter
-     */
-    private Collection<QName> getQNamesForResultModel(final Collection<String> resultModels4Offering) {
-        final List<QName> resultModels = new ArrayList<QName>(9);
-        for (final String string : resultModels4Offering) {
-            if (string.equals(OMConstants.OBS_TYPE_MEASUREMENT)) {
-                resultModels.add(OMConstants.RESULT_MODEL_MEASUREMENT);
-            } else if (string.equals(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION)) {
-                resultModels.add(OMConstants.RESULT_MODEL_CATEGORY_OBSERVATION);
-            } else if (string.equals(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION)) {
-                resultModels.add(OMConstants.RESULT_MODEL_GEOMETRY_OBSERVATION);
-            } else if (string.equals(OMConstants.OBS_TYPE_OBSERVATION)) {
-                resultModels.add(OMConstants.RESULT_MODEL_OBSERVATION);
-            } else if (string.equals(OMConstants.OBS_TYPE_COUNT_OBSERVATION)) {
-                resultModels.add(OMConstants.RESULT_MODEL_COUNT_OBSERVATION);
-            } else if (string.equals(OMConstants.OBS_TYPE_TRUTH_OBSERVATION)) {
-                resultModels.add(OMConstants.RESULT_MODEL_TRUTH_OBSERVATION);
-            } else if (string.equals(OMConstants.OBS_TYPE_TEXT_OBSERVATION)) {
-                resultModels.add(OMConstants.RESULT_MODEL_TEXT_OBSERVATION);
-            } else if (string.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)) {
-                resultModels.add(OMConstants.RESULT_MODEL_OBSERVATION);
-            } else {
-                resultModels.add(OMConstants.RESULT_MODEL_OBSERVATION);
-            }
-        }
-        return resultModels;
     }
 
     private Collection<String> getObservationTypes(final String offering) {

@@ -320,7 +320,7 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
         if (encoder != null) {
             XmlObject xmlObject = (XmlObject) encoder.encode(iTime);
             XmlObject substitution =
-                    timeObjectPropertyType.addNewAbstractTimeObject().substitute(GmlHelper.getQnameForITime(iTime),
+                    timeObjectPropertyType.addNewAbstractTimeObject().substitute(GmlHelper.getGml321QnameForITime(iTime),
                             xmlObject.schemaType());
             substitution.set(xmlObject);
         } else {
@@ -353,7 +353,7 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
         xbObs.addNewResultTime().addNewTimeInstant().set(xmlObject);
         XmlObject substitution =
                 xbObs.getResultTime().getTimeInstant()
-                        .substitute(GmlHelper.getQnameForITime(iTime), xmlObject.schemaType());
+                        .substitute(GmlHelper.getGml321QnameForITime(iTime), xmlObject.schemaType());
         substitution.set(xmlObject);
     }
 

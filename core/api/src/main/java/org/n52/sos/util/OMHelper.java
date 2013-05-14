@@ -23,6 +23,10 @@
  */
 package org.n52.sos.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
 import org.n52.sos.ogc.om.OMConstants;
@@ -64,7 +68,7 @@ public final class OMHelper {
         return true;
     }
 
-    public static String getObservationTypeFromValue(IValue<?> value) {
+    public static String getObservationTypeFor(IValue<?> value) {
         if (value instanceof BooleanValue) {
             return OMConstants.OBS_TYPE_TRUTH_OBSERVATION;
         } else if (value instanceof CategoryValue) {
@@ -84,23 +88,62 @@ public final class OMHelper {
     private OMHelper() {
     }
 
-    public static String getObservationTypeForQName(QName resultModel) {
-       if (resultModel.equals(OMConstants.RESULT_MODEL_MEASUREMENT)) {
-           return OMConstants.OBS_TYPE_MEASUREMENT;
-       } else if (resultModel.equals(OMConstants.RESULT_MODEL_OBSERVATION)) {
-           return OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION;
+    public static String getObservationTypeFor(QName resultModel) {
+        if (resultModel.equals(OMConstants.RESULT_MODEL_MEASUREMENT)) {
+            return OMConstants.OBS_TYPE_MEASUREMENT;
+        } else if (resultModel.equals(OMConstants.RESULT_MODEL_CATEGORY_OBSERVATION)) {
+            return OMConstants.OBS_TYPE_CATEGORY_OBSERVATION;
+        } else if (resultModel.equals(OMConstants.RESULT_MODEL_GEOMETRY_OBSERVATION)) {
+            return OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION;
+        } else if (resultModel.equals(OMConstants.RESULT_MODEL_COUNT_OBSERVATION)) {
+            return OMConstants.OBS_TYPE_COUNT_OBSERVATION;
+        } else if (resultModel.equals(OMConstants.RESULT_MODEL_TRUTH_OBSERVATION)) {
+            return OMConstants.OBS_TYPE_TRUTH_OBSERVATION;
+        } else if (resultModel.equals(OMConstants.RESULT_MODEL_TEXT_OBSERVATION)) {
+            return OMConstants.OBS_TYPE_TEXT_OBSERVATION;
        }
-       // TODO add all other types
        return OMConstants.OBS_TYPE_OBSERVATION;
     }
 
-    public static QName getQNameForObservationTyper(String resultModel) {
-        if (resultModel.equals(OMConstants.OBS_TYPE_MEASUREMENT)) {
+    /**
+     * Get the QName for resultModels from observationType constant
+     * 
+     * @param resultModels4Offering
+     *            Observation types
+     * @return QNames for resultModel parameter
+     */
+    public static Collection<QName> getQNamesForResultModel(final Collection<String> resultModels4Offering) {
+        final List<QName> resultModels = new ArrayList<QName>(9);
+        for (final String string : resultModels4Offering) {
+            resultModels.add(getQNameFor(string));
+        }
+        return resultModels;
+    }
+    
+    public static QName getQNameFor(String observationType) {
+        if (observationType.equals(OMConstants.OBS_TYPE_MEASUREMENT)) {
             return OMConstants.RESULT_MODEL_MEASUREMENT;
-        } else if (resultModel.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)) {
+        } else if (observationType.equals(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION)) {
+            return OMConstants.RESULT_MODEL_CATEGORY_OBSERVATION;
+        } else if (observationType.equals(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION)) {
+            return OMConstants.RESULT_MODEL_GEOMETRY_OBSERVATION;
+        } else if (observationType.equals(OMConstants.OBS_TYPE_COUNT_OBSERVATION)) {
+            return OMConstants.RESULT_MODEL_COUNT_OBSERVATION;
+        } else if (observationType.equals(OMConstants.OBS_TYPE_TRUTH_OBSERVATION)) {
+            return OMConstants.RESULT_MODEL_TRUTH_OBSERVATION;
+        } else if (observationType.equals(OMConstants.OBS_TYPE_TEXT_OBSERVATION)) {
+            return OMConstants.RESULT_MODEL_TEXT_OBSERVATION;
+        } else {
             return OMConstants.RESULT_MODEL_OBSERVATION;
         }
-        // TODO add all other types
-        return OMConstants.RESULT_MODEL_OBSERVATION;
+    }
+
+    public static Object getEncodedResultModelFor(String resultModel) {
+        QName qNameFor = getQNameFor(resultModel);
+        StringBuilder builder = new StringBuilder();
+        builder.append(qNameFor.getPrefix());
+        builder.append(":");
+        builder.append(qNameFor.getLocalPart());
+        return builder.toString();
     }
 }

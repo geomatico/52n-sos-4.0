@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public final class GmlHelper {
     
     
-    public static  QName getQnameForGeometry(Geometry geom) {
+    public static  QName getGml321QnameForGeometry(Geometry geom) {
         if (geom instanceof Point) {
             return new QName(GMLConstants.NS_GML_32, GMLConstants.EN_POINT, GMLConstants.NS_GML);
         } else if (geom instanceof LineString) {
@@ -50,11 +50,20 @@ public final class GmlHelper {
     }
     
 
-    public static QName getQnameForITime(ITime iTime) {
+    public static QName getGml321QnameForITime(ITime iTime) {
         if (iTime instanceof TimeInstant) {
             return GMLConstants.QN_TIME_INSTANT_32;
         } else if (iTime instanceof TimePeriod) {
             return GMLConstants.QN_TIME_PERIOD_32;
+        }
+        return GMLConstants.QN_ABSTRACT_TIME_32;
+    }
+    
+    public static QName getGml311QnameForITime(ITime iTime) {
+        if (iTime instanceof TimeInstant) {
+            return GMLConstants.QN_TIME_INSTANT;
+        } else if (iTime instanceof TimePeriod) {
+            return GMLConstants.QN_TIME_PERIOD;
         }
         return GMLConstants.QN_ABSTRACT_TIME_32;
     }

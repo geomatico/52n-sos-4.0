@@ -31,12 +31,10 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetObservationByIdDAO;
 import org.n52.sos.encode.Encoder;
-import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
 import org.n52.sos.exception.ows.concrete.MissingResponseFormatParameterException;
 import org.n52.sos.exception.ows.concrete.NoEncoderForResponseException;
-import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -70,7 +68,7 @@ public class SosGetObservationByIdOperatorV100 extends
         checkObservationIDs(sosRequest.getObservationIdentifier(),
                             Sos1Constants.GetObservationByIdParams.ObservationId.name());
         // check responseFormat!
-		String responseFormat = sosRequest.getResponseFormat();
+	String responseFormat = sosRequest.getResponseFormat();
         if ((responseFormat == null) || !(responseFormat.length() > 0)) {
             throw new MissingResponseFormatParameterException();
 		}
@@ -102,22 +100,13 @@ public class SosGetObservationByIdOperatorV100 extends
         checkRequestedParameters(sosRequest);
 
         try {
-            String namespace;
             GetObservationByIdResponse response = getDao().getObservationById(sosRequest);
             
-            // TODO call encoder directly
             String contentType = SosConstants.CONTENT_TYPE_XML;
-            if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION) ) {
-                namespace = Sos1Constants.NS_SOS;
-            } else {
-                throw new InvalidParameterValueException().at(OWSConstants.RequestParams.version)
-                        .withMessage("Received version in request is not supported!");
-            }
-            
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Encoder<XmlObject, GetObservationByIdResponse> encoder = CodingHelper.getEncoder(namespace, response);
-            
+            Encoder<XmlObject, GetObservationByIdResponse> encoder = CodingHelper.getEncoder(sosRequest.getResponseFormat(), response);
             if (encoder != null) {
+                contentType = encoder.getContentType();
                 encoder.encode(response).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
                 return new ServiceResponse(baos, contentType, applyZIPcomp, true);
                 

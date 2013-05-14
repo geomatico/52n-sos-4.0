@@ -202,7 +202,7 @@ public class ITRequestEncoder {
             }
 
             if (req.getResultModel() != null) {
-                xb_getObs.setResultModel(OMHelper.getQNameForObservationTyper(req.getResultModel()));
+                xb_getObs.setResultModel(OMHelper.getQNameFor(req.getResultModel()));
             }
 
             if (req.getResponseMode() != null && !req.getResponseMode().equals(SosConstants.PARAMETER_NOT_SET)) {
