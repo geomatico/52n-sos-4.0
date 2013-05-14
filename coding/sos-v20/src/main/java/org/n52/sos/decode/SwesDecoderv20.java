@@ -192,7 +192,8 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
             if (decoder == null) {
                 throw new InvalidParameterValueException()
                         .at(Sos2Constants.InsertSensorParams.procedureDescriptionFormat)
-                        .withMessage("The requested procedureDescritpionFormat is not supported!");
+                        .withMessage("The requested " + Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name()
+                        		+ " is not supported!");
             }
             Object decodedObject = decoder.decode(xmlObject);
             if (decodedObject instanceof SosProcedureDescription) {
