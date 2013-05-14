@@ -28,6 +28,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import net.opengis.sensorML.x101.CapabilitiesDocument.Capabilities;
+import net.opengis.sensorML.x101.ComponentsDocument.Components.ComponentList.Component;
 import net.opengis.sensorML.x101.IdentificationDocument.Identification.IdentifierList;
 import net.opengis.sensorML.x101.IdentificationDocument.Identification.IdentifierList.Identifier;
 import net.opengis.sensorML.x101.SensorMLDocument;
@@ -163,17 +164,24 @@ public class SensorMLEncoderV101Test {
 				SensorMLConstants.PARENT_PROCEDURE_FIELD_DEFINITION, TEST_ID_2);
 	}
 
-//	@Test
-//	public void should_encode_child_procedures() throws OwsExceptionReport
-//	{
-//		SensorML sensorMl = new SensorML();
-//		System system = new System();
-//		sensorMl.addMember(system);
-//		System childProcedure = new System();
-//		system.addChildProcedure(childProcedure);
-//		childProcedure.addFeatureOfInterest(TEST_ID_1);
-//		SystemType xbSystemType = decodeSystem(sensorMl);
-//		assertThat(xbSystemType.getComponents().getComponentList().sizeOfComponentArray(), is(1));
-//	}	
+	@Test
+	public void should_encode_child_procedures() throws OwsExceptionReport
+	{
+		SensorML sensorMl = new SensorML();
+		System system = new System();
+		sensorMl.addMember(system);
+		System childProcedure = new System();
+		system.addChildProcedure(childProcedure);
+		childProcedure.addFeatureOfInterest(TEST_ID_1);
+		SystemType xbSystemType = decodeSystem(sensorMl);
+		assertThat(xbSystemType.getComponents().getComponentList().sizeOfComponentArray(), is(1));
+		Component xbComponent = xbSystemType.getComponents().getComponentList().getComponentArray(0);
+		assertThat(xbComponent.getProcess(), instanceOf(SystemType.class));
+		SystemType xbComponentSystem = (SystemType) xbComponent.getProcess();
+		SimpleDataRecordType xbSimpleDataRecord = decodeSimpleDataRecord(xbComponentSystem,
+				SensorMLConstants.ELEMENT_NAME_FEATURES_OF_INTEREST, 1);
+		validateField(xbSimpleDataRecord.getFieldArray(0), SensorMLConstants.FEATURE_OF_INTEREST_FIELD_NAME,
+				SensorMLConstants.FEATURE_OF_INTEREST_FIELD_DEFINITION, TEST_ID_1);
+	}
 	
 }

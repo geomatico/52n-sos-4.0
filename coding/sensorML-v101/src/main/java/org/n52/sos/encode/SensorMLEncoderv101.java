@@ -324,8 +324,6 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                                             SystemType.type);
                     final System smlSystem = (System) sml;
                     // TODO howTo without explicit setting
-                    // TODO check and remove
-                    // smlSystem.setFeatureOfInterest(smlSensorDesc.getFeatureOfInterest());
                     addAbstractProcessValues(xbSystem, smlSystem);
                     addSystemValues(xbSystem, smlSystem);
                 } else if (sml instanceof ProcessModel) {
@@ -885,7 +883,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                         throw new NoApplicableCodeException()
                                 .withMessage("The sensor type is not supported by this SOS");
                     }
-                    // TODO add feature/parentProcs/childProcs to component
+                    // TODO add feature/parentProcs/childProcs to component - is this already done?
                     component.setProcess(xbProcess);
                     if (schemaType == null) {
                         schemaType = xbProcess.schemaType();
