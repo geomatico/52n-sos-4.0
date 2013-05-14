@@ -46,6 +46,7 @@ public class ServiceSettings implements SettingDefinitionProvider {
     public static final String SENSOR_DIRECTORY = "service.sensorDirectory";
     public static final String USE_DEFAULT_PREFIXES = "service.useDefaultPrefixes";
     public static final String ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR = "service.encodeFullChildrenInDescribeSensor";
+    public static final String GENERATE_OFFERING_WHEN_NOT_SPECIFIED = "service.generateOfferingWhenNotSpecified";
     public static final String MAX_GET_OBSERVATION_RESULTS = "service.maxGetObservationResults";
 
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
@@ -110,6 +111,14 @@ public class ServiceSettings implements SettingDefinitionProvider {
     		.setDefaultValue(true)
     		.setTitle("Whether to encode full SensorML for child procedures in DescribeSensor responses")
     		.setDescription("Whether to encode full SensorML for child procedures in DescribeSensor responses.");    
+
+    public static final BooleanSettingDefinition GENERATE_OFFERING_WHEN_NOT_SPECIFIED_DEFINITION = new BooleanSettingDefinition()
+			.setGroup(GROUP)
+			.setOrder(13)
+			.setKey(GENERATE_OFFERING_WHEN_NOT_SPECIFIED)
+			.setDefaultValue(true)
+			.setTitle("Whether to generate an offering during InsertSensor if none are specified.")
+			.setDescription("Whether to generate an offering during InsertSensor if none are specified.");    
     
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
             ServiceSettings.SERVICE_URL_DEFINITION,
@@ -118,7 +127,8 @@ public class ServiceSettings implements SettingDefinitionProvider {
             ServiceSettings.SUPPORTS_QUALITY_DEFINITION,
             ServiceSettings.SENSOR_DIRECTORY_DEFINITION,
             ServiceSettings.USE_DEFAULT_PREFIXES_DEFINITION,
-            ServiceSettings.ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR_DEFINITION);
+            ServiceSettings.ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR_DEFINITION,
+            ServiceSettings.GENERATE_OFFERING_WHEN_NOT_SPECIFIED_DEFINITION);
 
     @Override
     public Set<SettingDefinition<?, ?>> getSettingDefinitions() {

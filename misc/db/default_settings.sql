@@ -137,6 +137,7 @@ INSERT INTO "settings" VALUES('service.sosUrl');
 INSERT INTO "settings" VALUES('service.supportsQuality');
 INSERT INTO "settings" VALUES('service.useDefaultPrefixes');
 INSERT INTO "settings" VALUES('service.encodeFullChildrenInDescribeSensor');
+INSERT INTO "settings" VALUES('service.generateOfferingWhenNotSpecified');
 
 INSERT INTO "settings" VALUES('serviceIdentification.abstract');
 INSERT INTO "settings" VALUES('serviceIdentification.accessConstraints');
@@ -167,6 +168,7 @@ INSERT INTO "boolean_settings" VALUES(1,'service.skipDuplicateObservations');
 INSERT INTO "boolean_settings" VALUES(0,'service.blockGetObservationRequestsWithoutRestriction');
 INSERT INTO "boolean_settings" VALUES(0,'service.useDefaultPrefixes');
 INSERT INTO "boolean_settings" VALUES(1,'service.encodeFullChildrenInDescribeSensor');
+INSERT INTO "boolean_settings" VALUES(1,'service.generateOfferingWhenNotSpecified');
 
 INSERT INTO "file_settings" VALUES(NULL,'serviceIdentification.file');
 INSERT INTO "file_settings" VALUES(NULL,'serviceProvider.file');

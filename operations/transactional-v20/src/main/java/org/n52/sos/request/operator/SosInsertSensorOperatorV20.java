@@ -62,6 +62,7 @@ import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.MiscSettings;
+import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.JavaHelper;
@@ -267,7 +268,8 @@ public class SosInsertSensorOperatorV20 extends
 
         }
         // check if offering is valid
-        if (sosOfferings == null || sosOfferings.isEmpty()) {
+        if ((sosOfferings == null || sosOfferings.isEmpty()) &&
+        		ServiceConfiguration.getInstance().isGenerateOfferingWhenNotSpecified()) {
             sosOfferings = new HashSet<SosOffering>(0);
             sosOfferings.add(new SosOffering(getDefaultOfferingPrefix() + request.getAssignedProcedureIdentifier()));
         }

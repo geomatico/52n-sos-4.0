@@ -62,7 +62,7 @@ public class SensorMLEncoderV101Test {
 	public static void cleanUp(){
 		SettingsManager.getInstance().cleanup();
 	}
-	
+
 	@Test
 	public void should_set_identifier() throws OwsExceptionReport
 	{

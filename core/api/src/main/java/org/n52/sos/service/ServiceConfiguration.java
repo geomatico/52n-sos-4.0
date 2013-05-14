@@ -33,6 +33,7 @@ import static org.n52.sos.service.MiscSettings.HTTP_STATUS_CODE_USE_IN_KVP_POX_B
 import static org.n52.sos.service.MiscSettings.SRS_NAME_PREFIX_SOS_V1;
 import static org.n52.sos.service.MiscSettings.SRS_NAME_PREFIX_SOS_V2;
 import static org.n52.sos.service.ServiceSettings.ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR;
+import static org.n52.sos.service.ServiceSettings.GENERATE_OFFERING_WHEN_NOT_SPECIFIED;
 import static org.n52.sos.service.ServiceSettings.MINIMUM_GZIP_SIZE;
 import static org.n52.sos.service.ServiceSettings.SENSOR_DIRECTORY;
 import static org.n52.sos.service.ServiceSettings.SERVICE_URL;
@@ -69,6 +70,7 @@ public class ServiceConfiguration {
     private String defaultFeaturePrefix;
     private boolean useDefaultPrefixes;
     private boolean encodeFullChildrenInDescribeSensor;
+    private boolean generateOfferingWhenNotSpecified;
     private boolean useHttpStatusCodesInKvpAndPoxBinding;
 
     /**
@@ -76,7 +78,7 @@ public class ServiceConfiguration {
      */
     public static ServiceConfiguration getInstance() {
     	if (instance == null) {
-    		instance = new ServiceConfiguration();
+    		SettingsManager.getInstance().configure(instance = new ServiceConfiguration());
     	}
     	return instance;
     }    
@@ -85,7 +87,6 @@ public class ServiceConfiguration {
      * private constructor for singleton
      */
     private ServiceConfiguration() {
-    	SettingsManager.getInstance().configure(instance = this);
     }
 
     /**
@@ -223,7 +224,16 @@ public class ServiceConfiguration {
     public void setEncodeFullChildrenInDescribeSensor(final boolean encodeFullChildrenInDescribeSensor) {
     	this.encodeFullChildrenInDescribeSensor = encodeFullChildrenInDescribeSensor;
     }    
-   
+
+    public boolean isGenerateOfferingWhenNotSpecified() {
+    	return generateOfferingWhenNotSpecified;
+    }
+
+    @Setting(GENERATE_OFFERING_WHEN_NOT_SPECIFIED)
+    public void setGenerateOfferingWhenNotSpecified(final boolean generateOfferingWhenNotSpecified) {
+    	this.generateOfferingWhenNotSpecified = generateOfferingWhenNotSpecified;
+    }    
+    
     /**
      * @return the supportsQuality
      */
