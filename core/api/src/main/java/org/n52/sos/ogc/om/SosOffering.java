@@ -34,6 +34,9 @@ public class SosOffering implements Comparable<SosOffering> {
 
     /** name of this offering */
     private String offeringName;
+    
+    /** flag to identify offering as offering from a parent procedure, default = false */
+    private boolean parentOfferingFlag = false;
 
     /**
      * constructor
@@ -97,6 +100,23 @@ public class SosOffering implements Comparable<SosOffering> {
     
     public boolean isSetOfferingName() {
         return offeringName != null && !offeringName.isEmpty();
+    }
+    
+    /**
+     * Set if offering is from parent procedure or not
+     * 
+     * @param parentOfferingFlag Offering is from parent procedure or not
+     */
+    public void setParentOfferingFlag(boolean parentOfferingFlag) {
+        this.parentOfferingFlag = parentOfferingFlag;
+    }
+    
+    /**
+     * 
+     * @return offering is from parent procedure or not
+     */
+    public boolean isParentOffering() {
+        return parentOfferingFlag;
     }
 
 	@Override
