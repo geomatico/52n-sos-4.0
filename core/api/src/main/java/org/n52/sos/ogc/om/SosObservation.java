@@ -31,6 +31,7 @@ import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.values.TVPValue;
+import org.n52.sos.util.StringHelper;
 
 /**
  * Class represents a SOS observation
@@ -399,5 +400,9 @@ public class SosObservation implements Serializable {
     
     public boolean isSetResultTime() {
         return resultTime != null && resultTime.isSetValue();
+    }
+
+    public boolean isSetResultType() {
+        return StringHelper.isNotEmpty(resultType);
     }
 }
