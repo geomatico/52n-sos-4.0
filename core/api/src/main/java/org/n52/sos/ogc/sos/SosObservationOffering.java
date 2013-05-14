@@ -489,7 +489,7 @@ public class SosObservationOffering implements Comparable<SosObservationOffering
         return observationTypes != null && !observationTypes.isEmpty();
     }
 
-    private boolean isSetFeatureOfInterestTypes() {
+    public boolean isSetFeatureOfInterestTypes() {
         return featureOfInterestTypes != null && !featureOfInterestTypes.isEmpty();
     }
 
@@ -497,7 +497,7 @@ public class SosObservationOffering implements Comparable<SosObservationOffering
         return observationResultTypes != null && !observationResultTypes.isEmpty();
     }
 
-    private boolean isSetResponseFormats() {
+    public boolean isSetResponseFormats() {
         return responseFormats != null && !responseFormats.isEmpty();
     }
 
@@ -505,7 +505,7 @@ public class SosObservationOffering implements Comparable<SosObservationOffering
         return responseModes != null && !responseModes.isEmpty();
     }
 
-    private boolean isSetProcedureDescriptionFormats() {
+    public boolean isSetProcedureDescriptionFormats() {
         return procedureDescriptionFormats != null && !procedureDescriptionFormats.isEmpty();
     }
 }
