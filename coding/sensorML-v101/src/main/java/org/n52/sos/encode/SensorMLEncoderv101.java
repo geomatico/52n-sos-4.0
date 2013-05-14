@@ -234,7 +234,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         }
     }
 
-    private XmlObject createSensorDescriptionFromString(final AbstractSensorML sensorDesc) throws OwsExceptionReport {
+    protected XmlObject createSensorDescriptionFromString(final AbstractSensorML sensorDesc) throws OwsExceptionReport {
         try {
             final XmlObject xmlObject = XmlObject.Factory.parse(sensorDesc.getSensorDescriptionXmlString());
             if (xmlObject instanceof SensorMLDocument) {
@@ -306,7 +306,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
     	}
     }
 
-    private XmlObject createSensorMLDescription(final SensorML smlSensorDesc) throws OwsExceptionReport {
+    protected SensorMLDocument createSensorMLDescription(final SensorML smlSensorDesc) throws OwsExceptionReport {
         final SensorMLDocument sensorMLDoc =
                 SensorMLDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         final net.opengis.sensorML.x101.SensorMLDocument.SensorML xbSensorML = sensorMLDoc.addNewSensorML();
