@@ -31,8 +31,10 @@ import org.n52.sos.ogc.om.SosObservation;
 public class GetObservationByIdResponse extends AbstractServiceResponse {
 
     private String responseFormat;
-
+    
     private List<SosObservation> observationCollection;
+    
+    private String resultModel;
 
     public String getResponseFormat() {
         return responseFormat;
@@ -48,6 +50,18 @@ public class GetObservationByIdResponse extends AbstractServiceResponse {
 
     public void setObservationCollection(List<SosObservation> observationCollection) {
         this.observationCollection = observationCollection;
+    }
+    
+    public void setResultModel(String resultModel) {
+        this.resultModel = resultModel;
+    }
+    
+    public String getResultModel() {
+        return resultModel;
+    }
+    
+    public boolean isSetResultModel() {
+        return resultModel != null;
     }
 
 }
