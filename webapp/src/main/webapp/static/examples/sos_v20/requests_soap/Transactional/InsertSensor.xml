@@ -45,7 +45,7 @@
 								<swe:SimpleDataRecord>
 									<!-- Field name is used for the offering's name -->
 									<swe:field name="Offering for sensor 9">
-										<swe:Text>
+										<swe:Text definition="urn:ogc:def:identifier:OGC:offeringID">
 											<swe:value>http://www.52north.org/test/offering/9</swe:value>
 										</swe:Text>
 									</swe:field>
