@@ -119,7 +119,7 @@ public class GetObservationResponse extends AbstractServiceResponse {
         this.resultModel = resultModel;
     }
     
-    public String GetResultModel() {
+    public String getResultModel() {
         return resultModel;
     }
     
