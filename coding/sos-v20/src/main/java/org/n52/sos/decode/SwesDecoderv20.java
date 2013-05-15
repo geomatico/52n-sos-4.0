@@ -81,26 +81,18 @@ import org.w3c.dom.NodeList;
 public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObject, XmlObject> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SwesDecoderv20.class);
-    
+
     @SuppressWarnings("unchecked")
-    private static final Set<DecoderKey> DECODER_KEYS = CollectionHelper.union(
-            CodingHelper.decoderKeysForElements(SWEConstants.NS_SWES_20,
-            DescribeSensorDocument.class,
-            InsertSensorDocument.class,
-            UpdateSensorDescriptionDocument.class,
-            DeleteSensorDocument.class
-        ),
-        CodingHelper.xmlDecoderKeysForOperation(
-            SosConstants.SOS, Sos2Constants.SERVICEVERSION,
-            SosConstants.Operations.DescribeSensor,
-            Sos2Constants.Operations.InsertSensor,
-            Sos2Constants.Operations.UpdateSensorDescription,
-            Sos2Constants.Operations.DeleteSensor
-        )
-    );
-    
+    private static final Set<DecoderKey> DECODER_KEYS = CollectionHelper.union(CodingHelper.decoderKeysForElements(
+            SWEConstants.NS_SWES_20, DescribeSensorDocument.class, InsertSensorDocument.class,
+            UpdateSensorDescriptionDocument.class, DeleteSensorDocument.class), CodingHelper
+            .xmlDecoderKeysForOperation(SosConstants.SOS, Sos2Constants.SERVICEVERSION,
+                    SosConstants.Operations.DescribeSensor, Sos2Constants.Operations.InsertSensor,
+                    Sos2Constants.Operations.UpdateSensorDescription, Sos2Constants.Operations.DeleteSensor));
+
     public SwesDecoderv20() {
-       LOGGER.debug("Decoder for the following keys initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));
+        LOGGER.debug("Decoder for the following keys initialized successfully: {}!",
+                StringHelper.join(", ", DECODER_KEYS));
     }
 
     @Override
@@ -112,7 +104,7 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
         return Collections.emptyMap();
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
         return Collections.emptySet();
@@ -142,9 +134,10 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
      * @param xbDescSenDoc
      *            XmlBeans document representing the describeSensor request
      * @return Returns SOS describeSensor request
-
-     *
-     * @throws OwsExceptionReport     *             if validation of the request failed
+     * 
+     * 
+     * @throws OwsExceptionReport
+     *             * if validation of the request failed
      */
     private AbstractServiceRequest parseDescribeSensor(DescribeSensorDocument xbDescSenDoc) throws OwsExceptionReport {
         DescribeSensorRequest descSensorRequest = new DescribeSensorRequest();
@@ -179,21 +172,21 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
         if (xbInsertSensor.getMetadataArray() != null && xbInsertSensor.getMetadataArray().length > 0) {
             request.setMetadata(parseMetadata(xbInsertSensor.getMetadataArray()));
         }
-        SosHelper.checkProcedureDescriptionFormat(xbInsertSensor.getProcedureDescriptionFormat(), 
+        SosHelper.checkProcedureDescriptionFormat(xbInsertSensor.getProcedureDescriptionFormat(),
                 Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name());
-        
+
         try {
             XmlObject xmlObject =
-                    XmlObject.Factory.parse(getNodeFromNodeList(xbInsertSensor.getProcedureDescription()
-                            .getDomNode().getChildNodes()));
-            
-            Decoder<?, XmlObject> decoder = CodingRepository.getInstance()
-                    .getDecoder(CodingHelper.getDecoderKey(xmlObject));
+                    XmlObject.Factory.parse(getNodeFromNodeList(xbInsertSensor.getProcedureDescription().getDomNode()
+                            .getChildNodes()));
+
+            Decoder<?, XmlObject> decoder =
+                    CodingRepository.getInstance().getDecoder(CodingHelper.getDecoderKey(xmlObject));
             if (decoder == null) {
-                throw new InvalidParameterValueException()
-                        .at(Sos2Constants.InsertSensorParams.procedureDescriptionFormat)
-                        .withMessage("The requested " + Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name()
-                        		+ " is not supported!");
+                throw new InvalidParameterValueException().at(
+                        Sos2Constants.InsertSensorParams.procedureDescriptionFormat)
+                        .withMessage("The requested %s is not supported!",
+                        Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name());
             }
             Object decodedObject = decoder.decode(xmlObject);
             if (decodedObject instanceof SosProcedureDescription) {
@@ -220,9 +213,10 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
      * @param xbUpSenDoc
      *            UpdateSensorDescription document
      * @return SOS UpdateSensor request
-
-     *
-     * @throws OwsExceptionReport     *             if an error occurs.
+     * 
+     * 
+     * @throws OwsExceptionReport
+     *             * if an error occurs.
      */
     private AbstractServiceRequest parseUpdateSensorDescription(UpdateSensorDescriptionDocument xbUpSenDoc)
             throws OwsExceptionReport {
@@ -232,27 +226,27 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
         request.setVersion(xbUpdateSensor.getVersion());
         request.setProcedureIdentifier(xbUpdateSensor.getProcedure());
         request.setProcedureDescriptionFormat(xbUpdateSensor.getProcedureDescriptionFormat());
-        
-        
+
         for (Description description : xbUpdateSensor.getDescriptionArray()) {
             try {
                 XmlObject xmlObject =
-                        XmlObject.Factory.parse(getNodeFromNodeList(description.getSensorDescription()
-                                .getData().getDomNode().getChildNodes()));
-                Decoder<?, XmlObject> decoder = CodingRepository.getInstance()
-                        .getDecoder(CodingHelper.getDecoderKey(xmlObject));
+                        XmlObject.Factory.parse(getNodeFromNodeList(description.getSensorDescription().getData()
+                                .getDomNode().getChildNodes()));
+                Decoder<?, XmlObject> decoder =
+                        CodingRepository.getInstance().getDecoder(CodingHelper.getDecoderKey(xmlObject));
                 if (decoder == null) {
-                    throw new InvalidParameterValueException().at(UpdateSensorDescriptionParams.procedureDescriptionFormat)
-                            .withMessage("The requested procedureDescritpionFormat is not supported!");
+                    throw new InvalidParameterValueException().at(
+                            UpdateSensorDescriptionParams.procedureDescriptionFormat).withMessage(
+                            "The requested procedureDescritpionFormat is not supported!");
                 }
-                
+
                 Object decodedObject = decoder.decode(xmlObject);
                 if (decodedObject instanceof SosProcedureDescription) {
                     request.addProcedureDescriptionString((SosProcedureDescription) decodedObject);
                 }
             } catch (XmlException xmle) {
-                throw new NoApplicableCodeException().causedBy(xmle)
-                        .withMessage("Error while parsing procedure description of UpdateSensor request!");
+                throw new NoApplicableCodeException().causedBy(xmle).withMessage(
+                        "Error while parsing procedure description of UpdateSensor request!");
             }
         }
         return request;
@@ -289,14 +283,15 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
                 }
             }
         } catch (XmlException xmle) {
-            throw new NoApplicableCodeException().causedBy(xmle)
-                    .withMessage("An error occurred while parsing the metadata in the http post request");
+            throw new NoApplicableCodeException().causedBy(xmle).withMessage(
+                    "An error occurred while parsing the metadata in the http post request");
         }
         return sosMetadata;
     }
 
     private List<SosFeatureRelationship> parseRelatedFeature(RelatedFeature[] relatedFeatureArray) {
-        List<SosFeatureRelationship> sosRelatedFeatures = new ArrayList<SosFeatureRelationship>(relatedFeatureArray.length);
+        List<SosFeatureRelationship> sosRelatedFeatures =
+                new ArrayList<SosFeatureRelationship>(relatedFeatureArray.length);
         for (RelatedFeature relatedFeature : relatedFeatureArray) {
             SosFeatureRelationship sosFeatureRelationship = new SosFeatureRelationship();
 
