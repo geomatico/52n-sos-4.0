@@ -39,7 +39,6 @@ import net.opengis.swes.x20.UpdateSensorDescriptionResponseType;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.swe.SWEConstants;
@@ -119,13 +118,7 @@ public class SwesEncoderv20 implements Encoder<XmlObject, AbstractServiceRespons
                 DescribeSensorResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         DescribeSensorResponseType describeSensorResponse = xbDescSensorRespDoc.addNewDescribeSensorResponse();
         describeSensorResponse.setProcedureDescriptionFormat(response.getOutputFormat());
-        String outputFormat;
-        if (response.getOutputFormat().equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
-            outputFormat = SensorMLConstants.NS_SML;
-        } else {
-            outputFormat = response.getOutputFormat();
-        }
-        XmlObject xmlObject = CodingHelper.encodeObjectToXml(outputFormat, response.getSensorDescription());
+        XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getOutputFormat(), response.getSensorDescription());
         describeSensorResponse.addNewDescription().addNewSensorDescription().addNewData().set(xmlObject);
         // set schema location
         N52XmlHelper.setSchemaLocationsToDocument(xbDescSensorRespDoc,

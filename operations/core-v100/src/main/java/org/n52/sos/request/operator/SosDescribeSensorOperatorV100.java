@@ -33,13 +33,11 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractDescribeSensorDAO;
 import org.n52.sos.encode.Encoder;
-import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
 import org.n52.sos.exception.ows.concrete.InvalidOutputFormatException;
-import org.n52.sos.exception.ows.concrete.MissingProcedureDescriptionFormatException;
+import org.n52.sos.exception.ows.concrete.NoEncoderForKeyException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
@@ -48,6 +46,7 @@ import org.n52.sos.response.DescribeSensorResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.N52XmlHelper;
+import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 
 /**
@@ -67,27 +66,6 @@ public class SosDescribeSensorOperatorV100 extends
         super(OPERATION_NAME, DescribeSensorRequest.class);
     }
 
-    /**
-     * from SosHelper, I think there was a bug, checks whether the value of
-     * outputFormat parameter is valid
-     * 
-     * @param procedureDecriptionFormat
-     *            the outputFormat parameter which should be checked
-     * 
-     * @throws OwsExceptionReport
-     *             if the value of the outputFormat parameter is incorrect
-     */
-    private void checkProcedureDescriptionFormat(String procedureDecriptionFormat, String parameterName)
-            throws OwsExceptionReport {
-        if (procedureDecriptionFormat == null || procedureDecriptionFormat.isEmpty()
-                || procedureDecriptionFormat.equals(SosConstants.PARAMETER_NOT_SET)) {
-            throw new MissingProcedureDescriptionFormatException();
-        }
-        if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
-            throw new InvalidParameterValueException(parameterName, procedureDecriptionFormat);
-        }
-    }
-
     @Override
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
@@ -99,28 +77,27 @@ public class SosDescribeSensorOperatorV100 extends
 
         checkRequestedParameters(sosRequest);
         DescribeSensorResponse response = getDao().getSensorDescription(sosRequest);
-        String contentType = SosConstants.CONTENT_TYPE_XML;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        String namespace = sosRequest.getProcedureDescriptionFormat();
 
+        Encoder<XmlObject, SosProcedureDescription> encoder;
+        try{
+            encoder = CodingHelper.getEncoder(namespace, response.getSensorDescription());
+        } catch (NoEncoderForKeyException e) {
+            throw new InvalidOutputFormatException(sosRequest.getProcedureDescriptionFormat());
+        }
+        
+        XmlObject encodedObject = encoder.encode(response.getSensorDescription());
+        List<String> schemaLocations = new ArrayList<String>(3);
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSML101());
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSWE101());
+        N52XmlHelper.setSchemaLocationsToDocument(encodedObject, schemaLocations);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            response.getOutputFormat();
-            String namespace = sosRequest.getProcedureDescriptionFormat();
-            Encoder<XmlObject, SosProcedureDescription> encoder = CodingHelper.getEncoder(namespace, response.getSensorDescription());
-            if (encoder != null) {
-                contentType = encoder.getContentType();
-                XmlObject encodedObject = encoder.encode(response.getSensorDescription());
-                List<String> schemaLocations = new ArrayList<String>(3);
-                schemaLocations.add(N52XmlHelper.getSchemaLocationForSML101());
-                schemaLocations.add(N52XmlHelper.getSchemaLocationForSWE101());
-                N52XmlHelper.setSchemaLocationsToDocument(encodedObject, schemaLocations);
-                encodedObject.save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
-                return new ServiceResponse(baos, contentType, applyZIPcomp, true);
-            } else {
-               throw new InvalidOutputFormatException(sosRequest.getProcedureDescriptionFormat());
-            }
+            encodedObject.save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
         } catch (IOException ioe) {
             throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
+        return new ServiceResponse(baos, SosConstants.CONTENT_TYPE_XML, applyZIPcomp, true);
     }
 
     private void checkRequestedParameters(DescribeSensorRequest sosRequest) throws OwsExceptionReport {
@@ -140,11 +117,8 @@ public class SosDescribeSensorOperatorV100 extends
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
-        // TODO necessary in SOS 1.0.0, different value? take care, here the
-        // local method is used, as it sowrks somehow differently in the sos
-        // helper(only sos 200?)
         try {
-            checkProcedureDescriptionFormat(sosRequest.getProcedureDescriptionFormat(),
+            SosHelper.checkProcedureDescriptionFormat(sosRequest.getProcedureDescriptionFormat(),
                     Sos1Constants.DescribeSensorParams.outputFormat.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);

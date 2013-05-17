@@ -41,7 +41,6 @@ import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.exception.ows.concrete.InvalidProcedureDescriptionFormatException;
 import org.n52.sos.exception.ows.concrete.InvalidResponseFormatParameterException;
 import org.n52.sos.exception.ows.concrete.MissingProcedureDescriptionFormatException;
 import org.n52.sos.exception.sos.ResponseExceedsSizeLimitException;
@@ -387,12 +386,12 @@ public class SosHelper {
      * checks whether the value of outputFormat parameter is valid
      * 
      * @param procedureDecriptionFormat
-     *            the outputFormat parameter which should be checked
+     *            the procedureDecriptionFormat parameter which should be checked
      * @param parameterName
      *            the parameter name
 
      *
-     * @throws OwsExceptionReport if the value of the outputFormat parameter is incorrect
+     * @throws OwsExceptionReport if the value of the procedureDecriptionFormat is incorrect
      */
     public static void checkProcedureDescriptionFormat(final String procedureDecriptionFormat, final String parameterName) throws
             OwsExceptionReport {
@@ -400,12 +399,8 @@ public class SosHelper {
             || procedureDecriptionFormat.equals(SosConstants.PARAMETER_NOT_SET)) {
             throw new MissingProcedureDescriptionFormatException();
         }
-        if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
-            if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
-                throw new InvalidProcedureDescriptionFormatException(procedureDecriptionFormat);
-            } else if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
-                throw new InvalidProcedureDescriptionFormatException(procedureDecriptionFormat);
-            }
+        if (!CodingRepository.getInstance().getAllProcedureDescriptionFormats().contains(procedureDecriptionFormat)) {
+        	throw new InvalidParameterValueException(parameterName, procedureDecriptionFormat);
         }
     }
 

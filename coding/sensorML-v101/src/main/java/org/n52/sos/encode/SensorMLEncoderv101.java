@@ -144,8 +144,8 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SensorMLEncoderv101.class);
 
     private static final Map<SupportedTypeKey, Set<String>> SUPPORTED_TYPES = Collections.singletonMap(
-            SupportedTypeKey.ProcedureDescriptionFormat,
-            Collections.singleton(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL));
+            SupportedTypeKey.ProcedureDescriptionFormat, CollectionHelper.set(
+            		SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL, SensorMLConstants.SENSORML_CONTENT_TYPE));
 
     @SuppressWarnings("unchecked")
     private static final Set<EncoderKey> ENCODER_KEYS = CollectionHelper.union(
