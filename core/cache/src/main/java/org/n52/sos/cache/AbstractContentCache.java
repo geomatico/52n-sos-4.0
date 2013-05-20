@@ -286,6 +286,8 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
     private Map<String, DateTime> minPhenomenonTimeForOfferings = newSynchronizedMap();
     private Map<String, DateTime> maxResultTimeForOfferings = newSynchronizedMap();
     private Map<String, DateTime> minResultTimeForOfferings = newSynchronizedMap();
+    private Map<String, DateTime> maxPhenomenonTimeForProcedures = newSynchronizedMap();
+    private Map<String, DateTime> minPhenomenonTimeForProcedures = newSynchronizedMap();    
     private SetMultiMap<String, String> allowedObservationTypeForOfferings = newSynchronizedSetMultiMap();
     private SetMultiMap<String, String> childFeaturesForFeatureOfInterest = newSynchronizedSetMultiMap();
     private SetMultiMap<String, String> childProceduresForProcedures = newSynchronizedSetMultiMap();
@@ -320,7 +322,7 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
     private SosEnvelope globalEnvelope = new SosEnvelope(null, defaultEpsgCode);
     private TimePeriod globalPhenomenonTimeEnvelope = new TimePeriod();
     private TimePeriod globalResultTimeEnvelope = new TimePeriod();
-
+    
     /**
      * @return the relating offering -> max phenomenon time
      */
@@ -336,6 +338,20 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
     }
 
     /**
+     * @return the relating procedure -> max phenomenon time
+     */
+    protected Map<String, DateTime> getMaxPhenomenonTimeForProceduresMap() {
+        return this.maxPhenomenonTimeForProcedures;
+    }
+
+    /**
+     * @return the relating procedure -> min phenomenon time
+     */
+    protected Map<String, DateTime> getMinPhenomenonTimeForProceduresMap() {
+        return this.minPhenomenonTimeForProcedures;
+    }
+
+    /**
      * @return the relating offering -> max result time
      */
     protected Map<String, DateTime> getMaxResultTimeForOfferingsMap() {
@@ -348,7 +364,7 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
     protected Map<String, DateTime> getMinResultTimeForOfferingsMap() {
         return this.minResultTimeForOfferings;
     }
-
+    
     /**
      * @return the relating offering -> allowed observation type
      */
@@ -608,7 +624,7 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
     public int getDefaultEPSGCode() {
         return this.defaultEpsgCode;
     }
-
+    
     @Override
     public int hashCode() {
         return hash(7, 41,
@@ -617,6 +633,8 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
                     minPhenomenonTimeForOfferings,
                     maxResultTimeForOfferings,
                     minResultTimeForOfferings,
+                    maxPhenomenonTimeForProcedures,
+                    minPhenomenonTimeForProcedures,                    
                     allowedObservationTypeForOfferings,
                     childFeaturesForFeatureOfInterest,
                     childProceduresForProcedures,
@@ -674,6 +692,12 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
         if (!eq(this.minResultTimeForOfferings, other.minResultTimeForOfferings)) {
             return false;
         }
+        if (!eq(this.maxPhenomenonTimeForProcedures, other.maxPhenomenonTimeForProcedures)) {
+            return false;
+        }
+        if (!eq(this.minPhenomenonTimeForProcedures, other.minPhenomenonTimeForProcedures)) {
+            return false;
+        }        
         if (!eq(this.allowedObservationTypeForOfferings, other.allowedObservationTypeForOfferings)) {
             return false;
         }

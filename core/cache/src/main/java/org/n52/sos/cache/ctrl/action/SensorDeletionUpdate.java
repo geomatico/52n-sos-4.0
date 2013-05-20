@@ -61,6 +61,10 @@ public class SensorDeletionUpdate extends InMemoryCacheUpdate {
         final String procedure = request.getProcedureIdentifier();
 
         cache.removeProcedure(procedure);
+
+        cache.removeMinPhenomenonTimeForProcedure(procedure);        
+        cache.removeMaxPhenomenonTimeForProcedure(procedure);
+
         for (String feature : cache.getFeaturesOfInterest()) {
             cache.removeProcedureForFeatureOfInterest(feature, procedure);
             if (cache.getProceduresForFeatureOfInterest(feature).isEmpty()) {

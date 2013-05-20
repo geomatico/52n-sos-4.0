@@ -336,6 +336,28 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
+    public void setMaxPhenomenonTimeForProcedure(String procedure, DateTime maxTime) {
+        notNullOrEmpty("procedure", procedure);
+        LOG.trace("Setting maximal phenomenon time for procedure {} to {}", procedure, maxTime);
+        if (maxTime == null) {
+            getMaxPhenomenonTimeForProceduresMap().remove(procedure);
+        } else {
+            getMaxPhenomenonTimeForProceduresMap().put(procedure, maxTime);
+        }
+    }
+
+    @Override
+    public void setMinPhenomenonTimeForProcedure(String procedure, DateTime minTime) {
+        notNullOrEmpty("procedure", procedure);
+        LOG.trace("Setting minimal phenomenon time for procedure {} to {}", procedure, minTime);
+        if (minTime == null) {
+            getMinPhenomenonTimeForProceduresMap().remove(procedure);
+        } else {
+            getMinPhenomenonTimeForProceduresMap().put(procedure, minTime);
+        }
+    }
+
+    @Override
     public void setNameForOffering(String offering, String name) {
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("name", name);
@@ -617,6 +639,20 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         LOG.trace("Removing minEventTime for offering {}", offering);
         getMinPhenomenonTimeForOfferingsMap().remove(offering);
+    }
+
+    @Override
+    public void removeMaxPhenomenonTimeForProcedure(String procedure) {
+        notNullOrEmpty("procedure", procedure);
+        LOG.trace("Removing maxEventTime for procedure {}", procedure);
+        getMaxPhenomenonTimeForProceduresMap().remove(procedure);
+    }
+
+    @Override
+    public void removeMinPhenomenonTimeForProcedure(String procedure) {
+        notNullOrEmpty("procedure", procedure);
+        LOG.trace("Removing minEventTime for procedure {}", procedure);
+        getMinPhenomenonTimeForProceduresMap().remove(procedure);
     }
 
     @Override
@@ -1048,6 +1084,22 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
+    public void updatePhenomenonTimeForProcedure(String procedure, ITime eventTime) {
+        notNullOrEmpty("procedure", procedure);
+        notNull("eventTime", eventTime);
+        TimePeriod tp = toTimePeriod(eventTime);
+        LOG.trace("Expanding phenomenon time of procedure {} to include {}", procedure, tp);
+        if (!hasMaxPhenomenonTimeForProcedure(procedure)
+            || getMaxPhenomenonTimeForProcedure(procedure).isBefore(tp.getEnd())) {
+            setMaxPhenomenonTimeForProcedure(procedure, tp.getEnd());
+        }
+        if (!hasMinPhenomenonTimeForProcedure(procedure)
+            || getMinPhenomenonTimeForProcedure(procedure).isAfter(tp.getStart())) {
+            setMinPhenomenonTimeForProcedure(procedure, tp.getStart());
+        }
+    }
+
+    @Override
     public void recalculateGlobalEnvelope() {
         LOG.trace("Recalculating global spatial envelope based on offerings");
         SosEnvelope globalEnvelope = null;
@@ -1296,6 +1348,18 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         getMaxPhenomenonTimeForOfferingsMap().clear();
     }
 
+    @Override
+    public void clearMinPhenomenonTimeForProcedures() {
+        LOG.trace("Clearing min phenomenon time for procedures");
+        getMinPhenomenonTimeForProceduresMap().clear();
+    }
+
+    @Override
+    public void clearMaxPhenomenonTimeForProcedures() {
+        LOG.trace("Clearing max phenomenon time for procedures");
+        getMaxPhenomenonTimeForProceduresMap().clear();
+    }
+    
     @Override
     public void clearMinResultTimeForOfferings() {
         LOG.trace("Clearing min result time for offerings");

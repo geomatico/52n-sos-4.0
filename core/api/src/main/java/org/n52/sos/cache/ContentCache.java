@@ -67,6 +67,24 @@ public interface ContentCache extends Serializable {
     boolean hasMaxPhenomenonTimeForOffering(String offering);
 
     /**
+     * Returns the maximal phenomenon time period for the specified procedure.
+     *
+     * @param procedure the procedure identifier
+     *
+     * @return the maximal phenomenon time for the specified procedure or null if it is not set
+     */    
+    DateTime getMaxPhenomenonTimeForProcedure(String procedure);
+
+    /**
+     * Returns the whether or not the maximal phenomenon time for the specified procedure is set.
+     *
+     * @param procedure the procedure identifier
+     *
+     * @return if the maximal phenomenon time is set
+     */    
+    boolean hasMaxPhenomenonTimeForProcedure(String procedure);
+
+    /**
      * @return the minimal phenomenon time for all observations
      */
     DateTime getMinPhenomenonTime();
@@ -94,6 +112,24 @@ public interface ContentCache extends Serializable {
      */
     boolean hasMinPhenomenonTimeForOffering(String offering);
 
+    /**
+     * Returns the minimal phenomenon time period for the specified procedure.
+     *
+     * @param procedure the procedure identifier
+     *
+     * @return the minimal phenomenon time for the specified procedure or null if it is not set
+     */    
+    DateTime getMinPhenomenonTimeForProcedure(String procedure);
+
+    /**
+     * Returns the whether or not the minimal phenomenon time for the specified procedure is set.
+     *
+     * @param procedure the procedure identifier
+     *
+     * @return if the minimal phenomenon time is set
+     */    
+    boolean hasMinPhenomenonTimeForProcedure(String procedure);
+    
     /**
      * @return the maximal result time for all observations
      */

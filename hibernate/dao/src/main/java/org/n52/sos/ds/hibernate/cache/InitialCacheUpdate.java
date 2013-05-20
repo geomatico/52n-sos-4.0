@@ -52,9 +52,9 @@ import org.n52.sos.ds.hibernate.cache.base.SridCacheUpdate;
  */
 public class InitialCacheUpdate extends CompositeCacheUpdate {
 
-    public InitialCacheUpdate(int threads) {
-        super(new OfferingCacheUpdate(threads),
-              new ProcedureCacheUpdate(),
+    public InitialCacheUpdate(int offeringThreads, int procedureThreads) {
+        super(new OfferingCacheUpdate(offeringThreads),
+              new ProcedureCacheUpdate(procedureThreads),
               new ObservablePropertiesCacheUpdate(),
               new FeatureOfInterestCacheUpdate(),
               new RelatedFeaturesCacheUpdate(),

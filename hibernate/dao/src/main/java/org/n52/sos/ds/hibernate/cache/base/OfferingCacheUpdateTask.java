@@ -162,7 +162,10 @@ class OfferingCacheUpdateTask extends RunnableAction {
     protected Set<String> getRelatedFeatureIdentifiersFrom(Offering hOffering) {
         Set<String> relatedFeatureList = new HashSet<String>(hOffering.getRelatedFeatures().size());
         for (RelatedFeature hRelatedFeature : hOffering.getRelatedFeatures()) {
-            relatedFeatureList.add(hRelatedFeature.getFeatureOfInterest().getIdentifier());
+            if (hRelatedFeature.getFeatureOfInterest() != null
+                    && hRelatedFeature.getFeatureOfInterest().getIdentifier() != null) {
+                relatedFeatureList.add(hRelatedFeature.getFeatureOfInterest().getIdentifier());
+            }
         }
         return relatedFeatureList;
     }

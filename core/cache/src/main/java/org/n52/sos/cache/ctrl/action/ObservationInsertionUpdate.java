@@ -54,6 +54,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * <li>Offering &rarr; observation type</li>
  * <li>Offering &rarr; temporal bounding box</li>
  * <li>Offering &rarr; spatial bounding box</li>
+ * <li>Procedure &rarr; temporal bounding box</li> 
  * <li>Global temporal bounding box</li></ul>
  *
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
@@ -90,7 +91,8 @@ public class ObservationInsertionUpdate extends InMemoryCacheUpdate {
 
             cache.updatePhenomenonTime(phenomenonTime);
             cache.updateResultTime(resultTime);
-
+            cache.updatePhenomenonTimeForProcedure(procedure, phenomenonTime);
+            
             if (observation.getIdentifier() != null) {
                 final String identifier = observation.getIdentifier().getValue();
                 cache.addObservationIdentifier(identifier);

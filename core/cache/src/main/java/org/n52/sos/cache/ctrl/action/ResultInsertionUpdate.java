@@ -77,7 +77,8 @@ public class ResultInsertionUpdate extends InMemoryCacheUpdate {
         cache.updateResultTime(resultTime);
 
         cache.addProcedure(procedure);
-
+        cache.updatePhenomenonTimeForProcedure(procedure, phenomenonTime);
+        
         cache.addProcedureForObservableProperty(observableProperty, procedure);
         cache.addObservablePropertyForResultTemplate(templateIdentifier, observableProperty);
         cache.addObservablePropertyForProcedure(procedure, observableProperty);

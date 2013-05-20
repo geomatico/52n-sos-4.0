@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
  * When executing this &auml;ction (see {@link Action}), the following relations are added and some settings are updated
  * in cache:<ul>
  * <li>Procedure</li>
+ * <li>Procedure &harr; parent procedures</li>
  * <li>Offering &harr; procedure</li>
  * <li>Offering &rarr; name</li></ul>
  * <li>Offering &rarr; allowed observation type</li>
@@ -77,7 +78,7 @@ public class SensorInsertionUpdate extends InMemoryCacheUpdate {
         cache.addProcedure(procedure);
         cache.addParentProcedures(procedure, request.getProcedureDescription().getParentProcedures());
         //TODO child procedures
-        
+
         // offerings
         for (SosOffering sosOffering : request.getProcedureDescription().getOfferings()) {
             cache.addOffering(offering);

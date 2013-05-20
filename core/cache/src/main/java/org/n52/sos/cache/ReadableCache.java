@@ -164,6 +164,34 @@ public class ReadableCache extends AbstractContentCache {
     }
 
     @Override
+    public DateTime getMaxPhenomenonTimeForProcedure(final String procedure) { 
+        DateTime maxTime = null;
+        for (String thisProcedure : getChildProcedures(procedure, true, true)) {
+            if (getMaxPhenomenonTimeForProceduresMap().get(thisProcedure) != null){
+                DateTime thisTime = getMaxPhenomenonTimeForProceduresMap().get(thisProcedure);
+                if (maxTime == null || maxTime.isBefore(thisTime)) {
+                    maxTime = thisTime;
+                }
+            }
+        }        
+        return maxTime;
+    }
+
+    @Override
+    public DateTime getMinPhenomenonTimeForProcedure(final String procedure) {
+        DateTime minTime = null;
+        for (String thisProcedure : getChildProcedures(procedure, true, true)) {
+            if (getMinPhenomenonTimeForProceduresMap().get(thisProcedure) != null){
+                DateTime thisTime = getMinPhenomenonTimeForProceduresMap().get(thisProcedure);
+                if (minTime == null || minTime.isBefore(thisTime)) {
+                    minTime = thisTime;
+                }
+            }
+        }        
+        return minTime;
+    }
+
+    @Override
     public Set<String> getAllowedObservationTypesForOffering(final String offering) {
         return copyOf(getAllowedObservationTypesForOfferingsMap().get(offering));
     }
@@ -326,6 +354,26 @@ public class ReadableCache extends AbstractContentCache {
         return getMinPhenomenonTimeForOffering(offering) != null;
     }
 
+    @Override
+    public boolean hasMaxPhenomenonTimeForProcedure(final String procedure) {
+        for (String thisProcedure : getChildProcedures(procedure, true, true)) {
+            if (getMaxPhenomenonTimeForProceduresMap().get(thisProcedure) != null){
+                return true;
+            }
+        }                
+        return false;
+    }
+
+    @Override
+    public boolean hasMinPhenomenonTimeForProcedure(final String procedure) {
+        for (String thisProcedure : getChildProcedures(procedure, true, true)) {
+            if (getMinPhenomenonTimeForProceduresMap().get(thisProcedure) != null){
+                return true;
+            }
+        }                
+        return false;        
+    }
+    
     @Override
     public boolean hasEnvelopeForOffering(final String offering) {
         final SosEnvelope e = getEnvelopeForOffering(offering);

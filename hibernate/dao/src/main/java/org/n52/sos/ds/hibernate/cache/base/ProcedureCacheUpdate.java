@@ -23,72 +23,42 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.*;
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getProcedureObjects;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
-import org.n52.sos.ds.hibernate.entities.Observation;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
+import org.n52.sos.ds.hibernate.cache.AbstractQueuingDatasourceCacheUpdate;
 import org.n52.sos.ds.hibernate.entities.Procedure;
-import org.n52.sos.util.CollectionHelper;
 
 
 /**
- *
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author Shane StClair <shane@axiomalaska.com>
  */
-public class ProcedureCacheUpdate extends AbstractDatasourceCacheUpdate {
-    protected Set<String> getObservableProperties(Set<ObservationConstellation> set) {
-        Set<String> observableProperties = new HashSet<String>(set.size());
-        for (ObservationConstellation observationConstellation : set) {
-            observableProperties.add(observationConstellation.getObservableProperty().getIdentifier());
-        }
-        return observableProperties;
-    }
-
-    protected Set<String> getProcedureIdentifiers(Set<Procedure> procedures) {
-        Set<String> identifiers = new HashSet<String>(procedures.size());
-        for (Procedure procedure : procedures) {
-            identifiers.add(procedure.getIdentifier());
-        }
-        return identifiers;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected Set<String> getObservationIdentifiers(Session session, String procedureIdentifier) {
-        return CollectionHelper.asSet(session.createCriteria(Observation.class)
-                .setProjection(Projections.distinct(Projections.property(Observation.IDENTIFIER)))
-                .add(Restrictions.eq(Observation.DELETED, false))
-                .createCriteria(Observation.PROCEDURE)
-                .add(Restrictions.eq(Procedure.IDENTIFIER, procedureIdentifier))
-                .list());
+public class ProcedureCacheUpdate extends AbstractQueuingDatasourceCacheUpdate<Procedure> {    
+    private static final String THREAD_GROUP_NAME = "procedure-cache-update";
+    
+    public ProcedureCacheUpdate(int threads) {
+        super(threads);
     }
 
     @Override
-    public void execute() {
-        List<Procedure> hProcedures = getProcedureObjects(getSession());
-        for (Procedure p : hProcedures) {
-            if (!p.isDeleted()) {
-                final String id = p.getIdentifier();
-                final Set<ObservationConstellation> ocs = getObservationConstellations(p);
-                getCache().addProcedure(id);
-                getCache().setOfferingsForProcedure(id, getAllOfferingIdentifiersFrom(ocs));
-                getCache().setObservablePropertiesForProcedure(id, getObservableProperties(ocs));
-                getCache().addParentProcedures(id, getProcedureIdentifiers(p.getParentProcedures()));
-                getCache().setObservationIdentifiersForProcedure(id, getObservationIdentifiers(getSession(), id));
-            }
-        }
+    protected String getThreadGroupName() {
+        return THREAD_GROUP_NAME;
     }
-    
-    @SuppressWarnings("unchecked")
-    protected Set<ObservationConstellation> getObservationConstellations(Procedure procedure) {
-        return CollectionHelper.asSet(getSession().createCriteria(ObservationConstellation.class)
-                .add(Restrictions.eq(ObservationConstellation.PROCEDURE, procedure)).list());
+
+    @Override
+    protected List<Procedure> getObjectsToQueue() {
+        return getProcedureObjects(getSession());
+    }
+
+    @Override
+    protected void queueTask(Procedure procedure) {
+        if (!procedure.isDeleted()) {
+            // create runnable for procedure
+            Runnable task = new ProcedureCacheUpdateTask(getCountDownLatch(), getSessionFactory(), getCache(), procedure, getErrorList());
+            // put runnable in executor service
+            getExecutor().submit(task);
+        }
     }
 }

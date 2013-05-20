@@ -71,8 +71,12 @@ public class SosCacheFeederDAO extends HibernateSessionHolder implements CacheFe
         }
         CompositeOwsException errors = new CompositeOwsException();
         Session session = null;
+        //give procedure cache update 20% of the threads, the rest to offering cache update
+        int procedureCacheUpdateThreads = Math.min(Math.round(getCacheThreadCount() * 0.2f), 1);
+        int offeringCacheUpdateThreads = getCacheThreadCount() - procedureCacheUpdateThreads;
         try {
-            InitialCacheUpdate update = new InitialCacheUpdate(getCacheThreadCount());
+            InitialCacheUpdate update = new InitialCacheUpdate(offeringCacheUpdateThreads,
+                    procedureCacheUpdateThreads);
             session = getSession();
             update.setCache(cache);
             update.setErrors(errors);

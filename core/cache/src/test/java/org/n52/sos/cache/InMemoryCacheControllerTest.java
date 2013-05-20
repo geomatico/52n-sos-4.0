@@ -216,7 +216,7 @@ public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
             throws OwsExceptionReport {
         updateCacheWithSingleObservation(PROCEDURE);
 
-        assertTrue("temporal envelope of does NOT contain observation timestamp",
+        assertTrue("temporal envelope of offering does NOT contain observation timestamp",
                    (getCache().getMinPhenomenonTimeForOffering(getFirstOffering())
                 .isBefore(getPhenomenonTimeFromObservation())
                     || getCache().getMinPhenomenonTimeForOffering(getFirstOffering())
@@ -224,6 +224,22 @@ public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
                    && (getCache().getMaxPhenomenonTimeForOffering(getFirstOffering())
                 .isAfter(getPhenomenonTimeFromObservation())
                        || getCache().getMaxPhenomenonTimeForOffering(getFirstOffering())
+                .isEqual(getPhenomenonTimeFromObservation())));
+    }
+
+    @Test
+    public void should_contain_observation_timestamp_in_temporal_envelope_of_procedure_after_InsertObservation()
+            throws OwsExceptionReport {
+        updateCacheWithSingleObservation(PROCEDURE);
+
+        assertTrue("temporal envelope of procedure does NOT contain observation timestamp",
+                   (getCache().getMinPhenomenonTimeForProcedure(getProcedure())
+                .isBefore(getPhenomenonTimeFromObservation())
+                    || getCache().getMinPhenomenonTimeForProcedure(getProcedure())
+                .isEqual(getPhenomenonTimeFromObservation()))
+                   && (getCache().getMaxPhenomenonTimeForProcedure(getProcedure())
+                .isAfter(getPhenomenonTimeFromObservation())
+                       || getCache().getMaxPhenomenonTimeForProcedure(getProcedure())
                 .isEqual(getPhenomenonTimeFromObservation())));
     }
 
@@ -1015,6 +1031,10 @@ public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
         return ((InsertObservationRequest) request).getOfferings().get(0);
     }
 
+    private String getProcedure() {
+        return ((InsertObservationRequest) request).getAssignedSensorId();
+    }
+    
     private SosEnvelope getSosEnvelopeFromObservation(SosObservation sosObservation) {
         return new SosEnvelope(
                 ((SosSamplingFeature) sosObservation.getObservationConstellation().getFeatureOfInterest()).getGeometry()

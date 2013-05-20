@@ -26,22 +26,11 @@ package org.n52.sos.ds.hibernate.cache.base;
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getOfferingObjects;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 import org.hibernate.criterion.Restrictions;
-import org.n52.sos.ds.ConnectionProvider;
-import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.ds.hibernate.ThreadLocalSessionFactory;
-import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.AbstractQueuingDatasourceCacheUpdate;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Offering;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.service.Configurator;
-import org.n52.sos.util.CollectionHelper;
-import org.n52.sos.util.GroupedAndNamedThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,61 +38,25 @@ import org.slf4j.LoggerFactory;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class OfferingCacheUpdate extends AbstractDatasourceCacheUpdate {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OfferingCacheUpdate.class);
+public class OfferingCacheUpdate extends AbstractQueuingDatasourceCacheUpdate<Offering> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OfferingCacheUpdate.class);    
     private static final String THREAD_GROUP_NAME = "offering-cache-update";
-    private final ThreadFactory threadFactory = new GroupedAndNamedThreadFactory(THREAD_GROUP_NAME);
-    private final ConnectionProvider connectionProvider = Configurator.getInstance().getDataConnectionProvider();
-    private final ThreadLocalSessionFactory sessionFactory = new ThreadLocalSessionFactory(connectionProvider);
-    private final ExecutorService executor;
-    private List<OwsExceptionReport> errors;
-    private CountDownLatch offeringThreadsRunning;
 
     public OfferingCacheUpdate(int threads) {
-        this.executor = Executors.newFixedThreadPool(threads, threadFactory);
-    }
-
-    protected CountDownLatch getCountDownLatch() {
-        return offeringThreadsRunning;
-    }
-
-    protected ExecutorService getExecutor() {
-        return executor;
-    }
-
-    protected ThreadLocalSessionFactory getSessionFactory() {
-        return sessionFactory;
+        super(threads);
     }
 
     @Override
-    public void execute() {
-        List<Offering> offerings = getOfferingObjects(getSession());
-
-        LOGGER.debug("multithreading init");
-
-        offeringThreadsRunning = new CountDownLatch(offerings.size());
-        errors = CollectionHelper.synchronizedList();
-
-        try {
-            queueTasks(offerings);
-            waitForTaskCompletion();
-            LOGGER.debug("Finished waiting for other threads");
-            getErrors().add(errors);
-        } finally {
-            try {
-                getSessionFactory().close();
-            } catch (ConnectionProviderException cpe) {
-                LOGGER.error("Error while closing SessionFactory", cpe);
-            }
-        }
+    protected String getThreadGroupName() {
+        return THREAD_GROUP_NAME;
     }
 
-    protected void queueTasks(List<Offering> hOfferings) {
-        for (Offering offering : hOfferings) {
-            queueTask(offering);
-        }
-    }
+    @Override
+    protected List<Offering> getObjectsToQueue() {
+        return getOfferingObjects(getSession());
+    }    
 
+    @Override    
     protected void queueTask(Offering offering) {
         @SuppressWarnings("unchecked")
         List<ObservationConstellation> observationConstellation = getSession()
@@ -113,23 +66,12 @@ public class OfferingCacheUpdate extends AbstractDatasourceCacheUpdate {
         if (observationConstellation != null && !observationConstellation.isEmpty()) {
             // create runnable for offeringId
             Runnable task =
-                     new OfferingCacheUpdateTask(getCountDownLatch(), getSessionFactory(), getCache(), offering, errors);
+                     new OfferingCacheUpdateTask(getCountDownLatch(), getSessionFactory(), getCache(), offering, getErrorList());
             // put runnable in executor service
             getExecutor().submit(task);
         } else {
             getCountDownLatch().countDown();
             LOGGER.debug("Offering '{}' contains deleted procedure, latch.countDown().", offering.getIdentifier());
-        }
-    }
-
-    protected void waitForTaskCompletion() {
-        getExecutor().shutdown(); // <-- will finish all submitted tasks
-        // wait for all threads to finish
-        try {
-            LOGGER.debug("Waiting for {} threads to finish", getCountDownLatch().getCount());
-            getCountDownLatch().await();
-        } catch (InterruptedException e) {
-            /* nothing to do here */
         }
     }
 }

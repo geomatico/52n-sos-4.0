@@ -271,6 +271,28 @@ public class HibernateCriteriaQueryUtilities {
     }
 
     /**
+     * Get min time from observations for procedure
+     * 
+     * @param procedure
+     *            Procedure identifier
+     * @param session
+     *            Hibernate session
+     * @return min time for procedure
+     */
+    public static DateTime getMinDate4Procedure(String procedure, Session session) {
+        Criteria criteria = session.createCriteria(Observation.class)
+                .setProjection(Projections.min(Observation.PHENOMENON_TIME_START))
+                .add(Restrictions.eq(Observation.DELETED, false))
+                .createCriteria(Observation.PROCEDURE)
+                .add(Restrictions.eq(Procedure.IDENTIFIER, procedure));
+        Object min = criteria.uniqueResult();
+        if (min != null) {
+            return new DateTime(min);
+        }
+        return null;
+    }    
+    
+    /**
      * Get min result time from observations for offering
      * 
      * @param offering
@@ -318,6 +340,46 @@ public class HibernateCriteriaQueryUtilities {
                 .setProjection(Projections.max(Observation.PHENOMENON_TIME_END))
                 .createCriteria(Observation.OFFERINGS)
                 .add(Restrictions.eq(Offering.IDENTIFIER, offering));
+
+        Object maxEnd = cend.uniqueResult();
+
+        if (maxStart == null && maxEnd == null) {
+            return null;
+        } else {
+            DateTime start = new DateTime(maxStart);
+            if (maxEnd != null) {
+                DateTime end = new DateTime(maxEnd);
+                if (end.isAfter(start)) {
+                    return end;
+                }
+            }
+            return start;
+        }
+    }
+
+    /**
+     * Get max time from observations for procedure
+     * 
+     * @param procedure
+     *            Procedure identifier
+     * @param session
+     *            Hibernate session
+     * @return max time for procedure
+     */
+    public static DateTime getMaxDate4Procedure(String procedure, Session session) {
+        Criteria cstart = session.createCriteria(Observation.class)
+                .add(Restrictions.eq(Observation.DELETED, false))
+                .setProjection(Projections.max(Observation.PHENOMENON_TIME_START))
+                .createCriteria(Observation.PROCEDURE)
+                .add(Restrictions.eq(Procedure.IDENTIFIER, procedure));
+
+        Object maxStart = cstart.uniqueResult();
+
+        Criteria cend = session.createCriteria(Observation.class)
+                .add(Restrictions.eq(Observation.DELETED, false))
+                .setProjection(Projections.max(Observation.PHENOMENON_TIME_END))
+                .createCriteria(Observation.PROCEDURE)
+                .add(Restrictions.eq(Procedure.IDENTIFIER, procedure));
 
         Object maxEnd = cend.uniqueResult();
 
