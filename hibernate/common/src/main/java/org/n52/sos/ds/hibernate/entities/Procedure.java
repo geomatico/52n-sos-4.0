@@ -48,8 +48,8 @@ public class Procedure extends SpatialEntity implements Serializable, HasDeleted
     private ProcedureDescriptionFormat procedureDescriptionFormat;
     private boolean deleted;
     private Set<ValidProcedureTime> validProcedureTimes = new HashSet<ValidProcedureTime>(0);
-    private Set<Procedure> proceduresForChildSensorId = new HashSet<Procedure>(0);
-    private Set<Procedure> proceduresForParentSensorId = new HashSet<Procedure>(0);
+    private Set<Procedure> childProcedures = new HashSet<Procedure>(0);
+    private Set<Procedure> parentProcedures = new HashSet<Procedure>(0);
 
     public Procedure() {
     }
@@ -96,21 +96,21 @@ public class Procedure extends SpatialEntity implements Serializable, HasDeleted
         return this;
     }
 
-    public Set<Procedure> getProceduresForChildSensorId() {
-        return proceduresForChildSensorId;
+    public Set<Procedure> getChildProcedures() {
+        return childProcedures;
     }
 
-    public Procedure setProceduresForChildSensorId(final Set<Procedure> proceduresForChildSensorId) {
-        this.proceduresForChildSensorId = proceduresForChildSensorId;
+    public Procedure setChildProcedures(final Set<Procedure> childProcedures) {
+        this.childProcedures = childProcedures;
         return this;
     }
 
-    public Set<Procedure> getProceduresForParentSensorId() {
-        return proceduresForParentSensorId;
+    public Set<Procedure> getParentProcedures() {
+        return parentProcedures;
     }
 
-    public Procedure setProceduresForParentSensorId(final Set<Procedure> proceduresForParentSensorId) {
-        this.proceduresForParentSensorId = proceduresForParentSensorId;
+    public Procedure setParentProcedures(final Set<Procedure> parentProcedures) {
+        this.parentProcedures = parentProcedures;
         return this;
     }
 }

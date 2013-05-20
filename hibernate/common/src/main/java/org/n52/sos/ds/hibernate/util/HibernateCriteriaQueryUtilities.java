@@ -25,6 +25,7 @@ package org.n52.sos.ds.hibernate.util;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -371,6 +372,25 @@ public class HibernateCriteriaQueryUtilities {
         return (Procedure) session.createCriteria(Procedure.class)
                 .add(Restrictions.eq(Procedure.IDENTIFIER, identifier))
                 .uniqueResult();
+    }
+
+    /**
+     * Get Procedure objects for procedure identifiers
+     * 
+     * @param identifiers
+     *            Procedure identifiers
+     * @param session
+     *            Hibernate session
+     * @return Procedure objects
+     */
+    @SuppressWarnings("unchecked")
+    public static List<Procedure> getProceduresForIdentifiers(Collection<String> identifiers, Session session) {
+        if (identifiers == null || identifiers.isEmpty()) {
+            return new ArrayList<Procedure>();
+        }
+        return session.createCriteria(Procedure.class)
+                .add(Restrictions.in(Procedure.IDENTIFIER, identifiers))
+                .list();
     }
 
     /**

@@ -43,7 +43,7 @@
             </key>
             <one-to-many class="org.n52.sos.ds.hibernate.entities.ValidProcedureTime" />
         </set>
-        <set name="proceduresForChildSensorId" table="sensor_system" inverse="false" lazy="true" fetch="select">
+        <set name="childProcedures" table="sensor_system" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="parent_sensor_id" not-null="true" />
             </key>
@@ -51,7 +51,7 @@
                 <column name="child_sensor_id" not-null="true" />
             </many-to-many>
         </set>
-        <set name="proceduresForParentSensorId" table="sensor_system" inverse="false" lazy="true" fetch="select">
+        <set name="parentProcedures" table="sensor_system" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="child_sensor_id" not-null="true" />
             </key>

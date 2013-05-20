@@ -32,7 +32,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.AbstractInsertSensorDAO;
-import org.n52.sos.ds.hibernate.HibernateSessionHolder;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.ObservationType;
@@ -87,7 +86,8 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
             if (procedureDescriptionFormat != null && observationTypes != null && featureOfInterestTypes != null) {
                 Procedure hProcedure =
                         HibernateCriteriaTransactionalUtilities.getOrInsertProcedure(assignedProcedureID,
-                                procedureDescriptionFormat, session);
+                                procedureDescriptionFormat, request.getProcedureDescription().getParentProcedures()
+                                ,session);
                 // TODO: set correct validTime,
                 HibernateCriteriaTransactionalUtilities.insertValidProcedureTime(
                         hProcedure,
@@ -101,7 +101,8 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
                                     featureOfInterestTypes, session);
                     for (ObservableProperty hObservableProperty : hObservableProperties) {
                         HibernateCriteriaTransactionalUtilities.checkOrInsertObservationConstellation(
-                                        hProcedure, hObservableProperty, hOffering, session);
+                                hProcedure, hObservableProperty, hOffering, assignedOffering.isParentOffering(),
+                                session);
                     }
                 }
                 // TODO: parent and child procedures

@@ -26,12 +26,14 @@ package org.n52.sos.ds.hibernate.entities;
 import java.io.Serializable;
 
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasDeletedFlag;
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasHiddenChildFlag;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservableProperty;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasObservationType;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasOffering;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasProcedure;
 
-public class ObservationConstellation implements Serializable, HasProcedure, HasObservableProperty, HasOffering, HasObservationType, HasDeletedFlag {
+public class ObservationConstellation implements Serializable, HasProcedure, HasObservableProperty,
+    HasOffering, HasObservationType, HasHiddenChildFlag, HasDeletedFlag {
 public static final String ID = "observationConstellationId";
     private static final long serialVersionUID = -3890149740562709928L;
     private long observationConstellationId;
@@ -108,8 +110,9 @@ public static final String ID = "observationConstellationId";
         return deleted;
     }
     
-    public void setHiddenChild(final boolean hiddenChild) {
+    public ObservationConstellation setHiddenChild(final boolean hiddenChild) {
         this.hiddenChild = hiddenChild;
+        return this;
     }
     
     public boolean getHiddenChild() {

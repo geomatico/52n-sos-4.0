@@ -25,6 +25,7 @@ package org.n52.sos.ogc.sensorML;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.n52.sos.ogc.om.SosOffering;
 
@@ -96,4 +97,50 @@ public class SensorML extends AbstractSensorML {
     public boolean isSetMembers() {
         return members != null && !members.isEmpty();
     }
+
+    /**
+     * @return If member's parent procedures are set if this is a wrapper,
+     * if normal parent procedures are set otherwise
+     */
+    @Override
+    public boolean isSetParentProcedures() {
+        if (isWrapper() && !super.isSetParentProcedures()) {
+            return members.get(0).isSetParentProcedures();
+        }
+        return super.isSetParentProcedures();
+    }
+    
+    /**
+     * @return Member's parent procedures if this is a wrapper, normal parent procedures otherwise
+     */
+    @Override
+    public Set<String> getParentProcedures() {
+        if (isWrapper() && !super.isSetParentProcedures()) {
+            return members.get(0).getParentProcedures();
+        }
+        return super.getParentProcedures();
+    }
+
+    /**
+     * @return If member's offerings are set if this is a wrapper,
+     * if normal offerings are set otherwise
+     */
+    @Override
+    public boolean isSetOfferings() {
+        if (isWrapper() && !super.isSetOfferings()) {
+            return members.get(0).isSetOfferings();
+        }
+        return super.isSetOfferings();
+    }
+
+    /**
+     * @return Member's offerings if this is a wrapper, normal offerings otherwise 
+     */    
+    @Override
+    public Set<SosOffering> getOfferings() {
+        if (isWrapper() && !isSetOfferings()) {
+            return members.get(0).getOfferings();
+        }
+        return super.getOfferings();
+    }    
 }

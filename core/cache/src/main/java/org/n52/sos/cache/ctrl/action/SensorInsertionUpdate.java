@@ -75,13 +75,14 @@ public class SensorInsertionUpdate extends InMemoryCacheUpdate {
 
         // procedure relations
         cache.addProcedure(procedure);
-        //FIXME shouldn't this be done for every offering of this procedure?
-        cache.addOffering(offering);
-        cache.addProcedureForOffering(offering, procedure);
-        cache.addOfferingForProcedure(procedure, offering);
-
-        // offering name
+        cache.addParentProcedures(procedure, request.getProcedureDescription().getParentProcedures());
+        //TODO child procedures
+        
+        // offerings
         for (SosOffering sosOffering : request.getProcedureDescription().getOfferings()) {
+            cache.addOffering(offering);
+            cache.addProcedureForOffering(offering, procedure);
+            cache.addOfferingForProcedure(procedure, offering);
             if (sosOffering.isSetOfferingName()) {
                 cache.setNameForOffering(sosOffering.getOfferingIdentifier(), sosOffering.getOfferingName());
             }

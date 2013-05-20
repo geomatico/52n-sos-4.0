@@ -236,8 +236,8 @@ public class HibernateObservationBuilder {
             procedure.setIdentifier("Procedure");
             procedure.setGeom(null);
             procedure.setProcedureDescriptionFormat(getProcedureDescriptionFormat());
-            procedure.setProceduresForChildSensorId(null);
-            procedure.setProceduresForParentSensorId(null);
+            procedure.setChildProcedures(null);
+            procedure.setParentProcedures(null);
             session.save(procedure);
             session.flush();
             procedure.setValidProcedureTimes(Collections.singleton(getValidProcedureTime()));

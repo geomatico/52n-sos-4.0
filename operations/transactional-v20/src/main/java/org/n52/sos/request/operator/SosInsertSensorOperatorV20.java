@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.cache.ContentCache;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.AbstractInsertSensorDAO;
@@ -44,14 +45,13 @@ import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.exception.ows.concrete.EncoderResponseUnsupportedException;
 import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
 import org.n52.sos.exception.ows.concrete.InvalidFeatureOfInterestTypeException;
+import org.n52.sos.exception.ows.concrete.InvalidOfferingParameterException;
 import org.n52.sos.exception.ows.concrete.MissingFeatureOfInterestTypeException;
 import org.n52.sos.exception.ows.concrete.MissingObservedPropertyParameterException;
 import org.n52.sos.exception.ows.concrete.NoEncoderForResponseException;
 import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sensorML.AbstractProcess;
-import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -62,7 +62,6 @@ import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.MiscSettings;
-import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.JavaHelper;
@@ -244,32 +243,25 @@ public class SosInsertSensorOperatorV20 extends
         }
     }
 
-    private void checkAndSetAssignedOfferings(InsertSensorRequest request) {
-        // if procedureDescription is SensorML
-        Set<SosOffering> sosOfferings = null;
-        if (request.getProcedureDescription().isSetOfferings()) {
-            sosOfferings = request.getProcedureDescription().getOfferings();
-        } else {
-            if (request.getProcedureDescription() instanceof SensorML) {
-                SensorML sensorML = (SensorML) request.getProcedureDescription();
-                // if SensorML is a wrapper and member size is 1
-                if (sensorML.isWrapper() && sensorML.getMembers().size() == 1) {
-                    AbstractProcess process = sensorML.getMembers().get(0);
-                    if (process.isSetOfferings()) {
-                        sosOfferings = process.getOfferings();
-                    }
-                    if (process.isSetParentProcedures()) {
-                        getOfferingsForParentProcedures(process.getParentProcedures());
-                    }
+    private void checkAndSetAssignedOfferings(InsertSensorRequest request) throws InvalidOfferingParameterException {
+        Set<SosOffering> sosOfferings = request.getProcedureDescription().getOfferings();        
+        ContentCache cache = Configurator.getInstance().getCache();
+        
+        // add parent procedure offerings
+        if (request.getProcedureDescription().isSetParentProcedures()) {            
+            Set<String> allParentProcedures = cache.getParentProcedures(
+                    request.getProcedureDescription().getParentProcedures(), true, true);
+            for (String parentProcedure : allParentProcedures) {
+                for (String offering : cache.getOfferingsForProcedure(parentProcedure)) {
+                    SosOffering sosOffering = new SosOffering(offering,null);
+                    sosOffering.setParentOfferingFlag(true);
+                    sosOfferings.add(sosOffering);
                 }
             }
         }
-        if (request.getProcedureDescription().isSetParentProcedures()) {
 
-        }
-        // check if offering is valid
-        if ((sosOfferings == null || sosOfferings.isEmpty()) &&
-        		ServiceConfiguration.getInstance().isGenerateOfferingWhenNotSpecified()) {
+        // if no offerings are assigned, generate one
+        if (sosOfferings == null || sosOfferings.isEmpty()) {
             sosOfferings = new HashSet<SosOffering>(0);
             sosOfferings.add(new SosOffering(getDefaultOfferingPrefix() + request.getAssignedProcedureIdentifier()));
         }
@@ -278,7 +270,7 @@ public class SosInsertSensorOperatorV20 extends
 
     private void checkProcedureAndOfferingCombination(InsertSensorRequest request) throws OwsExceptionReport {
         for (SosOffering offering : request.getAssignedOfferings()) {
-            if (getCache().getOfferings().contains(offering.getOfferingIdentifier())) {
+            if (!offering.isParentOffering() && getCache().getOfferings().contains(offering.getOfferingIdentifier())) {
                 throw new InvalidParameterValueException()
                         .at(Sos2Constants.InsertSensorParams.offeringIdentifier)
                         .withMessage(
@@ -287,24 +279,12 @@ public class SosInsertSensorOperatorV20 extends
             }
         }
     }
-
-    private void getParentProcedures() {
-        // checkParentProcedures if exist, else exception
-        // insert proc as hidden child to parents
-        // insert proc with new offering if set
-        // set relation in sensor_system
-    }
-
+    
     private void getChildProcedures() {
+        // TODO implement
         // add parent offerings
         // insert if not exist and proc is encoded, else Exception
         // insert as hidden child
         // set relation in sensor_system
     }
-
-    private void getOfferingsForParentProcedures(Set<String> set) {
-        // TODO Auto-generated method stub
-
-    }
-
 }

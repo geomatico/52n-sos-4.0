@@ -180,8 +180,8 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
                     XmlObject.Factory.parse(getNodeFromNodeList(xbInsertSensor.getProcedureDescription().getDomNode()
                             .getChildNodes()));
 
-            Decoder<?, XmlObject> decoder =
-                    CodingRepository.getInstance().getDecoder(CodingHelper.getDecoderKey(xmlObject));
+            Decoder<?, XmlObject> decoder = CodingRepository.getInstance().getDecoder(
+                    new XmlNamespaceDecoderKey(xbInsertSensor.getProcedureDescriptionFormat(), xmlObject.getClass()));
             if (decoder == null) {
                 throw new InvalidParameterValueException().at(
                         Sos2Constants.InsertSensorParams.procedureDescriptionFormat)

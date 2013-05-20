@@ -25,6 +25,7 @@ package org.n52.sos.ds.hibernate.util;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -75,12 +76,17 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class HibernateCriteriaTransactionalUtilities {
 
-    public static Procedure getOrInsertProcedure(String identifier, ProcedureDescriptionFormat pdf, Session session) {
+    public static Procedure getOrInsertProcedure(String identifier, ProcedureDescriptionFormat pdf,
+            Collection<String> parentProcedures, Session session) {
         Procedure result = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(identifier, session);
         if (result == null) {
             result = new Procedure();
             result.setProcedureDescriptionFormat(pdf);
             result.setIdentifier(identifier);
+            if (parentProcedures != null && !parentProcedures.isEmpty()) {
+                result.setParentProcedures(CollectionHelper.asSet(HibernateCriteriaQueryUtilities.getProceduresForIdentifiers(
+                        parentProcedures, session)));
+            }
         }
         result.setDeleted(false);
         session.saveOrUpdate(result);
@@ -232,15 +238,14 @@ public class HibernateCriteriaTransactionalUtilities {
     }
 
     public static ObservationConstellation checkOrInsertObservationConstellation(Procedure hProcedure,
-                                                                                 ObservableProperty hObservableProperty,
-                                                                                 Offering hOffering,
-                                                                                 Session session) {
+            ObservableProperty hObservableProperty, Offering hOffering, boolean hiddenChild, Session session) {
         ObservationConstellation obsConst = (ObservationConstellation) session
                 .createCriteria(ObservationConstellation.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .add(Restrictions.eq(ObservationConstellation.OFFERING, hOffering))
                 .add(Restrictions.eq(ObservationConstellation.OBSERVABLE_PROPERTY, hObservableProperty))
                 .add(Restrictions.eq(ObservationConstellation.PROCEDURE, hProcedure))
+                .add(Restrictions.eq(ObservationConstellation.HIDDEN_CHILD, hiddenChild))                
                 .uniqueResult();
         if (obsConst == null) {
             obsConst = new ObservationConstellation();
@@ -248,7 +253,7 @@ public class HibernateCriteriaTransactionalUtilities {
             obsConst.setProcedure(hProcedure);
             obsConst.setOffering(hOffering);
             obsConst.setDeleted(false);
-            obsConst.setHiddenChild(false);
+            obsConst.setHiddenChild(hiddenChild);
             session.save(obsConst);
             session.flush();
             session.refresh(obsConst);

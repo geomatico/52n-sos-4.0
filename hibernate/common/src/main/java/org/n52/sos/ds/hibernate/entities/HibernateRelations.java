@@ -101,6 +101,12 @@ public interface HibernateRelations {
         HasGeometry setGeom(Geometry geom);
     }
 
+    interface HasHiddenChildFlag {
+        String HIDDEN_CHILD = "hiddenChild";
+        HasHiddenChildFlag setHiddenChild(boolean hiddenChild);
+        boolean isHiddenChild();        
+    }
+    
     interface HasIdentifier {
         String IDENTIFIER = "identifier";
         String getIdentifier();
