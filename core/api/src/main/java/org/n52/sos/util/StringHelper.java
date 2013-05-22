@@ -23,8 +23,14 @@
  */
 package org.n52.sos.util;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 public final class StringHelper {
 
@@ -83,14 +89,37 @@ public final class StringHelper {
     private StringHelper() {
     }
 
-	/**
-	 * Check if string is null or empty
-	 * 
-	 * @param string string to check
-	 * @return <tt>true</tt>, if the string is null or empty
-	 */
-	public static boolean isNullOrEmpty(final String string)
-	{
-		return string == null || string.isEmpty();
-	}
+    /**
+     * Check if string is null or empty
+     * 
+     * @param string
+     *            string to check
+     * @return <tt>true</tt>, if the string is null or empty
+     */
+    public static boolean isNullOrEmpty(final String string) {
+        return string == null || string.isEmpty();
+    }
+
+    public static String convertStreamToString(InputStream is, String charsetName) throws OwsExceptionReport {
+        try {
+            Scanner scanner;
+            if (isNotEmpty(charsetName)) {
+                scanner = new Scanner(is, charsetName);
+            } else {
+                scanner = new Scanner(is);
+            }
+            scanner.useDelimiter("\\A");
+            if (scanner.hasNext()) {
+                return scanner.next();
+            }
+        } catch (NoSuchElementException nsee) {
+            throw new NoApplicableCodeException().causedBy(nsee).withMessage(
+                    "Error while reading content of HTTP request: %s", nsee.getMessage());
+        }
+        return "";
+    }
+
+    public static String convertStreamToString(InputStream descriptionXmlAsStream) throws OwsExceptionReport {
+        return convertStreamToString(descriptionXmlAsStream, null);
+    }
 }
