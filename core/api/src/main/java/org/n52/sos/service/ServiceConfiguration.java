@@ -154,6 +154,10 @@ public class ServiceConfiguration {
         characterEncoding = encoding;
         XmlOptionsHelper.getInstance().setCharacterEncoding(characterEncoding);
     }
+    
+    public String getCharacterEncoding() {
+        return characterEncoding;
+    }
 
     /**
      * Returns the minimum size a response has to hvae to be compressed.
