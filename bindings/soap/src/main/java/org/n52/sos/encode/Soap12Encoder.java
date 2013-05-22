@@ -25,6 +25,7 @@ package org.n52.sos.encode;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.soap.SoapFault;
 import org.n52.sos.soap.SoapHelper;
 import org.n52.sos.soap.SoapResponse;
@@ -176,11 +178,14 @@ public class Soap12Encoder extends AbstractSoapEncoder {
 
     private XmlObject createSOAP12Body(final ServiceResponse response) throws OwsExceptionReport {
         try {
-            return XmlObject.Factory.parse(new String(response.getByteArray()), XmlOptionsHelper.getInstance()
+            return XmlObject.Factory.parse(new String(response.getByteArray(), ServiceConfiguration.getInstance().getCharacterEncoding()), XmlOptionsHelper.getInstance()
                     .getXmlOptions());
         } catch (final XmlException xmle) {
             throw new NoApplicableCodeException().causedBy(xmle)
                     .withMessage("Error while creating SOAP body!");
+        } catch (UnsupportedEncodingException uee) {
+            throw new NoApplicableCodeException().causedBy(uee)
+            .withMessage("Error while creating SOAP body!");
         }
     }
 
