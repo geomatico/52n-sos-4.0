@@ -52,7 +52,6 @@ import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
-import org.n52.sos.ds.hibernate.entities.Quality;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.entities.TextObservation;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
@@ -70,7 +69,6 @@ import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.quality.SosQuality;
-import org.n52.sos.ogc.om.quality.SosQuality.QualityType;
 import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.CountValue;
@@ -165,7 +163,6 @@ public class HibernateObservationUtilities {
      * @throws OwsExceptionReport
      *             * If an error occurs
      */
-    @SuppressWarnings("unchecked")
     public static List<SosObservation> createSosObservationsFromObservations(final Collection<Observation> observations,
             final String version, String resultModel, final Session session) throws OwsExceptionReport {
         final List<SosObservation> observationCollection = new ArrayList<SosObservation>(0);
@@ -226,23 +223,6 @@ public class HibernateObservationUtilities {
                 // hObservationConstellation.getOffering().getIdentifier();
                 // String mimeType = SosConstants.PARAMETER_NOT_SET;
 
-                // create quality
-                ArrayList<SosQuality> qualityList = null;
-                if (isSupportsQuality()) {
-                    hObservation.getQualities();
-                    for (final Quality hQuality : hObservation.getQualities()) {
-                        final String qualityTypeString = hQuality.getSweType().getSweType();
-                        final String qualityUnit = hQuality.getUnit().getUnit();
-                        final String qualityName = hQuality.getName();
-                        final String qualityValue = hQuality.getValue();
-                        qualityList = new ArrayList<SosQuality>(1);
-                        if (qualityValue != null) {
-                            final QualityType qualityType = QualityType.valueOf(qualityTypeString);
-                            final SosQuality quality = new SosQuality(qualityName, qualityUnit, qualityValue, qualityType);
-                            qualityList.add(quality);
-                        }
-                    }
-                }
                 final IValue<?> value = getValueFromObservation(hObservation);
                 if (hObservation.getUnit() != null) {
                     value.setUnit(hObservation.getUnit().getUnit());
@@ -275,8 +255,8 @@ public class HibernateObservationUtilities {
                             OMConstants.OBS_TYPE_OBSERVATION)) {
                         final List<ResultTemplate> hResultTemplates =
                                              HibernateCriteriaQueryUtilities
-                                .getResultTemplateObjectsForObservationConstellation(
-                                hObservationConstellation, session);
+                                .getResultTemplateObjectsForObservationConstellationAndFeature(
+                                hObservationConstellation, obsConst.getFeatureOfInterest(), session);
                         // Set<ResultTemplate> hResultTemplates =
                         // hObservationConstellation.getResultTemplates();
                         if (hResultTemplates != null && !hResultTemplates.isEmpty()) {
@@ -302,7 +282,7 @@ public class HibernateObservationUtilities {
                     observationConstellations.put(obsConstHash, obsConst);
                 }
                 final SosObservation sosObservation =
-                               createNewObservation(observationConstellations, hObservation, qualityList, value, obsConstHash);
+                               createNewObservation(observationConstellations, hObservation, value, obsConstHash);
                 if (hObservation.getSetId() != null && !hObservation.getSetId().isEmpty()) {
                     sosObservation.setSetId(hObservation.getSetId());
                 }
@@ -361,7 +341,7 @@ public class HibernateObservationUtilities {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static SosObservation createNewObservation(
             final Map<Integer, SosObservationConstellation> observationConstellations, final Observation hObservation,
-            final List<SosQuality> qualityList, final IValue<?> value, final int obsConstHash) {
+            final IValue<?> value, final int obsConstHash) {
         final SosObservation sosObservation = new SosObservation();
         sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
         if (hObservation.isSetIdentifier()
@@ -377,7 +357,7 @@ public class HibernateObservationUtilities {
         sosObservation.setTupleSeparator(getTupleSeparator());
         sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
         sosObservation.setResultTime(new TimeInstant(new DateTime(hObservation.getResultTime())));
-        sosObservation.setValue(new SosSingleObservationValue(getPhenomenonTime(hObservation), value, qualityList));
+        sosObservation.setValue(new SosSingleObservationValue(getPhenomenonTime(hObservation), value));
         return sosObservation;
     }
 
@@ -417,31 +397,31 @@ public class HibernateObservationUtilities {
      */
     private static IValue<?> getValueFromObservation(final Observation hObservation) {
         if (hObservation instanceof NumericObservation) {
-            return new QuantityValue(((NumericObservation) hObservation).getValue().getValue());
+            return new QuantityValue(((NumericObservation) hObservation).getValue());
         } else if (hObservation instanceof BooleanObservation) {
             return new org.n52.sos.ogc.om.values.BooleanValue(Boolean.valueOf(((BooleanObservation) hObservation)
-                    .getValue().getValue()));
+                    .getValue()));
         } else if (hObservation instanceof CategoryObservation) {
-            return new org.n52.sos.ogc.om.values.CategoryValue(((CategoryObservation) hObservation).getValue()
-                    .getValue());
+            return new org.n52.sos.ogc.om.values.CategoryValue(((CategoryObservation) hObservation).getValue());
         } else if (hObservation instanceof CountObservation) {
             return new org.n52.sos.ogc.om.values.CountValue(Integer.valueOf(((CountObservation) hObservation)
-                    .getValue().getValue()));
+                    .getValue()));
         } else if (hObservation instanceof TextObservation) {
-            return new org.n52.sos.ogc.om.values.TextValue(((TextObservation) hObservation).getValue().getValue());
+            return new org.n52.sos.ogc.om.values.TextValue(((TextObservation) hObservation).getValue().toString());
         } else if (hObservation instanceof GeometryObservation) {
-            return new org.n52.sos.ogc.om.values.GeometryValue(((GeometryObservation) hObservation).getValue()
-                    .getValue());
+            return new org.n52.sos.ogc.om.values.GeometryValue(((GeometryObservation) hObservation).getValue());
         } else if (hObservation instanceof BlobObservation) {
-            return new UnknownValue(((BlobObservation) hObservation).getValue().getValue());
+            return new UnknownValue(((BlobObservation) hObservation).getValue());
         }
         return null;
     }
 
+    @SuppressWarnings("rawtypes")
     public static List<SosObservation> unfoldObservation(final SosObservation multiObservation) throws OwsExceptionReport {
         if (multiObservation.getValue() instanceof SosSingleObservationValue) {
             return Collections.singletonList(multiObservation);
         } else {
+            
             final SweDataArrayValue arrayValue =
                     ((SweDataArrayValue) ((SosMultiObservationValues) multiObservation.getValue()).getValue());
             final List<List<String>> values = arrayValue.getValue().getValues();

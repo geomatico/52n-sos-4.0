@@ -44,6 +44,7 @@ import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.FeatureQueryHandler;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
+import org.n52.sos.ds.hibernate.entities.TFeatureOfInterest;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.SpatialRestrictions;
@@ -63,6 +64,7 @@ import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.SosHelper;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -269,21 +271,25 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
             identifier.setCodeSpace(feature.getCodespace().getCodespace());
         }
         SosSamplingFeature sampFeat = new SosSamplingFeature(identifier);
-        if (feature.getName() != null && !feature.getName().isEmpty()) {
-            sampFeat.setName(SosHelper.createCodeTypeListFromCSV(feature.getName()));
+        if (feature.isSetNames()) {
+            sampFeat.setName(SosHelper.createCodeTypeListFromCSV(feature.getNames()));
         }
         sampFeat.setDescription(null);
         sampFeat.setGeometry(getGeomtery(feature));
         sampFeat.setFeatureType(feature.getFeatureOfInterestType().getFeatureOfInterestType());
         sampFeat.setUrl(feature.getUrl());
-        sampFeat.setXmlDescription(feature.getDescriptionXml());
-        Set<FeatureOfInterest> parentFeatures = feature.getFeatureOfInterestsForParentFeatureId();
-        if (parentFeatures != null && !parentFeatures.isEmpty()) {
-            List<SosAbstractFeature> sampledFeatures = new ArrayList<SosAbstractFeature>(parentFeatures.size());
-            for (FeatureOfInterest parentFeature : parentFeatures) {
-                sampledFeatures.add(createSosAbstractFeature(parentFeature, version));
+        if (feature.isSetDescriptionXml()) {
+            sampFeat.setXmlDescription(feature.getDescriptionXml());
+        }
+        if (feature instanceof TFeatureOfInterest) {
+            Set<FeatureOfInterest> parentFeatures = ((TFeatureOfInterest)feature).getParents();
+            if (parentFeatures != null && !parentFeatures.isEmpty()) {
+                List<SosAbstractFeature> sampledFeatures = new ArrayList<SosAbstractFeature>(parentFeatures.size());
+                for (FeatureOfInterest parentFeature : parentFeatures) {
+                    sampledFeatures.add(createSosAbstractFeature(parentFeature, version));
+                }
+                sampFeat.setSampledFeatures(sampledFeatures);
             }
-            sampFeat.setSampledFeatures(sampledFeatures);
         }
         return sampFeat;
     }
@@ -304,7 +310,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
                 }
             }
             if (samplingFeature.isSetNames()) {
-                feature.setName(SosHelper.createCSVFromCodeTypeList(samplingFeature.getName()));
+                feature.setNames(SosHelper.createCSVFromCodeTypeList(samplingFeature.getName()));
             }
 
             processGeometryPreSave(samplingFeature, feature);

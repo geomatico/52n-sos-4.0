@@ -22,17 +22,11 @@
 -- visit the Free Software Foundation web page, http://www.fsf.org.
 --
 
-DELETE FROM observation_has_text_value AS ohtv USING text_value AS v
-WHERE ohtv.text_value_id = v.text_value_id AND v.value LIKE 'test_text%';
 DELETE FROM text_value WHERE value LIKE 'test_text%';
-
-
-DELETE FROM observation_has_category_value AS ohcv USING category_value AS v
-WHERE ohcv.category_value_id = v.category_value_id AND v.value LIKE 'test_category%';
 
 DELETE FROM category_value WHERE value LIKE 'test_category%';
 
-DELETE FROM observation_has_numeric_value AS ohnv
+DELETE FROM numeric_value AS ohnv
 USING   observation AS o, 
         feature_of_interest AS f,
         procedure AS p,
@@ -51,7 +45,7 @@ WHERE   ohnv.observation_id = o.observation_id AND
             
         );
     
-DELETE FROM observation_has_boolean_value AS ohbv
+DELETE FROM boolean_value AS ohbv
 USING   observation AS o, 
         feature_of_interest AS f,
         procedure AS p,
@@ -70,7 +64,7 @@ WHERE   ohbv.observation_id = o.observation_id AND
             
         );
 
-DELETE FROM observation_has_blob_value AS ohbv
+DELETE FROM blob_value AS ohbv
 USING   observation AS o, 
         feature_of_interest AS f,
         procedure AS p,
@@ -89,7 +83,7 @@ WHERE   ohbv.observation_id = o.observation_id AND
             
         );
 
-DELETE FROM observation_has_count_value AS ohcv
+DELETE FROM count_value AS ohcv
 USING   observation AS o, 
         feature_of_interest AS f,
         procedure AS p,
@@ -147,9 +141,7 @@ WHERE   f.feature_of_interest_id = o.feature_of_interest_id AND
             op.identifier LIKE 'http://www.52north.org/test/observableProperty/%' OR
             u.unit LIKE 'test_unit_%'
             
-        );
-
-
+        ) ;
 
 DELETE FROM observation_constellation AS oc
 USING   procedure AS p,

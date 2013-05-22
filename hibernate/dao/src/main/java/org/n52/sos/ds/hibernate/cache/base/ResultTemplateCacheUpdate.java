@@ -52,10 +52,8 @@ public class ResultTemplateCacheUpdate extends AbstractDatasourceCacheUpdate {
         for (ResultTemplate resultTemplate : resultTemplates) {
             String id = resultTemplate.getIdentifier();
             getCache().addResultTemplate(id);
-            getCache().addResultTemplateForOffering(resultTemplate.getObservationConstellation()
-                    .getOffering().getIdentifier(), id);
+            getCache().addResultTemplateForOffering(resultTemplate.getOffering().getIdentifier(), id);
             getCache().addObservablePropertyForResultTemplate(id, resultTemplate
-                    .getObservationConstellation()
                     .getObservableProperty()
                     .getIdentifier());
             getCache().addFeatureOfInterestForResultTemplate(id, resultTemplate

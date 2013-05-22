@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
+import org.n52.sos.ds.hibernate.entities.TFeatureOfInterest;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 /**
@@ -54,8 +55,10 @@ public class FeatureOfInterestCacheUpdate extends AbstractDatasourceCacheUpdate 
             getCache().addFeatureOfInterest(featureOfInterest.getIdentifier());
             getCache().setProceduresForFeatureOfInterest(featureOfInterest.getIdentifier(),
                                                          getProceduresForFeatureOfInterest(getSession(), featureOfInterest));
-            getCache().setFeatureHierarchy(featureOfInterest.getIdentifier(),
-                                           getFeatureIdentifiers(featureOfInterest.getFeatureOfInterestsForChildFeatureId()));
+            if (featureOfInterest instanceof TFeatureOfInterest) {
+                getCache().setFeatureHierarchy(featureOfInterest.getIdentifier(),
+                                               getFeatureIdentifiers(((TFeatureOfInterest)featureOfInterest).getChilds()));
+            }
         }
         try {
             getCache().setGlobalEnvelope(getFeatureQueryHandler().getEnvelopeForFeatureIDs(

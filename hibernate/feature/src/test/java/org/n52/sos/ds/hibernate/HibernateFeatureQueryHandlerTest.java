@@ -75,7 +75,7 @@ public class HibernateFeatureQueryHandlerTest extends HibernateFeatureQueryHandl
         FeatureOfInterest featureOfInterest = new FeatureOfInterest();
         featureOfInterest.setIdentifier(identifier);
         featureOfInterest.setFeatureOfInterestId(id);
-        featureOfInterest.setName(name);
+//        featureOfInterest.setNames(name);
         featureOfInterest.setGeom(geom);
         featureOfInterest.setUrl(url);
         featureOfInterest.setFeatureOfInterestType(type);

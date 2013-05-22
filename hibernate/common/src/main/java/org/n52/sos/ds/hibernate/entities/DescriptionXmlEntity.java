@@ -25,19 +25,27 @@ package org.n52.sos.ds.hibernate.entities;
 
 import java.io.Serializable;
 
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValue;
+import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasDescriptionXml;
+import org.n52.sos.util.StringHelper;
 
-public class BlobObservation extends Observation implements Serializable, HasValue {
+public abstract class DescriptionXmlEntity implements Serializable, HasDescriptionXml {
+    
+    private static final long serialVersionUID = 4403718095170057053L;
+    
+    private String descriptionXml;
 
-    private static final long serialVersionUID = -3712110463000862218L;
-
-    private Object value;
-
-    public Object getValue() {
-        return this.value;
+    @Override
+    public String getDescriptionXml() {
+        return descriptionXml;
     }
-
-    public void setValue(Object value) {
-        this.value = value;
+    
+    @Override
+    public void setDescriptionXml(String descriptionXml) {
+        this.descriptionXml = descriptionXml;
+    }
+    
+    @Override
+    public boolean isSetDescriptionXml() {
+        return StringHelper.isNotEmpty(descriptionXml);
     }
 }

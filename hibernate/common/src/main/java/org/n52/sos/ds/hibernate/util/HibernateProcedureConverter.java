@@ -48,6 +48,7 @@ import org.n52.sos.ds.hibernate.entities.NumericObservation;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
+import org.n52.sos.ds.hibernate.entities.TProcedure;
 import org.n52.sos.ds.hibernate.entities.TextObservation;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
@@ -106,12 +107,15 @@ public class HibernateProcedureConverter {
         SosProcedureDescription sosProcedureDescription = null;
 
         // TODO: check and query for validTime parameter
-        final Set<ValidProcedureTime> validProcedureTimes = procedure.getValidProcedureTimes();
-        for (final ValidProcedureTime validProcedureTime : validProcedureTimes) {
-            if (validProcedureTime.getEndTime() == null) {
-                filename = validProcedureTime.getDescriptionUrl();
-                xmlDoc = validProcedureTime.getDescriptionXml();
+        if (procedure instanceof TProcedure) {
+            final Set<ValidProcedureTime> validProcedureTimes = ((TProcedure)procedure).getValidProcedureTimes();
+            for (final ValidProcedureTime validProcedureTime : validProcedureTimes) {
+                if (validProcedureTime.getEndTime() == null) {
+                    xmlDoc = validProcedureTime.getDescriptionXml();
+                }
             }
+        } else {
+            filename = procedure.getDescriptionFile();
         }
 
         final String descriptionFormat = procedure.getProcedureDescriptionFormat().getProcedureDescriptionFormat();
@@ -144,7 +148,7 @@ public class HibernateProcedureConverter {
                         .withMessage("An error occured while parsing the sensor description document!")
                         .setStatus(INTERNAL_SERVER_ERROR);
             } catch (final XmlException xmle) {
-                throw new XmlDecodingException("sensor description document", xmlDoc, xmle)
+                throw new XmlDecodingException("sensor description document", xmle)
                         .setStatus(INTERNAL_SERVER_ERROR);
             }
         }
@@ -448,7 +452,7 @@ public class HibernateProcedureConverter {
     }
 
     private SosProcedureDescription createProcedureDescriptionFromXml(final String procedureIdentifier,
-            final String outputFormat, final String xmlDoc) throws XmlException {
+            final String outputFormat, final String xmlDoc) throws IOException, XmlException {
         final XmlObject procedureDescription = XmlObject.Factory.parse(xmlDoc);
         SosProcedureDescription sosProcedureDescription;
         try {

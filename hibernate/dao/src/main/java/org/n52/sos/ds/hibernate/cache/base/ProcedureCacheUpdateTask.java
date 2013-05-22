@@ -37,6 +37,7 @@ import org.n52.sos.ds.hibernate.ThreadLocalSessionFactory;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
+import org.n52.sos.ds.hibernate.entities.TProcedure;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.exception.ows.concrete.GenericThrowableWrapperException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -73,7 +74,9 @@ class ProcedureCacheUpdateTask extends RunnableAction {
         cache.addProcedure(id);
         cache.setOfferingsForProcedure(id, getOfferingIdentifiers(ocs));
         cache.setObservablePropertiesForProcedure(id, getObservableProperties(ocs));
-        cache.addParentProcedures(id, getProcedureIdentifiers(procedure.getParentProcedures()));
+        if (procedure instanceof TProcedure) {
+            cache.addParentProcedures(id, getProcedureIdentifiers(((TProcedure)procedure).getParents()));
+        }
         cache.setObservationIdentifiersForProcedure(id, getObservationIdentifiers(session, id));        
 
         // Temporal Envelope

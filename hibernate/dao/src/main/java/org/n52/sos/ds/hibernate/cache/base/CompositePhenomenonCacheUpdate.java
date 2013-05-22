@@ -23,13 +23,11 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getCompositePhenomenonObjects;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
-import org.n52.sos.ds.hibernate.entities.CompositePhenomenon;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 
 /**
@@ -38,11 +36,11 @@ import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 public class CompositePhenomenonCacheUpdate extends AbstractDatasourceCacheUpdate {
     @Override
     public void execute() {
-        for (CompositePhenomenon cp : getCompositePhenomenonObjects(getSession())) {
-            getCache().setObservablePropertiesForCompositePhenomenon(
-                    cp.getIdentifier(),
-                    getObservablePropertyIdentifiers(cp.getObservableProperties()));
-        }
+//        for (CompositePhenomenon cp : getCompositePhenomenonObjects(getSession())) {
+//            getCache().setObservablePropertiesForCompositePhenomenon(
+//                    cp.getIdentifier(),
+//                    getObservablePropertyIdentifiers(cp.getObservableProperties()));
+//        }
         // FIXME: getCache().setCompositePhenomenonsForOfferings(null);
     }
 

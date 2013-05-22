@@ -1,60 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-configuration PUBLIC
-		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-		"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+                                         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
-    <session-factory>
-        <!-- <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property> -->
-        <property name="hibernate.transaction.factory_class">org.hibernate.engine.transaction.internal.jdbc.JdbcTransactionFactory</property>
-        <property name="hibernate.current_session_context_class">thread</property>
-        <property name="hibernate.cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
-        <property name="hibernate.c3p0.min_size">10</property>
-        <property name="hibernate.c3p0.max_size">30</property>
-        <property name="hibernate.c3p0.idle_test_period">1</property>
-        <property name="hibernate.c3p0.acquire_increment">1</property>
-        <property name="hibernate.c3p0.timeout">0</property>
-        <property name="hibernate.c3p0.max_statements">0</property>
-        <property name="hibernate.connection.autoReconnect">true</property>
-        <property name="hibernate.connection.autoReconnectForPools">true</property>
-        <property name="hibernate.connection.testOnBorrow">true</property>
-        <property name="hibernate.max_fetch_depth">1</property>
-        <!-- <property name="hibernate.connection.oracle.jdbc.V8Compatible">true</property> -->
-<!-- No sql output in std out.
+ <session-factory name="">
+  <!-- <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property> -->
+  <property name="hibernate.transaction.factory_class">org.hibernate.engine.transaction.internal.jdbc.JdbcTransactionFactory</property>
+  <property name="hibernate.current_session_context_class">thread</property>
+  <property name="hibernate.cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
+  <property name="hibernate.c3p0.min_size">10</property>
+  <property name="hibernate.c3p0.max_size">30</property>
+  <property name="hibernate.c3p0.idle_test_period">1</property>
+  <property name="hibernate.c3p0.acquire_increment">1</property>
+  <property name="hibernate.c3p0.timeout">0</property>
+  <property name="hibernate.c3p0.max_statements">0</property>
+  <property name="hibernate.connection.autoReconnect">true</property>
+  <property name="hibernate.connection.autoReconnectForPools">true</property>
+  <property name="hibernate.connection.testOnBorrow">true</property>
+  <property name="hibernate.connection.autocommit">false</property>
+  <property name="hibernate.max_fetch_depth">1</property>
+  <!-- <property name="hibernate.connection.oracle.jdbc.V8Compatible">true</property> 
+ No sql output in std out.
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
--->
-        
-        <!-- Hibernate mapping files -->
-        <mapping resource="mapping/BlobValue.hbm.xml"/>
-        <mapping resource="mapping/CategoryValue.hbm.xml"/>
-        <mapping resource="mapping/Codespace.hbm.xml"/>
-        <mapping resource="mapping/CompositePhenomenon.hbm.xml"/>
-        <mapping resource="mapping/FeatureOfInterest.hbm.xml"/>
-        <mapping resource="mapping/FeatureOfInterestType.hbm.xml"/>
-        <mapping resource="mapping/GeographyColumns.hbm.xml"/>
-        <mapping resource="mapping/GeometryColumns.hbm.xml"/>
-        <mapping resource="mapping/GeometryValue.hbm.xml"/>
-        <mapping resource="mapping/NumericValue.hbm.xml"/>
-        <mapping resource="mapping/ObservableProperty.hbm.xml"/>
-        <mapping resource="mapping/Observation.hbm.xml"/>
-        <mapping resource="mapping/ObservationConstellation.hbm.xml"/>
-        <!-- <mapping resource="mapping/ObservationConstellationOfferingObservationType.hbm.xml"/> -->
-        <mapping resource="mapping/ObservationTemplate.hbm.xml"/>
-        <mapping resource="mapping/ObservationType.hbm.xml"/>
-        <mapping resource="mapping/Offering.hbm.xml"/>
-        <mapping resource="mapping/Procedure.hbm.xml"/>
-        <mapping resource="mapping/ProcedureDescriptionFormat.hbm.xml"/>
-        <mapping resource="mapping/Quality.hbm.xml"/>
-        <mapping resource="mapping/RelatedFeature.hbm.xml"/>
-        <mapping resource="mapping/RelatedFeatureRole.hbm.xml"/>
-        <mapping resource="mapping/Request.hbm.xml"/>
-        <mapping resource="mapping/ResultTemplate.hbm.xml"/>
-        <!-- <mapping resource="mapping/ResultType.hbm.xml"/> -->
-        <mapping resource="mapping/SpatialFilteringProfile.hbm.xml"/>
-        <mapping resource="mapping/SpatialRefSys.hbm.xml"/>
-        <mapping resource="mapping/SweType.hbm.xml"/>
-        <mapping resource="mapping/TextValue.hbm.xml"/>
-        <mapping resource="mapping/Unit.hbm.xml"/>
-        <mapping resource="mapping/ValidProcedureTime.hbm.xml"/>
-    </session-factory>
+
+ Hibernate mapping files 
+ core module -->
+  <mapping resource="mapping/core/Codespace.hbm.xml"/>
+  <mapping resource="mapping/core/FeatureOfInterest.hbm.xml"/>
+  <mapping resource="mapping/core/FeatureOfInterestType.hbm.xml"/>
+  <mapping resource="mapping/core/ObservableProperty.hbm.xml"/>
+  <mapping resource="mapping/core/Observation.hbm.xml"/>
+  <mapping resource="mapping/core/Offering.hbm.xml"/>
+  <mapping resource="mapping/core/Procedure.hbm.xml"/>
+  <mapping resource="mapping/core/ProcedureDescriptionFormat.hbm.xml"/>
+  <mapping resource="mapping/core/Unit.hbm.xml"/>
+  <!-- transactional module -->
+  <mapping resource="mapping/transactional/ObservationConstellation.hbm.xml"/>
+  <mapping resource="mapping/transactional/ObservationType.hbm.xml"/>
+  <mapping resource="mapping/transactional/RelatedFeature.hbm.xml"/>
+  <mapping resource="mapping/transactional/RelatedFeatureRole.hbm.xml"/>
+  <mapping resource="mapping/transactional/ResultTemplate.hbm.xml"/>
+  <mapping resource="mapping/transactional/ValidProcedureTime.hbm.xml"/>
+  <mapping resource="mapping/transactional/TFeatureOfInterest.hbm.xml"/>
+  <mapping resource="mapping/transactional/TObservableProperty.hbm.xml"/>
+  <mapping resource="mapping/transactional/TOffering.hbm.xml"/>
+  <mapping resource="mapping/transactional/TProcedure.hbm.xml"/>
+ </session-factory>
 </hibernate-configuration>

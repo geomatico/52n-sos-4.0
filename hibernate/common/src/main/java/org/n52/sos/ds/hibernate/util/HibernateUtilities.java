@@ -29,7 +29,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.hibernate.entities.BlobObservation;
-import org.n52.sos.ds.hibernate.entities.BlobValue;
 import org.n52.sos.ds.hibernate.entities.BooleanObservation;
 import org.n52.sos.ds.hibernate.entities.CategoryObservation;
 import org.n52.sos.ds.hibernate.entities.CountObservation;
@@ -42,6 +41,7 @@ import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
+import org.n52.sos.ds.hibernate.entities.TFeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.TextObservation;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
@@ -143,7 +143,7 @@ public class HibernateUtilities {
         if (relatedFeatures != null) {
             for (RelatedFeature relatedFeature : relatedFeatures) {
                 HibernateCriteriaTransactionalUtilities.insertFeatureOfInterestRelationShip(
-                        relatedFeature.getFeatureOfInterest(), featureOfInterest, session);
+                        (TFeatureOfInterest)relatedFeature.getFeatureOfInterest(), featureOfInterest, session);
             }
         }
     }
@@ -195,41 +195,31 @@ public class HibernateUtilities {
     public static Observation createObservationFromValue(IValue<?> value, Session session) {
         if (value instanceof BooleanValue) {
             BooleanObservation observation = new BooleanObservation();
-            org.n52.sos.ds.hibernate.entities.BooleanValue booleanValue =
-                                                           new org.n52.sos.ds.hibernate.entities.BooleanValue();
-            booleanValue.setValue(((BooleanValue) value).getValue());
-            observation.setValue(booleanValue);
+            observation.setValue(((BooleanValue) value).getValue());
             return observation;
         } else if (value instanceof UnknownValue) {
             BlobObservation observation = new BlobObservation();
-            observation.setValue(HibernateCriteriaTransactionalUtilities.getOrInsertBlobValue(
-                    ((BlobValue) value).getValue(), session));
+            observation.setValue(((UnknownValue) value).getValue());
             return observation;
         } else if (value instanceof CategoryValue) {
             CategoryObservation observation = new CategoryObservation();
-            observation.setValue(HibernateCriteriaTransactionalUtilities.getOrInsertCategoryValue(
-                    ((CategoryValue) value).getValue(), session));
+            observation.setValue(((CategoryValue) value).getValue());
             return observation;
         } else if (value instanceof CountValue) {
             CountObservation observation = new CountObservation();
-            org.n52.sos.ds.hibernate.entities.CountValue countValue = new org.n52.sos.ds.hibernate.entities.CountValue();
-            countValue.setValue(((CountValue) value).getValue());
-            observation.setValue(countValue);
+            observation.setValue(((CountValue) value).getValue());
             return observation;
         } else if (value instanceof GeometryValue) {
             GeometryObservation observation = new GeometryObservation();
-            observation.setValue(HibernateCriteriaTransactionalUtilities.getOrInsertGeometryValue(
-                    ((GeometryValue) value).getValue(), session));
+            observation.setValue(((GeometryValue) value).getValue());
             return observation;
         } else if (value instanceof QuantityValue) {
             NumericObservation observation = new NumericObservation();
-            observation.setValue(HibernateCriteriaTransactionalUtilities.getOrInsertNumericValue(
-                    ((QuantityValue) value).getValue(), session));
+            observation.setValue(((QuantityValue) value).getValue());
             return observation;
         } else if (value instanceof TextValue) {
             TextObservation observation = new TextObservation();
-            observation.setValue(HibernateCriteriaTransactionalUtilities.getOrInsertTextValue(
-                    ((TextValue) value).getValue(), session));
+            observation.setValue(((TextValue) value).getValue());
             return observation;
         }
         return new Observation();

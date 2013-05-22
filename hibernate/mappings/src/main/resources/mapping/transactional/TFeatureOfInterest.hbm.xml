@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<subclass name="org.n52.sos.ds.hibernate.entities.TFeatureOfInterest" extends="org.n52.sos.ds.hibernate.entities.FeatureOfInterest" discriminator-value="true">
+        <set name="childs" table="feature_relation" inverse="false" lazy="true" fetch="select" >
+            <key>
+                <column name="parent_feature_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.TObservableProperty" foreign-key="feature_of_interest_child_fk">
+                <column name="child_feature_id" not-null="true" />
+            </many-to-many>
+        </set>
+        <set name="parents" table="feature_relation" inverse="false" lazy="true" fetch="select">
+            <key>
+                <column name="child_feature_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.TObservableProperty" foreign-key="feature_of_interest_parent_fk">
+                <column name="parent_feature_id" not-null="true" />
+            </many-to-many>
+        </set>
+	</subclass>
+</hibernate-mapping>

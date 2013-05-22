@@ -43,6 +43,7 @@ import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
+import org.n52.sos.ds.hibernate.entities.TOffering;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.exception.ows.concrete.GenericThrowableWrapperException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -119,13 +120,16 @@ class OfferingCacheUpdateTask extends RunnableAction {
         getCache().setHiddenChildProceduresForOffering(offeringId, procedureIdentifiers.get(ProcedureFlag.HIDDEN_CHILD));
         // Observable properties
         getCache().setObservablePropertiesForOffering(offeringId, getObservablePropertyIdentifierFrom(observationConstellations));
-        // Related features
-        getCache().setRelatedFeaturesForOffering(offeringId, getRelatedFeatureIdentifiersFrom(getOffering()));
+
         // Observation types
         getCache().setObservationTypesForOffering(offeringId, getObservationTypesFrom(observationConstellations));
-        getCache()
-                .setAllowedObservationTypeForOffering(offeringId, getObservationTypesFromObservationType(getOffering()
-                .getObservationTypes()));
+        if (getOffering() instanceof TOffering) {
+            // Related features
+            getCache().setRelatedFeaturesForOffering(offeringId, getRelatedFeatureIdentifiersFrom((TOffering)getOffering()));
+            getCache()
+                    .setAllowedObservationTypeForOffering(offeringId, getObservationTypesFromObservationType(((TOffering)getOffering())
+                    .getObservationTypes()));
+        }
         // Spatial Envelope
         getCache().setEnvelopeForOffering(offeringId, getEnvelopeForOffering(dsOfferingId, session));
         // Features of Interest
@@ -159,7 +163,7 @@ class OfferingCacheUpdateTask extends RunnableAction {
         return allProcedures;
     }
 
-    protected Set<String> getRelatedFeatureIdentifiersFrom(Offering hOffering) {
+    protected Set<String> getRelatedFeatureIdentifiersFrom(TOffering hOffering) {
         Set<String> relatedFeatureList = new HashSet<String>(hOffering.getRelatedFeatures().size());
         for (RelatedFeature hRelatedFeature : hOffering.getRelatedFeatures()) {
             if (hRelatedFeature.getFeatureOfInterest() != null

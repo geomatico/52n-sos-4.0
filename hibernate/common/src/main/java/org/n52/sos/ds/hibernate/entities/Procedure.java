@@ -24,93 +24,65 @@
 package org.n52.sos.ds.hibernate.entities;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasCoordinate;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasDeletedFlag;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasGeometry;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasProcedureDescriptionFormat;
-import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValidProcedureTimes;
 
-/**
- * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
- *
- * @since 4.0.0
- */
-public class Procedure extends SpatialEntity implements Serializable, HasDeletedFlag,
-                                  HasProcedureDescriptionFormat, HasValidProcedureTimes, HasGeometry, HasCoordinate {
+public class Procedure extends SpatialEntity implements Serializable, HasDeletedFlag, HasProcedureDescriptionFormat,
+        HasGeometry, HasCoordinate {
+
+    private static final long serialVersionUID = -3115365895730874831L;
+
     public static final String ID = "procedureId";
-    public static final String PROCEDURES_FOR_CHILD_SENSOR_ID = "proceduresForChildSensorId";
-    public static final String PROCEDURES_FOR_PARENT_SENSOR_ID = "proceduresForParentSensorId";
-    private static final long serialVersionUID = -4982481368011439515L;
+    
+    public static final String DESCRIPTION_URL = "descriptionUrl";
+
     private long procedureId;
+
     private ProcedureDescriptionFormat procedureDescriptionFormat;
+
     private boolean deleted;
-    private Set<ValidProcedureTime> validProcedureTimes = new HashSet<ValidProcedureTime>(0);
-    private Set<Procedure> childProcedures = new HashSet<Procedure>(0);
-    private Set<Procedure> parentProcedures = new HashSet<Procedure>(0);
-
-    public Procedure() {
-    }
-
+    
+    private String descriptionFile;
+    
     public long getProcedureId() {
-        return procedureId;
+        return this.procedureId;
     }
 
-    public Procedure setProcedureId(final long procedureId) {
+    public void setProcedureId(long procedureId) {
         this.procedureId = procedureId;
-        return this;
     }
 
     @Override
     public ProcedureDescriptionFormat getProcedureDescriptionFormat() {
-        return procedureDescriptionFormat;
+        return this.procedureDescriptionFormat;
     }
 
     @Override
-    public Procedure setProcedureDescriptionFormat(final ProcedureDescriptionFormat procedureDescriptionFormat) {
+    public Procedure setProcedureDescriptionFormat(ProcedureDescriptionFormat procedureDescriptionFormat) {
         this.procedureDescriptionFormat = procedureDescriptionFormat;
         return this;
     }
 
     @Override
     public boolean isDeleted() {
-        return deleted;
+        return this.deleted;
     }
 
     @Override
-	public Procedure setDeleted(final boolean deleted) {
+    public Procedure setDeleted(boolean deleted) {
         this.deleted = deleted;
         return this;
     }
-
-    @Override
-    public Set<ValidProcedureTime> getValidProcedureTimes() {
-        return validProcedureTimes;
+    
+    public String getDescriptionFile() {
+        return this.descriptionFile;
     }
 
-    @Override
-    public Procedure setValidProcedureTimes(final Set<ValidProcedureTime> validProcedureTimes) {
-        this.validProcedureTimes = validProcedureTimes;
-        return this;
+    public void setDescriptionFile(String descriptionFile) {
+        this.descriptionFile = descriptionFile;
     }
-
-    public Set<Procedure> getChildProcedures() {
-        return childProcedures;
-    }
-
-    public Procedure setChildProcedures(final Set<Procedure> childProcedures) {
-        this.childProcedures = childProcedures;
-        return this;
-    }
-
-    public Set<Procedure> getParentProcedures() {
-        return parentProcedures;
-    }
-
-    public Procedure setParentProcedures(final Set<Procedure> parentProcedures) {
-        this.parentProcedures = parentProcedures;
-        return this;
-    }
+    
 }

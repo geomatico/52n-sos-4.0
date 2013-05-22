@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <subclass name="org.n52.sos.ds.hibernate.entities.TObservableProperty" extends="org.n52.sos.ds.hibernate.entities.ObservableProperty" discriminator-value="true">
+        <set name="childs" table="composite_phenomenon" inverse="false" lazy="true" fetch="select" >
+            <key>
+                <column name="parent_observable_property_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.TObservableProperty" foreign-key="observable_property_child_fk">
+                <column name="child_observable_property_id" not-null="true" />
+            </many-to-many>
+        </set>
+        <set name="parents" table="composite_phenomenon" inverse="false" lazy="true" fetch="select">
+            <key>
+                <column name="child_observable_property_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.TObservableProperty" foreign-key="observable_property_parent_fk">
+                <column name="parent_observable_property_id" not-null="true" />
+            </many-to-many>
+        </set>
+	</subclass>
+</hibernate-mapping>

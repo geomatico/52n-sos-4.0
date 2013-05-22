@@ -23,8 +23,6 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import static org.n52.sos.ds.hibernate.entities.Observation.*;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -112,7 +110,7 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
                                 hObservationConstellation.getOffering(), session);
                         if (isSweArrayObservation(hObservationConstellation)) {
                             final ResultTemplate resultTemplate =
-                                    createResultTemplate(sosObservation, hObservationConstellation, hFeature);
+                                    createResultTemplate(sosObservation, hObservationConstellation, hFeature, session);
                             session.save(resultTemplate);
                             session.flush();
                         }
@@ -144,19 +142,19 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
             String exceptionMsg = "Error while inserting new observation!";
             if (he instanceof ConstraintViolationException) {
                 final ConstraintViolationException cve = (ConstraintViolationException) he;
-                if (cve.getConstraintName() != null) {
-                    if (cve.getConstraintName().equalsIgnoreCase(CONSTRAINT_OBSERVATION_IDENTITY)) {
-                        exceptionMsg = "Observation with same values already contained in database";
-                    } else if (cve.getConstraintName().equalsIgnoreCase(CONSTRAINT_OBSERVATION_IDENTIFIER_IDENTITY)) {
-                        exceptionMsg = "Observation identifier already contained in database";
-                    }
-                } else if (cve.getMessage() != null) {
-                    if (cve.getMessage().contains(CONSTRAINT_OBSERVATION_IDENTITY)) {
-                        exceptionMsg = "Observation with same values already contained in database";
-                        exceptionMsg = "Observation identifier already contained in database";
-                    }
-                    
-                }
+//                if (cve.getConstraintName() != null) {
+//                    if (cve.getConstraintName().equalsIgnoreCase(CONSTRAINT_OBSERVATION_IDENTITY)) {
+//                        exceptionMsg = "Observation with same values already contained in database";
+//                    } else if (cve.getConstraintName().equalsIgnoreCase(CONSTRAINT_OBSERVATION_IDENTIFIER_IDENTITY)) {
+//                        exceptionMsg = "Observation identifier already contained in database";
+//                    }
+//                } else if (cve.getMessage() != null) {
+//                    if (cve.getMessage().contains(CONSTRAINT_OBSERVATION_IDENTITY)) {
+//                        exceptionMsg = "Observation with same values already contained in database";
+//                        exceptionMsg = "Observation identifier already contained in database";
+//                    }
+//                    
+//                }
                 status = StatusCode.BAD_REQUEST;
             }
             throw new NoApplicableCodeException().causedBy(he).withMessage(exceptionMsg).setStatus(status);
@@ -176,7 +174,7 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
     }
 
     private ResultTemplate createResultTemplate(final SosObservation observation,
-            final ObservationConstellation hObsConst, final FeatureOfInterest feature) throws OwsExceptionReport {
+            final ObservationConstellation hObsConst, final FeatureOfInterest feature, Session session) throws OwsExceptionReport {
         final ResultTemplate resultTemplate = new ResultTemplate();
         // TODO identifier handling: ignoring code space now
         String identifier;
@@ -187,7 +185,9 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
             identifier = UUID.randomUUID().toString();
         }
         resultTemplate.setIdentifier(identifier);
-        resultTemplate.setObservationConstellation(hObsConst);
+        resultTemplate.setObservableProperty(hObsConst.getObservableProperty());
+        resultTemplate.setProcedure(hObsConst.getProcedure());
+        resultTemplate.setOffering(hObsConst.getOffering());
         resultTemplate.setFeatureOfInterest(feature);
         final SosSweDataArray dataArray = ((SweDataArrayValue) observation.getValue().getValue()).getValue();
 

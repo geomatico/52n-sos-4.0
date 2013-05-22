@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="org.n52.sos.ds.hibernate.entities.ValidProcedureTime" table="valid_procedure_time">
+        <id name="validProcedureTimeId" type="long">
+            <column name="valid_procedure_time_id" />
+            <generator class="sequence">
+            	<param name="sequence">valid_procedure_time_id_seq</param>
+            </generator>
+        </id>
+       <many-to-one name="procedure" class="org.n52.sos.ds.hibernate.entities.Procedure" fetch="join" foreign-key="valid_procedure_time_procedure_fk">
+            <column index="valid_procedure_time_procedure_idx" name="procedure_id" not-null="true" />
+        </many-to-one>
+        <property name="startTime" type="timestamp">
+            <column index="valid_procedure_time_start_time_idx" name="start_time" length="29" not-null="true" />
+        </property>
+        <property name="endTime" type="timestamp">
+            <column index="valid_procedure_time_end_time_idx" name="end_time" length="29" />
+        </property>
+        <property name="descriptionXml" type="org.hibernate.type.StringClobType" >
+            <column name="description_xml" not-null="true"/>
+        </property>
+    </class>
+</hibernate-mapping>

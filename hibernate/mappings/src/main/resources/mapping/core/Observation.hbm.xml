@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="org.n52.sos.ds.hibernate.entities.Observation" table="observation">
+        <id name="observationId" type="long">
+            <column name="observation_id" />
+            <generator class="sequence">
+            	<param name="sequence">observation_id_seq</param>
+            </generator>
+        </id>
+        <many-to-one name="featureOfInterest" class="org.n52.sos.ds.hibernate.entities.FeatureOfInterest" fetch="select" foreign-key="observation_feature_of_interest_fk">
+           	<column index="observation_feature_of_interest_idx" name="feature_of_interest_id" not-null="true" unique-key="observation_identity" />
+        </many-to-one>
+        <many-to-one name="observableProperty" class="org.n52.sos.ds.hibernate.entities.ObservableProperty" fetch="join" foreign-key="observation_observable_property_fk">
+            <column index="observation_observable_property_idx" name="observable_property_id" not-null="true" unique-key="observation_identity"/>
+        </many-to-one>
+        <many-to-one name="procedure" class="org.n52.sos.ds.hibernate.entities.Procedure" fetch="join" foreign-key="observation_procedure_fk">
+            <column index="observation_procedure_idx" name="procedure_id" not-null="true" unique-key="observation_identity" />
+        </many-to-one>
+         <property name="phenomenonTimeStart" type="timestamp">
+            <column index="observation_phenomenon_time_start_idx" name="phenomenon_time_start" length="29" not-null="true" unique-key="observation_identity"/>
+        </property>
+        <property name="phenomenonTimeEnd" type="timestamp">
+            <column index="observation_phenomenon_time_end_idx" name="phenomenon_time_end" length="29" not-null="true" unique-key="observation_identity"/>
+        </property>
+        <property name="resultTime" type="timestamp">
+            <column index="observation_result_time_idx" name="result_time" length="29" not-null="true" unique-key="observation_identity"/>
+        </property>
+        <property name="identifier" type="string">
+            <column index="observation_identifier_idx" name="identifier" unique="true" />
+        </property>
+        <many-to-one name="codespace" class="org.n52.sos.ds.hibernate.entities.Codespace" fetch="select" foreign-key="observation_codespace_fk">
+            <column index="observation_codespace_idx" name="codespace_id" />
+        </many-to-one>
+        <property name="deleted" type="boolean">
+            <column name="deleted" not-null="true" default="false"/>
+        </property>
+        <property name="validTimeStart" type="timestamp">
+            <column name="valid_time_start" length="29" />
+        </property>
+        <property name="validTimeEnd" type="timestamp">
+            <column name="valid_time_end" length="29" />
+        </property>
+        <many-to-one name="unit" class="org.n52.sos.ds.hibernate.entities.Unit" fetch="join" foreign-key="observation_unit_flk">
+            <column name="unit_id" not-null="false" />
+        </many-to-one>
+        <property name="setId" type="java.lang.String">
+            <column index="observation_set_idx" name="set_id" />
+        </property>
+        <set name="offerings" table="observation_relates_to_offering" inverse="false" lazy="true" fetch="select" >
+            <key>
+                <column name="observation_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.Offering" foreign-key="observation_offering_fk">
+                <column name="offering_id" not-null="true" />
+            </many-to-many>
+        </set>
+        <joined-subclass name="org.n52.sos.ds.hibernate.entities.BlobObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="blob_value">
+        	<key column="observation_id" foreign-key="observation_blob_value_fk" />
+         	<property name="value" type="blob" />
+        </joined-subclass>
+		<joined-subclass name="org.n52.sos.ds.hibernate.entities.BooleanObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="boolean_value">
+        	<key column="observation_id" foreign-key="observation_boolean_value_fk" />
+        	<property name="value" type="boolean" />
+        </joined-subclass>
+		<joined-subclass name="org.n52.sos.ds.hibernate.entities.CategoryObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="category_value">
+        	<key column="observation_id" foreign-key="observation_category_value_fk" />
+         	<property name="value" type="string" />
+        </joined-subclass>
+		<joined-subclass name="org.n52.sos.ds.hibernate.entities.CountObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="count_value">
+        	<key column="observation_id" foreign-key="observation_count_value_fk" />
+        	<property name="value" type="integer" />
+        </joined-subclass>
+		<joined-subclass name="org.n52.sos.ds.hibernate.entities.GeometryObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="geometry_value">
+        	<key column="observation_id" foreign-key="observation_geometry_value_fk" />
+         	<property name="value" type="org.hibernate.spatial.GeometryType" />
+        </joined-subclass>
+		<joined-subclass name="org.n52.sos.ds.hibernate.entities.NumericObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="numeric_value">
+        	<key column="observation_id" foreign-key="observation_numeric_value_fk" />
+         	<property name="value" type="big_decimal" />
+        </joined-subclass>
+		<joined-subclass name="org.n52.sos.ds.hibernate.entities.TextObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="text_value">
+        	<key column="observation_id" foreign-key="observation_text_value_fk" />
+        	<property name="value" type="clob" />
+        </joined-subclass>
+    </class>
+</hibernate-mapping>

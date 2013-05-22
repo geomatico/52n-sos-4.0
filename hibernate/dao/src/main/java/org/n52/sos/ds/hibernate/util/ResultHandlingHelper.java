@@ -177,20 +177,20 @@ public class ResultHandlingHelper {
         
 		if (observedProperty.equals(definition)) {
 		        if (observation instanceof NumericObservation) {
-		            return String.valueOf(((NumericObservation) observation).getValue().getValue());
+		            return String.valueOf(((NumericObservation) observation).getValue());
 		        } else if (observation instanceof BooleanObservation) {
-		            return String.valueOf(((BooleanObservation) observation).getValue().getValue());
+		            return String.valueOf(((BooleanObservation) observation).getValue());
 		        } else if (observation instanceof CategoryObservation) {
-		            return String.valueOf(((CategoryObservation) observation).getValue().getValue());
+		            return String.valueOf(((CategoryObservation) observation).getValue());
 		        } else if (observation instanceof CountObservation) {
-		            return String.valueOf(((CountObservation) observation).getValue().getValue());
+		            return String.valueOf(((CountObservation) observation).getValue());
 		        } else if (observation instanceof TextObservation) {
-		            return String.valueOf(((TextObservation) observation).getValue().getValue());
+		            return String.valueOf(((TextObservation) observation).getValue());
 		        } else if (observation instanceof GeometryObservation) {
 		            final WKTWriter writer = new WKTWriter();
-		            return writer.write(((GeometryObservation) observation).getValue().getValue());
+		            return writer.write(((GeometryObservation) observation).getValue());
 		        } else if (observation instanceof BlobObservation) {
-		            return String.valueOf(((BlobObservation) observation).getValue().getValue());
+		            return String.valueOf(((BlobObservation) observation).getValue());
 		        }
 //            // TODO multiple values?
 //			Set<BooleanValue> booleanValues = observation.getBooleanValue();

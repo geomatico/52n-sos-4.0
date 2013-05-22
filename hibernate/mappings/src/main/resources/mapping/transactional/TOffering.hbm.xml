@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<subclass name="org.n52.sos.ds.hibernate.entities.TOffering" extends="org.n52.sos.ds.hibernate.entities.Offering" discriminator-value="true">
+		<set name="relatedFeatures" table="offering_has_related_feature" inverse="false" lazy="true" fetch="select">
+            <key>
+                <column name="offering_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.RelatedFeature" foreign-key="offering_related_feature_fk">
+                <column name="related_feature_id" not-null="true" />
+            </many-to-many>
+        </set>
+        <set name="observationTypes" table="offering_has_allowed_observation_type" inverse="false" lazy="true" fetch="select">
+            <key>
+                <column name="offering_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.ObservationType" foreign-key="offering_observation_type_fk">
+                <column name="observation_type_id" not-null="true" />
+            </many-to-many>
+        </set>
+        <set name="featureOfInterestTypes" table="offering_has_allowed_feature_of_interest_type" inverse="false" lazy="true" fetch="select">
+            <key>
+                <column name="offering_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.FeatureOfInterestType" foreign-key="offering_feature_of_interest_type_fk">
+                <column name="feature_of_interest_type_id" not-null="true" />
+            </many-to-many>
+        </set>
+	</subclass>
+</hibernate-mapping>

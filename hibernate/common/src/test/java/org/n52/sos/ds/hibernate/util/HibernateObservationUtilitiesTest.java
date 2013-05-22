@@ -23,9 +23,6 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
-import static org.hamcrest.number.IsCloseTo.closeTo;
-import static org.n52.sos.ds.hibernate.HibernateTestCase.assertThat;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +37,6 @@ import org.n52.sos.ds.hibernate.entities.Codespace;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
 import org.n52.sos.ds.hibernate.entities.NumericObservation;
-import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
@@ -108,8 +104,6 @@ public class HibernateObservationUtilitiesTest extends HibernateTestCase {
             Codespace hCodespace = new Codespace();
             Procedure hProcedure = new Procedure();
             NumericObservation hObservation = new NumericObservation();
-            NumericValue hNumericValue = new NumericValue();
-
 
             hProcedureDescriptionFormat.setProcedureDescriptionFormat(PROCEDURE_DESCRIPTION_FORMAT);
             hCodespace.setCodespace(CODESPACE);
@@ -141,8 +135,7 @@ public class HibernateObservationUtilitiesTest extends HibernateTestCase {
 
             session.flush();
             
-            hNumericValue.setValue(BigDecimal.valueOf(1.0));
-            hObservation.setValue(hNumericValue);
+            hObservation.setValue(BigDecimal.valueOf(1.0));
             hObservation.setProcedure(hProcedure);
             hObservation.setOfferings(Collections.singleton(hOffering));
             hObservation.setObservableProperty(hObservableProperty);

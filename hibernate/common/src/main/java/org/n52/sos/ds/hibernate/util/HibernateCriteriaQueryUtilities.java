@@ -23,7 +23,6 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,14 +37,9 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
-import org.n52.sos.ds.hibernate.entities.BlobValue;
-import org.n52.sos.ds.hibernate.entities.CategoryValue;
 import org.n52.sos.ds.hibernate.entities.Codespace;
-import org.n52.sos.ds.hibernate.entities.CompositePhenomenon;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
-import org.n52.sos.ds.hibernate.entities.GeometryValue;
-import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
@@ -56,18 +50,16 @@ import org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
-import org.n52.sos.ds.hibernate.entities.ResultType;
-import org.n52.sos.ds.hibernate.entities.SpatialRefSys;
-import org.n52.sos.ds.hibernate.entities.SweType;
-import org.n52.sos.ds.hibernate.entities.TextValue;
+import org.n52.sos.ds.hibernate.entities.TOffering;
+import org.n52.sos.ds.hibernate.entities.TProcedure;
 import org.n52.sos.ds.hibernate.entities.Unit;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
+import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
+import org.n52.sos.util.CollectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Utility class for Hiberntate Criteria queries.
@@ -436,6 +428,12 @@ public class HibernateCriteriaQueryUtilities {
                 .uniqueResult();
     }
 
+    public static TProcedure getTProcedureForIdentifier(String identifier, Session session) {
+        return (TProcedure) session.createCriteria(TProcedure.class)
+                .add(Restrictions.eq(Procedure.IDENTIFIER, identifier))
+                .uniqueResult();
+    }
+
     /**
      * Get Procedure objects for procedure identifiers
      * 
@@ -571,16 +569,6 @@ public class HibernateCriteriaQueryUtilities {
                 .add(Restrictions.eq(ObservationType.OBSERVATION_TYPE, observationType)).uniqueResult();
     }
 
-    public static ResultType getResultType(String resultType, Session session) {
-        return (ResultType) session.createCriteria(ResultType.class)
-                .add(Restrictions.eq(ResultType.PARAMETER_RESULT_TYPE, resultType)).uniqueResult();
-    }
-
-    public static SweType getValueType(String valueType, Session session) {
-        return (SweType) session.createCriteria(SweType.class)
-                .add(Restrictions.eq(SweType.SWE_TYPE, valueType)).uniqueResult();
-    }
-
     public static Unit getUnit(String unit, Session session) {
         return (Unit) session.createCriteria(Unit.class)
                 .add(Restrictions.eq(Unit.UNIT, unit)).uniqueResult();
@@ -608,31 +596,6 @@ public class HibernateCriteriaQueryUtilities {
     public static FeatureOfInterest getFeatureOfInterest(String identifier, Session session) {
         return (FeatureOfInterest) session.createCriteria(FeatureOfInterest.class)
                 .add(Restrictions.eq(FeatureOfInterest.IDENTIFIER, identifier)).uniqueResult();
-    }
-
-    public static BlobValue getBlobValue(Object value, Session session) {
-        return (BlobValue) session.createCriteria(BlobValue.class)
-                .add(Restrictions.eq(BlobValue.VALUE, value)).uniqueResult();
-    }
-
-    public static CategoryValue getCategoryValue(String value, Session session) {
-        return (CategoryValue) session.createCriteria(CategoryValue.class)
-                .add(Restrictions.eq(CategoryValue.VALUE, value)).uniqueResult();
-    }
-
-    public static GeometryValue getGeometryValue(Geometry value, Session session) {
-        return (GeometryValue) session.createCriteria(GeometryValue.class)
-                .add(Restrictions.eq(GeometryValue.VALUE, value)).uniqueResult();
-    }
-
-    public static NumericValue getNumericValue(BigDecimal value, Session session) {
-        return (NumericValue) session.createCriteria(NumericValue.class)
-                .add(Restrictions.eq(NumericValue.VALUE, value)).uniqueResult();
-    }
-
-    public static TextValue getTextValue(String value, Session session) {
-        return (TextValue) session.createCriteria(TextValue.class)
-                .add(Restrictions.eq(TextValue.VALUE, value)).uniqueResult();
     }
 
     @SuppressWarnings("unchecked")
@@ -668,19 +631,14 @@ public class HibernateCriteriaQueryUtilities {
                 .add(Restrictions.eq(Offering.IDENTIFIER, identifier)).uniqueResult();
     }
 
+    public static TOffering getTOfferingForIdentifier(String identifier, Session session) {
+        return (TOffering) session.createCriteria(TOffering.class)
+                .add(Restrictions.eq(Offering.IDENTIFIER, identifier)).uniqueResult();
+    }
+
     @SuppressWarnings("unchecked")
     public static List<ObservableProperty> getObservablePropertyObjects(Session session) {
         return session.createCriteria(ObservableProperty.class).list();
-    }
-
-    @SuppressWarnings("unchecked")
-    public static List<CompositePhenomenon> getCompositePhenomenonObjects(Session session) {
-        return session.createCriteria(CompositePhenomenon.class).list();
-    }
-
-    @SuppressWarnings("unchecked")
-    public static List<SpatialRefSys> getSpatialRefSysObjects(Session session) {
-        return session.createCriteria(SpatialRefSys.class).list();
     }
 
     public static ResultTemplate getResultTemplateObject(String identifier, Session session) {
@@ -689,30 +647,42 @@ public class HibernateCriteriaQueryUtilities {
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).uniqueResult();
     }
 
-    @SuppressWarnings("unchecked")
     public static List<ResultTemplate> getResultTemplateObjects(Session session) {
-        return session.createCriteria(ResultTemplate.class)
-                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
-                .createCriteria(ResultTemplate.OBSERVATION_CONSTELLATION)
-                .add(Restrictions.eq(ObservationConstellation.DELETED, false)).list();
+        List<ObservationConstellation> observationConstellations = getObservationConstellations(session);
+        List<ResultTemplate> resultTemplates = CollectionHelper.list();
+        for (ObservationConstellation observationConstellation : observationConstellations) {
+            ResultTemplate resultTemplate = getResultTemplateObjectsForObservationConstellation(observationConstellation, session);
+            if (resultTemplate != null) {
+                resultTemplates.add(resultTemplate);
+            }
+        }
+        return resultTemplates;
     }
 
     @SuppressWarnings("unchecked")
-    public static List<ResultTemplate> getResultTemplateObjectsForObservationConstellation(
+    private static List<ObservationConstellation> getObservationConstellations(Session session) {
+        return session.createCriteria(ObservationConstellation.class)
+        .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+        .add(Restrictions.eq(ObservationConstellation.DELETED, false)).list();
+        
+    }
+    
+    public static ResultTemplate getResultTemplateObjectsForObservationConstellation (
             ObservationConstellation observationConstellation, Session session) {
-        return session.createCriteria(ResultTemplate.class)
-                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
-                .add(Restrictions.eq(ResultTemplate.OBSERVATION_CONSTELLATION, observationConstellation))
-                .list();
+        return getResultTemplateObject(observationConstellation.getOffering().getIdentifier(), observationConstellation.getObservableProperty().getIdentifier(), session);
+    }
+
+    public static List<ResultTemplate> getResultTemplateObjectsForObservationConstellationAndFeature(
+            ObservationConstellation observationConstellation, SosAbstractFeature sosAbstractFeature, Session session) {
+        return getResultTemplateObject(observationConstellation.getOffering().getIdentifier(), observationConstellation.getObservableProperty().getIdentifier(), CollectionHelper.asList(sosAbstractFeature.getIdentifier().getValue()) , session);
     }
 
     @SuppressWarnings("unchecked")
     public static ResultTemplate getResultTemplateObject(String offering, String observedProperty, Session session) {
         Criteria rtc = session.createCriteria(ResultTemplate.class).setMaxResults(1);
-        Criteria occ = rtc.createCriteria(ResultTemplate.OBSERVATION_CONSTELLATION);
-        occ.createCriteria(ObservationConstellation.OFFERING)
+        rtc.createCriteria(ObservationConstellation.OFFERING)
                 .add(Restrictions.eq(Offering.IDENTIFIER, offering));
-        occ.createCriteria(ObservationConstellation.OBSERVABLE_PROPERTY)
+        rtc.createCriteria(ObservationConstellation.OBSERVABLE_PROPERTY)
                 .add(Restrictions.eq(ObservableProperty.IDENTIFIER, observedProperty));
         /* there can be multiple but equal result templates... */
         List<ResultTemplate> templates = (List<ResultTemplate>) rtc.list();
@@ -724,10 +694,9 @@ public class HibernateCriteriaQueryUtilities {
                                                                Collection<String> featureOfInterest, Session session) {
         Criteria rtc = session.createCriteria(ResultTemplate.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        Criteria occ = rtc.createCriteria(ResultTemplate.OBSERVATION_CONSTELLATION);
-        occ.createCriteria(ObservationConstellation.OFFERING)
+        rtc.createCriteria(ObservationConstellation.OFFERING)
                 .add(Restrictions.eq(Offering.IDENTIFIER, offering));
-        occ.createCriteria(ObservationConstellation.OBSERVABLE_PROPERTY)
+        rtc.createCriteria(ObservationConstellation.OBSERVABLE_PROPERTY)
                 .add(Restrictions.eq(ObservableProperty.IDENTIFIER, observedProperty));
         if (featureOfInterest != null && !featureOfInterest.isEmpty()) {
             rtc.createCriteria(ResultTemplate.FEATURE_OF_INTEREST)
@@ -748,6 +717,16 @@ public class HibernateCriteriaQueryUtilities {
     public static Codespace getCodespace(String codespace, Session session) {
         return (Codespace) session.createCriteria(Codespace.class)
                 .add(Restrictions.eq(Codespace.CODESPACE, codespace)).uniqueResult();
+    }
+
+    public static List<ObservationConstellation> getObservationConstellation(Procedure procedure, ObservableProperty observableProperty,
+            Offering offering, Session session) {
+         return session.createCriteria(ObservationConstellation.class)
+        .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+        .add(Restrictions.eq(ObservationConstellation.PROCEDURE, procedure))
+        .add(Restrictions.eq(ObservationConstellation.OBSERVABLE_PROPERTY, observableProperty))
+        .add(Restrictions.eq(ObservationConstellation.OFFERING, offering))
+        .add(Restrictions.eq(ObservationConstellation.DELETED, false)).list();
     }
 
 }

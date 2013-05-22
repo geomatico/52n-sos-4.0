@@ -30,7 +30,6 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.hibernate.entities.BooleanObservation;
-import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.Codespace;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
@@ -40,6 +39,9 @@ import org.n52.sos.ds.hibernate.entities.ObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat;
+import org.n52.sos.ds.hibernate.entities.TFeatureOfInterest;
+import org.n52.sos.ds.hibernate.entities.TOffering;
+import org.n52.sos.ds.hibernate.entities.TProcedure;
 import org.n52.sos.ds.hibernate.entities.Unit;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
 import org.n52.sos.util.CollectionHelper;
@@ -79,7 +81,7 @@ public class HibernateObservationBuilder {
         observation.setOfferings(CollectionHelper.set(getOffering1(), getOffering2()));
         observation.setUnit(getUnit());
         observation.setCodespace(getCodespace());
-        observation.setValue(getBooleanValue());
+        observation.setValue(true);
         session.save(observation);
         session.flush();
         return observation;
@@ -132,16 +134,17 @@ public class HibernateObservationBuilder {
                 .add(Restrictions.eq(FeatureOfInterest.IDENTIFIER, FEATURE_OF_INTEREST))
                 .uniqueResult();
         if (featureOfInterest == null) {
-            featureOfInterest = new FeatureOfInterest();
-            featureOfInterest.setCodespace(getCodespace());
-            featureOfInterest.setDescriptionXml("<xml/>");
-            featureOfInterest.setFeatureOfInterestType(getFeatureOfInterestType());
-            featureOfInterest.setFeatureOfInterestsForChildFeatureId(null);
-            featureOfInterest.setFeatureOfInterestsForParentFeatureId(null);
-            featureOfInterest.setIdentifier(FEATURE_OF_INTEREST);
-            featureOfInterest.setName(FEATURE_OF_INTEREST);
-            session.save(featureOfInterest);
+            TFeatureOfInterest tFeatureOfInterest = new TFeatureOfInterest();
+            tFeatureOfInterest.setCodespace(getCodespace());
+            tFeatureOfInterest.setDescriptionXml("<xml/>");
+            tFeatureOfInterest.setFeatureOfInterestType(getFeatureOfInterestType());
+            tFeatureOfInterest.setChilds(null);
+            tFeatureOfInterest.setParents(null);
+            tFeatureOfInterest.setIdentifier(FEATURE_OF_INTEREST);
+            tFeatureOfInterest.setNames(FEATURE_OF_INTEREST);
+            session.save(tFeatureOfInterest);
             session.flush();
+            return tFeatureOfInterest;
         }
         return featureOfInterest;
     }
@@ -167,14 +170,15 @@ public class HibernateObservationBuilder {
                 .add(Restrictions.eq(Offering.IDENTIFIER, OFFERING_1))
                 .uniqueResult();
         if (offering == null) {
-            offering = new Offering();
-            offering.setFeatureOfInterestTypes(Collections.singleton(getFeatureOfInterestType()));
-            offering.setIdentifier(OFFERING_1);
-            offering.setName(OFFERING_1);
-            offering.setObservationTypes(Collections.singleton(getObservationType()));
-            offering.setRelatedFeatures(null);
+            TOffering tOffering = new TOffering();
+            tOffering.setFeatureOfInterestTypes(Collections.singleton(getFeatureOfInterestType()));
+            tOffering.setIdentifier(OFFERING_1);
+            tOffering.setName(OFFERING_1);
+            tOffering.setObservationTypes(Collections.singleton(getObservationType()));
+            tOffering.setRelatedFeatures(null);
             session.save(offering);
             session.flush();
+            return tOffering;
         }
         return offering;
     }
@@ -185,14 +189,15 @@ public class HibernateObservationBuilder {
                 .add(Restrictions.eq(Offering.IDENTIFIER, OFFERING_2))
                 .uniqueResult();
         if (offering == null) {
-            offering = new Offering();
-            offering.setFeatureOfInterestTypes(Collections.singleton(getFeatureOfInterestType()));
-            offering.setIdentifier(OFFERING_2);
-            offering.setName(OFFERING_2);
-            offering.setObservationTypes(Collections.singleton(getObservationType()));
-            offering.setRelatedFeatures(null);
+            TOffering tOffering = new TOffering();
+            tOffering.setFeatureOfInterestTypes(Collections.singleton(getFeatureOfInterestType()));
+            tOffering.setIdentifier(OFFERING_2);
+            tOffering.setName(OFFERING_2);
+            tOffering.setObservationTypes(Collections.singleton(getObservationType()));
+            tOffering.setRelatedFeatures(null);
             session.save(offering);
             session.flush();
+            return tOffering;
         }
         return offering;
     }
@@ -231,19 +236,19 @@ public class HibernateObservationBuilder {
                 .add(Restrictions.eq(Procedure.IDENTIFIER, "Procedure"))
                 .uniqueResult();
         if (procedure == null) {
-            procedure = new Procedure();
-            procedure.setDeleted(false);
-            procedure.setIdentifier("Procedure");
-            procedure.setGeom(null);
-            procedure.setProcedureDescriptionFormat(getProcedureDescriptionFormat());
-            procedure.setChildProcedures(null);
-            procedure.setParentProcedures(null);
+            TProcedure tProcedure = new TProcedure();
+            tProcedure.setDeleted(false);
+            tProcedure.setIdentifier("Procedure");
+            tProcedure.setGeom(null);
+            tProcedure.setProcedureDescriptionFormat(getProcedureDescriptionFormat());
+            tProcedure.setChilds(null);
+            tProcedure.setParents(null);
             session.save(procedure);
             session.flush();
-            procedure.setValidProcedureTimes(Collections.singleton(getValidProcedureTime()));
+            tProcedure.setValidProcedureTimes(Collections.singleton(getValidProcedureTime()));
             session.update(procedure);
             session.flush();
-            return procedure;
+            return tProcedure;
         }
         return procedure;
     }
@@ -306,10 +311,5 @@ public class HibernateObservationBuilder {
             session.refresh(observationType);
         }
         return observationType;
-    }
-    private BooleanValue getBooleanValue() {
-        BooleanValue booleanValue = new BooleanValue();
-        booleanValue.setValue(true);
-        return booleanValue;
     }
 }

@@ -94,8 +94,6 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
             throws OwsExceptionReport {
         final Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(request.getProcedure(), session);
         return procedureConverter.createSosProcedureDescription(procedure, request.getProcedure(), request.getProcedureDescriptionFormat());
-        
-       
     }
 
     private void addValuesToSensorDescription(SosProcedureDescription procedureDescription, String version, String procedureDescriptionFormat,

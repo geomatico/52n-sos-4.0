@@ -32,6 +32,7 @@ import org.joda.time.DateTime;
 import org.n52.sos.ds.AbstractUpdateSensorDescriptionDAO;
 import org.n52.sos.ds.hibernate.HibernateSessionHolder;
 import org.n52.sos.ds.hibernate.entities.Procedure;
+import org.n52.sos.ds.hibernate.entities.TProcedure;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
@@ -70,15 +71,17 @@ public class UpdateSensorDescriptionDAO extends AbstractUpdateSensorDescriptionD
                 Procedure procedure =
                         HibernateCriteriaQueryUtilities.getProcedureForIdentifier(request.getProcedureIdentifier(),
                                 session);
-                Set<ValidProcedureTime> validProcedureTimes = procedure.getValidProcedureTimes();
-                for (ValidProcedureTime validProcedureTime : validProcedureTimes) {
-                    if (validProcedureTime.getEndTime() == null) {
-                        validProcedureTime.setEndTime(currentTime.toDate());
-                        HibernateCriteriaTransactionalUtilities.updateValidProcedureTime(validProcedureTime, session);
+                if (procedure instanceof TProcedure) {
+                    Set<ValidProcedureTime> validProcedureTimes = ((TProcedure)procedure).getValidProcedureTimes();
+                    for (ValidProcedureTime validProcedureTime : validProcedureTimes) {
+                        if (validProcedureTime.getEndTime() == null) {
+                            validProcedureTime.setEndTime(currentTime.toDate());
+                            HibernateCriteriaTransactionalUtilities.updateValidProcedureTime(validProcedureTime, session);
+                        }
                     }
+                    HibernateCriteriaTransactionalUtilities.insertValidProcedureTime(procedure,
+                            procedureDescription.getSensorDescriptionXmlString(), currentTime, session);
                 }
-                HibernateCriteriaTransactionalUtilities.insertValidProcedureTime(procedure,
-                        procedureDescription.getSensorDescriptionXmlString(), currentTime, session);
             }
             session.flush();
             transaction.commit();
