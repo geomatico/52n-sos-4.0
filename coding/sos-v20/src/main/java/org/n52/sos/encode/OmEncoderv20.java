@@ -79,6 +79,8 @@ import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.GmlHelper;
+import org.n52.sos.util.OMHelper;
+import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.SweHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -379,8 +381,13 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
     // FIXME String.equals(QName)!?
     private void addSingleObservationToResult(XmlObject xbResult, SosObservation sosObservation, String observationID)
             throws OwsExceptionReport {
-        String observationType = sosObservation.getObservationConstellation().getObservationType();
         SosSingleObservationValue<?> observationValue = (SosSingleObservationValue) sosObservation.getValue();
+        String observationType = "";
+        if (sosObservation.getObservationConstellation().isSetObservationType()) {
+            observationType = sosObservation.getObservationConstellation().getObservationType();
+        } else {
+           observationType = OMHelper.getObservationTypeFor(observationValue.getValue());
+        }
         if ((observationType.equals(OMConstants.OBS_TYPE_MEASUREMENT)) && observationValue.getValue() instanceof QuantityValue) {
             QuantityValue quantityValue = (QuantityValue) observationValue.getValue();
             xbResult.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, quantityValue));
