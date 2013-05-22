@@ -72,7 +72,6 @@ import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.AbstractServiceResponse;
 import org.n52.sos.response.GetCapabilitiesResponse;
-import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
