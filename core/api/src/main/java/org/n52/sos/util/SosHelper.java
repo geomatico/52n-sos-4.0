@@ -501,6 +501,9 @@ public class SosHelper {
         if ((values != null) && !values.isEmpty()) {
             for (final CodeType value : values) {
                 builder.append(value.getValue());
+                if (value.isSetCodeSpace()) {
+                    // TODO add codespace to name
+                }
                 builder.append(',');
             }
             builder.delete(builder.lastIndexOf(","), builder.length());
@@ -511,6 +514,7 @@ public class SosHelper {
     public static List<CodeType> createCodeTypeListFromCSV(final String csv) {
         final List<CodeType> names = new ArrayList<CodeType>(0);
         if ((csv != null) && !csv.isEmpty()) {
+            // TODO get codespace from string if available
             for (final String name : csv.split(",")) {
                 names.add(new CodeType(name));
             }
