@@ -27,10 +27,15 @@ import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getO
 
 import java.util.List;
 
+import javax.print.DocFlavor.READER;
+
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.hibernate.cache.AbstractQueuingDatasourceCacheUpdate;
+import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Offering;
+import org.n52.sos.util.CollectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,15 +68,26 @@ public class OfferingCacheUpdate extends AbstractQueuingDatasourceCacheUpdate<Of
                 .createCriteria(ObservationConstellation.class)
                 .add(Restrictions.eq(ObservationConstellation.DELETED, false))
                 .add(Restrictions.eq(ObservationConstellation.OFFERING, offering)).list();
-        if (observationConstellation != null && !observationConstellation.isEmpty()) {
+        if (CollectionHelper.isNotEmpty(observationConstellation)) {
             // create runnable for offeringId
             Runnable task =
                      new OfferingCacheUpdateTask(getCountDownLatch(), getSessionFactory(), getCache(), offering, getErrorList());
             // put runnable in executor service
             getExecutor().submit(task);
         } else {
-            getCountDownLatch().countDown();
-            LOGGER.debug("Offering '{}' contains deleted procedure, latch.countDown().", offering.getIdentifier());
+            Integer count = (Integer)getSession().createCriteria(Observation.class)
+            .add(Restrictions.eq(Observation.OFFERINGS, offering))
+            .setProjection(Projections.countDistinct(Observation.OFFERINGS)).uniqueResult();
+            if (count > 0) {
+             // create runnable for offeringId
+                Runnable task =
+                         new OfferingCacheUpdateTask(getCountDownLatch(), getSessionFactory(), getCache(), offering, getErrorList());
+                // put runnable in executor service
+                getExecutor().submit(task);
+            } else {
+                getCountDownLatch().countDown();
+                LOGGER.debug("Offering '{}' contains deleted procedure, latch.countDown().", offering.getIdentifier());
+            }
         }
     }
 }

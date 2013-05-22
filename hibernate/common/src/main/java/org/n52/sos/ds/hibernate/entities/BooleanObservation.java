@@ -27,22 +27,26 @@ import java.io.Serializable;
 
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValue;
 
-public class BooleanObservation extends Observation implements Serializable, HasValue {
+public class BooleanObservation extends Observation implements Serializable, HasValue<Boolean> {
 
     private static final long serialVersionUID = -4414870432506280754L;
 
     private boolean value;
 
-    public boolean getValue() {
+    @Override
+    public Boolean getValue() {
         return this.value;
     }
     
-    public boolean isValue() {
+    @Override
+    public boolean isSetValue() {
         return this.value;
     }
 
-    public void setValue(boolean value) {
+    @Override
+    public void setValue(Boolean value) {
         this.value = value;
     }
+
 
 }

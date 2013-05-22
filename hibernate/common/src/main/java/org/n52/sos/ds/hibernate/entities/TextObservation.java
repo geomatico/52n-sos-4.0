@@ -24,41 +24,28 @@
 package org.n52.sos.ds.hibernate.entities;
 
 import java.io.Serializable;
-import java.sql.Clob;
-import java.sql.SQLException;
-
-import javax.sql.rowset.serial.SerialClob;
-import javax.sql.rowset.serial.SerialException;
 
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValue;
 import org.n52.sos.util.StringHelper;
 
-public class TextObservation extends Observation implements Serializable, HasValue {
+public class TextObservation extends Observation implements Serializable, HasValue<String> {
 
     private static final long serialVersionUID = 627306968328720439L;
 
-    private Clob value;
-
-    public Clob getValue() {
+    private String value;
+    
+    @Override
+    public String getValue() {
         return this.value;
     }
-
-    public void setValue(Clob value) {
+    
+    @Override
+    public void setValue(String value) {
         this.value = value;
     }
-    
-    public void setValue(String value) {
-        if (StringHelper.isNotEmpty(value)) {
-            try {
-                this.value = new SerialClob(value.toCharArray());
-            } catch (SerialException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (SQLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
 
+    @Override
+    public boolean isSetValue() {
+        return StringHelper.isNotEmpty(value);
+    }
 }

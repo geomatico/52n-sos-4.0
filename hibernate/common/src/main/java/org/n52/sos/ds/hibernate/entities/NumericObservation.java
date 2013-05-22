@@ -28,18 +28,25 @@ import java.math.BigDecimal;
 
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValue;
 
-public class NumericObservation extends Observation implements Serializable, HasValue {
+public class NumericObservation extends Observation implements Serializable, HasValue<BigDecimal> {
 
     private static final long serialVersionUID = -835034606459038906L;
 
     private BigDecimal value;
 
+    @Override
     public BigDecimal getValue() {
         return this.value;
     }
 
+    @Override
     public void setValue(BigDecimal value) {
         this.value = value;
+    }
+
+    @Override
+    public boolean isSetValue() {
+        return value != null;
     }
 
 }

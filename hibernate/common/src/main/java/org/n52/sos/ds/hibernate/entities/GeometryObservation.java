@@ -29,18 +29,25 @@ import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValue;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class GeometryObservation extends Observation implements Serializable, HasValue {
+public class GeometryObservation extends Observation implements Serializable, HasValue<Geometry> {
 
     private static final long serialVersionUID = -8962773936339280967L;
 
     private Geometry value;
 
+    @Override
     public Geometry getValue() {
         return this.value;
     }
 
+    @Override
     public void setValue(Geometry value) {
         this.value = value;
+    }
+
+    @Override
+    public boolean isSetValue() {
+        return value != null;
     }
 
 }

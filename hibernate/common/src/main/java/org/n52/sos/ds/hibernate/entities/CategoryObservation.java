@@ -26,19 +26,27 @@ package org.n52.sos.ds.hibernate.entities;
 import java.io.Serializable;
 
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValue;
+import org.n52.sos.util.StringHelper;
 
-public class CategoryObservation extends Observation implements Serializable, HasValue {
+public class CategoryObservation extends Observation implements Serializable, HasValue<String> {
 
     private static final long serialVersionUID = -1495946668761330077L;
 
     private String value;
 
+    @Override
     public String getValue() {
         return this.value;
     }
 
+    @Override
     public void setValue(String value) {
         this.value = value;
+    }
+
+    @Override
+    public boolean isSetValue() {
+        return StringHelper.isNotEmpty(value);
     }
 
 }

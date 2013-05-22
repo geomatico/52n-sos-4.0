@@ -242,8 +242,11 @@ public interface HibernateRelations {
         void setUrl(String url);
     }
 
-    interface HasValue {
+    interface HasValue<T> {
         String VALUE = "value";
+        T getValue();
+        void setValue(T value);
+        boolean isSetValue();
     }
 
     interface HasOfferings {

@@ -27,17 +27,24 @@ import java.io.Serializable;
 
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValue;
 
-public class BlobObservation extends Observation implements Serializable, HasValue {
+public class BlobObservation extends Observation implements Serializable, HasValue<Object> {
 
     private static final long serialVersionUID = -3712110463000862218L;
 
     private Object value;
 
+    @Override
     public Object getValue() {
         return this.value;
     }
 
+    @Override
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    @Override
+    public boolean isSetValue() {
+        return value != null;
     }
 }

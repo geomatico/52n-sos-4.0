@@ -27,18 +27,25 @@ import java.io.Serializable;
 
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValue;
 
-public class CountObservation extends Observation implements Serializable, HasValue {
+public class CountObservation extends Observation implements Serializable, HasValue<Integer> {
 
     private static final long serialVersionUID = -4973111548964831609L;
 
     private Integer value;
 
+    @Override
     public Integer getValue() {
         return this.value;
     }
 
+    @Override
     public void setValue(Integer value) {
         this.value = value;
+    }
+
+    @Override
+    public boolean isSetValue() {
+        return value != null;
     }
 
 }

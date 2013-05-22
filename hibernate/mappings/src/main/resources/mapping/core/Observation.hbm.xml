@@ -82,7 +82,7 @@
         </joined-subclass>
 		<joined-subclass name="org.n52.sos.ds.hibernate.entities.TextObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="text_value">
         	<key column="observation_id" foreign-key="observation_text_value_fk" />
-        	<property name="value" type="clob" />
+        	<property name="value" type="org.hibernate.type.StringClobType" />
         </joined-subclass>
     </class>
 </hibernate-mapping>
