@@ -42,7 +42,7 @@ create table offering (offering_id int8 not null, hibernate_discriminator boolea
 create table offering_has_allowed_feature_of_interest_type (offering_id int8 not null, feature_of_interest_type_id int8 not null, primary key (offering_id, feature_of_interest_type_id));
 create table offering_has_allowed_observation_type (offering_id int8 not null, observation_type_id int8 not null, primary key (offering_id, observation_type_id));
 create table offering_has_related_feature (related_feature_id int8 not null, offering_id int8 not null, primary key (offering_id, related_feature_id));
-create table procedure (procedure_id int8 not null, hibernate_discriminator boolean not null, procedure_description_format_id int8 not null, identifier varchar(255) not null unique, deleted boolean default false not null, description_file varchar(255), primary key (procedure_id));
+create table procedure (procedure_id int8 not null, hibernate_discriminator boolean not null, procedure_description_format_id int8 not null, identifier varchar(255) not null unique, deleted boolean default false not null, description_file text, primary key (procedure_id));
 create table procedure_description_format (procedure_description_format_id int8 not null, procedure_description_format varchar(255) not null, primary key (procedure_description_format_id));
 create table related_feature (related_feature_id int8 not null, feature_of_interest_id int8 not null, primary key (related_feature_id));
 create table related_feature_has_related_feature_role (related_feature_id int8 not null, related_feature_role_id int8 not null, primary key (related_feature_id, related_feature_role_id));
