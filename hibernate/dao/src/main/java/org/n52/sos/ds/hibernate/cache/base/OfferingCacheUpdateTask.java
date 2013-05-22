@@ -23,7 +23,6 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering;
 
 import java.util.Collection;
@@ -34,11 +33,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ds.hibernate.ThreadLocalSessionFactory;
+import org.n52.sos.ds.hibernate.cache.DatasourceCacheUpdateHelper;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
@@ -46,40 +44,70 @@ import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.TOffering;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.exception.ows.concrete.GenericThrowableWrapperException;
+import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CacheHelper;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.RunnableAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * 
  * @author Christian Autermann <c.autermann@52north.org>
  */
 class OfferingCacheUpdateTask extends RunnableAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OfferingCacheUpdateTask.class);
+
     private CountDownLatch countDownLatch;
+
     private ThreadLocalSessionFactory sessionFactory;
-    private List<OwsExceptionReport> errors;
+
+    private List<OwsExceptionReport> errors = CollectionHelper.list();
+
     private Offering offering;
+
     private WritableContentCache cache;
 
-    OfferingCacheUpdateTask(
-            CountDownLatch countDownLatch, 
-            ThreadLocalSessionFactory sessionFactory,
-            WritableContentCache offeringCache,
-            Offering offering,
-            List<OwsExceptionReport> error) {
-        this.countDownLatch = countDownLatch;
-        this.sessionFactory = sessionFactory;
-        this.cache = offeringCache;
-        this.offering = offering;
-        this.errors = error;
+    private List<ObservationConstellation> observationConstellations = CollectionHelper.list();
+
+    OfferingCacheUpdateTask() {
     }
-    
+
+    protected OfferingCacheUpdateTask setCountDownLatch(CountDownLatch countDownLatch) {
+        this.countDownLatch = countDownLatch;
+        return this;
+    }
+
+    protected OfferingCacheUpdateTask setThreadLocalSessionFactory(ThreadLocalSessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+        return this;
+    }
+
+    protected OfferingCacheUpdateTask setWritableContentCache(WritableContentCache offeringCache) {
+        this.cache = offeringCache;
+        return this;
+    }
+
+    protected OfferingCacheUpdateTask setOffering(Offering offering) {
+        this.offering = offering;
+        return this;
+    }
+
+    protected OfferingCacheUpdateTask setErrorList(List<OwsExceptionReport> error) {
+        this.errors = error;
+        return this;
+    }
+
+    protected OfferingCacheUpdateTask setObservationConstellations(
+            List<ObservationConstellation> observationConstellations) {
+        this.observationConstellations = observationConstellations;
+        return this;
+    }
+
     protected CountDownLatch getCountDownLatch() {
         return countDownLatch;
     }
@@ -95,9 +123,13 @@ class OfferingCacheUpdateTask extends RunnableAction {
     protected WritableContentCache getCache() {
         return cache;
     }
-    
+
     public ThreadLocalSessionFactory getSessionFactory() {
         return sessionFactory;
+    }
+
+    protected List<ObservationConstellation> getObservationConstellations() {
+        return observationConstellations;
     }
 
     protected void getOfferingInformationFromDbAndAddItToCacheMaps(Session session) throws OwsExceptionReport {
@@ -107,54 +139,59 @@ class OfferingCacheUpdateTask extends RunnableAction {
         getCache().addOffering(offeringId);
         getCache().setNameForOffering(offeringId, getOffering().getName());
         // Procedures
-        @SuppressWarnings("unchecked")
-        List<ObservationConstellation> observationConstellations = session
-                .createCriteria(ObservationConstellation.class)
-                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
-                .add(Restrictions.eq(ObservationConstellation.DELETED, false))
-                .add(Restrictions.eq(ObservationConstellation.OFFERING, offering))
-                .list();
-        final Map<ProcedureFlag, Set<String>> procedureIdentifiers = getProcedureIdentifierFrom(observationConstellations);
+        final Map<ProcedureFlag, Set<String>> procedureIdentifiers = getProcedureIdentifier(session);
 
         getCache().setProceduresForOffering(offeringId, procedureIdentifiers.get(ProcedureFlag.PARENT));
-        getCache().setHiddenChildProceduresForOffering(offeringId, procedureIdentifiers.get(ProcedureFlag.HIDDEN_CHILD));
+        getCache().setHiddenChildProceduresForOffering(offeringId,
+                procedureIdentifiers.get(ProcedureFlag.HIDDEN_CHILD));
         // Observable properties
-        getCache().setObservablePropertiesForOffering(offeringId, getObservablePropertyIdentifierFrom(observationConstellations));
+        getCache().setObservablePropertiesForOffering(offeringId, getObservablePropertyIdentifier(session));
 
         // Observation types
-        getCache().setObservationTypesForOffering(offeringId, getObservationTypesFrom(observationConstellations));
+        getCache().setObservationTypesForOffering(offeringId, getObservationTypes(session));
         if (getOffering() instanceof TOffering) {
             // Related features
-            getCache().setRelatedFeaturesForOffering(offeringId, getRelatedFeatureIdentifiersFrom((TOffering)getOffering()));
-            getCache()
-                    .setAllowedObservationTypeForOffering(offeringId, getObservationTypesFromObservationType(((TOffering)getOffering())
-                    .getObservationTypes()));
+            getCache().setRelatedFeaturesForOffering(offeringId,
+                    getRelatedFeatureIdentifiersFrom((TOffering) getOffering()));
+            getCache().setAllowedObservationTypeForOffering(offeringId,
+                    getObservationTypesFromObservationType(((TOffering) getOffering()).getObservationTypes()));
         }
         // Spatial Envelope
         getCache().setEnvelopeForOffering(offeringId, getEnvelopeForOffering(dsOfferingId, session));
         // Features of Interest
-        List<String> featureOfInterestIdentifiers = HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(dsOfferingId, session);
-        getCache()
-                .setFeaturesOfInterestForOffering(offeringId, getValidFeaturesOfInterestFrom(featureOfInterestIdentifiers));
+        List<String> featureOfInterestIdentifiers =
+                HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(dsOfferingId, session);
+        getCache().setFeaturesOfInterestForOffering(offeringId,
+                getValidFeaturesOfInterestFrom(featureOfInterestIdentifiers));
         // Temporal Envelope
-        getCache().setMinPhenomenonTimeForOffering(offeringId, HibernateCriteriaQueryUtilities
-                .getMinDate4Offering(dsOfferingId, session));
-        getCache().setMaxPhenomenonTimeForOffering(offeringId, HibernateCriteriaQueryUtilities
-                .getMaxDate4Offering(dsOfferingId, session));
-        getCache().setMinResultTimeForOffering(offeringId, HibernateCriteriaQueryUtilities
-                .getMinResultTime4Offering(dsOfferingId, session));
-        getCache().setMaxResultTimeForOffering(offeringId, HibernateCriteriaQueryUtilities
-                .getMaxResultTime4Offering(dsOfferingId, session));
+        getCache().setMinPhenomenonTimeForOffering(offeringId,
+                HibernateCriteriaQueryUtilities.getMinDate4Offering(dsOfferingId, session));
+        getCache().setMaxPhenomenonTimeForOffering(offeringId,
+                HibernateCriteriaQueryUtilities.getMaxDate4Offering(dsOfferingId, session));
+        getCache().setMinResultTimeForOffering(offeringId,
+                HibernateCriteriaQueryUtilities.getMinResultTime4Offering(dsOfferingId, session));
+        getCache().setMaxResultTimeForOffering(offeringId,
+                HibernateCriteriaQueryUtilities.getMaxResultTime4Offering(dsOfferingId, session));
     }
 
-    protected Map<ProcedureFlag, Set<String>> getProcedureIdentifierFrom(Collection<ObservationConstellation> set) {
+    protected Map<ProcedureFlag, Set<String>> getProcedureIdentifier(Session session) {
         Set<String> procedures = new HashSet<String>(0);
         Set<String> hiddenChilds = new HashSet<String>(0);
-        for (ObservationConstellation oc : set) {
-            if (oc.isHiddenChild()) {
-                hiddenChilds.add(CacheHelper.addPrefixOrGetProcedureIdentifier(oc.getProcedure().getIdentifier()));
-            } else {
-                procedures.add(CacheHelper.addPrefixOrGetProcedureIdentifier(oc.getProcedure().getIdentifier()));
+        if (CollectionHelper.isNotEmpty(getObservationConstellations())) {
+            for (ObservationConstellation oc : getObservationConstellations()) {
+                if (oc.isHiddenChild()) {
+                    hiddenChilds.add(CacheHelper.addPrefixOrGetProcedureIdentifier(oc.getProcedure().getIdentifier()));
+                } else {
+                    procedures.add(CacheHelper.addPrefixOrGetProcedureIdentifier(oc.getProcedure().getIdentifier()));
+                }
+            }
+        } else {
+            List<String> list = HibernateCriteriaQueryUtilities.getProcedureIdentifiersForOffering(getOffering().getIdentifier(), session);
+            if (list.size() > 1) {
+                throw new RuntimeException(String.format("There are more than one procedures defined for the offering '%s'!", getOffering().getIdentifier()));
+            }
+            for (String procedureIdentifier : list) {
+                procedures.add(CacheHelper.addPrefixOrGetProcedureIdentifier(procedureIdentifier));
             }
         }
         Map<ProcedureFlag, Set<String>> allProcedures = new HashMap<ProcedureFlag, Set<String>>();
@@ -175,29 +212,56 @@ class OfferingCacheUpdateTask extends RunnableAction {
     }
 
     protected Collection<String> getValidFeaturesOfInterestFrom(List<String> featureOfInterestIdentifiers) {
-       Set<String> features = new HashSet<String>(featureOfInterestIdentifiers.size());
-       for (String featureIdentifier : featureOfInterestIdentifiers) {
-           features.add(CacheHelper.addPrefixOrGetFeatureIdentifier(featureIdentifier));
-       }
-       return features;
-    }
-
-    protected Set<String> getObservablePropertyIdentifierFrom(Collection<ObservationConstellation> set) {
-        Set<String> observableProperties = new HashSet<String>(set.size());
-        for (ObservationConstellation oc : set) {
-            if (oc.getObservableProperty() != null) {
-                observableProperties.add(CacheHelper.addPrefixOrGetObservablePropertyIdentifier(oc.getObservableProperty().getIdentifier()));
-            }
+        Set<String> features = new HashSet<String>(featureOfInterestIdentifiers.size());
+        for (String featureIdentifier : featureOfInterestIdentifiers) {
+            features.add(CacheHelper.addPrefixOrGetFeatureIdentifier(featureIdentifier));
         }
-        return observableProperties;
+        return features;
     }
 
-    protected Set<String> getObservationTypesFrom(Collection<ObservationConstellation> set) {
-        Set<String> observationTypes = new HashSet<String>(set.size());
-        for (ObservationConstellation oc : set) {
-            if (oc.getObservationType() != null) {
-                observationTypes.add(oc.getObservationType().getObservationType());
+    protected Set<String> getObservablePropertyIdentifier(Session session) {
+        if (CollectionHelper.isNotEmpty(getObservationConstellations())) {
+            return DatasourceCacheUpdateHelper.getAllObservablePropertyIdentifiersFrom(getObservationConstellations());
+        } else {
+            Set<String> observableProperties = CollectionHelper.set();
+            List<String> list = HibernateCriteriaQueryUtilities.getObservablePropertyIdentifiersForOffering(getOffering().getIdentifier(), session);
+            for (String observablePropertyIdentifier : list) {
+                observableProperties.add(CacheHelper.addPrefixOrGetObservablePropertyIdentifier(observablePropertyIdentifier));
             }
+            return observableProperties;
+        }
+    }
+
+    protected Set<String> getObservationTypes(Session session) {
+        if (CollectionHelper.isNotEmpty(getObservationConstellations())) {
+            Set<String> observationTypes = CollectionHelper.set();
+            for (ObservationConstellation oc : getObservationConstellations()) {
+                if (oc.getObservationType() != null) {
+                    observationTypes.add(oc.getObservationType().getObservationType());
+                }
+            }
+            return observationTypes;
+        } else {
+           return getObservationTypesFromObservations(session); 
+        }
+    }
+
+    private Set<String> getObservationTypesFromObservations(Session session) {
+        Set<String> observationTypes = CollectionHelper.set();
+        if (HibernateCriteriaQueryUtilities.checkNumericObservationsFor(getOffering().getIdentifier(), session)){
+            observationTypes.add(OMConstants.OBS_TYPE_MEASUREMENT);
+        } else if (HibernateCriteriaQueryUtilities.checkCategoryObservationsFor(getOffering().getIdentifier(), session)) {
+            observationTypes.add(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION);
+        } else if (HibernateCriteriaQueryUtilities.checkCountObservationsFor(getOffering().getIdentifier(), session)) {
+            observationTypes.add(OMConstants.OBS_TYPE_COUNT_OBSERVATION);
+        } else if (HibernateCriteriaQueryUtilities.checkTextObservationsFor(getOffering().getIdentifier(), session)) {
+            observationTypes.add(OMConstants.OBS_TYPE_TEXT_OBSERVATION);
+        } else if (HibernateCriteriaQueryUtilities.checkBooleanObservationsFor(getOffering().getIdentifier(), session)) {
+            observationTypes.add(OMConstants.OBS_TYPE_TRUTH_OBSERVATION);
+        } else if (HibernateCriteriaQueryUtilities.checkBlobObservationsFor(getOffering().getIdentifier(), session)) {
+            observationTypes.add(OMConstants.OBS_TYPE_OBSERVATION);
+        } else if (HibernateCriteriaQueryUtilities.checkGeometryObservationsFor(getOffering().getIdentifier(), session)) {
+            observationTypes.add(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION);
         }
         return observationTypes;
     }
@@ -217,11 +281,11 @@ class OfferingCacheUpdateTask extends RunnableAction {
         }
         return obsTypes;
     }
-    
+
     private enum ProcedureFlag {
         PARENT, HIDDEN_CHILD;
     }
-    
+
     @Override
     public void execute() {
         try {
@@ -229,8 +293,9 @@ class OfferingCacheUpdateTask extends RunnableAction {
         } catch (OwsExceptionReport owse) {
             getErrors().add(owse);
         } catch (Exception e) {
-            getErrors().add(new GenericThrowableWrapperException(e)
-                    .withMessage("Error while processing offering cache update task!"));
+            getErrors().add(
+                    new GenericThrowableWrapperException(e)
+                            .withMessage("Error while processing offering cache update task!"));
         } finally {
             LOGGER.debug("OfferingTask finished, latch.countDown().");
             getCountDownLatch().countDown();

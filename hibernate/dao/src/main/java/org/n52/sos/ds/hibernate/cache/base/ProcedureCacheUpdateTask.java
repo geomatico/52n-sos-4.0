@@ -34,6 +34,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ds.hibernate.ThreadLocalSessionFactory;
+import org.n52.sos.ds.hibernate.cache.DatasourceCacheUpdateHelper;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
@@ -72,8 +73,8 @@ class ProcedureCacheUpdateTask extends RunnableAction {
         final String id = procedure.getIdentifier();
         final Set<ObservationConstellation> ocs = getObservationConstellations(session, procedure);
         cache.addProcedure(id);
-        cache.setOfferingsForProcedure(id, getOfferingIdentifiers(ocs));
-        cache.setObservablePropertiesForProcedure(id, getObservableProperties(ocs));
+        cache.setOfferingsForProcedure(id, getOfferingIdentifiers(ocs, session));
+        cache.setObservablePropertiesForProcedure(id, getObservableProperties(ocs, session));
         if (procedure instanceof TProcedure) {
             cache.addParentProcedures(id, getProcedureIdentifiers(((TProcedure)procedure).getParents()));
         }
@@ -107,12 +108,12 @@ class ProcedureCacheUpdateTask extends RunnableAction {
                 .add(Restrictions.eq(ObservationConstellation.PROCEDURE, procedure)).list());
     }
     
-    protected Set<String> getObservableProperties(Set<ObservationConstellation> set) {
-        Set<String> observableProperties = new HashSet<String>(set.size());
-        for (ObservationConstellation observationConstellation : set) {
-            observableProperties.add(observationConstellation.getObservableProperty().getIdentifier());
+    protected Set<String> getObservableProperties(Set<ObservationConstellation> set, Session session) {
+        if (CollectionHelper.isNotEmpty(set)) {
+            return DatasourceCacheUpdateHelper.getAllObservablePropertyIdentifiersFrom(set);
+        } else {
+            return CollectionHelper.asSet(HibernateCriteriaQueryUtilities.getObservablePropertyIdentifiersForProcedure(procedure.getIdentifier(), session));
         }
-        return observableProperties;
     }
 
     protected Set<String> getProcedureIdentifiers(Set<Procedure> procedures) {
@@ -133,12 +134,16 @@ class ProcedureCacheUpdateTask extends RunnableAction {
                 .list());
     }
     
-    protected Set<String> getOfferingIdentifiers(Set<ObservationConstellation> observationConstellations) {
-        Set<String> offerings = new HashSet<String>(observationConstellations.size());
-        for (ObservationConstellation oc : observationConstellations) {
-            offerings.add(oc.getOffering().getIdentifier());
+    protected Set<String> getOfferingIdentifiers(Set<ObservationConstellation> observationConstellations, Session session) {
+        if (CollectionHelper.isNotEmpty(observationConstellations)) {
+            Set<String> offerings = new HashSet<String>(observationConstellations.size());
+            for (ObservationConstellation oc : observationConstellations) {
+                offerings.add(oc.getOffering().getIdentifier());
+            }
+            return offerings;
+        } else {
+            return CollectionHelper.asSet(HibernateCriteriaQueryUtilities.getOfferingIdentifiersForProcedure(procedure.getIdentifier(), session));
         }
-        return offerings;
     }
     
 }

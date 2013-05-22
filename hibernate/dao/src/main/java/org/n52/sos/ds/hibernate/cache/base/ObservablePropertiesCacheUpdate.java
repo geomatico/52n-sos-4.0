@@ -25,13 +25,14 @@ package org.n52.sos.ds.hibernate.cache.base;
 
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getObservablePropertyObjects;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.DatasourceCacheUpdateHelper;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
+import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.util.CollectionHelper;
 
 /**
@@ -39,21 +40,18 @@ import org.n52.sos.util.CollectionHelper;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class ObservablePropertiesCacheUpdate extends AbstractDatasourceCacheUpdate {
-    protected Set<String> getProcedureIdentifiers(Set<ObservationConstellation> set) {
-        Set<String> procedures = new HashSet<String>(set.size());
-        for (ObservationConstellation oc : set) {
-            procedures.add(oc.getProcedure().getIdentifier());
-        }
-        return procedures;
-    }
-
     @Override
     public void execute() {
         for (ObservableProperty op : getObservablePropertyObjects(getSession())) {
             final String identifier = op.getIdentifier();
             final Set<ObservationConstellation> ocs = getObservationConstellations(op);
-            getCache().setOfferingsForObservableProperty(identifier, getAllOfferingIdentifiersFrom(ocs));
-            getCache().setProceduresForObservableProperty(identifier, getProcedureIdentifiers(ocs));
+            if (CollectionHelper.isNotEmpty(ocs)) {
+                getCache().setOfferingsForObservableProperty(identifier, DatasourceCacheUpdateHelper.getAllOfferingIdentifiersFrom(ocs));
+                getCache().setProceduresForObservableProperty(identifier, DatasourceCacheUpdateHelper.getAllProcedureIdentifiersFrom(ocs));
+            } else {
+                getCache().setOfferingsForObservableProperty(identifier, HibernateCriteriaQueryUtilities.getOfferingIdentifiersForObservableProperty(op.getIdentifier(), getSession()));
+                getCache().setProceduresForObservableProperty(identifier, HibernateCriteriaQueryUtilities.getProcedureIdentifiersForObservableProperty(op.getIdentifier(), getSession()));
+            }
         }
     }
    

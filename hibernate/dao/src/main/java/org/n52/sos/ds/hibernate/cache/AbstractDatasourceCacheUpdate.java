@@ -23,12 +23,8 @@
  */
 package org.n52.sos.ds.hibernate.cache;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.hibernate.Session;
 import org.n52.sos.ds.DatasourceCacheUpdate;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
@@ -44,11 +40,4 @@ public abstract class AbstractDatasourceCacheUpdate extends DatasourceCacheUpdat
         this.session = session;
     }
 
-    protected Set<String> getAllOfferingIdentifiersFrom(Set<ObservationConstellation> observationConstellations) {
-        Set<String> offerings = new HashSet<String>(observationConstellations.size());
-        for (ObservationConstellation oc : observationConstellations) {
-            offerings.add(oc.getOffering().getIdentifier());
-        }
-        return offerings;
-    }
 }

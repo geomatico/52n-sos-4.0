@@ -27,8 +27,7 @@ import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getO
 
 import java.util.List;
 
-import javax.print.DocFlavor.READER;
-
+import org.hibernate.Criteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.hibernate.cache.AbstractQueuingDatasourceCacheUpdate;
@@ -71,17 +70,21 @@ public class OfferingCacheUpdate extends AbstractQueuingDatasourceCacheUpdate<Of
         if (CollectionHelper.isNotEmpty(observationConstellation)) {
             // create runnable for offeringId
             Runnable task =
-                     new OfferingCacheUpdateTask(getCountDownLatch(), getSessionFactory(), getCache(), offering, getErrorList());
+                     new OfferingCacheUpdateTask().setCountDownLatch(getCountDownLatch()).setThreadLocalSessionFactory(getSessionFactory())
+                     .setWritableContentCache(getCache()).setOffering(offering).setErrorList(getErrorList())
+                     .setObservationConstellations(observationConstellation);
             // put runnable in executor service
             getExecutor().submit(task);
         } else {
-            Integer count = (Integer)getSession().createCriteria(Observation.class)
-            .add(Restrictions.eq(Observation.OFFERINGS, offering))
-            .setProjection(Projections.countDistinct(Observation.OFFERINGS)).uniqueResult();
+            Criteria criteria = getSession().createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
+            criteria.createCriteria(Observation.OFFERINGS).add(Restrictions.eq(Offering.IDENTIFIER, offering.getIdentifier()));
+            Long count = (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
             if (count > 0) {
              // create runnable for offeringId
                 Runnable task =
-                         new OfferingCacheUpdateTask(getCountDownLatch(), getSessionFactory(), getCache(), offering, getErrorList());
+                        new OfferingCacheUpdateTask().setCountDownLatch(getCountDownLatch()).setThreadLocalSessionFactory(getSessionFactory())
+                        .setWritableContentCache(getCache()).setOffering(offering).setErrorList(getErrorList())
+                        .setObservationConstellations(observationConstellation);
                 // put runnable in executor service
                 getExecutor().submit(task);
             } else {

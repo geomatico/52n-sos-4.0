@@ -40,14 +40,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class FeatureOfInterestCacheUpdate extends AbstractDatasourceCacheUpdate {
-    protected Set<String> getFeatureIdentifiers(Collection<FeatureOfInterest> featuresOfInterest) {
-        Set<String> featureList = new HashSet<String>(featuresOfInterest.size());
-        for (FeatureOfInterest featureOfInterest : featuresOfInterest) {
-            featureList.add(featureOfInterest.getIdentifier());
-        }
-        return featureList;
-    }
-
+    
     @Override
     public void execute() {
         // FIXME shouldn't the identifiers be translated using CacheHelper.addPrefixAndGetFeatureIdentifier()?
@@ -66,5 +59,13 @@ public class FeatureOfInterestCacheUpdate extends AbstractDatasourceCacheUpdate 
         } catch (OwsExceptionReport ex) {
             getErrors().add(ex);
         }
+    }
+
+    protected Set<String> getFeatureIdentifiers(Collection<FeatureOfInterest> featuresOfInterest) {
+        Set<String> featureList = new HashSet<String>(featuresOfInterest.size());
+        for (FeatureOfInterest featureOfInterest : featuresOfInterest) {
+            featureList.add(featureOfInterest.getIdentifier());
+        }
+        return featureList;
     }
 }

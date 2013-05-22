@@ -23,17 +23,17 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
-import static org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName.*;
-import static org.n52.sos.util.HTTPConstants.StatusCode.*;
+import static org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName.altitude;
+import static org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName.easting;
+import static org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName.northing;
+import static org.n52.sos.util.HTTPConstants.StatusCode.BAD_REQUEST;
+import static org.n52.sos.util.HTTPConstants.StatusCode.INTERNAL_SERVER_ERROR;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlObject;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -51,9 +51,9 @@ import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.TProcedure;
 import org.n52.sos.ds.hibernate.entities.TextObservation;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
+import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.exception.ows.concrete.XmlDecodingException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -72,7 +72,6 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
-import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
@@ -86,7 +85,9 @@ import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.JavaHelper;
+import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,6 +120,7 @@ public class HibernateProcedureConverter {
         }
 
         final String descriptionFormat = procedure.getProcedureDescriptionFormat().getProcedureDescriptionFormat();
+        checkOutputFormatWithDescriptionFormat(outputFormat, procedure.getProcedureDescriptionFormat().getProcedureDescriptionFormat(), procedureIdentifier);
         // check whether SMLFile or Url is set
         if (filename == null && xmlDoc == null) {
             final SensorML sml = new SensorML();
@@ -134,28 +136,46 @@ public class HibernateProcedureConverter {
             }
             sosProcedureDescription = sml;
         } else {
-            try {
+//            try {
                 if (filename != null && descriptionFormat != null && xmlDoc == null) {
-                    sosProcedureDescription =
-                            createProcedureDescriptionFromFile(procedureIdentifier, outputFormat, filename,
-                                    descriptionFormat);
+                    if (filename.startsWith("<")) {
+                        sosProcedureDescription =
+                                createProcedureDescriptionFromXml(procedureIdentifier, filename);
+                    } else {
+                        sosProcedureDescription =
+                                createProcedureDescriptionFromFile(procedureIdentifier, filename);
+                    }
                 } else {
                     sosProcedureDescription =
-                            createProcedureDescriptionFromXml(procedureIdentifier, outputFormat, xmlDoc);
+                            createProcedureDescriptionFromXml(procedureIdentifier, xmlDoc);
                 }
-            } catch (final IOException ioe) {
-                throw new NoApplicableCodeException().causedBy(ioe)
-                        .withMessage("An error occured while parsing the sensor description document!")
-                        .setStatus(INTERNAL_SERVER_ERROR);
-            } catch (final XmlException xmle) {
-                throw new XmlDecodingException("sensor description document", xmle)
-                        .setStatus(INTERNAL_SERVER_ERROR);
-            }
+//            } catch (final IOException ioe) {
+//                throw new NoApplicableCodeException().causedBy(ioe)
+//                        .withMessage("An error occured while parsing the sensor description document!")
+//                        .setStatus(INTERNAL_SERVER_ERROR);
+//            } catch (final XmlException xmle) {
+//                throw new XmlDecodingException("sensor description document", xmle)
+//                        .setStatus(INTERNAL_SERVER_ERROR);
+//            }
         }
         if (sosProcedureDescription != null) {
             sosProcedureDescription.setDescriptionFormat(descriptionFormat);
         }
         return sosProcedureDescription;
+    }
+
+    private void checkOutputFormatWithDescriptionFormat(String outputFormat, String procedureDescriptionFormat,
+            String procedureIdentifier) throws OwsExceptionReport {
+
+        if (StringHelper.isNullOrEmpty(procedureDescriptionFormat) || (!procedureDescriptionFormat.equalsIgnoreCase(outputFormat)
+                && !procedureDescriptionFormat.equalsIgnoreCase(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE))) {
+            throw new InvalidParameterValueException()
+                    .at(SosConstants.DescribeSensorParams.procedure)
+                    .withMessage("The value of the output format is wrong and has to be %s for procedure %s",
+                            procedureDescriptionFormat, procedureIdentifier).setStatus(BAD_REQUEST);
+        } else {
+            SosHelper.checkProcedureDescriptionFormat(procedureDescriptionFormat, "ProcedureDescriptionFormatFromDataSource");
+        }
     }
 
     private ProcessModel createSmlProcessModel(final Procedure procedure) throws OwsExceptionReport {
@@ -452,44 +472,19 @@ public class HibernateProcedureConverter {
     }
 
     private SosProcedureDescription createProcedureDescriptionFromXml(final String procedureIdentifier,
-            final String outputFormat, final String xmlDoc) throws IOException, XmlException {
-        final XmlObject procedureDescription = XmlObject.Factory.parse(xmlDoc);
-        SosProcedureDescription sosProcedureDescription;
-        try {
-            sosProcedureDescription = (SosProcedureDescription) CodingHelper.decodeXmlElement(procedureDescription);
+            final String xmlDoc) throws CodedException, OwsExceptionReport {
+            SosProcedureDescription sosProcedureDescription = (SosProcedureDescription) CodingHelper.decodeXmlElement(XmlHelper.parseXmlString(xmlDoc));
             sosProcedureDescription.setIdentifier(procedureIdentifier);
-        } catch (final OwsExceptionReport owse) {
-            sosProcedureDescription =
-                    new SosProcedureDescriptionUnknowType(procedureIdentifier, outputFormat,
-                            procedureDescription.xmlText());
-        }
-        return sosProcedureDescription;
+            return sosProcedureDescription;
     }
 
     private SosProcedureDescription createProcedureDescriptionFromFile(final String procedureIdentifier,
-            final String outputFormat, final String filename, final String descriptionFormat)
-            throws OwsExceptionReport, XmlException, IOException {
-        if (!descriptionFormat.equalsIgnoreCase(outputFormat)
-                && !descriptionFormat.equalsIgnoreCase(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
-            throw new InvalidParameterValueException()
-                    .at(SosConstants.DescribeSensorParams.procedure)
-                    .withMessage("The value of the output format is wrong and has to be %s for procedure %s",
-                            descriptionFormat, procedureIdentifier).setStatus(BAD_REQUEST);
-        }
-
+            final String filename) throws CodedException, OwsExceptionReport {
         // check if filename contains placeholder for configured
         // sensor directory
-        final XmlObject procedureDescription = XmlObject.Factory.parse(getDescribeSensorDocumentAsStream(filename));
-        SosProcedureDescription sosProcedureDescription;
-        try {
-            sosProcedureDescription = (SosProcedureDescription) CodingHelper.decodeXmlElement(procedureDescription);
+            SosProcedureDescription sosProcedureDescription = (SosProcedureDescription) CodingHelper.decodeXmlElement(XmlHelper.parseXmlString(StringHelper.convertStreamToString(getDescribeSensorDocumentAsStream(filename))));
             sosProcedureDescription.setIdentifier(procedureIdentifier);
-        } catch (final OwsExceptionReport owse) {
-            sosProcedureDescription =
-                    new SosProcedureDescriptionUnknowType(procedureIdentifier, outputFormat,
-                            procedureDescription.xmlText());
-        }
-        return sosProcedureDescription;
+            return sosProcedureDescription;
     }
 
     private InputStream getDescribeSensorDocumentAsStream(String filename) {

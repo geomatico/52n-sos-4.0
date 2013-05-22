@@ -37,9 +37,15 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
+import org.n52.sos.ds.hibernate.entities.BlobObservation;
+import org.n52.sos.ds.hibernate.entities.BooleanObservation;
+import org.n52.sos.ds.hibernate.entities.CategoryObservation;
 import org.n52.sos.ds.hibernate.entities.Codespace;
+import org.n52.sos.ds.hibernate.entities.CountObservation;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
+import org.n52.sos.ds.hibernate.entities.GeometryObservation;
+import org.n52.sos.ds.hibernate.entities.NumericObservation;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
@@ -52,6 +58,7 @@ import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.entities.TOffering;
 import org.n52.sos.ds.hibernate.entities.TProcedure;
+import org.n52.sos.ds.hibernate.entities.TextObservation;
 import org.n52.sos.ds.hibernate.entities.Unit;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
@@ -513,6 +520,28 @@ public class HibernateCriteriaQueryUtilities {
                 .add(Restrictions.eq(Offering.IDENTIFIER, offeringID));
         return c.list();
     }
+    
+    @SuppressWarnings("unchecked")
+    public static List<String> getProcedureIdentifiersForOffering(String offeringID, Session session) {
+        Criteria c = session.createCriteria(Observation.class)
+                .add(Restrictions.eq(Observation.DELETED, false));
+        c.createCriteria(Observation.PROCEDURE)
+                .setProjection(Projections.distinct(Projections.property(Procedure.IDENTIFIER)));
+        c.createCriteria(Observation.OFFERINGS)
+                .add(Restrictions.eq(Offering.IDENTIFIER, offeringID));
+        return c.list();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static List<String> getObservablePropertyIdentifiersForOffering(String offeringID, Session session) {
+        Criteria c = session.createCriteria(Observation.class)
+                .add(Restrictions.eq(Observation.DELETED, false));
+        c.createCriteria(Observation.OBSERVABLE_PROPERTY)
+                .setProjection(Projections.distinct(Projections.property(ObservableProperty.IDENTIFIER)));
+        c.createCriteria(Observation.OFFERINGS)
+                .add(Restrictions.eq(Offering.IDENTIFIER, offeringID));
+        return c.list();
+    }
 
     @SuppressWarnings("unchecked")
     public static List<String> getFeatureOfInterestIdentifiersForObservationConstellation(
@@ -719,6 +748,7 @@ public class HibernateCriteriaQueryUtilities {
                 .add(Restrictions.eq(Codespace.CODESPACE, codespace)).uniqueResult();
     }
 
+    @SuppressWarnings("unchecked")
     public static List<ObservationConstellation> getObservationConstellation(Procedure procedure, ObservableProperty observableProperty,
             Offering offering, Session session) {
          return session.createCriteria(ObservationConstellation.class)
@@ -727,6 +757,88 @@ public class HibernateCriteriaQueryUtilities {
         .add(Restrictions.eq(ObservationConstellation.OBSERVABLE_PROPERTY, observableProperty))
         .add(Restrictions.eq(ObservationConstellation.OFFERING, offering))
         .add(Restrictions.eq(ObservationConstellation.DELETED, false)).list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<String> getObservablePropertyIdentifiersForProcedure(String procedureID, Session session) {
+        Criteria c = session.createCriteria(Observation.class)
+                .add(Restrictions.eq(Observation.DELETED, false));
+        c.createCriteria(Observation.OBSERVABLE_PROPERTY)
+                .setProjection(Projections.distinct(Projections.property(ObservableProperty.IDENTIFIER)));
+        c.createCriteria(Observation.PROCEDURE)
+                .add(Restrictions.eq(Procedure.IDENTIFIER, procedureID));
+        return c.list();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static List<String> getOfferingIdentifiersForProcedure(String procedureID, Session session) {
+        Criteria c = session.createCriteria(Observation.class)
+                .add(Restrictions.eq(Observation.DELETED, false));
+        c.createCriteria(Observation.OFFERINGS)
+                .setProjection(Projections.distinct(Projections.property(Offering.IDENTIFIER)));
+        c.createCriteria(Observation.PROCEDURE)
+                .add(Restrictions.eq(Procedure.IDENTIFIER, procedureID));
+        return c.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Collection<String> getOfferingIdentifiersForObservableProperty(String observablePropertyID, Session session) {
+        Criteria c = session.createCriteria(Observation.class)
+                .add(Restrictions.eq(Observation.DELETED, false));
+        c.createCriteria(Observation.OFFERINGS)
+                .setProjection(Projections.distinct(Projections.property(Offering.IDENTIFIER)));
+        c.createCriteria(Observation.OBSERVABLE_PROPERTY)
+                .add(Restrictions.eq(ObservableProperty.IDENTIFIER, observablePropertyID));
+        return c.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Collection<String> getProcedureIdentifiersForObservableProperty(String observablePropertyID, Session session) {
+        Criteria c = session.createCriteria(Observation.class)
+                .add(Restrictions.eq(Observation.DELETED, false));
+        c.createCriteria(Observation.PROCEDURE)
+                .setProjection(Projections.distinct(Projections.property(Procedure.IDENTIFIER)));
+        c.createCriteria(Observation.OBSERVABLE_PROPERTY)
+                .add(Restrictions.eq(ObservableProperty.IDENTIFIER, observablePropertyID));
+        return c.list();
+    }
+
+    public static boolean checkNumericObservationsFor(String offeringID, Session session) {
+        return checkObservationFor(NumericObservation.class, offeringID, session);
+    }
+    
+    public static boolean checkBooleanObservationsFor(String offeringID, Session session) {
+        return checkObservationFor(BooleanObservation.class, offeringID, session);
+    }
+    
+    public static boolean checkCountObservationsFor(String offeringID, Session session) {
+        return checkObservationFor(CountObservation.class, offeringID, session);
+    }
+    
+    public static boolean checkCategoryObservationsFor(String offeringID, Session session) {
+        return checkObservationFor(CategoryObservation.class, offeringID, session);
+    }
+    
+    public static boolean checkTextObservationsFor(String offeringID, Session session) {
+        return checkObservationFor(TextObservation.class, offeringID, session);
+    }
+    
+    public static boolean checkBlobObservationsFor(String offeringID, Session session) {
+        return checkObservationFor(BlobObservation.class, offeringID, session);
+    }
+    
+    public static boolean checkGeometryObservationsFor(String offeringID, Session session) {
+        return checkObservationFor(GeometryObservation.class, offeringID, session);
+    }
+    
+    @SuppressWarnings("rawtypes") 
+    private static boolean checkObservationFor(Class clazz, String offeringID, Session session) {
+        Criteria c = session.createCriteria(clazz)
+                .add(Restrictions.eq(Observation.DELETED, false));
+        c.createCriteria(Observation.OFFERINGS)
+                .add(Restrictions.eq(Offering.IDENTIFIER, offeringID));
+        c.setMaxResults(1);
+        return c.list().size() == 1;
     }
 
 }
