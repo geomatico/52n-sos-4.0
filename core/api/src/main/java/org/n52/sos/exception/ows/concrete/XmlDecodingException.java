@@ -41,4 +41,9 @@ public class XmlDecodingException extends NoApplicableCodeException {
         withMessage("Error while decoding %s:\n%s", name, xml).causedBy(e);
         setStatus(INTERNAL_SERVER_ERROR);
     }
+    
+    public XmlDecodingException(final String name, final XmlException e) {
+        withMessage("Error while decoding %s", name).causedBy(e);
+        setStatus(INTERNAL_SERVER_ERROR);
+    }
 }
