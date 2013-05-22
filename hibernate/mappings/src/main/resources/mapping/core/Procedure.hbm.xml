@@ -19,7 +19,7 @@
         <property name="deleted" type="boolean">
             <column name="deleted" not-null="true" default="false"/>
         </property>
-        <property name="descriptionFile" type="string">
+        <property name="descriptionFile" type="org.hibernate.type.StringClobType">
             <column name="description_file" />
         </property>
         <!-- optional properties, used for automatic sensor description creation if available -->
