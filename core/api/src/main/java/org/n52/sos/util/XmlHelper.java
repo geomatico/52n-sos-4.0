@@ -31,8 +31,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
@@ -67,46 +65,34 @@ public final class XmlHelper {
 
     /**
      * Parse XML document from HTTP-Post request.
-      *
+     * 
      * @param request
      *            HTTP-Post request
      * @return XML document
-     *
-     * @throws OwsExceptionReport If an error occurs
+     * 
+     * @throws OwsExceptionReport
+     *             If an error occurs
      */
     public static XmlObject parseXmlSosRequest(HttpServletRequest request) throws OwsExceptionReport {
         XmlObject doc;
         try {
             if (request.getParameterMap().isEmpty()) {
-                String requestContent = convertStreamToString(request.getInputStream());
+                String requestContent = StringHelper.convertStreamToString(request.getInputStream(), request.getCharacterEncoding());
                 doc = XmlObject.Factory.parse(requestContent);
             } else {
                 doc =
-                XmlObject.Factory.parse(SosHelper.parseHttpPostBodyWithParameter(request.getParameterNames(),
-                                                                                 request.getParameterMap()));
+                        XmlObject.Factory.parse(SosHelper.parseHttpPostBodyWithParameter(request.getParameterNames(),
+                                request.getParameterMap()));
             }
         } catch (XmlException xmle) {
-            throw new NoApplicableCodeException().causedBy(xmle)
-                    .withMessage("An xml error occured when parsing the request! Message: %s", xmle.getMessage());
+            throw new NoApplicableCodeException().causedBy(xmle).withMessage(
+                    "An xml error occured when parsing the request! Message: %s", xmle.getMessage());
         } catch (IOException ioe) {
-            throw new NoApplicableCodeException().causedBy(ioe)
-                    .withMessage("Error while reading request! Message: %s", ioe.getMessage());
+            throw new NoApplicableCodeException().causedBy(ioe).withMessage(
+                    "Error while reading request! Message: %s", ioe.getMessage());
         }
         // validateDocument(doc);
         return doc;
-    }
-
-    private static String convertStreamToString(InputStream is) throws OwsExceptionReport {
-        try {
-            Scanner scanner = new Scanner(is).useDelimiter("\\A");
-            if (scanner.hasNext()) {
-                return scanner.next();
-            }
-        } catch (NoSuchElementException nsee) {
-            throw new NoApplicableCodeException().causedBy(nsee)
-                    .withMessage("Error while reading content of HTTP request: %s", nsee.getMessage());
-        }
-        return "";
     }
 
     /**
@@ -133,7 +119,8 @@ public final class XmlHelper {
      * @param doc
      *            the document which should be checked
      * 
-     * @throws OwsExceptionReport * if the Document is not valid
+     * @throws OwsExceptionReport
+     *             * if the Document is not valid
      */
     public static boolean validateDocument(XmlObject doc) throws OwsExceptionReport {
         // Create an XmlOptions instance and set the error listener.
@@ -174,13 +161,12 @@ public final class XmlHelper {
             CompositeOwsException exceptions = new CompositeOwsException();
             for (XmlError error : errors) {
 
-
                 // get name of the missing or invalid parameter
                 message = error.getMessage();
                 if (message != null) {
 
-                    exceptions.add(new InvalidRequestException().at(message)
-                            .withMessage("[XmlBeans validation error:] %s", message));
+                    exceptions.add(new InvalidRequestException().at(message).withMessage(
+                            "[XmlBeans validation error:] %s", message));
 
                     // TODO check if code can be used for validation of SOS
                     // 1.0.0 requests
@@ -300,8 +286,9 @@ public final class XmlHelper {
      * @param file
      *            File
      * @return XML document
-     *
-     * @throws OwsExceptionReport If an error occurs
+     * 
+     * @throws OwsExceptionReport
+     *             If an error occurs
      */
     public static XmlObject loadXmlDocumentFromFile(File file) throws OwsExceptionReport {
         InputStream is = null;
@@ -309,11 +296,11 @@ public final class XmlHelper {
             is = FileIOHelper.loadInputStreamFromFile(file);
             return XmlObject.Factory.parse(is);
         } catch (XmlException xmle) {
-            throw new NoApplicableCodeException().causedBy(xmle)
-                    .withMessage("Error while parsing file %s!", file.getName());
+            throw new NoApplicableCodeException().causedBy(xmle).withMessage("Error while parsing file %s!",
+                    file.getName());
         } catch (IOException ioe) {
-            throw new NoApplicableCodeException().causedBy(ioe)
-                    .withMessage("Error while parsing file %s!", file.getName());
+            throw new NoApplicableCodeException().causedBy(ioe).withMessage("Error while parsing file %s!",
+                    file.getName());
         } finally {
             if (is != null) {
                 try {
@@ -402,7 +389,7 @@ public final class XmlHelper {
                 return schemaTypeNamespace;
             }
         }
-        
+
     }
 
     private static String getSchemaTypeNamespace(XmlObject doc) {
@@ -461,22 +448,24 @@ public final class XmlHelper {
         } else {
             QName nameOfElement = substitutionElement.schemaType().getName();
             String localPart = nameOfElement.getLocalPart().replace("Type", "");
-            name = new QName(nameOfElement.getNamespaceURI(), localPart, getPrefixForNamespace(elementToSubstitute, nameOfElement.getNamespaceURI()));
+            name =
+                    new QName(nameOfElement.getNamespaceURI(), localPart, getPrefixForNamespace(elementToSubstitute,
+                            nameOfElement.getNamespaceURI()));
         }
         return substituteElement(elementToSubstitute, substitutionElement.schemaType(), name);
     }
-    
+
     public static String getPrefixForNamespace(XmlObject element, String namespace) {
         XmlCursor cursor = element.newCursor();
         String prefix = cursor.prefixForNamespace(namespace);
         cursor.dispose();
         return prefix;
     }
-    
+
     public static XmlObject substituteElement(XmlObject elementToSubstitute, SchemaType schemaType, QName name) {
         return elementToSubstitute.substitute(name, schemaType);
     }
-    
+
     public static String getLocalName(XmlObject element) {
         return (element == null) ? null : element.getDomNode().getLocalName();
     }
@@ -485,50 +474,50 @@ public final class XmlHelper {
     }
 
     /**
-     * Interface for providing exceptional cases in XML validation (e.g. substituation groups).
+     * Interface for providing exceptional cases in XML validation (e.g.
+     * substituation groups).
      */
     private enum LaxValidationCase {
         ABSTRACT_OFFERING {
             @Override
             public boolean shouldPass(XmlValidationError xve) {
-                return xve.getFieldQName() != null &&
-                         xve.getExpectedQNames() != null &&
-                         xve.getFieldQName().equals(SWEConstants.QN_OFFERING) &&
-                         xve.getExpectedQNames().contains(SWEConstants.QN_ABSTRACT_OFFERING) &&
-                         (xve.getMessage().contains(BEFORE_END_CONTENT_ELEMENT) || (xve.getOffendingQName() != null &&
-                                                                                    xve
-                        .getOffendingQName().equals(Sos2Constants.QN_OBSERVATION_OFFERING)));
+                return xve.getFieldQName() != null
+                        && xve.getExpectedQNames() != null
+                        && xve.getFieldQName().equals(SWEConstants.QN_OFFERING)
+                        && xve.getExpectedQNames().contains(SWEConstants.QN_ABSTRACT_OFFERING)
+                        && (xve.getMessage().contains(BEFORE_END_CONTENT_ELEMENT) || (xve.getOffendingQName() != null && xve
+                                .getOffendingQName().equals(Sos2Constants.QN_OBSERVATION_OFFERING)));
             }
         },
         /**
-         * Allow substitutions of gml:AbstractFeature. This lax validation lets pass every child, hence it checks not
-         * _if_ this is a valid substitution.
+         * Allow substitutions of gml:AbstractFeature. This lax validation lets
+         * pass every child, hence it checks not _if_ this is a valid
+         * substitution.
          */
         ABSTRACT_FEATURE_GML {
             @Override
             public boolean shouldPass(XmlValidationError xve) {
-                return xve.getExpectedQNames() != null &&
-                         (xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_FEATURE_GML) || xve
-                        .getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_FEATURE_GML_32));
+                return xve.getExpectedQNames() != null
+                        && (xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_FEATURE_GML) || xve
+                                .getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_FEATURE_GML_32));
             }
         },
         ABSTRACT_TIME_GML_3_2_1 {
             @Override
             public boolean shouldPass(XmlValidationError xve) {
-                return xve.getExpectedQNames() != null &&
-                         xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_TIME_32);
+                return xve.getExpectedQNames() != null
+                        && xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_TIME_32);
             }
         },
         SOS_INSERTION_META_DATA {
             @Override
             public boolean shouldPass(XmlValidationError xve) {
-                return xve.getFieldQName() != null &&
-                         xve.getExpectedQNames() != null &&
-                         xve.getFieldQName().equals(SWEConstants.QN_METADATA) &&
-                         xve.getExpectedQNames().contains(SWEConstants.QN_INSERTION_METADATA) &&
-                         (xve.getMessage().contains(BEFORE_END_CONTENT_ELEMENT) || (xve.getOffendingQName() != null &&
-                                                                                    xve
-                        .getOffendingQName().equals(Sos2Constants.QN_SOS_INSERTION_METADATA)));
+                return xve.getFieldQName() != null
+                        && xve.getExpectedQNames() != null
+                        && xve.getFieldQName().equals(SWEConstants.QN_METADATA)
+                        && xve.getExpectedQNames().contains(SWEConstants.QN_INSERTION_METADATA)
+                        && (xve.getMessage().contains(BEFORE_END_CONTENT_ELEMENT) || (xve.getOffendingQName() != null && xve
+                                .getOffendingQName().equals(Sos2Constants.QN_SOS_INSERTION_METADATA)));
             }
         };
         private static final String BEFORE_END_CONTENT_ELEMENT = "before the end of the content in element";
@@ -537,37 +526,43 @@ public final class XmlHelper {
     }
 
     /**
-     * Utility method to append the contents of the child docment to the end of the parent XmlObject.
-     * This is useful when dealing with elements without generated methods (like elements with xs:any)
+     * Utility method to append the contents of the child docment to the end of
+     * the parent XmlObject. This is useful when dealing with elements without
+     * generated methods (like elements with xs:any)
      * 
-     * @param parent Parent to append contents to
-     * @param childDoc Xml document containing contents to be appended
+     * @param parent
+     *            Parent to append contents to
+     * @param childDoc
+     *            Xml document containing contents to be appended
      */
-    public static void append( XmlObject parent, XmlObject childDoc ){
+    public static void append(XmlObject parent, XmlObject childDoc) {
         XmlCursor parentCursor = parent.newCursor();
         parentCursor.toEndToken();
 
         XmlCursor childCursor = childDoc.newCursor();
         childCursor.toFirstChild();
-        
-        childCursor.moveXml( parentCursor );
+
+        childCursor.moveXml(parentCursor);
         parentCursor.dispose();
         childCursor.dispose();
     }
-    
+
     /**
-     * Remove namespace declarations from an xml fragment (useful for moving all declarations to a document root
-     * @param x The fragment to localize
+     * Remove namespace declarations from an xml fragment (useful for moving all
+     * declarations to a document root
+     * 
+     * @param x
+     *            The fragment to localize
      */
-    public static void removeNamespaces( XmlObject x ){
-        XmlCursor c = x.newCursor(); 
-        while( c.hasNextToken() ){
-            if( c.isNamespace() ){ 
-                c.removeXml(); 
-            } else {                
-                c.toNextToken(); 
-            } 
-        } 
-        c.dispose(); 
-    }    
+    public static void removeNamespaces(XmlObject x) {
+        XmlCursor c = x.newCursor();
+        while (c.hasNextToken()) {
+            if (c.isNamespace()) {
+                c.removeXml();
+            } else {
+                c.toNextToken();
+            }
+        }
+        c.dispose();
+    }
 }
