@@ -176,7 +176,7 @@ public class HibernateObservationBuilder {
             tOffering.setName(OFFERING_1);
             tOffering.setObservationTypes(Collections.singleton(getObservationType()));
             tOffering.setRelatedFeatures(null);
-            session.save(offering);
+            session.save(tOffering);
             session.flush();
             return tOffering;
         }
@@ -195,7 +195,7 @@ public class HibernateObservationBuilder {
             tOffering.setName(OFFERING_2);
             tOffering.setObservationTypes(Collections.singleton(getObservationType()));
             tOffering.setRelatedFeatures(null);
-            session.save(offering);
+            session.save(tOffering);
             session.flush();
             return tOffering;
         }
@@ -243,10 +243,10 @@ public class HibernateObservationBuilder {
             tProcedure.setProcedureDescriptionFormat(getProcedureDescriptionFormat());
             tProcedure.setChilds(null);
             tProcedure.setParents(null);
-            session.save(procedure);
+            session.save(tProcedure);
             session.flush();
             tProcedure.setValidProcedureTimes(Collections.singleton(getValidProcedureTime()));
-            session.update(procedure);
+            session.update(tProcedure);
             session.flush();
             return tProcedure;
         }
