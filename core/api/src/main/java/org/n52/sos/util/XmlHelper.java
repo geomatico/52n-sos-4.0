@@ -42,6 +42,7 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlValidationError;
+import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.swes.InvalidRequestException;
 import org.n52.sos.ogc.gml.GMLConstants;
@@ -78,7 +79,7 @@ public final class XmlHelper {
         try {
             if (request.getParameterMap().isEmpty()) {
                 String requestContent = StringHelper.convertStreamToString(request.getInputStream(), request.getCharacterEncoding());
-                doc = XmlObject.Factory.parse(requestContent);
+                doc = parseXmlString(requestContent);
             } else {
                 doc =
                         XmlObject.Factory.parse(SosHelper.parseHttpPostBodyWithParameter(request.getParameterNames(),
@@ -93,6 +94,15 @@ public final class XmlHelper {
         }
         // validateDocument(doc);
         return doc;
+    }
+
+    public static XmlObject parseXmlString(String xmlString) throws CodedException {
+        try {
+            return XmlObject.Factory.parse(xmlString);
+        } catch (XmlException xmle) {
+            throw new NoApplicableCodeException().causedBy(xmle).withMessage(
+                    "An xml error occured when parsing the request! Message: %s", xmle.getMessage());
+        }
     }
 
     /**
