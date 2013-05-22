@@ -385,7 +385,7 @@ public class SosHelper {
     /**
      * checks whether the value of outputFormat parameter is valid
      * 
-     * @param procedureDecriptionFormat
+     * @param procedureDescriptionFormat
      *            the procedureDecriptionFormat parameter which should be checked
      * @param parameterName
      *            the parameter name
@@ -393,14 +393,14 @@ public class SosHelper {
      *
      * @throws OwsExceptionReport if the value of the procedureDecriptionFormat is incorrect
      */
-    public static void checkProcedureDescriptionFormat(final String procedureDecriptionFormat, final String parameterName) throws
+    public static void checkProcedureDescriptionFormat(final String procedureDescriptionFormat, final String parameterName) throws
             OwsExceptionReport {
-        if ((procedureDecriptionFormat == null) || procedureDecriptionFormat.isEmpty()
-            || procedureDecriptionFormat.equals(SosConstants.PARAMETER_NOT_SET)) {
+        if (StringHelper.isNullOrEmpty(procedureDescriptionFormat)
+            || procedureDescriptionFormat.equals(SosConstants.PARAMETER_NOT_SET)) {
             throw new MissingProcedureDescriptionFormatException();
         }
-        if (!CodingRepository.getInstance().getAllProcedureDescriptionFormats().contains(procedureDecriptionFormat)) {
-        	throw new InvalidParameterValueException(parameterName, procedureDecriptionFormat);
+        if (!CodingRepository.getInstance().getAllProcedureDescriptionFormats().contains(procedureDescriptionFormat)) {
+        	throw new InvalidParameterValueException(parameterName, procedureDescriptionFormat);
         }
     }
 
