@@ -24,6 +24,7 @@
 package org.n52.sos;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -44,8 +45,8 @@ import org.hibernate.spatial.dialect.postgis.PostgisDialect;
  */
 public class SQLScriptGenerator {
 
-    private Dialect getDialect(int selction) throws Exception {
-        switch (selction) {
+    private Dialect getDialect(int selection) throws Exception {
+        switch (selection) {
         case 1:
             return new PostgisDialect();
         case 2:
@@ -57,7 +58,22 @@ public class SQLScriptGenerator {
         }
     }
 
-    private int getSelection() throws IOException {
+    private void setDirectoriesForModelSelection(int selection, Configuration configuration) throws Exception {
+        switch (selection) {
+        case 1:
+            SQLScriptGenerator.class.getResource("/mapping/core");
+            configuration.addDirectory(new File(SQLScriptGenerator.class.getResource("/mapping/core").toURI()));
+            break;
+        case 2:
+            configuration.addDirectory(new File(SQLScriptGenerator.class.getResource("/mapping/core").toURI()));
+            configuration.addDirectory(new File(SQLScriptGenerator.class.getResource("/mapping/transactional").toURI()));
+            break;
+        default:
+            throw new Exception("The entered value is invalid!");
+        }
+    }
+
+    private int getDialectSelection() throws IOException {
         System.out.println("This SQL script generator supports:");
         System.out.println("1   PostGIS");
         System.out.println("2   Oracle");
@@ -71,12 +87,27 @@ public class SQLScriptGenerator {
         return Integer.parseInt(selection);
     }
 
+    private int getModelSelection() throws IOException {
+        System.out.println("Which database model should be created:");
+        System.out.println("1   Core");
+        System.out.println("2   Transcational");
+        System.out.println();
+        System.out.println("Enter your selection: ");
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String selection = null;
+        selection = br.readLine();
+        return Integer.parseInt(selection);
+    }
+
     public static void main(String[] args) {
         try {
             SQLScriptGenerator sqlScriptGenerator = new SQLScriptGenerator();
             Configuration configuration = new Configuration().configure("/sos-hibernate.cfg.xml");
-            int selection = sqlScriptGenerator.getSelection();
-            Dialect dia = sqlScriptGenerator.getDialect(selection);
+            int dialectSelection = sqlScriptGenerator.getDialectSelection();
+            Dialect dia = sqlScriptGenerator.getDialect(dialectSelection);
+            int modelSelection = sqlScriptGenerator.getModelSelection();
+            sqlScriptGenerator.setDirectoriesForModelSelection(modelSelection, configuration);
             // create script
             String[] create = configuration.generateSchemaCreationScript(dia);
             System.out.println();
