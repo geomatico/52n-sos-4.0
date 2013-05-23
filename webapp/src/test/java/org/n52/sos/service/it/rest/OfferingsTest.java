@@ -70,7 +70,7 @@ public class OfferingsTest extends RestBindingTest {
 	{
 		final Node xbResponse = getResponseAsNode(getOfferings());
 		
-		assertThat(xbResponse, hasXPath(offeringsLink(CONFIG.getResourceRelationSelf(), CONFIG.getResourceOfferings()), NS_CTXT));
+		assertThat(xbResponse, hasXPath(offeringsLink(REST_CONFIG.getResourceRelationSelf(), REST_CONFIG.getResourceOfferings()), NS_CTXT));
 	}
 	
 	@Test
@@ -91,7 +91,7 @@ public class OfferingsTest extends RestBindingTest {
 
 	private MockHttpServletResponse getOfferings()
 	{
-		return getResource(CONFIG.getResourceOfferings());
+		return getResource(REST_CONFIG.getResourceOfferings());
 	}
 	
 }

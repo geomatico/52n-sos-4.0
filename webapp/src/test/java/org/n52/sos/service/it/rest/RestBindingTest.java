@@ -23,14 +23,41 @@
  */
 package org.n52.sos.service.it.rest;
 
+import static org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName.*;
 import static org.n52.sos.service.it.RequestBuilder.get;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.xml.namespace.NamespaceContext;
 
+import net.opengis.sensorML.x101.SystemType;
+import net.opengis.sosREST.x10.SensorDocument;
+
 import org.n52.sos.binding.rest.Constants;
+import org.n52.sos.encode.SensorMLEncoderv101;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sensorML.SensorMLConstants;
+import org.n52.sos.ogc.sensorML.System;
+import org.n52.sos.ogc.sensorML.elements.SosSMLCapabilities;
+import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
+import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
+import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
+import org.n52.sos.ogc.swe.SosSweCoordinate;
+import org.n52.sos.ogc.swe.SosSweField;
+import org.n52.sos.ogc.swe.SosSweSimpleDataRecord;
+import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SosSweObservableProperty;
+import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
+import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.service.it.AbstractTransactionalTestv2;
 import org.n52.sos.service.it.SosNamespaceContext;
+import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.JavaHelper;
+import org.n52.sos.util.XmlOptionsHelper;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
@@ -43,15 +70,17 @@ public class RestBindingTest extends AbstractTransactionalTestv2{
 	protected static final String REST_URL = "/rest";
 	protected static final String CONTENT_TYPE = "application/gml+xml";
 	protected static final NamespaceContext NS_CTXT = new SosNamespaceContext();
-	protected static final Constants CONFIG = Constants.getInstance();
+	protected static final Constants REST_CONFIG = Constants.getInstance();
 	protected static final Configurator SOS_CONFIG = Configurator.getInstance();
+	protected static final ServiceConfiguration SERVICE_CONFIG = ServiceConfiguration.getInstance();
+
 	
-	protected String link(final String relType, final String resType)
+	protected String link(final String relType, final String resTypeWithOrWithoutId)
 	{
 		return "sosREST:link[" +
-				"@rel='" + CONFIG.getEncodingNamespace() + "/" + relType + "'" +
+				"@rel='" + REST_CONFIG.getEncodingNamespace() + "/" + relType + "'" +
 				" and " + 
-				"@href='" + CONFIG.getServiceUrl() + REST_URL + "/" + resType + "'" +
+				"@href='" + REST_CONFIG.getServiceUrl() + REST_URL + "/" + resTypeWithOrWithoutId + "'" +
 				" and " + 
 				"@type='" + CONTENT_TYPE + "'" +		
 				"]";
@@ -60,5 +89,78 @@ public class RestBindingTest extends AbstractTransactionalTestv2{
 	protected MockHttpServletResponse getResource(final String resType)
 	{
 		return execute(	get(REST_URL + "/" + resType).accept(CONTENT_TYPE));
+	}
+
+	protected String createRestSensor(final String sensorId,
+			final String offeringId) throws OwsExceptionReport
+	{
+		final System system = (System) new System()
+		.setPosition(new SosSMLPosition("test-sensor-position",true,SERVICE_CONFIG.getSrsNamePrefixSosV2()+4326,createCoordinates(52.0,7.5,42.0)))
+		.setInputs(createInputList("test-observable-property"))
+		.setOutputs(createOutputList("test-observable-property"))
+		.setIdentifications(createIdentifications(sensorId,offeringId))
+		.addCapabilities(new SosSMLCapabilities("InsertionMetadata", 
+				new SosSweSimpleDataRecord()
+						.addField(new SosSweField("sos:ObservationType", 
+								new SosSweText().setValue("http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement")))
+						.addField(new SosSweField("sos:FeatureOfInterestType",
+								new SosSweText().setValue("http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint")))))
+		.setIdentifier(sensorId);
+		final SystemType xbSystem = (SystemType) new SensorMLEncoderv101().encode(system);
+		final SensorDocument restSensor = SensorDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+		final SystemType substitute = (SystemType) restSensor.addNewSensor().addNewProcess().substitute(SensorMLConstants.SYSTEM_QNAME, SystemType.type);
+		substitute.set(xbSystem);
+		return restSensor.xmlText();
+	}
+
+	private List<SosSMLIdentifier> createIdentifications(final String sensorId,
+			final String offeringId)
+	{
+		return CollectionHelper.asList(new SosSMLIdentifier("uniqueId", "urn:ogc:def:identifier:OGC:1.0:uniqueID", sensorId), 
+				new SosSMLIdentifier("offerings", "urn:ogc:def:identifier:OGC:offeringID", offeringId));
+	}
+
+	private List<SosSMLIo<?>> createOutputList(final String string)
+	{
+		final SosSMLIo<Double> quanti = new SosSMLIo<Double>(
+				(SosSweQuantity) new SosSweQuantity()
+				.setUom("m")
+				.setDefinition("http://www.52north.org/test/observableProperty/42")
+				.setIdentifier("test-observable-property"));
+		final List<SosSMLIo<?>> outputs = new ArrayList<SosSMLIo<?>>(1);
+		outputs.add(quanti);
+		return Collections.unmodifiableList(outputs);
+	}
+
+	private List<SosSMLIo<?>> createInputList(final String string)
+	{
+		final SosSMLIo<String> io = new SosSMLIo<String>(
+				(SosSweObservableProperty) new SosSweObservableProperty()
+				.setDefinition("http://www.52north.org/test/observableProperty/42")
+				.setIdentifier("test-observable-property"));
+		final List<SosSMLIo<?>> inputs = new ArrayList<SosSMLIo<?>>(1);
+		inputs.add(io);
+		return Collections.unmodifiableList(inputs);
+	}
+
+	private List<SosSweCoordinate<?>> createCoordinates(final double latitude,
+			final double longitude,
+			final double altitudeV)
+	{
+		final List<SosSweCoordinate<?>> sweCoordinates = new ArrayList<SosSweCoordinate<?>>(3);
+	    sweCoordinates.add(new SosSweCoordinate<Double>(northing, createSweQuantity(latitude, "y", "deg")));
+	    sweCoordinates.add(new SosSweCoordinate<Double>(easting, createSweQuantity(longitude, "x", "deg")));
+	    sweCoordinates.add(new SosSweCoordinate<Double>(altitude, createSweQuantity(altitudeV, "z", "m")));
+	    return sweCoordinates;
+	}
+
+	private SosSweAbstractSimpleType<Double> createSweQuantity(final Double value,
+			final String asixID,
+			final String uom)
+	{
+		return new SosSweQuantity()
+		.setValue(JavaHelper.asDouble(value))
+		.setAxisID(asixID)
+		.setUom(uom);
 	}
 }

@@ -87,7 +87,7 @@ public class CapabilitiesTest extends RestBindingTest {
 	{
 		final Node response = getResponseAsNode(getCapabilities());
 		
-		assertThat(response, hasXPath(capabilitiesLink(CONFIG.getResourceRelationSelf(),CONFIG.getResourceCapabilities()),NS_CTXT));
+		assertThat(response, hasXPath(capabilitiesLink(REST_CONFIG.getResourceRelationSelf(),REST_CONFIG.getResourceCapabilities()),NS_CTXT));
 	}
 	
 	@Test
@@ -95,7 +95,7 @@ public class CapabilitiesTest extends RestBindingTest {
 	{
 		final Node response = getResponseAsNode(getCapabilities());
 		
-		assertThat(response, hasXPath(capabilitiesLink(CONFIG.getResourceRelationOfferingsGet(), CONFIG.getResourceOfferings()),NS_CTXT));
+		assertThat(response, hasXPath(capabilitiesLink(REST_CONFIG.getResourceRelationOfferingsGet(), REST_CONFIG.getResourceOfferings()),NS_CTXT));
 	}
 
 	@Test
@@ -103,7 +103,7 @@ public class CapabilitiesTest extends RestBindingTest {
 	{
 		final Node response = getResponseAsNode(getCapabilities());
 		
-		assertThat(response, hasXPath(capabilitiesLink(CONFIG.getResourceRelationFeaturesGet(), CONFIG.getResourceFeatures()),NS_CTXT));
+		assertThat(response, hasXPath(capabilitiesLink(REST_CONFIG.getResourceRelationFeaturesGet(), REST_CONFIG.getResourceFeatures()),NS_CTXT));
 	}
 	
 	@Test
@@ -111,7 +111,7 @@ public class CapabilitiesTest extends RestBindingTest {
 	{
 		final Node response = getResponseAsNode(getCapabilities());
 		
-		assertThat(response, hasXPath(capabilitiesLink(CONFIG.getResourceRelationSensorCreate(), CONFIG.getResourceSensors()),NS_CTXT));
+		assertThat(response, hasXPath(capabilitiesLink(REST_CONFIG.getResourceRelationSensorCreate(), REST_CONFIG.getResourceSensors()),NS_CTXT));
 	}
 	
 	@Test
@@ -119,7 +119,7 @@ public class CapabilitiesTest extends RestBindingTest {
 	{
 		final Node response = getResponseAsNode(getCapabilities());
 		
-		assertThat(response, hasXPath(capabilitiesLink(CONFIG.getResourceRelationSensorsGet(), CONFIG.getResourceSensors()),NS_CTXT));
+		assertThat(response, hasXPath(capabilitiesLink(REST_CONFIG.getResourceRelationSensorsGet(), REST_CONFIG.getResourceSensors()),NS_CTXT));
 	}
 	
 	@Test
@@ -127,7 +127,7 @@ public class CapabilitiesTest extends RestBindingTest {
 	{
 		final Node response = getResponseAsNode(getCapabilities());
 		
-		assertThat(response, hasXPath(capabilitiesLink(CONFIG.getResourceRelationObservationCreate(), CONFIG.getResourceObservations()),NS_CTXT));
+		assertThat(response, hasXPath(capabilitiesLink(REST_CONFIG.getResourceRelationObservationCreate(), REST_CONFIG.getResourceObservations()),NS_CTXT));
 	}
 	
 	@Test
@@ -135,12 +135,12 @@ public class CapabilitiesTest extends RestBindingTest {
 	{
 		final Node response = getResponseAsNode(getCapabilities());
 		
-		assertThat(response, hasXPath(capabilitiesLink(CONFIG.getResourceRelationObservationGet(), CONFIG.getResourceObservations()),NS_CTXT));
+		assertThat(response, hasXPath(capabilitiesLink(REST_CONFIG.getResourceRelationObservationGet(), REST_CONFIG.getResourceObservations()),NS_CTXT));
 	}
 	
 	private MockHttpServletResponse getCapabilities()
 	{
-		return getResource(CONFIG.getResourceCapabilities());
+		return getResource(REST_CONFIG.getResourceCapabilities());
 	}
 
 	private String capabilitiesLink(final String relType, final String resType)
