@@ -35,7 +35,7 @@ import org.n52.sos.ogc.om.TimeValuePair;
 import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.CountValue;
-import org.n52.sos.ogc.om.values.IValue;
+import org.n52.sos.ogc.om.values.Value;
 import org.n52.sos.ogc.om.values.NilTemplateValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
@@ -137,7 +137,7 @@ public final class SweHelper {
         return dataArray;
     }
 
-    private static SosSweAbstractDataComponent createElementType(IValue<?> iValue, String name) {
+    private static SosSweAbstractDataComponent createElementType(Value<?> iValue, String name) {
         SosSweDataRecord dataRecord = new SosSweDataRecord();
         dataRecord.addField(getPhenomenonTimeField());
         dataRecord.addField(getFieldForValue(iValue, name));
@@ -151,13 +151,13 @@ public final class SweHelper {
         return new SosSweField(OMConstants.PHENOMENON_TIME_NAME, time);
     }
 
-    private static SosSweField getFieldForValue(IValue<?> iValue, String name) {
+    private static SosSweField getFieldForValue(Value<?> iValue, String name) {
         SosSweAbstractDataComponent value = getValue(iValue);
         value.setDefinition(name);
         return new SosSweField(name, value);
     }
 
-    private static SosSweAbstractDataComponent getValue(IValue<?> iValue) {
+    private static SosSweAbstractDataComponent getValue(Value<?> iValue) {
         if (iValue instanceof BooleanValue) {
             return new SosSweBoolean();
         } else if (iValue instanceof CategoryValue) {
@@ -203,7 +203,7 @@ public final class SweHelper {
     }
 
     private static List<String> createBlock(SosSweAbstractDataComponent elementType, ITime phenomenonTime,
-            String phenID, IValue<?> value) {
+            String phenID, Value<?> value) {
         if (elementType instanceof SosSweDataRecord) {
             SosSweDataRecord elementTypeRecord = (SosSweDataRecord) elementType;
             List<String> block = new ArrayList<String>(elementTypeRecord.getFields().size());

@@ -68,7 +68,7 @@ public class SosObservation implements Serializable {
     /**
      * Map with observation values for each obsservableProeprty
      */
-    private IObservationValue<?> value;
+    private ObservationValue<?> value;
     
     private String setId;
 
@@ -284,7 +284,7 @@ public class SosObservation implements Serializable {
      * 
      * @return the values
      */
-    public IObservationValue<?> getValue() {
+    public ObservationValue<?> getValue() {
         return value;
     }
 
@@ -294,7 +294,7 @@ public class SosObservation implements Serializable {
      * @param value 
      *            the values to set
      */
-    public void setValue(IObservationValue<?> value) {
+    public void setValue(ObservationValue<?> value) {
         this.value = value;
     }
 

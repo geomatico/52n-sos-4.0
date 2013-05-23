@@ -28,7 +28,7 @@ import org.n52.sos.ogc.gml.time.ITime;
 /*
  * FIXME rename (remove the leading I)
  */
-public interface IMultiValue<T> extends IValue<T> {
+public interface IMultiValue<T> extends Value<T> {
     
     ITime getPhenomenonTime();
     

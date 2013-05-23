@@ -24,15 +24,15 @@
 package org.n52.sos.ogc.om;
 
 import org.n52.sos.ogc.gml.time.ITime;
-import org.n52.sos.ogc.om.values.IValue;
+import org.n52.sos.ogc.om.values.Value;
 
 public class TimeValuePair implements Comparable<TimeValuePair> {
     
     private ITime time;
     
-    private IValue<?> value;
+    private Value<?> value;
 
-    public TimeValuePair(ITime time, IValue<?> value) {
+    public TimeValuePair(ITime time, Value<?> value) {
         this.time = time;
         this.value = value;
     }
@@ -41,7 +41,7 @@ public class TimeValuePair implements Comparable<TimeValuePair> {
         return time;
     }
 
-    public IValue<?> getValue() {
+    public Value<?> getValue() {
         return value;
     }
 
@@ -49,7 +49,7 @@ public class TimeValuePair implements Comparable<TimeValuePair> {
         this.time = time;
     }
 
-    public void setValue(IValue<?> value) {
+    public void setValue(Value<?> value) {
         this.value = value;
     }
 

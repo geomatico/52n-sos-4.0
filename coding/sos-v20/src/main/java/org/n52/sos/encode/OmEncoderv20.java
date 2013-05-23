@@ -61,7 +61,7 @@ import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.CountValue;
 import org.n52.sos.ogc.om.values.GeometryValue;
-import org.n52.sos.ogc.om.values.IValue;
+import org.n52.sos.ogc.om.values.Value;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -262,7 +262,7 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
         return null;
     }
 
-    private XmlObject getNamedValueValue(IValue<?> iValue) throws OwsExceptionReport {
+    private XmlObject getNamedValueValue(Value<?> iValue) throws OwsExceptionReport {
         if (iValue instanceof BooleanValue) {
             BooleanValue booleanValue = (BooleanValue) iValue;
             XmlBoolean xbBoolean = XmlBoolean.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());

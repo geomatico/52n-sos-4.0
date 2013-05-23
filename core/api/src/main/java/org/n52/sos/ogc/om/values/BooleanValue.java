@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.om.values;
 
-public class BooleanValue implements IValue<Boolean> {
+public class BooleanValue implements Value<Boolean> {
     private static final long serialVersionUID = 3752649909580561689L;
 
     private Boolean value;

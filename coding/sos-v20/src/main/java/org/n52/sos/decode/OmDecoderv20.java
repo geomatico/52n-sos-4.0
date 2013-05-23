@@ -43,7 +43,7 @@ import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.AbstractSosPhenomenon;
-import org.n52.sos.ogc.om.IObservationValue;
+import org.n52.sos.ogc.om.ObservationValue;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosMultiObservationValues;
 import org.n52.sos.ogc.om.SosObservableProperty;
@@ -259,9 +259,9 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
         return null;
     }
 
-    private IObservationValue<?> getObservationValue(OMObservationType omObservation) throws OwsExceptionReport {
+    private ObservationValue<?> getObservationValue(OMObservationType omObservation) throws OwsExceptionReport {
         ITime phenomenonTime = getPhenomenonTime(omObservation);
-        IObservationValue<?> observationValue;
+        ObservationValue<?> observationValue;
         if (phenomenonTime.getIndeterminateValue() != null 
                 && phenomenonTime.getIndeterminateValue().equals("template")) {
             observationValue = new SosSingleObservationValue<String>(new NilTemplateValue());
@@ -272,7 +272,7 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
         return observationValue;
     }
 
-    private IObservationValue<?> getResult(OMObservationType omObservation) throws OwsExceptionReport {
+    private ObservationValue<?> getResult(OMObservationType omObservation) throws OwsExceptionReport {
         // TruthObservation
         if (omObservation.getResult().schemaType() == XmlBoolean.type) {
             XmlBoolean xbBoolean = (XmlBoolean) omObservation.getResult();
@@ -294,8 +294,8 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
         // result elements with other encoding like SWE_ARRAY_OBSERVATION
         else {
             Object decodedObject = CodingHelper.decodeXmlObject(omObservation.getResult());
-            if (decodedObject instanceof IObservationValue) {
-                return (IObservationValue) decodedObject;
+            if (decodedObject instanceof ObservationValue) {
+                return (ObservationValue) decodedObject;
             } else if (decodedObject instanceof SosSweDataArray) {
                     SosMultiObservationValues<SosSweDataArray> result = new SosMultiObservationValues<SosSweDataArray>();
                     SweDataArrayValue value = new SweDataArrayValue();

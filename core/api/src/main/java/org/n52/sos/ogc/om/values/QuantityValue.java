@@ -25,7 +25,7 @@ package org.n52.sos.ogc.om.values;
 
 import java.math.BigDecimal;
 
-public class QuantityValue implements IValue<BigDecimal> {
+public class QuantityValue implements Value<BigDecimal> {
     private static final long serialVersionUID = -1422892416601346312L;
 
     private BigDecimal value;

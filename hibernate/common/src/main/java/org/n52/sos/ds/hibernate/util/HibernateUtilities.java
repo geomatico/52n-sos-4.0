@@ -56,7 +56,7 @@ import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.CountValue;
 import org.n52.sos.ogc.om.values.GeometryValue;
-import org.n52.sos.ogc.om.values.IValue;
+import org.n52.sos.ogc.om.values.Value;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.om.values.UnknownValue;
@@ -194,7 +194,7 @@ public class HibernateUtilities {
         }
     }
 
-    public static Observation createObservationFromValue(IValue<?> value, Session session) {
+    public static Observation createObservationFromValue(Value<?> value, Session session) {
         if (value instanceof BooleanValue) {
             BooleanObservation observation = new BooleanObservation();
             observation.setValue(((BooleanValue) value).getValue());

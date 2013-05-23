@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.om.values;
 
-public class CountValue implements IValue<Integer> {
+public class CountValue implements Value<Integer> {
     private static final long serialVersionUID = 6995364149748171024L;
 
     private Integer value;

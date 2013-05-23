@@ -26,12 +26,9 @@ package org.n52.sos.ogc.om;
 import java.io.Serializable;
 
 import org.n52.sos.ogc.gml.time.ITime;
-import org.n52.sos.ogc.om.values.IValue;
+import org.n52.sos.ogc.om.values.Value;
 
-/*
- * FIXME rename (remove the leading I)
- */
-public interface IObservationValue<T extends IValue<?>> extends Serializable {
+public interface ObservationValue<T extends Value<?>> extends Serializable {
     
     /** phenomenon or sampling time of the observation */
     ITime getPhenomenonTime();

@@ -24,7 +24,7 @@
 package org.n52.sos.ogc.om.values;
 
 
-public class NilTemplateValue implements IValue<String> {
+public class NilTemplateValue implements Value<String> {
 
     private static final long serialVersionUID = -3751934124688213692L;
     private String unit;

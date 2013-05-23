@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.om.values;
 
-public class CategoryValue implements IValue<String> {
+public class CategoryValue implements Value<String> {
     private static final long serialVersionUID = 8364802854103009470L;
     private String value;
     

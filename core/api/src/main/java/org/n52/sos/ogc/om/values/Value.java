@@ -25,7 +25,7 @@ package org.n52.sos.ogc.om.values;
 
 import java.io.Serializable;
 
-public interface IValue<T> extends Serializable {
+public interface Value<T> extends Serializable {
     
     void setValue(T value);
     

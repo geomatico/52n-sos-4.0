@@ -60,7 +60,7 @@ import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.AbstractSosPhenomenon;
-import org.n52.sos.ogc.om.IObservationValue;
+import org.n52.sos.ogc.om.ObservationValue;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosMultiObservationValues;
 import org.n52.sos.ogc.om.SosObservableProperty;
@@ -72,7 +72,7 @@ import org.n52.sos.ogc.om.quality.SosQuality;
 import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.CountValue;
-import org.n52.sos.ogc.om.values.IValue;
+import org.n52.sos.ogc.om.values.Value;
 import org.n52.sos.ogc.om.values.NilTemplateValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
@@ -223,7 +223,7 @@ public class HibernateObservationUtilities {
                 // hObservationConstellation.getOffering().getIdentifier();
                 // String mimeType = SosConstants.PARAMETER_NOT_SET;
 
-                final IValue<?> value = getValueFromObservation(hObservation);
+                final Value<?> value = getValueFromObservation(hObservation);
                 if (hObservation.getUnit() != null) {
                     value.setUnit(hObservation.getUnit().getUnit());
                 }
@@ -343,7 +343,7 @@ public class HibernateObservationUtilities {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static SosObservation createNewObservation(
             final Map<Integer, SosObservationConstellation> observationConstellations, final Observation hObservation,
-            final IValue<?> value, final int obsConstHash) {
+            final Value<?> value, final int obsConstHash) {
         final SosObservation sosObservation = new SosObservation();
         sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
         if (hObservation.isSetIdentifier()
@@ -398,7 +398,7 @@ public class HibernateObservationUtilities {
      *            Observation object
      * @return Observation value
      */
-    private static IValue<?> getValueFromObservation(final Observation hObservation) {
+    private static Value<?> getValueFromObservation(final Observation hObservation) {
         if (hObservation instanceof NumericObservation) {
             return new QuantityValue(((NumericObservation) hObservation).getValue());
         } else if (hObservation instanceof BooleanObservation) {
@@ -442,10 +442,10 @@ public class HibernateObservationUtilities {
             for (final List<String> block : values) {
                 int tokenIndex = 0;
                 ITime phenomenonTime = null;
-                final List<IValue<?>> observedValues = new LinkedList<IValue<?>>();
+                final List<Value<?>> observedValues = new LinkedList<Value<?>>();
                 // map to store the observed properties
-                final Map<IValue<?>, String> definitionsForObservedValues = new HashMap<IValue<?>, String>();
-                IValue<?> observedValue = null;
+                final Map<Value<?>, String> definitionsForObservedValues = new HashMap<Value<?>, String>();
+                Value<?> observedValue = null;
                 for (final String token : block) {
                     // get values from block via definition in
                     // SosSweDataArray#getElementType
@@ -510,7 +510,7 @@ public class HibernateObservationUtilities {
                     }
                     tokenIndex++;
                 }
-                for (final IValue<?> iValue : observedValues) {
+                for (final Value<?> iValue : observedValues) {
                     final SosObservation newObservation =
                             createSingleValueObservation(multiObservation, phenomenonTime, iValue);
                     observationCollection.add(newObservation);
@@ -522,8 +522,8 @@ public class HibernateObservationUtilities {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static SosObservation createSingleValueObservation(final SosObservation multiObservation,
-            final ITime phenomenonTime, final IValue<?> iValue) {
-        final IObservationValue<?> value = new SosSingleObservationValue(phenomenonTime, iValue);
+            final ITime phenomenonTime, final Value<?> iValue) {
+        final ObservationValue<?> value = new SosSingleObservationValue(phenomenonTime, iValue);
         final SosObservation newObservation = new SosObservation();
         newObservation.setNoDataValue(multiObservation.getNoDataValue());
         /*

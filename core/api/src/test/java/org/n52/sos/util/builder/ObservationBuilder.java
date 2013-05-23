@@ -24,7 +24,7 @@
 package org.n52.sos.util.builder;
 
 import org.n52.sos.ogc.gml.CodeWithAuthority;
-import org.n52.sos.ogc.om.IObservationValue;
+import org.n52.sos.ogc.om.ObservationValue;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 
@@ -40,7 +40,7 @@ public class ObservationBuilder {
 	}
 
 	private SosObservationConstellation observationConstellation;
-	private IObservationValue<?> value;
+	private ObservationValue<?> value;
 	private String identifer;
 	private String identiferCodespace;
 
@@ -68,7 +68,7 @@ public class ObservationBuilder {
 		return sosObservation;
 	}
 
-	public ObservationBuilder setValue(IObservationValue<?> observationValue)
+	public ObservationBuilder setValue(ObservationValue<?> observationValue)
 	{
 		this.value = observationValue;
 		return this;

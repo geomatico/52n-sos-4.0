@@ -27,31 +27,31 @@ import java.util.List;
 
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.om.quality.SosQuality;
-import org.n52.sos.ogc.om.values.IValue;
+import org.n52.sos.ogc.om.values.Value;
 
-public class SosSingleObservationValue<T> implements IObservationValue<IValue<T>> {
+public class SosSingleObservationValue<T> implements ObservationValue<Value<T>> {
     private static final long serialVersionUID = -8162038672393523937L;
 
     private ITime phenomenonTime;
 
-    private IValue<T> value;
+    private Value<T> value;
 
     private List<SosQuality> qualityList;
 
     public SosSingleObservationValue() {
     }
 
-    public SosSingleObservationValue(IValue<T> value) {
+    public SosSingleObservationValue(Value<T> value) {
         this.value = value;
     }
 
-    public SosSingleObservationValue(ITime phenomenonTime, IValue<T> value, List<SosQuality> qualityList) {
+    public SosSingleObservationValue(ITime phenomenonTime, Value<T> value, List<SosQuality> qualityList) {
         this.phenomenonTime = phenomenonTime;
         this.value = value;
         this.qualityList = qualityList;
     }
 
-    public SosSingleObservationValue(ITime phenomenonTime, IValue<T> value) {
+    public SosSingleObservationValue(ITime phenomenonTime, Value<T> value) {
         this.phenomenonTime = phenomenonTime;
         this.value = value;
     }
@@ -62,12 +62,12 @@ public class SosSingleObservationValue<T> implements IObservationValue<IValue<T>
     }
 
     @Override
-    public IValue<T> getValue() {
+    public Value<T> getValue() {
         return value;
     }
 
     @Override
-    public void setValue(IValue<T> value) {
+    public void setValue(Value<T> value) {
         this.value = value;
     }
 

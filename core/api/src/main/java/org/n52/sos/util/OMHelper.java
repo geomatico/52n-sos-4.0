@@ -34,7 +34,7 @@ import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.CountValue;
-import org.n52.sos.ogc.om.values.IValue;
+import org.n52.sos.ogc.om.values.Value;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.om.values.TextValue;
@@ -68,7 +68,7 @@ public final class OMHelper {
         return true;
     }
 
-    public static String getObservationTypeFor(IValue<?> value) {
+    public static String getObservationTypeFor(Value<?> value) {
         if (value instanceof BooleanValue) {
             return OMConstants.OBS_TYPE_TRUTH_OBSERVATION;
         } else if (value instanceof CategoryValue) {
