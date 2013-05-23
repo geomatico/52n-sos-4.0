@@ -24,19 +24,35 @@
 package org.n52.sos.service.it.rest;
 
 import static org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName.*;
-import static org.n52.sos.service.it.RequestBuilder.get;
+import static org.n52.sos.service.it.RequestBuilder.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.xml.namespace.NamespaceContext;
 
+import net.opengis.om.x20.OMObservationType;
 import net.opengis.sensorML.x101.SystemType;
+import net.opengis.sosREST.x10.LinkType;
+import net.opengis.sosREST.x10.ObservationDocument;
+import net.opengis.sosREST.x10.ObservationType;
 import net.opengis.sosREST.x10.SensorDocument;
 
+import org.joda.time.DateTime;
 import org.n52.sos.binding.rest.Constants;
+import org.n52.sos.encode.OmEncoderv20;
 import org.n52.sos.encode.SensorMLEncoderv101;
+import org.n52.sos.ogc.gml.CodeWithAuthority;
+import org.n52.sos.ogc.gml.time.TimeInstant;
+import org.n52.sos.ogc.gml.time.TimePeriod;
+import org.n52.sos.ogc.om.AbstractSosPhenomenon;
+import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.om.SosObservationConstellation;
+import org.n52.sos.ogc.om.SosSingleObservationValue;
+import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.System;
@@ -44,6 +60,7 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLCapabilities;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
+import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
 import org.n52.sos.ogc.swe.SosSweField;
 import org.n52.sos.ogc.swe.SosSweSimpleDataRecord;
@@ -73,7 +90,6 @@ public class RestBindingTest extends AbstractTransactionalTestv2{
 	protected static final Constants REST_CONFIG = Constants.getInstance();
 	protected static final Configurator SOS_CONFIG = Configurator.getInstance();
 	protected static final ServiceConfiguration SERVICE_CONFIG = ServiceConfiguration.getInstance();
-
 	
 	protected String link(final String relType, final String resTypeWithOrWithoutId)
 	{
@@ -91,6 +107,11 @@ public class RestBindingTest extends AbstractTransactionalTestv2{
 		return execute(	get(REST_URL + "/" + resType).accept(CONTENT_TYPE));
 	}
 
+	/**
+	 * Creating example sensor with id <tt>sensorId</tt> and offering <tt>offeringId</tt> observing <tt>test-observable-property</tt>
+	 *  with type <tt>http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement</tt>
+	 *  with feature <tt>http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint</tt>
+	 */
 	protected String createRestSensor(final String sensorId,
 			final String offeringId) throws OwsExceptionReport
 	{
@@ -111,6 +132,38 @@ public class RestBindingTest extends AbstractTransactionalTestv2{
 		final SystemType substitute = (SystemType) restSensor.addNewSensor().addNewProcess().substitute(SensorMLConstants.SYSTEM_QNAME, SystemType.type);
 		substitute.set(xbSystem);
 		return restSensor.xmlText();
+	}
+	
+	private String createRestMeasurement(final String sensorId,
+			final String offeringId,
+			final long timestamp,
+			final double value,
+			final String featureId,
+			final String observableProperty) throws OwsExceptionReport
+	{
+		final SosObservation o = new SosObservation();
+		o.setValidTime(new TimePeriod(new DateTime(timestamp), new DateTime(timestamp)));
+		o.setObservationConstellation(
+				new SosObservationConstellation(
+						new SosProcedureDescriptionUnknowType(sensorId, null, null),
+						new AbstractSosPhenomenon(observableProperty), 
+						new SosSamplingFeature(new CodeWithAuthority(featureId))));
+		o.setResultTime(new TimeInstant(new DateTime(timestamp)));
+		final QuantityValue sosValue = new QuantityValue(new BigDecimal(value));
+		sosValue.setUnit("test-unit");
+		o.setValue(
+				new SosSingleObservationValue<BigDecimal>(
+						new TimeInstant(new DateTime(timestamp)),
+						sosValue));
+		final OMObservationType xbObservation = (OMObservationType) new OmEncoderv20().encode(o);
+		final ObservationDocument restObsDoc = ObservationDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+		final ObservationType restObservation = restObsDoc.addNewObservation();
+		restObservation.setOMObservation(xbObservation);
+		final LinkType link = restObservation.addNewLink();
+		link.setType(CONTENT_TYPE);
+		link.setRel(REST_CONFIG.getEncodingNamespace() + "/" + REST_CONFIG.getResourceRelationOfferingGet());
+		link.setHref(REST_CONFIG.getServiceUrl() + REST_CONFIG.getUrlPattern() + "/" + REST_CONFIG.getResourceOfferings() + "/" + offeringId);
+		return restObsDoc.xmlText();
 	}
 
 	private List<SosSMLIdentifier> createIdentifications(final String sensorId,
@@ -162,5 +215,46 @@ public class RestBindingTest extends AbstractTransactionalTestv2{
 		.setValue(JavaHelper.asDouble(value))
 		.setAxisID(asixID)
 		.setUom(uom);
+	}
+
+	/**
+	 * @see #createRestSensor(String, String)
+	 */
+	protected MockHttpServletResponse addSensor(final String sensorId,
+			final String offeringId) throws OwsExceptionReport
+	{
+		return execute(post(REST_URL + "/" + REST_CONFIG.getResourceSensors())
+				.accept(CONTENT_TYPE)
+				.contentType(CONTENT_TYPE)
+				.entity(createRestSensor(sensorId,offeringId)));
+	}
+	
+	protected String selfLink(final String resType)
+	{
+		return selfLink(resType, null);
+	}
+
+	protected String selfLink(final String resType,
+			final String resourceId)
+	{
+		return link(REST_CONFIG.getResourceRelationSelf(),resType + (resourceId!=null?"/" + resourceId:""));
+	}
+
+	protected String sensorLink(final String sensorId1)
+	{
+		return link(REST_CONFIG.getResourceRelationSensorGet(), REST_CONFIG.getResourceSensors() + "/" + sensorId1);
+	}
+
+	protected MockHttpServletResponse addMeasurement(final String sensorId,
+			final String offeringId,
+			final long timestamp,
+			final double value,
+			final String featureId,
+			final String observableProperty) throws OwsExceptionReport
+	{
+		return execute(post(REST_URL + "/" + REST_CONFIG.getResourceObservations())
+				.accept(CONTENT_TYPE)
+				.contentType(CONTENT_TYPE)
+				.entity(createRestMeasurement(sensorId,offeringId,timestamp,value,featureId,observableProperty)));		
 	}
 }

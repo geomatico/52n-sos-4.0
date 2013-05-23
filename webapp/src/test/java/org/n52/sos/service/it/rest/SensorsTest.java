@@ -23,7 +23,7 @@
  */
 package org.n52.sos.service.it.rest;
 
-import static org.n52.sos.service.it.RequestBuilder.*;
+import static org.n52.sos.service.it.RequestBuilder.delete;
 
 import java.io.UnsupportedEncodingException;
 
@@ -57,7 +57,7 @@ public class SensorsTest extends RestBindingTest {
 
 		assertThat(xbResponse, instanceOf(SensorDocument.class));
 		assertThat(response, hasXPath("//sosREST:Sensor/sml:System", NS_CTXT));
-		assertThat(response, hasXPath(link(REST_CONFIG.getResourceRelationSelf(),REST_CONFIG.getResourceSensors() + "/" + sensorId),NS_CTXT));
+		assertThat(response, hasXPath(selfLink(REST_CONFIG.getResourceSensors(),sensorId),NS_CTXT));
 		assertThat(response, hasXPath(link(REST_CONFIG.getResourceRelationFeaturesGet(),REST_CONFIG.getResourceFeatures() + "?" + REST_CONFIG.getHttpGetParameterNameProcedure() + "=" + sensorId),NS_CTXT));
 		assertThat(response, hasXPath(link(REST_CONFIG.getResourceRelationObservationsGet(),REST_CONFIG.getResourceObservations() + "?" + REST_CONFIG.getHttpGetParameterNameProcedure() + "=" + sensorId),NS_CTXT));
 	}
@@ -76,9 +76,9 @@ public class SensorsTest extends RestBindingTest {
 		final Node response = getResponseAsNode(mockResponse);
 		
 		assertThat(response, hasXPath("//sosREST:SensorCollection", NS_CTXT));
-		assertThat(response, hasXPath(link(REST_CONFIG.getResourceRelationSelf(), REST_CONFIG.getResourceSensors()), NS_CTXT));
-		assertThat(response, hasXPath(link(REST_CONFIG.getResourceRelationSensorGet(), REST_CONFIG.getResourceSensors() + "/" + sensorId1), NS_CTXT));
-		assertThat(response, hasXPath(link(REST_CONFIG.getResourceRelationSensorGet(), REST_CONFIG.getResourceSensors() + "/" + sensorId2), NS_CTXT));
+		assertThat(response, hasXPath(selfLink(REST_CONFIG.getResourceSensors()), NS_CTXT));
+		assertThat(response, hasXPath(sensorLink(sensorId1), NS_CTXT));
+		assertThat(response, hasXPath(sensorLink(sensorId2), NS_CTXT));
 	}
 
 	@Ignore("TODO implement DELETE sos/sensors/$SENSOR$")
@@ -92,23 +92,13 @@ public class SensorsTest extends RestBindingTest {
 		execute(delete(REST_URL + "/" + REST_CONFIG.getResourceSensors() + "/" + sensorId).accept(CONTENT_TYPE).contentType(CONTENT_TYPE));
 		final Node responseAfterDelete = getResponseAsNode(getResource(REST_CONFIG.getResourceSensors()));
 		
-		assertThat(responseBeforeDelete, hasXPath(link(REST_CONFIG.getResourceRelationSensorGet(), REST_CONFIG.getResourceSensors() + "/" + sensorId), NS_CTXT));
+		assertThat(responseBeforeDelete, hasXPath(sensorLink(sensorId), NS_CTXT));
 		assertThat(responseAfterDelete, 
-				hasXPath("count(" + link(REST_CONFIG.getResourceRelationSensorGet(), REST_CONFIG.getResourceSensors() + "/" + sensorId ) + ")",
+				hasXPath("count(" + sensorLink(sensorId) + ")",
 						NS_CTXT,
 						is("0")));
 	}
 	
-	protected MockHttpServletResponse 
-	addSensor(final String sensorId, final String offeringId)
-			throws OwsExceptionReport
-	{
-		return execute(post(REST_URL + "/" + REST_CONFIG.getResourceSensors())
-				.accept(CONTENT_TYPE)
-				.contentType(CONTENT_TYPE)
-				.entity(createRestSensor(sensorId,offeringId)));
-	}
-
 	@Before public void 
 	initTestDatabase()
 			throws OwsExceptionReport

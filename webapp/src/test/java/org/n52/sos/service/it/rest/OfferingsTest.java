@@ -24,13 +24,13 @@
 package org.n52.sos.service.it.rest;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.junit.Assert.fail;
 
 import java.io.UnsupportedEncodingException;
 
 import org.apache.xmlbeans.XmlException;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.w3c.dom.Node;
 
@@ -60,9 +60,10 @@ public class OfferingsTest extends RestBindingTest {
 	@Test
 	public void should_return_valid_sosRest_offeringslist()
 	{
-		final Node xbResponse = getResponseAsNode(getOfferings());
+		final Node response = getResponseAsNode(getOfferings());
 		
-		assertThat(xbResponse, hasXPath("//sosREST:OfferingCollection",NS_CTXT));
+		assertThat(response, hasXPath("//sosREST:OfferingCollection",NS_CTXT));
+		assertThat(response, hasXPath(selfLink(REST_CONFIG.getResourceOfferings()), NS_CTXT));
 	}
 	
 	@Test
@@ -75,12 +76,16 @@ public class OfferingsTest extends RestBindingTest {
 	
 	@Test
 	@Ignore("Init DB with testdata not possible atm")
-	public void should_contain_all_offering_links() throws UnsupportedEncodingException, XmlException
+	public void should_contain_all_offering_links() throws UnsupportedEncodingException, XmlException, OwsExceptionReport
 	{
-//		final Node xbResponse = getResponseAsNode(getOfferings());
-//		
-//		assertThat(xbResponse, hasXPath(offeringLink() + "add count check here", NS_CTXT));
-		fail("init db not possbile atm.");
+		final String sensorId = "test-sensor-id";
+		final String offeringId = "test-offering-id";
+		addSensor(sensorId, offeringId);
+		// FIXME the offeringId is not contained in the cache after adding the sensor
+		addMeasurement(sensorId,offeringId,System.currentTimeMillis(),0.5,"test-feature","test-observable-property");
+		final Node xbResponse = getResponseAsNode(getOfferings());
+		
+		assertThat(xbResponse, hasXPath("add count check here", NS_CTXT));
 	}
 	
 	private String offeringsLink(final String relType,
