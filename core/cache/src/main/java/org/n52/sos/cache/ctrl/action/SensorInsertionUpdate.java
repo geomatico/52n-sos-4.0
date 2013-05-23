@@ -72,7 +72,6 @@ public class SensorInsertionUpdate extends InMemoryCacheUpdate {
     public void execute() {
         final WritableContentCache cache = getCache();
         final String procedure = response.getAssignedProcedure();
-        final String offering = response.getAssignedOffering();
 
         // procedure relations
         cache.addProcedure(procedure);
@@ -81,23 +80,26 @@ public class SensorInsertionUpdate extends InMemoryCacheUpdate {
 
         // offerings
         for (SosOffering sosOffering : request.getProcedureDescription().getOfferings()) {
-            cache.addOffering(offering);
-            cache.addProcedureForOffering(offering, procedure);
-            cache.addOfferingForProcedure(procedure, offering);
+            cache.addOffering(sosOffering.getOfferingIdentifier());
+            cache.addProcedureForOffering(sosOffering.getOfferingIdentifier(), procedure);
+            cache.addOfferingForProcedure(procedure, sosOffering.getOfferingIdentifier());
             if (sosOffering.isSetOfferingName()) {
                 cache.setNameForOffering(sosOffering.getOfferingIdentifier(), sosOffering.getOfferingName());
             }
+            
+            // allowed observation types
+            cache.addAllowedObservationTypesForOffering(sosOffering.getOfferingIdentifier(),
+                    request.getMetadata().getObservationTypes());            
         }
-
-        // allowed observation types
-        cache.addAllowedObservationTypesForOffering(offering, request.getMetadata().getObservationTypes());
 
         // related features
         final Collection<SosFeatureRelationship> relatedFeatures = request.getRelatedFeatures();
         if (relatedFeatures != null && !relatedFeatures.isEmpty()) {
             for (SosFeatureRelationship relatedFeature : relatedFeatures) {
                 final String identifier = relatedFeature.getFeature().getIdentifier().getValue();
-                cache.addRelatedFeatureForOffering(offering, identifier);
+                for (SosOffering sosOffering : request.getProcedureDescription().getOfferings()) {                
+                    cache.addRelatedFeatureForOffering(sosOffering.getOfferingIdentifier(), identifier);
+                }
                 cache.addRoleForRelatedFeature(identifier, relatedFeature.getRole());
             }
         }
@@ -106,8 +108,12 @@ public class SensorInsertionUpdate extends InMemoryCacheUpdate {
         for (String observableProperty : request.getObservableProperty()) {
             cache.addProcedureForObservableProperty(observableProperty, procedure);
             cache.addObservablePropertyForProcedure(procedure, observableProperty);
-            cache.addOfferingForObservableProperty(observableProperty, offering);
-            cache.addObservablePropertyForOffering(offering, observableProperty);
+            for (SosOffering sosOffering : request.getProcedureDescription().getOfferings()) {                
+                cache.addOfferingForObservableProperty(observableProperty,
+                        sosOffering.getOfferingIdentifier());
+                cache.addObservablePropertyForOffering(sosOffering.getOfferingIdentifier(),
+                        observableProperty);
+            }
         }
     }
 }
