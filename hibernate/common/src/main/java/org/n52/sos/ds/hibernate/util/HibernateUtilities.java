@@ -48,6 +48,7 @@ import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
+import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
@@ -62,6 +63,7 @@ import org.n52.sos.ogc.om.values.UnknownValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.StringHelper;
 
 public class HibernateUtilities {
     public static ObservationConstellation checkObservationConstellation(SosObservationConstellation soc,
@@ -223,6 +225,34 @@ public class HibernateUtilities {
             return observation;
         }
         return new Observation();
+    }
+    
+    public static Criteria getObservationClassCriteriaForResultModel(String resultModel, Session session) {
+        if (StringHelper.isNotEmpty(resultModel)) {
+             if (resultModel.equals(OMConstants.OBS_TYPE_MEASUREMENT)) {
+                 return createCriteriaForObservationClass(NumericObservation.class, session);
+             } else if (resultModel.equals(OMConstants.OBS_TYPE_COUNT_OBSERVATION)) {
+                 return createCriteriaForObservationClass(CountObservation.class, session);
+             } else if (resultModel.equals(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION)) {
+                 return createCriteriaForObservationClass(CategoryObservation.class, session);
+             } else if (resultModel.equals(OMConstants.OBS_TYPE_TRUTH_OBSERVATION)) {
+                 return createCriteriaForObservationClass(BooleanObservation.class, session);
+             } else if (resultModel.equals(OMConstants.OBS_TYPE_TEXT_OBSERVATION)) {
+                 return createCriteriaForObservationClass(TextObservation.class, session);
+             } else if (resultModel.equals(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION)) {
+                 return createCriteriaForObservationClass(GeometryObservation.class, session);
+             } else if (resultModel.equals(OMConstants.OBS_TYPE_COMPLEX_OBSERVATION)) {
+                 return createCriteriaForObservationClass(BlobObservation.class, session);
+             }
+        }
+        return createCriteriaForObservationClass(Observation.class, session);
+    }
+    
+    @SuppressWarnings("rawtypes") 
+    public static Criteria createCriteriaForObservationClass(Class clazz, Session session) {
+        return session.createCriteria(clazz)
+                .add(Restrictions.eq(Observation.DELETED, false))
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
     }
 
     private HibernateUtilities() {

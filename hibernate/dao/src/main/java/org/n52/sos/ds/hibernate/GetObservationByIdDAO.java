@@ -30,9 +30,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.AbstractGetObservationByIdDAO;
-import org.n52.sos.ds.hibernate.HibernateSessionHolder;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
+import org.n52.sos.ds.hibernate.util.HibernateUtilities;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -52,7 +52,6 @@ public class GetObservationByIdDAO extends AbstractGetObservationByIdDAO {
         Session session = null;
         try {
             session = sessionHolder.getSession();
-
             List<Observation> observations = queryObservation(request, session);
             GetObservationByIdResponse response = new GetObservationByIdResponse();
             response.setService(request.getService());
@@ -72,10 +71,8 @@ public class GetObservationByIdDAO extends AbstractGetObservationByIdDAO {
 
     @SuppressWarnings("unchecked")
     private List<Observation> queryObservation(GetObservationByIdRequest request, Session session) {
-        return session.createCriteria(Observation.class)
-                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
-                .add(Restrictions.eq(Observation.DELETED, false))
-                .add(Restrictions.or(Restrictions.in(Observation.IDENTIFIER, request.getObservationIdentifier()),
+        final Criteria c = HibernateUtilities.getObservationClassCriteriaForResultModel(request.getResultModel(), session);
+        return c.add(Restrictions.or(Restrictions.in(Observation.IDENTIFIER, request.getObservationIdentifier()),
                                      Restrictions.in(Observation.SET_ID, request.getObservationIdentifier()))).list();
     }
 }

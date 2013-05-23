@@ -47,6 +47,7 @@ import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
+import org.n52.sos.ds.hibernate.util.HibernateUtilities;
 import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.ds.hibernate.util.TemporalRestrictions;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
@@ -235,9 +236,8 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
 
     protected Criteria createTemporalFilterLessCriteria(final Session session, final GetObservationRequest request,
                                                         final Set<String> features) throws HibernateException {
-        final Criteria c = session.createCriteria(Observation.class)
-                .add(Restrictions.eq(Observation.DELETED, false))
-                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        
+        final Criteria c = HibernateUtilities.getObservationClassCriteriaForResultModel(request.getResultModel(), session);
         if (request.isSetOffering()) {
             c.createCriteria(Observation.OFFERINGS)
                     .add(Restrictions.in(Offering.IDENTIFIER, request.getOfferings()));
