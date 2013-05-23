@@ -24,9 +24,6 @@
 
 package org.n52.sos.service.it;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
@@ -39,10 +36,17 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.hamcrest.Matcher;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.junit.BeforeClass;
 import org.n52.sos.ds.hibernate.H2Configuration;
+import org.n52.sos.ds.hibernate.HibernateTestCase;
+import org.n52.sos.ds.hibernate.entities.ObservationType;
+import org.n52.sos.ds.hibernate.util.ScrollableIterable;
 import org.n52.sos.exception.ows.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.SosService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,13 +61,37 @@ import org.xml.sax.SAXException;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
+ * 
+ * TODO Review @After and @Before calling between sub and super classes
+ * 
  */
-public abstract class AbstractSosServiceTest {
+public abstract class AbstractSosServiceTest extends HibernateTestCase {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractSosServiceTest.class);
     private static SosService service;
     private static final ServletContext servletContext = new MockServletContext();
     private static final ServletConfig servletConfig = new MockServletConfig(servletContext);
     private static final NamespaceContext namespaceContext = new SosNamespaceContext();
+    
+    /**
+     * "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CountObservation",
+    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_SWEArrayObservation",
+    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation",
+    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation",
+    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TextObservation"
+     */
+    private final String[] defaultObservationTypes = {
+    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CountObservation",
+    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_SWEArrayObservation",
+    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation",
+    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation",
+    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TextObservation"
+    		};
+    
     public static final String ENCODING = "UTF-8";
 
     @BeforeClass
@@ -71,6 +99,64 @@ public abstract class AbstractSosServiceTest {
         H2Configuration.assertInitialized();
         service = new SosService();
         service.init(servletConfig);
+    }
+    
+    /**
+     * Removes all entries of entity {@link ObservationType} from the database.
+     * @throws OwsExceptionReport
+     */
+    protected void removeObservationTypes() throws OwsExceptionReport {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = getSession();
+            transaction = session.beginTransaction();
+            final ScrollableIterable<ObservationType> i = ScrollableIterable.fromCriteria(session
+                    .createCriteria(ObservationType.class));
+            for (final ObservationType o : i) {
+                session.delete(o);
+            }
+            i.close();
+            session.flush();
+            transaction.commit();
+        } catch (final HibernateException he) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw he;
+        } finally {
+            returnSession(session);
+        }
+    }
+
+    /**
+     * Add some default entries of entity {@link ObservationType} to the test database.
+     * @throws OwsExceptionReport
+     * @see {@link #defaultObservationTypes}
+     */
+    protected void addObservationTypes() throws OwsExceptionReport {
+        Session session = null;
+        Transaction transaction = null;
+		try {
+        	session = getSession();
+        	transaction = session.beginTransaction();
+        	for (int i = 0; i < defaultObservationTypes.length; i++) 
+        	{
+        		final ObservationType ot = new ObservationType();
+        		ot.setObservationTypeId(i);
+        		ot.setObservationType(defaultObservationTypes[i]);
+        		session.save(ot);
+			}
+        	session.flush();
+        	transaction.commit();
+        } catch (final HibernateException he) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw he;
+        } finally {
+            returnSession(session);
+        }
     }
 
     public static Matcher<Node> invalidServiceParameterValueException(final String value) {
