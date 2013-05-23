@@ -297,12 +297,6 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
             if (decodedObject instanceof ObservationValue) {
                 return (ObservationValue) decodedObject;
             } else if (decodedObject instanceof SosSweDataArray) {
-                    SosMultiObservationValues<SosSweDataArray> result = new SosMultiObservationValues<SosSweDataArray>();
-                    SweDataArrayValue value = new SweDataArrayValue();
-                    value.setValue((SosSweDataArray) decodedObject);
-                    result.setValue(value);
-                    return result;
-            } else if (decodedObject instanceof SosSweDataArray) {
                 SosMultiObservationValues<SosSweDataArray> result = new SosMultiObservationValues<SosSweDataArray>();
                 SweDataArrayValue value = new SweDataArrayValue();
                 value.setValue((SosSweDataArray) decodedObject);
