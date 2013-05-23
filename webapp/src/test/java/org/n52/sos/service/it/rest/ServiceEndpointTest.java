@@ -23,9 +23,6 @@
  */
 package org.n52.sos.service.it.rest;
 
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.n52.sos.service.it.RequestBuilder.get;
 
 import javax.servlet.http.HttpServletResponse;

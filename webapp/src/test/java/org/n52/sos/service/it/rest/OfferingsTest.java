@@ -24,9 +24,7 @@
 package org.n52.sos.service.it.rest;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.xml.HasXPath.hasXPath;
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import java.io.UnsupportedEncodingException;
 
