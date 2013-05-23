@@ -23,6 +23,9 @@
  */
 package org.n52.sos.ds.hibernate;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Properties;
 
 import org.hibernate.HibernateException;
@@ -48,6 +51,10 @@ import org.slf4j.LoggerFactory;
 public class SessionFactoryProvider implements DataConnectionProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SessionFactoryProvider.class);
+    
+    public static final String HIBERNATE_RESOURCES = "HIBERNATE_RESOURCES";
+    
+    public static final String HIBERNATE_DIRECTORY = "HIBERNATE_DIRECTORY";
 
     /**
      * SessionFactory instance
@@ -130,12 +137,25 @@ public class SessionFactoryProvider implements DataConnectionProvider {
     }
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void initialize(Properties properties) throws ConfigurationException {
 		try {
 			LOGGER.debug("Instantiating session factory");
             Configuration configuration = new Configuration()
-					.configure("/sos-hibernate.cfg.xml")
-					.mergeProperties(properties);
+					.configure("/sos-hibernate.cfg.xml");
+            if (properties.containsKey(HIBERNATE_RESOURCES)) {
+                    List<String> resources = (List<String>)properties.get(HIBERNATE_RESOURCES);
+                    for (String resource : resources) {
+                        configuration.addResource(resource);
+                }
+                properties.remove(HIBERNATE_RESOURCES);
+            } else {
+                // TODO use HIBERNATE_DIRECTORY and configure in datasource.properties
+              configuration.addDirectory(new File(this.getClass().getResource("/mapping/core").toURI()));
+              configuration.addDirectory(new File(this.getClass().getResource("/mapping/transactional").toURI()));
+            }
+            configuration.mergeProperties(properties);
+
             ServiceRegistry serviceRegistry =
                     new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
             this.sessionFactory = configuration.buildSessionFactory(serviceRegistry);
@@ -143,6 +163,10 @@ public class SessionFactoryProvider implements DataConnectionProvider {
             String exceptionText = "An error occurs during instantiation of the database connection pool!";
             LOGGER.error(exceptionText, he);
 			throw new ConfigurationException(exceptionText, he);
+        } catch (URISyntaxException urise) {
+            String exceptionText = "An error occurs during instantiation of the database connection pool!";
+            LOGGER.error(exceptionText, urise);
+                        throw new ConfigurationException(exceptionText, urise);
         }
 	}
 

@@ -32,16 +32,17 @@ import org.n52.sos.service.Configurator;
 
 public class HibernateSessionHolder {
 
+    private final ConnectionProvider connectionProvider;
+
+    public HibernateSessionHolder() {
+        this.connectionProvider = Configurator.getInstance().getDataConnectionProvider();
+    }
+
     public static Session getSession(Object connection) throws OwsExceptionReport {
         if (!(connection instanceof Session)) {
             throw new NoApplicableCodeException().withMessage("The parameter connection is not an Hibernate Session!");
         }
         return (Session) connection;
-    }
-    private final ConnectionProvider connectionProvider;
-
-    public HibernateSessionHolder() {
-        this.connectionProvider = Configurator.getInstance().getDataConnectionProvider();
     }
 
     public Session getSession() throws OwsExceptionReport {

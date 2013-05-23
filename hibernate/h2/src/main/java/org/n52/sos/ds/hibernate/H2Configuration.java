@@ -36,6 +36,7 @@ import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.hibernate.HibernateException;
+import org.hibernate.MappingException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
@@ -49,33 +50,73 @@ import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.SosContextListener;
+import org.n52.sos.util.CollectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class H2Configuration {
     private static final Logger LOG = LoggerFactory.getLogger(H2Configuration.class);
+
     private static final String HIBERNATE_CONNECTION_URL = SQLiteSessionFactory.HIBERNATE_CONNECTION_URL;
+
     private static final String HIBERNATE_CONNECTION_DRIVER_CLASS =
-                                SQLiteSessionFactory.HIBERNATE_CONNECTION_DRIVER_CLASS;
+            SQLiteSessionFactory.HIBERNATE_CONNECTION_DRIVER_CLASS;
+
     private static final String HIBERNATE_DIALECT = SQLiteSessionFactory.HIBERNATE_DIALECT;
+
     private static final String H2_DRIVER = "org.h2.Driver";
+
     private static final String H2_CONNECTION_URL = "jdbc:h2:mem:sos;DB_CLOSE_DELAY=-1";
-    private static final Properties PROPERTIES = new Properties() {
-    	private static final long serialVersionUID = 3109256773218160485L;
+
+    private static Properties PROPERTIES = new Properties() {
+        private static final long serialVersionUID = 3109256773218160485L;
 
         {
             put(HIBERNATE_CONNECTION_URL, H2_CONNECTION_URL);
             put(HIBERNATE_CONNECTION_DRIVER_CLASS, H2_DRIVER);
             put(HIBERNATE_DIALECT, GeoDBDialect.class.getName());
+            put(SessionFactoryProvider.HIBERNATE_RESOURCES, getResources());
+        }
+
+        private List<String> getResources() {
+            List<String> resources = CollectionHelper.list();
+            // core
+            resources.add("mapping/core/Codespace.hbm.xml");
+            resources.add("mapping/core/FeatureOfInterest.hbm.xml");
+            resources.add("mapping/core/FeatureOfInterestType.hbm.xml");
+            resources.add("mapping/core/ObservableProperty.hbm.xml");
+            resources.add("mapping/core/Observation.hbm.xml");
+            resources.add("mapping/core/Offering.hbm.xml");
+            resources.add("mapping/core/Procedure.hbm.xml");
+            resources.add("mapping/core/ProcedureDescriptionFormat.hbm.xml");
+            resources.add("mapping/core/Unit.hbm.xml");
+            // transactional module
+            resources.add("mapping/transactional/ObservationConstellation.hbm.xml");
+            resources.add("mapping/transactional/ObservationType.hbm.xml");
+            resources.add("mapping/transactional/RelatedFeature.hbm.xml");
+            resources.add("mapping/transactional/RelatedFeatureRole.hbm.xml");
+            resources.add("mapping/transactional/ResultTemplate.hbm.xml");
+            resources.add("mapping/transactional/ValidProcedureTime.hbm.xml");
+            resources.add("mapping/transactional/TFeatureOfInterest.hbm.xml");
+            resources.add("mapping/transactional/TObservableProperty.hbm.xml");
+            resources.add("mapping/transactional/TOffering.hbm.xml");
+            resources.add("mapping/transactional/TProcedure.hbm.xml");
+            return resources;
         }
     };
+
     private static final Object lock = new Object();
+
     private static H2Configuration instance;
+
     private File tempDir;
+
     private Configuration configuration;
+
     private String[] createScript;
+
     private String[] dropScript;
-    
+
     public static void assertInitialized() {
         synchronized (lock) {
             if (instance == null) {
@@ -258,6 +299,10 @@ public class H2Configuration {
             LOG.debug("Executing {}", cmd);
             stmt.execute(cmd);
             configuration = new Configuration().configure("/sos-hibernate.cfg.xml");
+            List<String> resources = (List<String>) PROPERTIES.get(SessionFactoryProvider.HIBERNATE_RESOURCES);
+            for (String resource : resources) {
+                configuration.addResource(resource);
+            }
             final GeoDBDialect dialect = new GeoDBDialect();
             createScript = configuration.generateSchemaCreationScript(dialect);
             dropScript = configuration.generateDropSchemaScript(dialect);
@@ -268,6 +313,8 @@ public class H2Configuration {
         } catch (final ClassNotFoundException ex) {
             throw new RuntimeException(ex);
         } catch (final SQLException ex) {
+            throw new RuntimeException(ex);
+        } catch (MappingException ex) {
             throw new RuntimeException(ex);
         } finally {
             if (stmt != null) {

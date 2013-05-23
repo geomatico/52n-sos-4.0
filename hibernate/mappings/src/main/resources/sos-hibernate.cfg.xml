@@ -16,15 +16,15 @@
   <property name="hibernate.connection.autoReconnect">true</property>
   <property name="hibernate.connection.autoReconnectForPools">true</property>
   <property name="hibernate.connection.testOnBorrow">true</property>
-  <property name="hibernate.connection.autocommit">false</property>
+
   <property name="hibernate.max_fetch_depth">1</property>
   <!-- <property name="hibernate.connection.oracle.jdbc.V8Compatible">true</property> 
  No sql output in std out.
         <property name="hibernate.show_sql">true</property>
-        <property name="hibernate.format_sql">true</property>
+        <property name="hibernate.format_sql">true</property> -->
 
- Hibernate mapping files 
- core module -->
+   <!-- Hibernate mapping files -->
+   <!-- core module 
   <mapping resource="mapping/core/Codespace.hbm.xml"/>
   <mapping resource="mapping/core/FeatureOfInterest.hbm.xml"/>
   <mapping resource="mapping/core/FeatureOfInterestType.hbm.xml"/>
@@ -33,8 +33,8 @@
   <mapping resource="mapping/core/Offering.hbm.xml"/>
   <mapping resource="mapping/core/Procedure.hbm.xml"/>
   <mapping resource="mapping/core/ProcedureDescriptionFormat.hbm.xml"/>
-  <mapping resource="mapping/core/Unit.hbm.xml"/>
-  <!-- transactional module -->
+  <mapping resource="mapping/core/Unit.hbm.xml"/> -->
+  <!-- transactional module
   <mapping resource="mapping/transactional/ObservationConstellation.hbm.xml"/>
   <mapping resource="mapping/transactional/ObservationType.hbm.xml"/>
   <mapping resource="mapping/transactional/RelatedFeature.hbm.xml"/>
@@ -44,6 +44,6 @@
   <mapping resource="mapping/transactional/TFeatureOfInterest.hbm.xml"/>
   <mapping resource="mapping/transactional/TObservableProperty.hbm.xml"/>
   <mapping resource="mapping/transactional/TOffering.hbm.xml"/>
-  <mapping resource="mapping/transactional/TProcedure.hbm.xml"/>
+  <mapping resource="mapping/transactional/TProcedure.hbm.xml"/> -->
  </session-factory>
 </hibernate-configuration>
