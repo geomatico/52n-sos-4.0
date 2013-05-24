@@ -133,7 +133,7 @@ public class SamplingEncoderv20 implements Encoder<XmlObject, SosAbstractFeature
         if (absFeature instanceof SosSamplingFeature) {
             SosSamplingFeature sampFeat = (SosSamplingFeature) absFeature;
             StringBuilder builder = new StringBuilder();
-            builder.append("foi_");
+            builder.append("ssf_");
             builder.append(JavaHelper.generateID(absFeature.getIdentifier().getValue()));
             absFeature.setGmlId(builder.toString());
 
@@ -143,17 +143,20 @@ public class SamplingEncoderv20 implements Encoder<XmlObject, SosAbstractFeature
             if (sampFeat.getXmlDescription() != null) {
                 try {
                     XmlObject feature = XmlObject.Factory.parse(sampFeat.getXmlDescription());
-                    if (feature instanceof SFSpatialSamplingFeatureDocument) {
-                        xbSampFeatDoc = (SFSpatialSamplingFeatureDocument) feature;
-                    } else if (feature instanceof SFSpatialSamplingFeatureType) {
-                        xbSampFeatDoc.setSFSpatialSamplingFeature((SFSpatialSamplingFeatureType) feature);
+                        if (XmlHelper.getNamespace(feature).equals(SFConstants.NS_SAMS)) {
+                        if (feature instanceof SFSpatialSamplingFeatureDocument) {
+                            xbSampFeatDoc = (SFSpatialSamplingFeatureDocument) feature;
+                        } else if (feature instanceof SFSpatialSamplingFeatureType) {
+                            xbSampFeatDoc.setSFSpatialSamplingFeature((SFSpatialSamplingFeatureType) feature);
+                        }
+                        XmlHelper.updateGmlIDs(xbSampFeatDoc.getDomNode().getFirstChild(), absFeature.getGmlId(), null);
+                        return xbSampFeatDoc;
                     }
-                    XmlHelper.updateGmlIDs(xbSampFeatDoc.getDomNode().getFirstChild(), absFeature.getGmlId(), null);
                 } catch (XmlException xmle) {
                     throw new NoApplicableCodeException().causedBy(xmle)
                             .withMessage("Error while encoding GetFeatureOfInterest response, invalid samplingFeature description!");
                 }
-            } else {
+            }
                 SFSpatialSamplingFeatureType xbSampFeature = xbSampFeatDoc.addNewSFSpatialSamplingFeature();
                 // TODO: CHECK for all fields
                 // set gml:id
@@ -217,7 +220,6 @@ public class SamplingEncoderv20 implements Encoder<XmlObject, SosAbstractFeature
                     throw new NoApplicableCodeException()
                             .withMessage("Error while encoding geometry for feature, needed encoder is missing!");
                 }
-            }
             return xbSampFeatDoc;
         }
         throw new UnsupportedEncoderInputException(this, absFeature);
