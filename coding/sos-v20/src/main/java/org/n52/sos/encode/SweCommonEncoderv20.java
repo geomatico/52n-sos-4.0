@@ -430,7 +430,8 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
             xbQuantity.addNewUom().setCode(quantity.getUom());
         }
         if (quantity.getQuality() != null) {
-            // TODO
+            // TODO implement
+            LOGGER.warn("Quality encoding is not supported for {}", xbQuantity.schemaType());
         }
         return xbQuantity;
     }
@@ -452,7 +453,8 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
             xbTime.addNewUom().setHref(sosTime.getUom());
         }
         if (sosTime.getQuality() != null) {
-            // TODO
+            // TODO implement
+            LOGGER.warn("Quality encoding is not supported for {}", xbTime.schemaType());
         }
         return xbTime;
     }
@@ -466,7 +468,8 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
             xbTimeRange.setValue(sosTimeRange.getValue().getRangeAsStringList());
         }
         if (sosTimeRange.isSetQuality()) {
-            // TODO
+            // TODO implement
+            LOGGER.warn("Quality encoding is not supported for {}", xbTimeRange.schemaType());
         }
         return xbTimeRange;
     }

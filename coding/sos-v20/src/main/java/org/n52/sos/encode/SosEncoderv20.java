@@ -70,7 +70,9 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
+import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.OptionNotSupportedException;
 import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.filter.FilterConstants;
 import org.n52.sos.ogc.filter.TemporalFilter;
@@ -611,11 +613,11 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         }
     }
 
-    private void setExensions(final XmlObject addNewExtension, final SwesExtension extension) {
+    private void setExensions(final XmlObject addNewExtension, final SwesExtension extension) throws CodedException {
         if (extension instanceof SosInsertionCapabilities) {
             addNewExtension.set(createInsertionCapabilities((SosInsertionCapabilities) extension));
         } else {
-            // TODO: not supported
+            throw new OptionNotSupportedException().withMessage("The extension element is not supported by this service!");
         }
     }
 

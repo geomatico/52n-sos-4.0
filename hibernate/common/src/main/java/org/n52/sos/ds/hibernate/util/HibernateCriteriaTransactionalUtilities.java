@@ -54,6 +54,7 @@ import org.n52.sos.ds.hibernate.entities.TOffering;
 import org.n52.sos.ds.hibernate.entities.TProcedure;
 import org.n52.sos.ds.hibernate.entities.Unit;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
+import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
@@ -416,13 +417,13 @@ public class HibernateCriteriaTransactionalUtilities {
     }
 
     public static void insertObservationSingleValue(Set<ObservationConstellation> observationConstellations,
-            FeatureOfInterest feature, SosObservation observation, Session session) {
+            FeatureOfInterest feature, SosObservation observation, Session session) throws CodedException {
         insertObservationSingleValueWithSetId(observationConstellations, feature, observation, null, session);
     }
 
     @SuppressWarnings("rawtypes")
     private static void insertObservationSingleValueWithSetId(Set<ObservationConstellation> observationConstellations,
-            FeatureOfInterest feature, SosObservation sosObservation, String setId, Session session) {
+            FeatureOfInterest feature, SosObservation sosObservation, String setId, Session session) throws CodedException {
         SosSingleObservationValue<?> value = (SosSingleObservationValue) sosObservation.getValue();
         Observation hObservation = HibernateUtilities.createObservationFromValue(value.getValue(), session);
         hObservation.setDeleted(false);

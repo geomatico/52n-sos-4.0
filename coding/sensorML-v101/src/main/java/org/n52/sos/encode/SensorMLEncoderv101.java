@@ -260,7 +260,15 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                 }
 
             } else if (xmlObject instanceof AbstractProcessType) {
-                // TODO add values
+                AbstractProcessType abstractProcess = (AbstractProcessType) xmlObject;
+                addAbstractProcessValues(abstractProcess, (AbstractProcess)sensorDesc);
+                if (abstractProcess instanceof SystemType && sensorDesc instanceof System) {
+                    addSystemValues((SystemType) abstractProcess, (System) sensorDesc);
+                } else if (abstractProcess instanceof ProcessModelType
+                        && sensorDesc instanceof ProcessModel) {
+                    addProcessModelValues((ProcessModelType)abstractProcess,
+                            (ProcessModel) sensorDesc);
+                }
             }
             return xmlObject;
         } catch (final XmlException xmle) {

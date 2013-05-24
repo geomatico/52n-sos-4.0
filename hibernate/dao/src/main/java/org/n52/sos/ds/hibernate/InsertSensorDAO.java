@@ -41,12 +41,14 @@ import org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.sensorML.SensorML;
+import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosInsertionCapabilities;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
@@ -110,9 +112,9 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
                 response.setAssignedOffering(firstAssignedOffering.getOfferingIdentifier());
             } else if (procedureDescriptionFormat == null && observationTypes != null
                     && featureOfInterestTypes != null) {
-                // TODO: invalid parameter value procDescFormat
+                throw new InvalidParameterValueException(Sos2Constants.InsertSensorParams.procedureDescriptionFormat, "");
             } else {
-                // TODO: exception DB not initialized
+                throw new NoApplicableCodeException().withMessage("Error while inserting InsertSensor into database!");
             }
             session.flush();
             transaction.commit();

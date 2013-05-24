@@ -130,7 +130,7 @@ public class FesDecoderv20 implements Decoder<Object, XmlObject> {
                     if (sosGeometry instanceof Geometry) {
                         spatialFilter.setGeometry((Geometry) sosGeometry);
                     } else {
-                        //TODO throw exception
+                        throw new UnsupportedDecoderInputException(this, xbSpatialOpsType);
                     }
                     
                 } else {

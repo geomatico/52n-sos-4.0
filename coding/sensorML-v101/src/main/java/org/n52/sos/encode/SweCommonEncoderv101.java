@@ -297,7 +297,8 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             xbBoolean.setValue(bool.getValue().booleanValue());
         }
         if (bool.isSetQuality()) {
-            // TODO
+            // TODO implement
+            LOGGER.warn("Quality encoding is not supported for {}", xbBoolean.schemaType());
         }
         return xbBoolean;
     }
@@ -312,7 +313,8 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             xbCategory.addNewCodeSpace().setHref(category.getCodeSpace());
         }
         if (category.isSetQuality()) {
-            // TODO
+            // TODO implement
+            LOGGER.warn("Quality encoding is not supported for {}", xbCategory.schemaType());
         }
         return xbCategory;
     }
@@ -324,7 +326,8 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             xbCount.setValue(new BigInteger(Integer.toString(count.getValue().intValue())));
         }
         if (count.isSetQuality()) {
-            // TODO
+            // TODO implement
+            LOGGER.warn("Quality encoding is not supported for {}", xbCount.schemaType());
         }
         return xbCount;
     }
@@ -334,7 +337,8 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
                 ObservableProperty.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         addAbstractDataComponentValues(xbObservableProperty, observableProperty);
         if (observableProperty.isSetQuality()) {
-            // TODO
+            // TODO implementschemaType()
+            LOGGER.warn("Quality encoding is not supported for {}", xbObservableProperty.schemaType());
         }
         return xbObservableProperty;
     }
@@ -358,7 +362,8 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             xbQuantity.addNewUom().setCode(quantity.getUom());
         }
         if (quantity.isSetQuality()) {
-            // TODO
+            // TODO implement
+            LOGGER.warn("Quality encoding is not supported for {}", xbQuantity.schemaType());
         }
         return xbQuantity;
     }
@@ -377,7 +382,8 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             xbQuantityRange.addNewUom().setCode(quantityRange.getUom());
         }
         if (quantityRange.isSetQuality()) {
-            // TODO
+            // TODO implement
+            LOGGER.warn("Quality encoding is not supported for {}", xbQuantityRange.schemaType());
         }
         return xbQuantityRange;
     }
@@ -395,7 +401,8 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             xbText.setValue(text.getValue());
         }
         if (text.isSetQuality()) {
-            // TODO
+            // TODO implement
+            LOGGER.warn("Quality encoding is not supported for {}", xbText.toString());
         }
         return xbText;
     }
@@ -411,7 +418,8 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             xbTime.addNewUom().setCode(time.getUom());
         }
         if (time.isSetQuality()) {
-            // TODO
+            // TODO implement
+            LOGGER.warn("Quality encoding is not supported for {}", xbTime.schemaType());
         }
         return xbTime;
     }
@@ -465,7 +473,8 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             xbTimeRange.addNewUom().setCode(timeRange.getUom());
         }
         if (timeRange.isSetQuality()) {
-            // TODO
+            // TODO implement
+            LOGGER.warn("Quality encoding is not supported for {}", xbTimeRange.schemaType());
         }
         return xbTimeRange;
     }

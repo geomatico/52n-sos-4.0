@@ -128,9 +128,8 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
             return encodeTemporalFilter((TemporalFilter) element);
         } else if (element instanceof SpatialFilter) {
             return encodeSpatialFilter((SpatialFilter) element);
-        } else {
-            throw new UnsupportedEncoderInputException(this, element);
         }
+        throw new UnsupportedEncoderInputException(this, element);
     }
 
     private XmlObject encodeTemporalFilter(TemporalFilter temporalFilter) throws OwsExceptionReport {

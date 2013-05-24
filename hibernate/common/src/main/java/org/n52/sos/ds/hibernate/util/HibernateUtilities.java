@@ -43,6 +43,7 @@ import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.TFeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.TextObservation;
+import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.gml.time.ITime;
@@ -151,7 +152,7 @@ public class HibernateUtilities {
     }
 
     public static void addPhenomeonTimeAndResultTimeToObservation(Observation hObservation, ITime phenomenonTime,
-                                                                  TimeInstant resultTime) {
+                                                                  TimeInstant resultTime) throws CodedException {
         addPhenomenonTimeToObservation(hObservation, phenomenonTime);
         addResultTimeToObservation(hObservation, resultTime, phenomenonTime);
     }
@@ -168,7 +169,7 @@ public class HibernateUtilities {
         }
     }
 
-    public static void addResultTimeToObservation(Observation hObservation, TimeInstant resultTime, ITime phenomenonTime) {
+    public static void addResultTimeToObservation(Observation hObservation, TimeInstant resultTime, ITime phenomenonTime) throws CodedException {
         if (resultTime != null) {
             if (resultTime.getValue() != null) {
                 hObservation.setResultTime(resultTime.getValue().toDate());
@@ -176,13 +177,13 @@ public class HibernateUtilities {
                        && phenomenonTime instanceof TimeInstant) {
                 hObservation.setResultTime(((TimeInstant) phenomenonTime).getValue().toDate());
             } else {
-                // TODO: exception not valid resultTime
+                throw new NoApplicableCodeException().withMessage("Error while adding result time to Hibernate Observation entitiy!");
             }
         } else {
             if (phenomenonTime instanceof TimeInstant) {
                 hObservation.setResultTime(((TimeInstant) phenomenonTime).getValue().toDate());
             } else {
-                // TODO exception
+                throw new NoApplicableCodeException().withMessage("Error while adding result time to Hibernate Observation entitiy!");
             }
         }
     }
