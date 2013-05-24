@@ -162,10 +162,9 @@ public abstract class AbstractOmEncoderv20 implements ObservationEncoder<XmlObje
         addFeatureOfInterest(xbObservation, sosObservation.getObservationConstellation().getFeatureOfInterest());
         // set result
         XmlObject createResult = createResult(sosObservation, phenomenonTime.getGmlId());
+        XmlObject addNewResult = xbObservation.addNewResult();
         if (createResult != null) {
-            xbObservation.addNewResult().set(createResult(sosObservation, phenomenonTime.getGmlId()));
-        } else {
-            xbObservation.addNewResult().setNil();
+            addNewResult.set(createResult(sosObservation, phenomenonTime.getGmlId()));
         }
         return xbObservation;
     }
