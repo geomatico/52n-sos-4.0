@@ -92,7 +92,7 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
         ConformanceClasses.OM_V2_CATEGORY_OBSERVATION, 
         ConformanceClasses.OM_V2_COUNT_OBSERVATION, 
         ConformanceClasses.OM_V2_TRUTH_OBSERVATION, 
-        ConformanceClasses.OM_V2_GEOMETRY_OBSERVATION, 
+//        ConformanceClasses.OM_V2_GEOMETRY_OBSERVATION, 
         ConformanceClasses.OM_V2_TEXT_OBSERVATION);
 
     public OmDecoderv20() {

@@ -500,7 +500,7 @@ public abstract class TemporalRestriction {
      * </tr>
      * </table>
      */
-    public static class EqualsRestriction extends TemporalRestriction {
+    public static class TEqualsRestriction extends TemporalRestriction {
         @Override
         protected Criterion filterPeriodWithPeriod(String selfBegin, String selfEnd, Date otherBegin, Date otherEnd) {
             return Restrictions.and(Restrictions.eq(selfBegin, otherBegin),

@@ -213,9 +213,9 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
             ++j;
         }
 
-        if (observedProperties.size() > 1) {
-            // TODO composite phenomenon
-        }
+        // TODO support for compositePhenomenon
+//        if (observedProperties.size() > 1) {
+//        }
 
         SosMultiObservationValues<SosSweDataArray> sosValues =
                 createObservationValueFrom(blockValues, record, encoding, resultTimeIndex, phenomenonTimeIndex, types,

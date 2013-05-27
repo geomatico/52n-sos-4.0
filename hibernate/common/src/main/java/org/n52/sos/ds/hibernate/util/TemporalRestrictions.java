@@ -35,7 +35,7 @@ import org.n52.sos.ds.hibernate.util.TemporalRestriction.ContainsRestriction;
 import org.n52.sos.ds.hibernate.util.TemporalRestriction.DuringRestriction;
 import org.n52.sos.ds.hibernate.util.TemporalRestriction.EndedByRestriction;
 import org.n52.sos.ds.hibernate.util.TemporalRestriction.EndsRestriction;
-import org.n52.sos.ds.hibernate.util.TemporalRestriction.EqualsRestriction;
+import org.n52.sos.ds.hibernate.util.TemporalRestriction.TEqualsRestriction;
 import org.n52.sos.ds.hibernate.util.TemporalRestriction.MeetsRestriction;
 import org.n52.sos.ds.hibernate.util.TemporalRestriction.MetByRestriction;
 import org.n52.sos.ds.hibernate.util.TemporalRestriction.OverlappedByRestriction;
@@ -58,7 +58,7 @@ import org.n52.sos.ogc.gml.time.ITime;
  * @see DuringRestriction
  * @see EndedByRestriction
  * @see EndsRestriction
- * @see EqualsRestriction
+ * @see TEqualsRestriction
  * @see MeetsRestriction
  * @see MetByRestriction
  * @see OverlappedByRestriction
@@ -442,11 +442,11 @@ public class TemporalRestrictions {
      *
      * @return the <tt>Criterion</tt>
      *
-     * @see EqualsRestriction
+     * @see TEqualsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion equals(String begin, String end, ITime value) throws UnsupportedTimeException {
-        return filter(new EqualsRestriction(), begin, end, value);
+    public static Criterion tEquals(String begin, String end, ITime value) throws UnsupportedTimeException {
+        return filter(new TEqualsRestriction(), begin, end, value);
     }
 
     /**
@@ -457,11 +457,11 @@ public class TemporalRestrictions {
      *
      * @return the <tt>Criterion</tt>
      *
-     * @see EqualsRestriction
+     * @see TEqualsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion equals(String property, ITime value) throws UnsupportedTimeException {
-        return filter(new EqualsRestriction(), property, value);
+    public static Criterion tEquals(String property, ITime value) throws UnsupportedTimeException {
+        return filter(new TEqualsRestriction(), property, value);
     }
 
     /**
@@ -472,11 +472,11 @@ public class TemporalRestrictions {
      *
      * @return the <tt>Criterion</tt>
      *
-     * @see EqualsRestriction
+     * @see TEqualsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion equals(TimePrimitiveFieldDescriptor property, ITime value) throws UnsupportedTimeException {
-        return filter(new EqualsRestriction(), property, value);
+    public static Criterion tEquals(TimePrimitiveFieldDescriptor property, ITime value) throws UnsupportedTimeException {
+        return filter(new TEqualsRestriction(), property, value);
     }
 
     /**
@@ -792,7 +792,7 @@ public class TemporalRestrictions {
             case TM_During:
                 return during(property, value);
             case TM_Equals:
-                return equals(property, value);
+                return tEquals(property, value);
             case TM_Contains:
                 return contains(property, value);
             case TM_Overlaps:

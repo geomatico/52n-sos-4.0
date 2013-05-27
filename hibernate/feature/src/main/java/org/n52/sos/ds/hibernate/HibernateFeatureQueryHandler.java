@@ -322,9 +322,10 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
                 feature.setFeatureOfInterestType(HibernateCriteriaTransactionalUtilities
                         .getOrInsertFeatureOfInterestType(samplingFeature.getFeatureType(), session));
             }
-            if (samplingFeature.isSetSampledFeatures()) {
-                // TODO: create relationship
-            }
+            
+            // TODO: create relationship
+//            if (samplingFeature.isSetSampledFeatures()) {
+//            }
             session.save(feature);
             session.flush();
             return newId;

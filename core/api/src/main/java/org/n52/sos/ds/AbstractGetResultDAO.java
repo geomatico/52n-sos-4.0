@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.n52.sos.exception.ows.OperationNotSupportedException;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
@@ -54,7 +55,8 @@ public abstract class AbstractGetResultDAO extends AbstractOperationDAO {
             featureOfInterest = getCache().getFeaturesOfInterestWithResultTemplate();
         }
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            // TODO set parameter for SOS 1.0
+            throw new OperationNotSupportedException().at(SosConstants.Operations.GetResult).withMessage(
+                    "This operation is not supported for SOS {}!", Sos1Constants.SERVICEVERSION);
         } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
             opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultParams.offering, offerings);
             opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultParams.observedProperty, observableProperties);
@@ -68,7 +70,7 @@ public abstract class AbstractGetResultDAO extends AbstractOperationDAO {
             // new OWSParameterValuePossibleValues(null));
         }
     }
-    
+
     public abstract GetResultResponse getResult(GetResultRequest request) throws OwsExceptionReport;
 
 }

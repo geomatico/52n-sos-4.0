@@ -210,7 +210,8 @@ public class FesDecoderv20 implements Decoder<Object, XmlObject> {
                             temporalFilter.setTime(time);
                             break;
                         } else {
-                            //TODO throw exception
+                            throw new InvalidParameterValueException().at(Sos2Constants.GetObservationParams.temporalFilter)
+                            .withMessage("The requested temporal filter value is not supported by this SOS!");
                         }
                     }
                 }

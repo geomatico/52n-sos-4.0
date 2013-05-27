@@ -197,7 +197,7 @@ public class SosInsertSensorOperatorV20 extends
     private void checkObservableProperty(List<String> observableProperty) throws OwsExceptionReport {
         if (observableProperty == null || observableProperty.isEmpty()) {
             throw new MissingObservedPropertyParameterException();
-        } else {
+//        } else {
             // TODO: check with existing and/or defined in outputs
         }
     }

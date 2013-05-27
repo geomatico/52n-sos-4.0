@@ -74,6 +74,10 @@ public class SosHelper {
    
     private static Configuration config = new Configuration();
     private static final Logger LOGGER = LoggerFactory.getLogger(SosHelper.class);
+    
+    private static final String CSV_BLOCK_SEPARATOR = ",";
+    
+    private static final String CSV_TOKEN_SEPARATOR = "@@";
 
     protected static Configuration getConfiguration() {
         return config;
@@ -502,11 +506,12 @@ public class SosHelper {
             for (final CodeType value : values) {
                 builder.append(value.getValue());
                 if (value.isSetCodeSpace()) {
-                    // TODO add codespace to name
+                    builder.append(CSV_TOKEN_SEPARATOR);
+                    builder.append(value.getCodeSpace());
                 }
-                builder.append(',');
+                builder.append(CSV_BLOCK_SEPARATOR);
             }
-            builder.delete(builder.lastIndexOf(","), builder.length());
+            builder.delete(builder.lastIndexOf(CSV_BLOCK_SEPARATOR), builder.length());
         }
         return builder.toString();
     }
@@ -514,9 +519,13 @@ public class SosHelper {
     public static List<CodeType> createCodeTypeListFromCSV(final String csv) {
         final List<CodeType> names = new ArrayList<CodeType>(0);
         if ((csv != null) && !csv.isEmpty()) {
-            // TODO get codespace from string if available
-            for (final String name : csv.split(",")) {
-                names.add(new CodeType(name));
+            for (final String nameCodespaces : csv.split(CSV_BLOCK_SEPARATOR)) {
+                String[] nameCodespace = nameCodespaces.split(CSV_TOKEN_SEPARATOR);
+                CodeType codeType = new CodeType(nameCodespace[0]);
+                if (nameCodespace.length == 2) {
+                    codeType.setCodeSpace(nameCodespace[1]);
+                }
+                names.add(codeType);
             }
         }
         return names;

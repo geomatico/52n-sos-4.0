@@ -47,7 +47,7 @@ import org.n52.sos.ds.hibernate.util.TemporalRestriction.ContainsRestriction;
 import org.n52.sos.ds.hibernate.util.TemporalRestriction.DuringRestriction;
 import org.n52.sos.ds.hibernate.util.TemporalRestriction.EndedByRestriction;
 import org.n52.sos.ds.hibernate.util.TemporalRestriction.EndsRestriction;
-import org.n52.sos.ds.hibernate.util.TemporalRestriction.EqualsRestriction;
+import org.n52.sos.ds.hibernate.util.TemporalRestriction.TEqualsRestriction;
 import org.n52.sos.ds.hibernate.util.TemporalRestriction.MeetsRestriction;
 import org.n52.sos.ds.hibernate.util.TemporalRestriction.MetByRestriction;
 import org.n52.sos.ds.hibernate.util.TemporalRestriction.OverlappedByRestriction;
@@ -137,7 +137,7 @@ public class TemporalRestrictionInstantInstantTest extends TemporalRestrictionTe
     public void testEqualsPhenomenonTime() throws OwsExceptionReport {
         Session session = getSession();
         try {
-            Set<Identifier> filtered = filterPhenomenonTime(session, new EqualsRestriction());
+            Set<Identifier> filtered = filterPhenomenonTime(session, new TEqualsRestriction());
             assertThat(filtered, is(notNullValue()));
             assertThat(filtered, hasItem(II_EQUALS_ID));
             assertThat(filtered, hasSize(1));
@@ -150,7 +150,7 @@ public class TemporalRestrictionInstantInstantTest extends TemporalRestrictionTe
     public void testEqualsResultTime() throws OwsExceptionReport {
         Session session = getSession();
         try {
-            Set<Identifier> filtered = filterResultTime(session, new EqualsRestriction());
+            Set<Identifier> filtered = filterResultTime(session, new TEqualsRestriction());
             assertThat(filtered, is(notNullValue()));
             assertThat(filtered, hasItem(II_EQUALS_ID));
             assertThat(filtered, hasSize(1));

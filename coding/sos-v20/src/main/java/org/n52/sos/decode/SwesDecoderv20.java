@@ -309,7 +309,7 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
                 }
                 feature.setFeatureType(OGCConstants.UNKNOWN);
                 sosFeatureRelationship.setFeature(feature);
-            } else {
+//            } else {
                 // TODO: decode encoded feature, XML-Represent
             }
             sosFeatureRelationship.setRole(relatedFeature.getFeatureRelationship().getRole());
