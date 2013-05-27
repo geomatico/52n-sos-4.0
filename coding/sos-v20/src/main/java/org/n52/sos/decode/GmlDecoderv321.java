@@ -221,7 +221,7 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
      * GetObservation request and returns a String representing the BOX in
      * Well-Known-Text format
      * 
-     * @param xb_bbox
+     * @param envelopeDocument
      *            XmlBean representing the BBOX-element in the request
      * @return Returns WKT-String representing the BBOX as Multipoint with two
      *         elements
@@ -336,7 +336,7 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
      * creates SOS representation of time period from XMLBeans representation of
      * time period
      * 
-     * @param xb_timePeriod
+     * @param xbTimePeriod
      *            XMLBeans representation of time period
      * @return Returns SOS representation of time period
 

@@ -139,14 +139,14 @@ public class OgcDecoderv100 implements Decoder<Object, XmlObject> {
      *
      * @throws OwsExceptionReport     *             if parsing of the element failed
      */
-    private Object parseTemporalOperatorType(BinaryTemporalOpType xb_btot) throws OwsExceptionReport {
+    private Object parseTemporalOperatorType(BinaryTemporalOpType xbBinaryTemporalOp) throws OwsExceptionReport {
 
 		TemporalFilter temporalFilter = new TemporalFilter();
 		// FIXME local workaround against SOSHelper check value reference
 		String valueRef = "phenomenonTime";
 		try {
 			
-			NodeList nodes = xb_btot.getDomNode().getChildNodes();
+			NodeList nodes = xbBinaryTemporalOp.getDomNode().getChildNodes();
 	        for (int i = 0; i < nodes.getLength(); i++) {
 
 	            if (nodes.item(i).getNamespaceURI() != null
@@ -165,7 +165,7 @@ public class OgcDecoderv100 implements Decoder<Object, XmlObject> {
 	                if (timeObject != null && timeObject instanceof ITime) {
 	                    TimeOperator operator;
 	                    ITime time = (ITime) timeObject;
-	                    String localName = XmlHelper.getLocalName(xb_btot);
+	                    String localName = XmlHelper.getLocalName(xbBinaryTemporalOp);
 	                    // change to SOS 1.0. TMDuring kind of
 	                    if (localName.equals(TimeOperator.TM_During.name()) && time instanceof TimePeriod) {
 	                        operator = TimeOperator.TM_During;

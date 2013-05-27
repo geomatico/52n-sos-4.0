@@ -128,10 +128,10 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
     }
 
     /**
-     * Add parent procedures to a SystemDocument
+     * Add parent procedures to a procedure
      * 
-     * @param xb_systemDoc
-     *            System document to add parent procedures to
+     * @param procID
+     *            procedure identifier to add parent procedures to
      * @param parentProcedureIds
      *            The parent procedures to add
 
@@ -143,10 +143,10 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
     }
 
     /**
-     * Add a collection of child procedures to a SystemDocument
+     * Add a collection of child procedures to a procedure 
      * 
-     * @param xb_systemDoc
-     *            System document to add child procedures to
+     * @param procID
+     *            procedure identifier  to add child procedures to
      * @param childProcedures
      *            The child procedures to add
      *
