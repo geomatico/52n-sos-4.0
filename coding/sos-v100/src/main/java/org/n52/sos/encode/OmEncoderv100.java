@@ -246,8 +246,8 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
                 }
             }
         } else {
-            ObservationPropertyType xb_obs = xbObservationCollection.addNewMember();
-            xb_obs.setHref(GMLConstants.NIL_INAPPLICABLE);
+            ObservationPropertyType xbObservation = xbObservationCollection.addNewMember();
+            xbObservation.setHref(GMLConstants.NIL_INAPPLICABLE);
         }
         XmlHelper.makeGmlIdsUnique(xbObservationCollectionDoc.getDomNode());
         List<String> schemaLocations = new ArrayList<String>(3);

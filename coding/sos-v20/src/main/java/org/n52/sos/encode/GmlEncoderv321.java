@@ -380,7 +380,7 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         } else {
             timeInstantType.setId("ti_" + JavaHelper.generateID(timeInstantType.toString() + System.currentTimeMillis()));
         }
-        TimePositionType xb_posType = timeInstantType.addNewTimePosition();
+        TimePositionType xbTimePosition = timeInstantType.addNewTimePosition();
 
         String timeString = OGCConstants.UNKNOWN;
         if(timeInstant.isSetValue()) {
@@ -394,7 +394,7 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         } else if (timeInstant.isSetIndeterminateValue()) {
             timeString = timeInstant.getIndeterminateValue();
         }
-        xb_posType.setStringValue(timeString);
+        xbTimePosition.setStringValue(timeString);
         return timeInstantType;
     }
 

@@ -68,7 +68,7 @@ public class H2Configuration {
 
     private static final String H2_CONNECTION_URL = "jdbc:h2:mem:sos;DB_CLOSE_DELAY=-1";
 
-    private static Properties PROPERTIES = new Properties() {
+    private static Properties properties = new Properties() {
         private static final long serialVersionUID = 3109256773218160485L;
 
         {
@@ -285,7 +285,7 @@ public class H2Configuration {
     }
 
     private void createConfigurator() throws ConfigurationException {
-        Configurator.createInstance(PROPERTIES, getTempDir().getAbsolutePath());
+        Configurator.createInstance(properties, getTempDir().getAbsolutePath());
     }
 
     private void prepareDatabase() {
@@ -299,7 +299,7 @@ public class H2Configuration {
             LOG.debug("Executing {}", cmd);
             stmt.execute(cmd);
             configuration = new Configuration().configure("/sos-hibernate.cfg.xml");
-            List<String> resources = (List<String>) PROPERTIES.get(SessionFactoryProvider.HIBERNATE_RESOURCES);
+            List<String> resources = (List<String>) properties.get(SessionFactoryProvider.HIBERNATE_RESOURCES);
             for (String resource : resources) {
                 configuration.addResource(resource);
             }

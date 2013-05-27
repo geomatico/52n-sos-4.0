@@ -80,7 +80,7 @@ public class SamplingEncoderv100 implements Encoder<XmlObject, SosAbstractFeatur
 
     // TODO here also the question, sa:samplingPoint sampling/1.0 vs 2.0 mapping
     // or not and where and how to handle
-    private Map<SupportedTypeKey, Set<String>> SUPPORTED_TYPES = Collections.singletonMap(
+    private static final Map<SupportedTypeKey, Set<String>> SUPPORTED_TYPES = Collections.singletonMap(
             SupportedTypeKey.FeatureType, CollectionHelper.set(OGCConstants.UNKNOWN, SFConstants.EN_SAMPLINGPOINT,
                     SFConstants.EN_SAMPLINGSURFACE, SFConstants.EN_SAMPLINGCURVE));
 

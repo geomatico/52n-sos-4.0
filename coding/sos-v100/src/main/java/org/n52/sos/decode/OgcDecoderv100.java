@@ -69,7 +69,7 @@ public class OgcDecoderv100 implements Decoder<Object, XmlObject> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(OgcDecoderv100.class);
 
-    private Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(
+    private static final Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(
     		OGCConstants.NS_OGC,
             SpatialOperatorType.class,
             TemporalOperatorType.class,
@@ -104,8 +104,8 @@ public class OgcDecoderv100 implements Decoder<Object, XmlObject> {
 		}
 		// add propertyNameDoc here 
 		if (xmlObject instanceof PropertyNameDocument) {
-			PropertyNameDocument xb_propDoc = ((PropertyNameDocument) xmlObject);
-			return xb_propDoc.getPropertyName();
+			PropertyNameDocument xbPropertyNameDoc = ((PropertyNameDocument) xmlObject);
+			return xbPropertyNameDoc.getPropertyName();
         }
 		// add BBOXType here		
 		if (xmlObject instanceof BinarySpatialOpType) {

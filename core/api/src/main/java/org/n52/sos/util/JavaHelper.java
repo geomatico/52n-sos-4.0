@@ -44,14 +44,14 @@ public final class JavaHelper {
     /**
      * Message digest for generating single identifier
      */
-    private static MessageDigest MESSAGE_DIGEST;
+    private static MessageDigest messageDigest;
 
     /**
      * Instantiation of the message digest
      */
     static {
         try {
-            MESSAGE_DIGEST = MessageDigest.getInstance("SHA1");
+            messageDigest = MessageDigest.getInstance("SHA1");
         } catch (final NoSuchAlgorithmException nsae) {
             LOGGER.error("Error while getting SHA-1 messagedigest!", nsae);
         }
@@ -67,7 +67,7 @@ public final class JavaHelper {
     public static String generateID(final String message) {
         final long autoGeneratredID = new DateTime().getMillis();
         final String concate = message + Long.toString(autoGeneratredID);
-        return bytesToHex(MESSAGE_DIGEST.digest(concate.getBytes()));
+        return bytesToHex(messageDigest.digest(concate.getBytes()));
     }
 
     /**

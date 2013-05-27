@@ -34,7 +34,7 @@ import org.n52.sos.service.operator.ServiceOperatorRepository;
 
 /**
  * SOS GetCapabilities request
- *
+ * 
  */
 public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
@@ -78,7 +78,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Get accept Formats
-     *
+     * 
      * @return accept Formats
      */
     public List<String> getAcceptFormats() {
@@ -87,7 +87,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Set accept Formats
-     *
+     * 
      * @param acceptFormats
      *            accept Formats
      */
@@ -97,7 +97,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Get accept versions
-     *
+     * 
      * @return accept versions
      */
     public List<String> getAcceptVersions() {
@@ -107,14 +107,14 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
     public void addAcceptVersion(String acceptVersion) {
         acceptVersions.add(acceptVersion);
     }
-    
+
     public void setAcceptVersions(List<String> acceptVersions) {
         this.acceptVersions.addAll(acceptVersions);
     }
 
     /**
      * Get sections
-     *
+     * 
      * @return sections
      */
     public List<String> getSections() {
@@ -123,7 +123,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Set sections
-     *
+     * 
      * @param sections
      *            sections
      */
@@ -133,7 +133,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Get update sequence
-     *
+     * 
      * @return update sequence
      */
     public String getUpdateSequence() {
@@ -142,7 +142,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Set update sequence
-     *
+     * 
      * @param updateSequence
      *            update sequence
      */
@@ -152,7 +152,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Set extensions
-     *
+     * 
      * @param extensionArray
      *            extensions
      */
@@ -162,7 +162,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Get extensions
-     *
+     * 
      * @return extensions
      */
     public List<XmlObject> getExtensionArray() {
@@ -174,7 +174,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
         return operationName;
     }
 
-	@Override
+    @Override
     public ServiceOperatorKeyType[] getServiceOperatorKeyType() {
         if (serviceOperatorKeyTypes == null) {
             if (acceptVersions != null && acceptVersions.size() > 0) {
@@ -202,11 +202,12 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
     public boolean isSetSections() {
         return sections != null && !sections.isEmpty();
     }
-   
+
     public boolean isSetUpdateSequence() {
-        return updateSequence != null && !updateSequence.isEmpty() && !updateSequence.equals(SosConstants.PARAMETER_NOT_SET);
+        return updateSequence != null && !updateSequence.isEmpty()
+                && !updateSequence.equals(SosConstants.PARAMETER_NOT_SET);
     }
-    
+
     public boolean isSetExtensions() {
         return extensionArray != null && !extensionArray.isEmpty();
     }
