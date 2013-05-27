@@ -54,11 +54,11 @@ public final class DateTimeHelper {
      */
     private static String responseFormat;
 
-    private static final String ymdResponseFormat = "yyyy-MM-dd";
+    private static final String YMD_RESPONSE_FORMAT = "yyyy-MM-dd";
 
-    private static final String ymResponseFormat = "yyyy-MM";
+    private static final String YM_RESPONSE_FORMAT = "yyyy-MM";
 
-    private static final String yResponseFormat = "yyyy";
+    private static final String Y_RESPONSE_FORMAT = "yyyy";
 
     /**
      * lease value
@@ -207,7 +207,7 @@ public final class DateTimeHelper {
             } else {
                 result = new DateTime(dateTime.getMillis(), DateTimeZone.UTC);
             }
-            return result.toString(DateTimeFormat.forPattern(ymdResponseFormat));
+            return result.toString(DateTimeFormat.forPattern(YMD_RESPONSE_FORMAT));
         } catch (final IllegalArgumentException iae) {
             throw new DateTimeFormatException(dateTime, iae);
         }
@@ -230,7 +230,7 @@ public final class DateTimeHelper {
             } else {
                 result = new DateTime(dateTime.getMillis(), DateTimeZone.UTC);
             }
-            return result.toString(DateTimeFormat.forPattern(ymResponseFormat));
+            return result.toString(DateTimeFormat.forPattern(YM_RESPONSE_FORMAT));
         } catch (final IllegalArgumentException iae) {
             throw new DateTimeFormatException(dateTime, iae);
         }
@@ -253,7 +253,7 @@ public final class DateTimeHelper {
             } else {
                 result = new DateTime(dateTime.getMillis(), DateTimeZone.UTC);
             }
-            return result.toString(DateTimeFormat.forPattern(yResponseFormat));
+            return result.toString(DateTimeFormat.forPattern(Y_RESPONSE_FORMAT));
         } catch (final IllegalArgumentException iae) {
             throw new DateTimeFormatException(dateTime, iae);
         }

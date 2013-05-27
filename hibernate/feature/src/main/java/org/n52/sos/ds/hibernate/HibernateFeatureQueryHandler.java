@@ -64,7 +64,6 @@ import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.SosHelper;
-import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,8 +77,8 @@ import com.vividsolutions.jts.geom.Geometry;
 @Configurable
 public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateFeatureQueryHandler.class);
-    private static final int epsgWgs843D = 4329;
-    private static final int epsgWgs84 = 4326;
+    private static final int EPSG_WGS84_3D = 4329;
+    private static final int EPSG_WGS84 = 4326;
     private List<Range> epsgsWithReversedAxisOrder;
     private int defaultEPSG;
     private boolean spatialDatasource;
@@ -378,8 +377,8 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
             Geometry geom = JTSHelper.createGeometryFromWKT(wktString, epsg);
             if (feature.isSetAltitude()) {
                 geom.getCoordinate().z = getValueAsDouble(feature.getAltitude());
-                if (geom.getSRID() == epsgWgs84) {
-                    geom.setSRID(epsgWgs843D);
+                if (geom.getSRID() == EPSG_WGS84) {
+                    geom.setSRID(EPSG_WGS84_3D);
                 }
             }
             return switchCoordinateAxisOrderIfNeeded(geom);

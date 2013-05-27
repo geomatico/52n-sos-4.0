@@ -70,7 +70,7 @@ public class Configurator implements Cleanupable {
      * instance attribute, due to the singleton pattern.
      */
     private static Configurator instance = null;
-    private static final Lock initLock = new ReentrantLock();
+    private static final Lock INIT_LOCK = new ReentrantLock();
 
     /**
      * @return Returns the instance of the SosConfigurator. <tt>null</tt> will be returned if the parameterized {@link #createInstance(Properties, String)}
@@ -79,11 +79,11 @@ public class Configurator implements Cleanupable {
      * @see Configurator#createInstance(Properties, String)
      */
     public static Configurator getInstance() {
-        initLock.lock();
+        INIT_LOCK.lock();
         try {
             return instance;
         } finally {
-            initLock.unlock();
+            INIT_LOCK.unlock();
         }
     }
 
@@ -98,7 +98,7 @@ public class Configurator implements Cleanupable {
             throws ConfigurationException {
         if (instance == null) {
             boolean initialize = false;
-            initLock.lock();
+            INIT_LOCK.lock();
             try {
                 if (instance == null) {
                     try {
@@ -111,7 +111,7 @@ public class Configurator implements Cleanupable {
                     }
                 }
             } finally {
-                initLock.unlock();
+                INIT_LOCK.unlock();
             }
             if (initialize) {
                 try {

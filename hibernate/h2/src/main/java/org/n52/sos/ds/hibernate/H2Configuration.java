@@ -105,7 +105,7 @@ public class H2Configuration {
         }
     };
 
-    private static final Object lock = new Object();
+    private static final Object LOCK = new Object();
 
     private static H2Configuration instance;
 
@@ -118,7 +118,7 @@ public class H2Configuration {
     private String[] dropScript;
 
     public static void assertInitialized() {
-        synchronized (lock) {
+        synchronized (LOCK) {
             if (instance == null) {
                 try {
                     instance = new H2Configuration();
@@ -149,7 +149,7 @@ public class H2Configuration {
     }
 
     public static void recreate() {
-        synchronized (lock) {
+        synchronized (LOCK) {
             if (instance == null) {
                 throw new IllegalStateException("Database is not initialized");
             }
@@ -191,7 +191,7 @@ public class H2Configuration {
     }
 
     public static void truncate() {
-        synchronized (lock) {
+        synchronized (LOCK) {
             if (instance == null) {
                 throw new IllegalStateException("Database is not initialized");
             }
