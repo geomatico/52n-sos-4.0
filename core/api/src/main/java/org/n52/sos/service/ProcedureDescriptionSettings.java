@@ -142,8 +142,8 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	.setOrder(9)
 	.setKey(ProcedureDescriptionSettings.USE_SERVICE_CONTACT_AS_SENSOR_CONTACT)
 	.setDefaultValue(TRUE)
-	.setTitle("Use service contact as sensor contact")
-	.setDescription("Should the service contact be encoded as sensor contact if sensor description generation is activated.");
+	.setTitle("Use service contact as procedure contact")
+	.setDescription("Should the service contact be encoded as procedure contact if procedure description generation is activated.");
 	
 	private static final StringSettingDefinition LAT_LONG_UOM_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
