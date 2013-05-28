@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
+import static org.n52.sos.ogc.sensorML.elements.SosSMLClassifier.*;
 import static org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName.*;
 import static org.n52.sos.util.HTTPConstants.StatusCode.*;
 
@@ -409,13 +410,14 @@ public class HibernateProcedureConverter {
 
     private void createClassifier(final AbstractSensorML abstractSensorML) {
         if (!generationSettings().getClassifierIntendedApplicationValue().isEmpty()) {
-            abstractSensorML.addClassification(new SosSMLClassifier("intendedApplication", generationSettings()
-                    .getClassifierIntendedApplicationDefinition(), generationSettings()
-                    .getClassifierIntendedApplicationValue()));
+            abstractSensorML.addClassification(new SosSMLClassifier(INTENDED_APPLICATION, 
+            		generationSettings().getClassifierIntendedApplicationDefinition(),
+            		generationSettings().getClassifierIntendedApplicationValue()));
         }
-        if (!generationSettings().getClassifierSensorTypeValue().isEmpty()) {
-            abstractSensorML.addClassification(new SosSMLClassifier("sensorType", generationSettings()
-                    .getClassifierSensorTypeDefinition(), generationSettings().getClassifierSensorTypeValue()));
+        if (!generationSettings().getClassifierProcedureTypeValue().isEmpty()) {
+            abstractSensorML.addClassification(new SosSMLClassifier(PROCEDURE_TYPE,
+            		generationSettings().getClassifierSensorTypeDefinition(),
+            		generationSettings().getClassifierProcedureTypeValue()));
         }
     }
 
@@ -454,8 +456,8 @@ public class HibernateProcedureConverter {
             keywords.add(generationSettings().getClassifierIntendedApplicationValue());
         }
         if (generationSettings().isGenerateClassification()
-                && !generationSettings().getClassifierSensorTypeValue().isEmpty()) {
-            keywords.add(generationSettings().getClassifierSensorTypeValue());
+                && !generationSettings().getClassifierProcedureTypeValue().isEmpty()) {
+            keywords.add(generationSettings().getClassifierProcedureTypeValue());
         }
         return keywords;
     }

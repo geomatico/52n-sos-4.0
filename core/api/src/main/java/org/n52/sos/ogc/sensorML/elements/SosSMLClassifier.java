@@ -26,10 +26,18 @@ package org.n52.sos.ogc.sensorML.elements;
 /**
  * SOS internal representation of SensorML classifier
  * 
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * @author <a href="mailto:c.hollmann@52north.org">Carsten Hollmann</a>
+ * 
+ * @since 4.0.0
  */
 public class SosSMLClassifier {
 
-    private String name;
+    public static final String PROCEDURE_TYPE = "procedureType";
+
+	public static final String INTENDED_APPLICATION = "intendedApplication";
+
+	private String name;
     
     private String definition;
 
@@ -43,7 +51,7 @@ public class SosSMLClassifier {
      * @param value
      *            Classifier value
      */
-    public SosSMLClassifier(String name, String definition, String value) {
+    public SosSMLClassifier(final String name, final String definition, final String value) {
         super();
         this.name = name;
         this.definition = definition;
@@ -61,7 +69,7 @@ public class SosSMLClassifier {
      * @param name
      *            the name to set
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
     
@@ -76,7 +84,7 @@ public class SosSMLClassifier {
      * @param definition
      *            Identifier definition
      */
-    public void setDefinition(String definition) {
+    public void setDefinition(final String definition) {
         this.definition = definition;
     }
 
@@ -91,7 +99,7 @@ public class SosSMLClassifier {
      * @param value
      *            the value to set
      */
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
     }
 

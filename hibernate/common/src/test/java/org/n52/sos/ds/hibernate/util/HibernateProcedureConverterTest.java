@@ -32,6 +32,7 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.n52.sos.ogc.OGCConstants.*;
 import static org.n52.sos.ogc.sensorML.SensorMLConstants.NS_SML;
+import static org.n52.sos.ogc.sensorML.elements.SosSMLClassifier.*;
 import static org.n52.sos.util.StringHelper.join;
 
 import org.junit.BeforeClass;
@@ -49,6 +50,7 @@ import org.n52.sos.ogc.sensorML.RulesDefinition;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.System;
+import org.n52.sos.ogc.sensorML.elements.SosSMLClassifier;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.service.ProcedureDescriptionSettings;
@@ -218,23 +220,33 @@ public class HibernateProcedureConverterTest {
 	throws OwsExceptionReport {
 		// local fixtures
 		final String intendedApplicationValue = "test-intended-application-value";
-		final String sensorTypeValue = "test-sensor-type-value";
-		final String sensorTypeDefinition = "test-sensor-type-definition";
-		
+		final String intendedApplicationDefinition = "test-intended-application-definition";
+		final String procedureTypeValue = "test-sensor-type-value";
+		final String procedureTypeDefinition = "test-sensor-type-definition";
 		final ProcedureDescriptionSettings sdgs = ProcedureDescriptionSettings.getInstance();
+		
 		sdgs.setClassifierIntendedApplicationValue(intendedApplicationValue);
-		sdgs.setClassifierSensorTypeValue(sensorTypeValue);
-		sdgs.setClassifierSensorTypeDefinition(sensorTypeDefinition);
+		sdgs.setClassifierIntendedApplicationDefinition(intendedApplicationDefinition);
+		sdgs.setClassifierProcedureTypeValue(procedureTypeValue);
+		sdgs.setClassifierProcedureTypeDefinition(procedureTypeDefinition);
 		
 		final ProcessModel pModel = setupProcessModel();
 		
 		assertThat(pModel.getClassifications().size(), is(2));
-		assertThat(pModel.getClassifications().get(0).getName(), is("intendedApplication"));
-		assertThat(pModel.getClassifications().get(0).getValue(), is(intendedApplicationValue));
 		
-		assertThat(pModel.getClassifications().get(1).getName(), is("sensorType"));
-		assertThat(pModel.getClassifications().get(1).getDefinition(), is(sensorTypeDefinition));
-		assertThat(pModel.getClassifications().get(1).getValue(), is(sensorTypeValue));
+		for (final SosSMLClassifier classifier : pModel.getClassifications()) 
+		{
+			if (classifier.getName().equalsIgnoreCase(INTENDED_APPLICATION))
+			{
+				assertThat(classifier.getDefinition(), is(intendedApplicationDefinition));
+				assertThat(classifier.getValue(), is(intendedApplicationValue));
+			}
+			else if (classifier.getName().equalsIgnoreCase(PROCEDURE_TYPE))
+			{
+				assertThat(classifier.getDefinition(), is(procedureTypeDefinition));
+				assertThat(classifier.getValue(), is(procedureTypeValue));
+			}
+		}
 	}
 	
 	private String outputDefinition(final int i,

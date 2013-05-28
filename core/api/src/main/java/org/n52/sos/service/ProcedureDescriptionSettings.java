@@ -60,16 +60,17 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	public static final String GENERATE_CLASSIFICATION = "procedureDesc.GENERATE_CLASSIFICATION";
 	public static final String CLASSIFIER_INTENDED_APPLICATION_DEFINITION = "procedureDesc.CLASSIFIER_INTENDED_APPLICATION_DEFINITION";
 	public static final String CLASSIFIER_INTENDED_APPLICATION_VALUE = "procedureDesc.CLASSIFIER_INTENDED_APPLICATION_VALUE";
-	public static final String CLASSIFIER_SENSOR_TYPE_DEFINITION = "procedureDesc.CLASSIFIER_SENSOR_TYPE_DEFINITION";
-	public static final String CLASSIFIER_SENSOR_TYPE_VALUE = "procedureDesc.CLASSIFIER_SENSOR_TYPE_VALUE";
-	public static final String LAT_LONG_UOM = "procedureDescLAT_LONG_UOM";
-	public static final String ALTITUDE_UOM = "procedureDescALTITUDE_UOM";
+	public static final String CLASSIFIER_PROCEDURE_TYPE_DEFINITION = "procedureDesc.CLASSIFIER_PROCEDURE_TYPE_DEFINITION";
+	public static final String CLASSIFIER_PROCEDURE_TYPE_VALUE = "procedureDesc.CLASSIFIER_PROCEDURE_TYPE_VALUE";
+	public static final String LAT_LONG_UOM = "procedureDesc.LAT_LONG_UOM";
+	public static final String ALTITUDE_UOM = "procedureDesc.ALTITUDE_UOM";
 	public static final String USE_SERVICE_CONTACT_AS_SENSOR_CONTACT = "procedureDesc.USE_SERVICE_CONTACT_AS_SENSOR_CONTACT";
 	public static final String PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE = "procedureDesc.PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE";
+	public static final String ENRICH_WITH_OFFERINGS = "procedureDesc.ENRICH_WITH_OFFERINGS";
 
 	private static final StringSettingDefinition IDENTIFIER_LONG_NAME_DEFINITION_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
-	.setOrder(1)
+	.setOrder(10)
 	.setKey(ProcedureDescriptionSettings.IDENTIFIER_LONG_NAME_DEFINITION)
 	.setDefaultValue("urn:ogc:def:identifier:OGC:1.0:longname")
 	.setTitle("Identifier 'longname' definition")
@@ -77,7 +78,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 
 	private static final StringSettingDefinition IDENTIFIER_SHORT_NAME_DEFINITION_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
-	.setOrder(2)
+	.setOrder(20)
 	.setKey(ProcedureDescriptionSettings.IDENTIFIER_SHORT_NAME_DEFINITION)
 	.setDefaultValue("urn:ogc:def:identifier:OGC:1.0:shortname")
 	.setTitle("Identifier 'shortname' definition")
@@ -85,7 +86,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 
 	private static final StringSettingDefinition DESCRIPTION_TEMPLATE_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
-	.setOrder(3)
+	.setOrder(30)
 	.setKey(ProcedureDescriptionSettings.DESCRIPTION_TEMPLATE)
 	.setDefaultValue("The '%s' with the id '%s' observes the following properties: '%s'.")
 	.setTitle("Description template")
@@ -97,7 +98,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 
 	private static final BooleanSettingDefinition GENERATE_CLASSIFICATION_DEFINITION = new BooleanSettingDefinition()
 	.setGroup(GROUP)
-	.setOrder(4)
+	.setOrder(40)
 	.setKey(ProcedureDescriptionSettings.GENERATE_CLASSIFICATION)
 	.setDefaultValue(TRUE)
 	.setTitle("Generate classification")
@@ -105,7 +106,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 
 	private static final StringSettingDefinition CLASSIFIER_INTENDED_APPLICATION_DEFINITION_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
-	.setOrder(5)
+	.setOrder(50)
 	.setKey(ProcedureDescriptionSettings.CLASSIFIER_INTENDED_APPLICATION_DEFINITION)
 	.setDefaultValue("urn:ogc:def:classifier:OGC:1.0:application")
 	.setTitle("IntendedApplication definition")
@@ -113,33 +114,33 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 
 	private static final StringSettingDefinition CLASSIFIER_INTENDED_APPLICATION_VALUE_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
-	.setOrder(6)
+	.setOrder(60)
 	.setKey(ProcedureDescriptionSettings.CLASSIFIER_INTENDED_APPLICATION_VALUE)
 	.setDefaultValue("")
 	.setOptional(true)
 	.setTitle("IntendedApplication Value")
 	.setDescription("The value that will be used for all procedures/sensors of this SOS instance as term for the classifier 'intendedApllication' if the classification generation is activated. In addition, if this field is <b>empty</b>, the classifier 'intendedApplication' will <b>not</b> be added.");
 
-	private static final StringSettingDefinition CLASSIFIER_SENSOR_TYPE_DEFINITION_DEFINITION = new StringSettingDefinition()
+	private static final StringSettingDefinition CLASSIFIER_PROCEDURE_TYPE_DEFINITION_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
-	.setOrder(7)
-	.setKey(ProcedureDescriptionSettings.CLASSIFIER_SENSOR_TYPE_DEFINITION)
-	.setDefaultValue("urn:ogc:def:classifier:OGC:1.0:sensorType")
-	.setTitle("SensorType definition")
-	.setDescription("The definition that will be used for all procedures/sensors of this SOS instance as definition for the classifier 'sensorType' if the classification generation is activated.");
+	.setOrder(70)
+	.setKey(ProcedureDescriptionSettings.CLASSIFIER_PROCEDURE_TYPE_DEFINITION)
+	.setDefaultValue("urn:ogc:def:classifier:OGC:1.0:procedureType")
+	.setTitle("ProcedureType definition")
+	.setDescription("The definition that will be used for all procedures/sensors of this SOS instance as definition for the classifier 'procedureType' if the classification generation is activated.");
 
-	private static final StringSettingDefinition CLASSIFIER_SENSOR_TYPE_VALUE_DEFINITION = new StringSettingDefinition()
+	private static final StringSettingDefinition CLASSIFIER_PROCEDURE_TYPE_VALUE_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
-	.setOrder(8)
-	.setKey(ProcedureDescriptionSettings.CLASSIFIER_SENSOR_TYPE_VALUE)
+	.setOrder(80)
+	.setKey(ProcedureDescriptionSettings.CLASSIFIER_PROCEDURE_TYPE_VALUE)
 	.setDefaultValue("")
 	.setOptional(true)
-	.setTitle("SensorType Value")
-	.setDescription("The value that will be used for all procedures/sensors of this SOS instance as term for the classifier 'sensorType' if the classification generation is activated. In addition, if this field is <b>empty</b>, the classifier 'sensorType' will <b>not</b> be added.");
+	.setTitle("ProcedureType Value")
+	.setDescription("The value that will be used for all procedures of this SOS instance as term for the classifier 'procedureType' if the classification generation is activated. In addition, if this field is <b>empty</b>, the classifier 'procedureType' will <b>not</b> be added.");
 
 	private static final BooleanSettingDefinition USE_SERVICE_CONTACT_AS_SENSOR_CONTACT_DEFINITION = new BooleanSettingDefinition()
 	.setGroup(GROUP)
-	.setOrder(9)
+	.setOrder(90)
 	.setKey(ProcedureDescriptionSettings.USE_SERVICE_CONTACT_AS_SENSOR_CONTACT)
 	.setDefaultValue(TRUE)
 	.setTitle("Use service contact as procedure contact")
@@ -147,7 +148,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	
 	private static final StringSettingDefinition LAT_LONG_UOM_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
-	.setOrder(10)
+	.setOrder(100)
 	.setOptional(true)
 	.setKey(LAT_LONG_UOM)
 	.setDefaultValue("degree")
@@ -156,7 +157,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	
 	private static final StringSettingDefinition ALTITUDE_UOM_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
-	.setOrder(10)
+	.setOrder(110)
 	.setOptional(true)
 	.setKey(ALTITUDE_UOM)
 	.setDefaultValue("m")
@@ -165,7 +166,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	
 	private static final StringSettingDefinition PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
-	.setOrder(11)
+	.setOrder(120)
 	.setKey(PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE)
 	.setDefaultValue("The procedure '%s' generates the following output(s): '%s'. The input(s) is/are unknown (this description is generated).")
 	.setTitle("Description Template for the rules definition")
@@ -181,8 +182,8 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 			GENERATE_CLASSIFICATION_DEFINITION,
 			CLASSIFIER_INTENDED_APPLICATION_DEFINITION_DEFINITION,
 			CLASSIFIER_INTENDED_APPLICATION_VALUE_DEFINITION,
-			CLASSIFIER_SENSOR_TYPE_DEFINITION_DEFINITION,
-			CLASSIFIER_SENSOR_TYPE_VALUE_DEFINITION,
+			CLASSIFIER_PROCEDURE_TYPE_DEFINITION_DEFINITION,
+			CLASSIFIER_PROCEDURE_TYPE_VALUE_DEFINITION,
 			USE_SERVICE_CONTACT_AS_SENSOR_CONTACT_DEFINITION,
 			LAT_LONG_UOM_DEFINITION,
 			ALTITUDE_UOM_DEFINITION,
@@ -197,8 +198,8 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
     private boolean generateClassification;
     private String classifierIntendedApplicationValue;
     private String classifierIntendedApplicationDefinition;
-    private String classifierSensorTypeValue;
-    private String classifierSensorTypeDefinition;
+    private String classifierProcedureTypeValue;
+    private String classifierProcedureTypeDefinition;
     private boolean useServiceContactAsSensorContact;
     private String identifierShortNameDefinition;
     private String identifierLongNameDefinition;
@@ -247,7 +248,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
     }
 
     @Setting(GENERATE_CLASSIFICATION)
-    public void setSmlGenerationGenerateClassification(final boolean generateClassification)
+    public void setGenerateClassification(final boolean generateClassification)
     {
         this.generateClassification = generateClassification;
     }
@@ -270,7 +271,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
     }
 
     @Setting(CLASSIFIER_INTENDED_APPLICATION_DEFINITION)
-    public void setSmlGenerationClassifierIntendedApplicationDefinition(
+    public void setClassifierIntendedApplicationDefinition(
             final String classifierIntendedApplicationDefinition)
     {
         Validation.notNull(CLASSIFIER_INTENDED_APPLICATION_DEFINITION, classifierIntendedApplicationDefinition);
@@ -279,26 +280,26 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 
     public String getClassifierSensorTypeDefinition()
     {
-        return classifierSensorTypeDefinition;
+        return classifierProcedureTypeDefinition;
     }
 
-    @Setting(CLASSIFIER_SENSOR_TYPE_DEFINITION)
-    public void setClassifierSensorTypeDefinition(final String classifierSensorTypeDefinition)
+    @Setting(CLASSIFIER_PROCEDURE_TYPE_DEFINITION)
+    public void setClassifierProcedureTypeDefinition(final String classifierProcedureTypeDefinition)
     {
-        Validation.notNull(CLASSIFIER_SENSOR_TYPE_DEFINITION, classifierSensorTypeDefinition);
-        this.classifierSensorTypeDefinition = classifierSensorTypeDefinition;
+        Validation.notNull(CLASSIFIER_PROCEDURE_TYPE_DEFINITION, classifierProcedureTypeDefinition);
+        this.classifierProcedureTypeDefinition = classifierProcedureTypeDefinition;
     }
 
-    public String getClassifierSensorTypeValue() 
+    public String getClassifierProcedureTypeValue() 
     {
-        return classifierSensorTypeValue;
+        return classifierProcedureTypeValue;
     }
 
-    @Setting(CLASSIFIER_SENSOR_TYPE_VALUE)
-    public void setClassifierSensorTypeValue(final String classifierSensorTypeValue) 
+    @Setting(CLASSIFIER_PROCEDURE_TYPE_VALUE)
+    public void setClassifierProcedureTypeValue(final String classifierProcedureTypeValue) 
     {
-        this.classifierSensorTypeValue = (classifierSensorTypeValue == null) ? ""
-                                                      : classifierSensorTypeValue;
+        this.classifierProcedureTypeValue = (classifierProcedureTypeValue == null) ? ""
+                                                      : classifierProcedureTypeValue;
     }
 
     public boolean isUseServiceContactAsSensorContact()
