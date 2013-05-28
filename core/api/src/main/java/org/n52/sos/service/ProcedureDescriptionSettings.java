@@ -172,7 +172,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	.setDescription("The template used to generate a description using the procedure identifier and the observed properties. " +
 			"The template MUST contain '%s' two times. The first one will be replaced with the sensor id and" +
 			" the second with a comma separated list of properties: e.g. <i>The procedure '%s' generates the following output(s): '%s'. The " +
-			"input(s) is/are unknown (this description is generated).</i>.");
+			"input(s) is/are unknown (this description is generated).</i>");
 
 	private static final Set<? extends SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
 			IDENTIFIER_LONG_NAME_DEFINITION_DEFINITION,
