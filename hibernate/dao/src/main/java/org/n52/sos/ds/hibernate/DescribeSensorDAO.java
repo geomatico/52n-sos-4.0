@@ -39,6 +39,7 @@ import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateProcedureConverter;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
 import org.n52.sos.ogc.sensorML.SensorML;
@@ -46,11 +47,20 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.response.DescribeSensorResponse;
+import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ProcedureDescriptionSettings;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.SosHelper;
 
 /**
  * Implementation of the interface IDescribeSensorDAO
  * 
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * @author <a href="mailto:c.hollmann@52north.org">Carsten Hollmann</a>
+ * @author ShaneStClair
+ * @author <a href="mailto:c.autermann@52north.org">Christian Autermann</a>
+ * 
+ * @since 4.0.0
  */
 public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
     private final HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
@@ -69,7 +79,7 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
             final SosProcedureDescription result = queryProcedure(request, session);
             
             if (result instanceof SensorML && ((SensorML)result).isWrapper()) {
-                for (AbstractProcess abstractProcess :  ((SensorML)result).getMembers()) {
+                for (final AbstractProcess abstractProcess :  ((SensorML)result).getMembers()) {
                     addValuesToSensorDescription(abstractProcess, request.getVersion(), request.getProcedureDescriptionFormat(), session);
                 }
             } else {
@@ -96,8 +106,8 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
         return procedureConverter.createSosProcedureDescription(procedure, request.getProcedure(), request.getProcedureDescriptionFormat());
     }
 
-    private void addValuesToSensorDescription(SosProcedureDescription procedureDescription, String version, String procedureDescriptionFormat,
-            Session session) throws OwsExceptionReport {
+    private void addValuesToSensorDescription(final SosProcedureDescription procedureDescription, final String version, final String procedureDescriptionFormat,
+            final Session session) throws OwsExceptionReport {
         final Collection<String> features = getFeatureOfInterestIDsForProcedure(procedureDescription.getIdentifier(), version, session);
         if (features != null && !features.isEmpty()) {
             procedureDescription.addFeaturesOfInterest(new HashSet<String>(features));
@@ -114,6 +124,22 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
                 getChildProcedures(procedureDescription.getIdentifier(), procedureDescriptionFormat,
                        version, session);
        procedureDescription.addChildProcedures(childProcedures);
+       
+       // enrich with offerings
+       if (procedureSettings().isEnrichWithOfferings())
+       {
+    	   procedureDescription.addOfferings(getOfferingsForProcedure(procedureDescription.getIdentifier()));
+       }
+    }
+    
+    protected Collection<SosOffering> getOfferingsForProcedure(final String procedureIdentifier) {
+    	final Collection<String> offeringIds = Configurator.getInstance().getCache().getOfferingsForProcedure(procedureIdentifier);
+    	final Collection<SosOffering> offerings = CollectionHelper.list();
+    	for (final String offeringIdentifier : offeringIds) {
+			final String offeringName = Configurator.getInstance().getCache().getNameForOffering(offeringIdentifier);
+			offerings.add(new SosOffering(offeringIdentifier, offeringName));
+		}
+    	return offerings;
     }
 
     @SuppressWarnings("unchecked")
@@ -159,11 +185,16 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
         if (childProcedureIds != null && !childProcedureIds.isEmpty()) {
             for (final String childProcID : childProcedureIds) {
                 final Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(childProcID, session);
-                SosProcedureDescription childProcedure = procedureConverter.createSosProcedureDescription(procedure, childProcID, outputFormat);
+                final SosProcedureDescription childProcedure = procedureConverter.createSosProcedureDescription(procedure, childProcID, outputFormat);
                 addValuesToSensorDescription(childProcedure, version, outputFormat, session);
 				childProcedures.add(childProcedure);
             }
         }
         return childProcedures;
+    }
+    
+    private ProcedureDescriptionSettings procedureSettings()
+    {
+    	return ProcedureDescriptionSettings.getInstance();
     }
 }

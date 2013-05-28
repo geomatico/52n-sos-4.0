@@ -29,6 +29,7 @@ import static org.n52.sos.util.HTTPConstants.StatusCode.*;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -197,7 +198,7 @@ public class HibernateProcedureConverter {
     private RulesDefinition createRulesDefinition(final Procedure procedure, final String[] observableProperties) {
         final RulesDefinition rD = new RulesDefinition();
         final String description =
-                String.format(generationSettings().getProcessMethodRulesDefinitionDescriptionTemplate(),
+                String.format(procedureSettings().getProcessMethodRulesDefinitionDescriptionTemplate(),
                         procedure.getIdentifier(), StringHelper.join(",", CollectionHelper.list(observableProperties)));
         rD.setDescription(description);
         return rD;
@@ -238,12 +239,12 @@ public class HibernateProcedureConverter {
         abstractSensorML.setKeywords(createKeywordsList(procedure, observableProperties));
 
         // 5 set classification
-        if (generationSettings().isGenerateClassification()) {
+        if (procedureSettings().isGenerateClassification()) {
             createClassifier(abstractSensorML);
         }
 
         // 6 set contacts --> take from service information?
-        if (generationSettings().isUseServiceContactAsSensorContact()) {
+        if (procedureSettings().isUseServiceContactAsSensorContact()) {
             final List<SmlContact> contacts = createContactFromServiceContact();
             if (contacts != null && !contacts.isEmpty()) {
                 abstractSensorML.setContact(contacts);
@@ -362,11 +363,11 @@ public class HibernateProcedureConverter {
             final Object oAltitude) {
         final List<SosSweCoordinate<?>> sweCoordinates = new ArrayList<SosSweCoordinate<?>>(3);
         sweCoordinates.add(new SosSweCoordinate<Double>(northing, createSweQuantity(JavaHelper.asDouble(latitude),
-                "y", generationSettings().getLatLongUom())));
+                "y", procedureSettings().getLatLongUom())));
         sweCoordinates.add(new SosSweCoordinate<Double>(easting, createSweQuantity(JavaHelper.asDouble(longitude), "x",
-                generationSettings().getLatLongUom())));
+                procedureSettings().getLatLongUom())));
         sweCoordinates.add(new SosSweCoordinate<Double>(altitude, createSweQuantity(JavaHelper.asDouble(oAltitude),
-                "z", generationSettings().getAltitudeUom())));
+                "z", procedureSettings().getAltitudeUom())));
         // TODO add Integer: Which SweSimpleType to use?
         return sweCoordinates;
     }
@@ -409,20 +410,20 @@ public class HibernateProcedureConverter {
     }
 
     private void createClassifier(final AbstractSensorML abstractSensorML) {
-        if (!generationSettings().getClassifierIntendedApplicationValue().isEmpty()) {
+        if (!procedureSettings().getClassifierIntendedApplicationValue().isEmpty()) {
             abstractSensorML.addClassification(new SosSMLClassifier(INTENDED_APPLICATION, 
-            		generationSettings().getClassifierIntendedApplicationDefinition(),
-            		generationSettings().getClassifierIntendedApplicationValue()));
+            		procedureSettings().getClassifierIntendedApplicationDefinition(),
+            		procedureSettings().getClassifierIntendedApplicationValue()));
         }
-        if (!generationSettings().getClassifierProcedureTypeValue().isEmpty()) {
+        if (!procedureSettings().getClassifierProcedureTypeValue().isEmpty()) {
             abstractSensorML.addClassification(new SosSMLClassifier(PROCEDURE_TYPE,
-            		generationSettings().getClassifierSensorTypeDefinition(),
-            		generationSettings().getClassifierProcedureTypeValue()));
+            		procedureSettings().getClassifierSensorTypeDefinition(),
+            		procedureSettings().getClassifierProcedureTypeValue()));
         }
     }
 
     private List<String> createDescriptions(final Procedure procedure, final String[] observableProperties) {
-        return CollectionHelper.list(String.format(generationSettings().getDescriptionTemplate(),
+        return CollectionHelper.list(String.format(procedureSettings().getDescriptionTemplate(),
                 procedure.isSpatial() ? "sensor system" : "procedure", procedure.getIdentifier(),
                 StringHelper.join(",", CollectionHelper.list(observableProperties))));
     }
@@ -433,9 +434,9 @@ public class HibernateProcedureConverter {
                 new SosSMLIdentifier(OGCConstants.URN_UNIQUE_IDENTIFIER_END, OGCConstants.URN_UNIQUE_IDENTIFIER,
                         identifier);
         final SosSMLIdentifier idShortName =
-                new SosSMLIdentifier("shortname", generationSettings().getIdentifierShortNameDefinition(), identifier);
+                new SosSMLIdentifier("shortname", procedureSettings().getIdentifierShortNameDefinition(), identifier);
         final SosSMLIdentifier idLongName =
-                new SosSMLIdentifier("longname", generationSettings().getIdentifierLongNameDefinition(), identifier);
+                new SosSMLIdentifier("longname", procedureSettings().getIdentifierLongNameDefinition(), identifier);
         return CollectionHelper.list(idUniqueId, idLongName, idShortName);
     }
 
@@ -443,7 +444,7 @@ public class HibernateProcedureConverter {
         return ServiceConfiguration.getInstance();
     }
 
-    private ProcedureDescriptionSettings generationSettings() {
+    private ProcedureDescriptionSettings procedureSettings() {
         return ProcedureDescriptionSettings.getInstance();
     }
 
@@ -451,13 +452,17 @@ public class HibernateProcedureConverter {
         final List<String> keywords = CollectionHelper.list();
         keywords.addAll(CollectionHelper.list(observableProperties));
         keywords.add(procedure.getIdentifier());
-        if (generationSettings().isGenerateClassification()
-                && !generationSettings().getClassifierIntendedApplicationValue().isEmpty()) {
-            keywords.add(generationSettings().getClassifierIntendedApplicationValue());
+        if (procedureSettings().isGenerateClassification()
+                && !procedureSettings().getClassifierIntendedApplicationValue().isEmpty()) {
+            keywords.add(procedureSettings().getClassifierIntendedApplicationValue());
         }
-        if (generationSettings().isGenerateClassification()
-                && !generationSettings().getClassifierProcedureTypeValue().isEmpty()) {
-            keywords.add(generationSettings().getClassifierProcedureTypeValue());
+        if (procedureSettings().isGenerateClassification()
+                && !procedureSettings().getClassifierProcedureTypeValue().isEmpty()) {
+            keywords.add(procedureSettings().getClassifierProcedureTypeValue());
+        } 
+        // TODO test this and add offering names, too
+        if (procedureSettings().isEnrichWithOfferings()) {
+        	keywords.addAll(getOfferingsForProcedure(procedure.getIdentifier()));
         }
         return keywords;
     }
@@ -465,6 +470,10 @@ public class HibernateProcedureConverter {
     protected String[] getObservablePropertiesForProcedure(final String procedureIdentifier) {
         return Configurator.getInstance().getCache().getObservablePropertiesForProcedure(procedureIdentifier)
                 .toArray(new String[0]);
+    }
+    
+    protected Collection<String> getOfferingsForProcedure(final String procedureIdentifier) {
+    	return Configurator.getInstance().getCache().getOfferingsForProcedure(procedureIdentifier);
     }
 
     private SosProcedureDescription createProcedureDescriptionFromXml(final String procedureIdentifier,
