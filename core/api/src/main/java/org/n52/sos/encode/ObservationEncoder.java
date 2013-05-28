@@ -26,18 +26,33 @@ package org.n52.sos.encode;
 import java.util.Set;
 
 public interface ObservationEncoder<S, T> extends Encoder<S, T> {
-    
-    boolean isObservationAndMeasurmentV20Type();
-    
-    boolean shouldObservationsWithSameXBeMerged();
-    
+
     /**
-     * Get the supported response formats for this {@linkplain ObservationEncoder} and the specified service and
-     * version.
-     *
-     * @param service the service
-     * @param version the version
-     *
+     * Indicator whether the ObservationEncoder of type or subtype
+     * Observation&Measurement 2.0
+     * 
+     * @return Of type or not
+     */
+    boolean isObservationAndMeasurmentV20Type();
+
+    /**
+     * Indicator whether the single observations with the same procedure,
+     * observableProperty and featureOfInterest should be merged to one
+     * observation.
+     * 
+     * @return Merge or not
+     */
+    boolean shouldObservationsWithSameXBeMerged();
+
+    /**
+     * Get the supported response formats for this
+     * {@linkplain ObservationEncoder} and the specified service and version.
+     * 
+     * @param service
+     *            the service
+     * @param version
+     *            the version
+     * 
      * @return the response formats
      */
     Set<String> getSupportedResponseFormats(String service, String version);

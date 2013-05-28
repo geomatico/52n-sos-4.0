@@ -78,7 +78,7 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
      * file
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(OmEncoderv20.class);
-    
+
     private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(OMConstants.NS_OM_2,
             SosObservation.class, NamedValue.class);
 
@@ -126,8 +126,8 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
 
     @Override
     public Set<String> getSupportedResponseFormats(String service, String version) {
-        if (SUPPORTED_RESPONSE_FORMATS.get(service) != null &&
-                 SUPPORTED_RESPONSE_FORMATS.get(service).get(version) != null) {
+        if (SUPPORTED_RESPONSE_FORMATS.get(service) != null
+                && SUPPORTED_RESPONSE_FORMATS.get(service).get(version) != null) {
             return SUPPORTED_RESPONSE_FORMATS.get(service).get(version);
         }
         return new HashSet<String>(0);
@@ -166,7 +166,7 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
     protected String getDefaultFeatureEncodingNamespace() {
         return SFConstants.NS_SAMS;
     }
-    
+
     @Override
     protected String getDefaultProcedureEncodingNamspace() {
         return SensorMLConstants.NS_SML;
@@ -183,16 +183,26 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
     }
 
     // FIXME String.equals(QName)!?
-    private XmlObject createSingleObservationToResult(SosObservation sosObservation)
-            throws OwsExceptionReport {
+    /**
+     * Create a om:result content XmlBeans object from a SOS single value
+     * observation object
+     * 
+     * @param sosObservation
+     *            SOS observation
+     * @return XmlBeans object for om:result
+     * @throws OwsExceptionReport
+     *             If an error occurs
+     */
+    private XmlObject createSingleObservationToResult(SosObservation sosObservation) throws OwsExceptionReport {
         SosSingleObservationValue<?> observationValue = (SosSingleObservationValue) sosObservation.getValue();
         String observationType = "";
         if (sosObservation.getObservationConstellation().isSetObservationType()) {
             observationType = sosObservation.getObservationConstellation().getObservationType();
         } else {
-           observationType = OMHelper.getObservationTypeFor(observationValue.getValue());
+            observationType = OMHelper.getObservationTypeFor(observationValue.getValue());
         }
-        if ((observationType.equals(OMConstants.OBS_TYPE_MEASUREMENT)) && observationValue.getValue() instanceof QuantityValue) {
+        if ((observationType.equals(OMConstants.OBS_TYPE_MEASUREMENT))
+                && observationValue.getValue() instanceof QuantityValue) {
             QuantityValue quantityValue = (QuantityValue) observationValue.getValue();
             return CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, quantityValue);
         } else if ((observationType.equals(OMConstants.OBS_TYPE_COUNT_OBSERVATION))
@@ -230,7 +240,8 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
             CategoryValue categoryValue = (CategoryValue) observationValue.getValue();
             if (categoryValue.getValue() != null && !categoryValue.getValue().isEmpty()) {
                 Map<HelperValues, String> additionalValue = new EnumMap<HelperValues, String>(HelperValues.class);
-                additionalValue.put(HelperValues.GMLID, SosConstants.OBS_ID_PREFIX + sosObservation.getObservationID());
+                additionalValue
+                        .put(HelperValues.GMLID, SosConstants.OBS_ID_PREFIX + sosObservation.getObservationID());
                 XmlObject xmlObject =
                         CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, categoryValue, additionalValue);
                 return xmlObject;
@@ -243,7 +254,8 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
             GeometryValue geometryValue = (GeometryValue) observationValue.getValue();
             if (geometryValue.getValue() != null) {
                 Map<HelperValues, String> additionalValue = new EnumMap<HelperValues, String>(HelperValues.class);
-                additionalValue.put(HelperValues.GMLID, SosConstants.OBS_ID_PREFIX + sosObservation.getObservationID());
+                additionalValue
+                        .put(HelperValues.GMLID, SosConstants.OBS_ID_PREFIX + sosObservation.getObservationID());
                 XmlObject xmlObject =
                         CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, geometryValue.getValue(),
                                 additionalValue);
@@ -262,18 +274,27 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
             if (encodedObj instanceof XmlObject) {
                 return (XmlObject) encodedObj;
             } else {
-                throw new NoApplicableCodeException()
-                        .withMessage("Encoding of observation value of type \"%s\" failed. Result: %s",
-                                     observationValue.getValue() != null ? observationValue.getValue().getClass().getName()
-                                        : observationValue.getValue(), encodedObj != null ? encodedObj.getClass()
-                                        .getName() : encodedObj);
+                throw new NoApplicableCodeException().withMessage(
+                        "Encoding of observation value of type \"%s\" failed. Result: %s",
+                        observationValue.getValue() != null ? observationValue.getValue().getClass().getName()
+                                : observationValue.getValue(), encodedObj != null ? encodedObj.getClass().getName()
+                                : encodedObj);
             }
         }
         return null;
     }
 
-    private XmlObject createMultiObservationValueToResult(SosObservation sosObservation)
-            throws OwsExceptionReport {
+    /**
+     * Create a om:result content XmlBeans object from a SOS multi value
+     * observation object
+     * 
+     * @param sosObservation
+     *            SOS observation
+     * @return XmlBeans object for om:result
+     * @throws OwsExceptionReport
+     *             If an error occurs
+     */
+    private XmlObject createMultiObservationValueToResult(SosObservation sosObservation) throws OwsExceptionReport {
         SosMultiObservationValues<?> observationValue = (SosMultiObservationValues) sosObservation.getValue();
         // TODO create SosSweDataArray
         SosSweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
@@ -284,11 +305,11 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
         if (encodedObj instanceof XmlObject) {
             return (XmlObject) encodedObj;
         } else {
-            throw new NoApplicableCodeException()
-                    .withMessage("Encoding of observation value of type \"%s\" failed. Result: %s",
-                                 observationValue.getValue() != null ? observationValue.getValue().getClass().getName()
-                                    : observationValue.getValue(), encodedObj != null ? encodedObj.getClass()
-                                    .getName() : encodedObj);
+            throw new NoApplicableCodeException().withMessage(
+                    "Encoding of observation value of type \"%s\" failed. Result: %s",
+                    observationValue.getValue() != null ? observationValue.getValue().getClass().getName()
+                            : observationValue.getValue(), encodedObj != null ? encodedObj.getClass().getName()
+                            : encodedObj);
         }
     }
 }
