@@ -23,11 +23,8 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
-import static org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName.altitude;
-import static org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName.easting;
-import static org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName.northing;
-import static org.n52.sos.util.HTTPConstants.StatusCode.BAD_REQUEST;
-import static org.n52.sos.util.HTTPConstants.StatusCode.INTERNAL_SERVER_ERROR;
+import static org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName.*;
+import static org.n52.sos.util.HTTPConstants.StatusCode.*;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -58,6 +55,8 @@ import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceProvider;
+import org.n52.sos.ogc.sensorML.AbstractProcess;
+import org.n52.sos.ogc.sensorML.AbstractSensorML;
 import org.n52.sos.ogc.sensorML.ProcessMethod;
 import org.n52.sos.ogc.sensorML.ProcessModel;
 import org.n52.sos.ogc.sensorML.RulesDefinition;
@@ -164,8 +163,8 @@ public class HibernateProcedureConverter {
         return sosProcedureDescription;
     }
 
-    private void checkOutputFormatWithDescriptionFormat(String outputFormat, String procedureDescriptionFormat,
-            String procedureIdentifier) throws OwsExceptionReport {
+    private void checkOutputFormatWithDescriptionFormat(final String outputFormat, final String procedureDescriptionFormat,
+            final String procedureIdentifier) throws OwsExceptionReport {
 
         if (StringHelper.isNullOrEmpty(procedureDescriptionFormat) || (!procedureDescriptionFormat.equalsIgnoreCase(outputFormat)
                 && !procedureDescriptionFormat.equalsIgnoreCase(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE))) {
@@ -181,22 +180,11 @@ public class HibernateProcedureConverter {
     private ProcessModel createSmlProcessModel(final Procedure procedure) throws OwsExceptionReport {
         final ProcessModel smlProcessModel = new ProcessModel();
 
-        final String[] observableProperties = getObservablePropertiesForProcedure(procedure.getIdentifier());
-
-        smlProcessModel.setDescriptions(createDescriptions(procedure, observableProperties));
-
+        setCommonValues(procedure, smlProcessModel);
+        
+        smlProcessModel.setMethod(createMethod(procedure, getObservablePropertiesForProcedure(procedure.getIdentifier())));
         smlProcessModel.setNames(createNames(procedure));
-
-        smlProcessModel.setIdentifier(procedure.getIdentifier());
-
-        smlProcessModel.setIdentifications(createIdentifications(procedure.getIdentifier()));
-
-        smlProcessModel.setMethod(createMethod(procedure, observableProperties));
-
-        smlProcessModel.setOutputs(createOutputs(procedure, observableProperties));
-
-        // FIXME Eike: continue development here!
-
+        
         return smlProcessModel;
     }
 
@@ -221,43 +209,49 @@ public class HibernateProcedureConverter {
     private System createSmlSystem(final Procedure procedure) throws OwsExceptionReport {
         final System smlSystem = new System();
 
-        final String[] observableProperties = getObservablePropertiesForProcedure(procedure.getIdentifier());
+        setCommonValues(procedure, smlSystem);
+
+        // 8 set position --> from procedure
+        smlSystem.setPosition(createPosition(procedure));
+
+        // 9 set observed area --> from features
+        // TODO implement generation of observed area from available features
+        return smlSystem;
+    }
+
+	private void setCommonValues(final Procedure procedure,
+			final AbstractProcess abstractSensorML) throws OwsExceptionReport
+	{
+		final String[] observableProperties = getObservablePropertiesForProcedure(procedure.getIdentifier());
 
         // 1 set description
-        smlSystem.setDescriptions(createDescriptions(procedure, observableProperties));
+        abstractSensorML.setDescriptions(createDescriptions(procedure, observableProperties));
 
         // 2 identifier
-        smlSystem.setIdentifier(procedure.getIdentifier());
+        abstractSensorML.setIdentifier(procedure.getIdentifier());
 
         // 3 set identification
-        smlSystem.setIdentifications(createIdentifications(procedure.getIdentifier()));
+        abstractSensorML.setIdentifications(createIdentifications(procedure.getIdentifier()));
 
         // 4 set keywords
-        smlSystem.setKeywords(createKeywordsList(procedure, observableProperties));
+        abstractSensorML.setKeywords(createKeywordsList(procedure, observableProperties));
 
         // 5 set classification
         if (generationSettings().isGenerateClassification()) {
-            addClassifier(smlSystem);
+            createClassifier(abstractSensorML);
         }
 
         // 6 set contacts --> take from service information?
         if (generationSettings().isUseServiceContactAsSensorContact()) {
             final List<SmlContact> contacts = createContactFromServiceContact();
             if (contacts != null && !contacts.isEmpty()) {
-                smlSystem.setContact(contacts);
+                abstractSensorML.setContact(contacts);
             }
         }
 
         // 7 set outputs --> observableProperties
-        smlSystem.setOutputs(createOutputs(procedure, observableProperties));
-
-        // 8 set position --> from procedure
-        smlSystem.setPosition(createPosition(procedure));
-
-        // 9 set observed area --> from features
-
-        return smlSystem;
-    }
+        abstractSensorML.setOutputs(createOutputs(procedure, observableProperties));
+	}
 
     private List<SosSMLIo<?>> createOutputs(final Procedure procedure, final String[] observableProperties)
             throws OwsExceptionReport {
@@ -370,13 +364,13 @@ public class HibernateProcedureConverter {
                 "y", generationSettings().getLatLongUom())));
         sweCoordinates.add(new SosSweCoordinate<Double>(easting, createSweQuantity(JavaHelper.asDouble(longitude), "x",
                 generationSettings().getLatLongUom())));
-        sweCoordinates.add(new SosSweCoordinate<Double>(altitude, createSweQuantity(JavaHelper.asDouble(altitude),
+        sweCoordinates.add(new SosSweCoordinate<Double>(altitude, createSweQuantity(JavaHelper.asDouble(oAltitude),
                 "z", generationSettings().getAltitudeUom())));
         // TODO add Integer: Which SweSimpleType to use?
         return sweCoordinates;
     }
 
-    private SosSweAbstractSimpleType<Double> createSweQuantity(Double value, String asixID, String uom) {
+    private SosSweAbstractSimpleType<Double> createSweQuantity(final Double value, final String asixID, final String uom) {
         final SosSweQuantity quantity = new SosSweQuantity();
         quantity.setValue(JavaHelper.asDouble(value));
         quantity.setAxisID(asixID);
@@ -413,14 +407,14 @@ public class HibernateProcedureConverter {
         return serviceProvider;
     }
 
-    private void addClassifier(final System smlSystem) {
+    private void createClassifier(final AbstractSensorML abstractSensorML) {
         if (!generationSettings().getClassifierIntendedApplicationValue().isEmpty()) {
-            smlSystem.addClassification(new SosSMLClassifier("intendedApplication", generationSettings()
+            abstractSensorML.addClassification(new SosSMLClassifier("intendedApplication", generationSettings()
                     .getClassifierIntendedApplicationDefinition(), generationSettings()
                     .getClassifierIntendedApplicationValue()));
         }
         if (!generationSettings().getClassifierSensorTypeValue().isEmpty()) {
-            smlSystem.addClassification(new SosSMLClassifier("sensorType", generationSettings()
+            abstractSensorML.addClassification(new SosSMLClassifier("sensorType", generationSettings()
                     .getClassifierSensorTypeDefinition(), generationSettings().getClassifierSensorTypeValue()));
         }
     }
@@ -473,7 +467,7 @@ public class HibernateProcedureConverter {
 
     private SosProcedureDescription createProcedureDescriptionFromXml(final String procedureIdentifier,
             final String xmlDoc) throws CodedException, OwsExceptionReport {
-            SosProcedureDescription sosProcedureDescription = (SosProcedureDescription) CodingHelper.decodeXmlElement(XmlHelper.parseXmlString(xmlDoc));
+            final SosProcedureDescription sosProcedureDescription = (SosProcedureDescription) CodingHelper.decodeXmlElement(XmlHelper.parseXmlString(xmlDoc));
             sosProcedureDescription.setIdentifier(procedureIdentifier);
             return sosProcedureDescription;
     }
@@ -482,7 +476,7 @@ public class HibernateProcedureConverter {
             final String filename) throws CodedException, OwsExceptionReport {
         // check if filename contains placeholder for configured
         // sensor directory
-            SosProcedureDescription sosProcedureDescription = (SosProcedureDescription) CodingHelper.decodeXmlElement(XmlHelper.parseXmlString(StringHelper.convertStreamToString(getDescribeSensorDocumentAsStream(filename))));
+            final SosProcedureDescription sosProcedureDescription = (SosProcedureDescription) CodingHelper.decodeXmlElement(XmlHelper.parseXmlString(StringHelper.convertStreamToString(getDescribeSensorDocumentAsStream(filename))));
             sosProcedureDescription.setIdentifier(procedureIdentifier);
             return sosProcedureDescription;
     }

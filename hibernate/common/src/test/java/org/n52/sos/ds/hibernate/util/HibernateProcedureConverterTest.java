@@ -213,6 +213,30 @@ public class HibernateProcedureConverterTest {
 		assertThat(pModel.getMethod().getRulesDefinition().getDescription().length(), is(greaterThan(0)));
 	}
 	
+	@Test public void 
+	should_set_classifiers_for_smlProcessModel()
+	throws OwsExceptionReport {
+		// local fixtures
+		final String intendedApplicationValue = "test-intended-application-value";
+		final String sensorTypeValue = "test-sensor-type-value";
+		final String sensorTypeDefinition = "test-sensor-type-definition";
+		
+		final SensorDescriptionGenerationSettings sdgs = SensorDescriptionGenerationSettings.getInstance();
+		sdgs.setClassifierIntendedApplicationValue(intendedApplicationValue);
+		sdgs.setClassifierSensorTypeValue(sensorTypeValue);
+		sdgs.setClassifierSensorTypeDefinition(sensorTypeDefinition);
+		
+		final ProcessModel pModel = setupProcessModel();
+		
+		assertThat(pModel.getClassifications().size(), is(2));
+		assertThat(pModel.getClassifications().get(0).getName(), is("intendedApplication"));
+		assertThat(pModel.getClassifications().get(0).getValue(), is(intendedApplicationValue));
+		
+		assertThat(pModel.getClassifications().get(1).getName(), is("sensorType"));
+		assertThat(pModel.getClassifications().get(1).getDefinition(), is(sensorTypeDefinition));
+		assertThat(pModel.getClassifications().get(1).getValue(), is(sensorTypeValue));
+	}
+	
 	private String outputDefinition(final int i,
 			final ProcessModel pModel)
 	{
