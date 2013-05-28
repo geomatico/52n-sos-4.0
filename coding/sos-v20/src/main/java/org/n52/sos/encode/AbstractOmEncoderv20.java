@@ -91,13 +91,11 @@ public abstract class AbstractOmEncoderv20 implements ObservationEncoder<XmlObje
      * 
      * @param sosObservation
      *            SosObservation to be encoded
-     * @param phenomenonTimeID
-     *            Phenomenon time GML id.
      * @return XML encoded result object, e.g a gml:MeasureType
      * @throws OwsExceptionReport
      *             if an error occurs
      */
-    protected abstract XmlObject createResult(SosObservation sosObservation, String phenomenonTimeID)
+    protected abstract XmlObject createResult(SosObservation sosObservation)
             throws OwsExceptionReport;
 
     /**
@@ -227,10 +225,10 @@ public abstract class AbstractOmEncoderv20 implements ObservationEncoder<XmlObje
         xbObservation.addNewFeatureOfInterest().set(
                 addFeatureOfInterest(sosObservation.getObservationConstellation().getFeatureOfInterest()));
         // set result
-        XmlObject createResult = createResult(sosObservation, phenomenonTime.getGmlId());
+        XmlObject createResult = createResult(sosObservation);
         XmlObject addNewResult = xbObservation.addNewResult();
         if (createResult != null) {
-            addNewResult.set(createResult(sosObservation, phenomenonTime.getGmlId()));
+            addNewResult.set(createResult(sosObservation));
         }
         return xbObservation;
     }

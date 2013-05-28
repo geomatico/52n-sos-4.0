@@ -144,7 +144,7 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
     }
 
     @Override
-    protected XmlObject createResult(SosObservation sosObservation, String phenomenonTimeID) throws OwsExceptionReport {
+    protected XmlObject createResult(SosObservation sosObservation) throws OwsExceptionReport {
         // TODO if OM_SWEArrayObservation and get ResultEncoding and
         // ResultStructure exists,
         if (sosObservation.getValue() instanceof SosSingleObservationValue) {
