@@ -54,18 +54,18 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 			setDescription("Settings to configure the procedure description generation and enrichment feature.").
 			setOrder(4.2023f);
 
-	public static final String IDENTIFIER_LONG_NAME_DEFINITION = "sensorDescGen.SML_GENERATION_IDENTIFIER_LONG_NAME_DEFINITION";
-	public static final String IDENTIFIER_SHORT_NAME_DEFINITION = "sensorDescGen.SML_GENERATION_IDENTIFIER_SHORT_NAME_DEFINITION";
-	public static final String DESCRIPTION_TEMPLATE = "sensorDescGen.SML_GENERATION_DESCRIPTION_TEMPLATE";
-	public static final String GENERATE_CLASSIFICATION = "sensorDescGen.SML_GENERATION_GENERATE_CLASSIFICATION";
-	public static final String CLASSIFIER_INTENDED_APPLICATION_DEFINITION = "sensorDescGen.SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_DEFINITION";
-	public static final String CLASSIFIER_INTENDED_APPLICATION_VALUE = "sensorDescGen.SML_GENERATION_CLASSIFIER_INTENDED_APPLICATION_VALUE";
-	public static final String CLASSIFIER_SENSOR_TYPE_DEFINITION = "sensorDescGen.SML_GENERATION_CLASSIFIER_SENSOR_TYPE_DEFINITION";
-	public static final String CLASSIFIER_SENSOR_TYPE_VALUE = "sensorDescGen.SML_GENERATION_CLASSIFIER_SENSOR_TYPE_VALUE";
-	public static final String LAT_LONG_UOM = "sensorDescGen.LAT_LONG_UOM";
-	public static final String ALTITUDE_UOM = "sensorDescGen.ALTITUDE_UOM";
-	public static final String USE_SERVICE_CONTACT_AS_SENSOR_CONTACT = "sensorDescGen.SML_GENERATION_USE_SERVICE_CONTACT_AS_SENSOR_CONTACT";
-	public static final String PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE = "sensorDescGen.PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE";
+	public static final String IDENTIFIER_LONG_NAME_DEFINITION = "procedureDesc.IDENTIFIER_LONG_NAME_DEFINITION";
+	public static final String IDENTIFIER_SHORT_NAME_DEFINITION = "procedureDesc.IDENTIFIER_SHORT_NAME_DEFINITION";
+	public static final String DESCRIPTION_TEMPLATE = "procedureDesc.DESCRIPTION_TEMPLATE";
+	public static final String GENERATE_CLASSIFICATION = "procedureDesc.GENERATE_CLASSIFICATION";
+	public static final String CLASSIFIER_INTENDED_APPLICATION_DEFINITION = "procedureDesc.CLASSIFIER_INTENDED_APPLICATION_DEFINITION";
+	public static final String CLASSIFIER_INTENDED_APPLICATION_VALUE = "procedureDesc.CLASSIFIER_INTENDED_APPLICATION_VALUE";
+	public static final String CLASSIFIER_SENSOR_TYPE_DEFINITION = "procedureDesc.CLASSIFIER_SENSOR_TYPE_DEFINITION";
+	public static final String CLASSIFIER_SENSOR_TYPE_VALUE = "procedureDesc.CLASSIFIER_SENSOR_TYPE_VALUE";
+	public static final String LAT_LONG_UOM = "procedureDescLAT_LONG_UOM";
+	public static final String ALTITUDE_UOM = "procedureDescALTITUDE_UOM";
+	public static final String USE_SERVICE_CONTACT_AS_SENSOR_CONTACT = "procedureDesc.USE_SERVICE_CONTACT_AS_SENSOR_CONTACT";
+	public static final String PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE = "procedureDesc.PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE";
 
 	private static final StringSettingDefinition IDENTIFIER_LONG_NAME_DEFINITION_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
