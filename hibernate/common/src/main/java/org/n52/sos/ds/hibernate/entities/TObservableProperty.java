@@ -28,6 +28,11 @@ import java.util.Set;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasParentChilds;
 import org.n52.sos.util.CollectionHelper;
 
+/**
+ * @author <a href="mailto:c.hollmann@52north.org">Carsten Hollmann</a>
+ * 
+ * @since 4.0.0
+ */
 public class TObservableProperty extends ObservableProperty implements HasParentChilds<ObservableProperty, TObservableProperty> {
 
     private static final long serialVersionUID = -2442057838780645108L;
@@ -46,7 +51,7 @@ public class TObservableProperty extends ObservableProperty implements HasParent
     }
 
     @Override
-    public TObservableProperty setParents(Set<ObservableProperty> parents) {
+    public TObservableProperty setParents(final Set<ObservableProperty> parents) {
         this.parents = parents;
         return this;
     }
@@ -57,7 +62,7 @@ public class TObservableProperty extends ObservableProperty implements HasParent
     }
 
     @Override
-    public TObservableProperty setChilds(Set<ObservableProperty> childs) {
+    public TObservableProperty setChilds(final Set<ObservableProperty> childs) {
         this.childs = childs;
         return this;
     }

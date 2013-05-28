@@ -28,6 +28,11 @@ import java.util.Set;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasParentChilds;
 import org.n52.sos.util.CollectionHelper;
 
+/**
+ * @author <a href="mailto:c.hollmann@52north.org">Carsten Hollmann</a>
+ * 
+ * @since 4.0.0
+ */
 public class TFeatureOfInterest extends FeatureOfInterest implements HasParentChilds<FeatureOfInterest, TFeatureOfInterest>{
 
     private static final long serialVersionUID = -880472749711995015L;
@@ -46,7 +51,7 @@ public class TFeatureOfInterest extends FeatureOfInterest implements HasParentCh
     }
 
     @Override
-    public TFeatureOfInterest setParents(Set<FeatureOfInterest> parents) {
+    public TFeatureOfInterest setParents(final Set<FeatureOfInterest> parents) {
         this.parents = parents;
         return this;
     }
@@ -57,7 +62,7 @@ public class TFeatureOfInterest extends FeatureOfInterest implements HasParentCh
     }
 
     @Override
-    public TFeatureOfInterest setChilds(Set<FeatureOfInterest> childs) {
+    public TFeatureOfInterest setChilds(final Set<FeatureOfInterest> childs) {
         this.childs = childs;
         return this;
     }

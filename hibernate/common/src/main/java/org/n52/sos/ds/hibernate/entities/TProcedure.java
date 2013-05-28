@@ -29,6 +29,11 @@ import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasParentChilds;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasValidProcedureTimes;
 import org.n52.sos.util.CollectionHelper;
 
+/**
+ * @author <a href="mailto:c.hollmann@52north.org">Carsten Hollmann</a>
+ * 
+ * @since 4.0.0
+ */
 public class TProcedure extends Procedure implements HasValidProcedureTimes, HasParentChilds<Procedure, TProcedure> {
 
     private static final long serialVersionUID = 3307492687846686350L;
@@ -45,11 +50,11 @@ public class TProcedure extends Procedure implements HasValidProcedureTimes, Has
 
     @Override
     public Set<ValidProcedureTime> getValidProcedureTimes() {
-        return this.validProcedureTimes;
+        return validProcedureTimes;
     }
 
     @Override
-    public TProcedure setValidProcedureTimes(Set<ValidProcedureTime> validProcedureTimes) {
+    public TProcedure setValidProcedureTimes(final Set<ValidProcedureTime> validProcedureTimes) {
         this.validProcedureTimes = validProcedureTimes;
         return this;
     }
@@ -60,7 +65,7 @@ public class TProcedure extends Procedure implements HasValidProcedureTimes, Has
     }
 
     @Override
-    public TProcedure setParents(Set<Procedure> parents) {
+    public TProcedure setParents(final Set<Procedure> parents) {
         this.parents = parents;
         return this;
     }
@@ -71,7 +76,7 @@ public class TProcedure extends Procedure implements HasValidProcedureTimes, Has
     }
 
     @Override
-    public TProcedure setChilds(Set<Procedure> childs) {
+    public TProcedure setChilds(final Set<Procedure> childs) {
         this.childs = childs;
         return this;
     }
