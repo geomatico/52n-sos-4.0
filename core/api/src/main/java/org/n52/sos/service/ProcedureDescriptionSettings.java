@@ -47,11 +47,11 @@ import org.n52.sos.util.Validation;
  * @since 4.0.0
  */
 @Configurable
-public class SensorDescriptionGenerationSettings implements SettingDefinitionProvider {
+public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 
 	private static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup().
-			setTitle("Sensor Description Generation").
-			setDescription("Settings to configure the sensor description generation feature.").
+			setTitle("Procedure Description").
+			setDescription("Settings to configure the procedure description generation and enrichment feature.").
 			setOrder(4.2023f);
 
 	public static final String IDENTIFIER_LONG_NAME_DEFINITION = "sensorDescGen.SML_GENERATION_IDENTIFIER_LONG_NAME_DEFINITION";
@@ -70,7 +70,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 	private static final StringSettingDefinition IDENTIFIER_LONG_NAME_DEFINITION_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
 	.setOrder(1)
-	.setKey(SensorDescriptionGenerationSettings.IDENTIFIER_LONG_NAME_DEFINITION)
+	.setKey(ProcedureDescriptionSettings.IDENTIFIER_LONG_NAME_DEFINITION)
 	.setDefaultValue("urn:ogc:def:identifier:OGC:1.0:longname")
 	.setTitle("Identifier 'longname' definition")
 	.setDescription("The definition for the sml:identification holding the 'longname'. Used only if the sensor description is <b>generated</b>.");
@@ -78,7 +78,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 	private static final StringSettingDefinition IDENTIFIER_SHORT_NAME_DEFINITION_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
 	.setOrder(2)
-	.setKey(SensorDescriptionGenerationSettings.IDENTIFIER_SHORT_NAME_DEFINITION)
+	.setKey(ProcedureDescriptionSettings.IDENTIFIER_SHORT_NAME_DEFINITION)
 	.setDefaultValue("urn:ogc:def:identifier:OGC:1.0:shortname")
 	.setTitle("Identifier 'shortname' definition")
 	.setDescription("The definition for the sml:identification holding the 'shortname'. Used only if the sensor description is <b>generated</b>.");
@@ -86,7 +86,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 	private static final StringSettingDefinition DESCRIPTION_TEMPLATE_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
 	.setOrder(3)
-	.setKey(SensorDescriptionGenerationSettings.DESCRIPTION_TEMPLATE)
+	.setKey(ProcedureDescriptionSettings.DESCRIPTION_TEMPLATE)
 	.setDefaultValue("The '%s' with the id '%s' observes the following properties: '%s'.")
 	.setTitle("Description template")
 	.setDescription("The template used to generate a description using the sensor identifier and the observed properties " +
@@ -98,7 +98,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 	private static final BooleanSettingDefinition GENERATE_CLASSIFICATION_DEFINITION = new BooleanSettingDefinition()
 	.setGroup(GROUP)
 	.setOrder(4)
-	.setKey(SensorDescriptionGenerationSettings.GENERATE_CLASSIFICATION)
+	.setKey(ProcedureDescriptionSettings.GENERATE_CLASSIFICATION)
 	.setDefaultValue(TRUE)
 	.setTitle("Generate classification")
 	.setDescription("Should the classifiers for 'intendedApplication' and/or 'sensorType' be generated using the values from the next two settings?");
@@ -106,7 +106,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 	private static final StringSettingDefinition CLASSIFIER_INTENDED_APPLICATION_DEFINITION_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
 	.setOrder(5)
-	.setKey(SensorDescriptionGenerationSettings.CLASSIFIER_INTENDED_APPLICATION_DEFINITION)
+	.setKey(ProcedureDescriptionSettings.CLASSIFIER_INTENDED_APPLICATION_DEFINITION)
 	.setDefaultValue("urn:ogc:def:classifier:OGC:1.0:application")
 	.setTitle("IntendedApplication definition")
 	.setDescription("The definition that will be used for all procedures/sensors of this SOS instance as definition for the classifier 'intendedApllication' if the classification generation is activated.");
@@ -114,7 +114,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 	private static final StringSettingDefinition CLASSIFIER_INTENDED_APPLICATION_VALUE_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
 	.setOrder(6)
-	.setKey(SensorDescriptionGenerationSettings.CLASSIFIER_INTENDED_APPLICATION_VALUE)
+	.setKey(ProcedureDescriptionSettings.CLASSIFIER_INTENDED_APPLICATION_VALUE)
 	.setDefaultValue("")
 	.setOptional(true)
 	.setTitle("IntendedApplication Value")
@@ -123,7 +123,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 	private static final StringSettingDefinition CLASSIFIER_SENSOR_TYPE_DEFINITION_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
 	.setOrder(7)
-	.setKey(SensorDescriptionGenerationSettings.CLASSIFIER_SENSOR_TYPE_DEFINITION)
+	.setKey(ProcedureDescriptionSettings.CLASSIFIER_SENSOR_TYPE_DEFINITION)
 	.setDefaultValue("urn:ogc:def:classifier:OGC:1.0:sensorType")
 	.setTitle("SensorType definition")
 	.setDescription("The definition that will be used for all procedures/sensors of this SOS instance as definition for the classifier 'sensorType' if the classification generation is activated.");
@@ -131,7 +131,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 	private static final StringSettingDefinition CLASSIFIER_SENSOR_TYPE_VALUE_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
 	.setOrder(8)
-	.setKey(SensorDescriptionGenerationSettings.CLASSIFIER_SENSOR_TYPE_VALUE)
+	.setKey(ProcedureDescriptionSettings.CLASSIFIER_SENSOR_TYPE_VALUE)
 	.setDefaultValue("")
 	.setOptional(true)
 	.setTitle("SensorType Value")
@@ -140,7 +140,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 	private static final BooleanSettingDefinition USE_SERVICE_CONTACT_AS_SENSOR_CONTACT_DEFINITION = new BooleanSettingDefinition()
 	.setGroup(GROUP)
 	.setOrder(9)
-	.setKey(SensorDescriptionGenerationSettings.USE_SERVICE_CONTACT_AS_SENSOR_CONTACT)
+	.setKey(ProcedureDescriptionSettings.USE_SERVICE_CONTACT_AS_SENSOR_CONTACT)
 	.setDefaultValue(TRUE)
 	.setTitle("Use service contact as sensor contact")
 	.setDescription("Should the service contact be encoded as sensor contact if sensor description generation is activated.");
@@ -191,7 +191,7 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 
 
 
-	private static SensorDescriptionGenerationSettings instance = null;
+	private static ProcedureDescriptionSettings instance = null;
 	
     private String descriptionTemplate;
     private boolean generateClassification;
@@ -209,10 +209,10 @@ public class SensorDescriptionGenerationSettings implements SettingDefinitionPro
 
 	private String processMethodRulesDefinitionDescriptionTemplate;
 
-	public static SensorDescriptionGenerationSettings getInstance()
+	public static ProcedureDescriptionSettings getInstance()
 	{
 		if (instance == null) {
-			instance = new SensorDescriptionGenerationSettings();
+			instance = new ProcedureDescriptionSettings();
 			SettingsManager.getInstance().configure(instance);
 		}
 		return instance;

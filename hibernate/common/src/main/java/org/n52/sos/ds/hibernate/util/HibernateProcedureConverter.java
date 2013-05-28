@@ -79,7 +79,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweCount;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.SensorDescriptionGenerationSettings;
+import org.n52.sos.service.ProcedureDescriptionSettings;
 import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
@@ -441,8 +441,8 @@ public class HibernateProcedureConverter {
         return ServiceConfiguration.getInstance();
     }
 
-    private SensorDescriptionGenerationSettings generationSettings() {
-        return SensorDescriptionGenerationSettings.getInstance();
+    private ProcedureDescriptionSettings generationSettings() {
+        return ProcedureDescriptionSettings.getInstance();
     }
 
     private List<String> createKeywordsList(final Procedure procedure, final String[] observableProperties) {

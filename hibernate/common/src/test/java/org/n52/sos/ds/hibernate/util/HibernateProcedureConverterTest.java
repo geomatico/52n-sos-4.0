@@ -51,7 +51,7 @@ import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.System;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
-import org.n52.sos.service.SensorDescriptionGenerationSettings;
+import org.n52.sos.service.ProcedureDescriptionSettings;
 import org.n52.sos.service.ServiceConfiguration;
 
 
@@ -83,7 +83,7 @@ public class HibernateProcedureConverterTest {
 	public static void initFixtures()
 	{
 		// init settings
-		SensorDescriptionGenerationSettings.getInstance();
+		ProcedureDescriptionSettings.getInstance();
 		
 		spatialProcedure = (Procedure)(new Procedure()
 		.setProcedureDescriptionFormat(PROCEDURE_DESCRIPTION_FORMAT)
@@ -98,13 +98,13 @@ public class HibernateProcedureConverterTest {
 		.setIdentifier(PROCEDURE_IDENTIFIER));
 		
 		PROCEDURE_DESCRIPTION_NON_SPATIAL = format(
-				SensorDescriptionGenerationSettings.getInstance().getDescriptionTemplate(),
+				ProcedureDescriptionSettings.getInstance().getDescriptionTemplate(),
 				"procedure",
 				PROCEDURE_IDENTIFIER,
 				join(",", (Object[])OBSERVABLE_PROPERTIES));
 		
 		PROCEDURE_DESCRIPTION_SPATIAL = format(
-				SensorDescriptionGenerationSettings.getInstance().getDescriptionTemplate(),
+				ProcedureDescriptionSettings.getInstance().getDescriptionTemplate(),
 				"sensor system",
 				PROCEDURE_IDENTIFIER,
 				join(",", (Object[])OBSERVABLE_PROPERTIES));
@@ -221,7 +221,7 @@ public class HibernateProcedureConverterTest {
 		final String sensorTypeValue = "test-sensor-type-value";
 		final String sensorTypeDefinition = "test-sensor-type-definition";
 		
-		final SensorDescriptionGenerationSettings sdgs = SensorDescriptionGenerationSettings.getInstance();
+		final ProcedureDescriptionSettings sdgs = ProcedureDescriptionSettings.getInstance();
 		sdgs.setClassifierIntendedApplicationValue(intendedApplicationValue);
 		sdgs.setClassifierSensorTypeValue(sensorTypeValue);
 		sdgs.setClassifierSensorTypeDefinition(sensorTypeDefinition);
