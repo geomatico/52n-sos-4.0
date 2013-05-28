@@ -260,7 +260,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                 }
 
             } else if (xmlObject instanceof AbstractProcessType) {
-                AbstractProcessType abstractProcess = (AbstractProcessType) xmlObject;
+                final AbstractProcessType abstractProcess = (AbstractProcessType) xmlObject;
                 addAbstractProcessValues(abstractProcess, (AbstractProcess)sensorDesc);
                 if (abstractProcess instanceof SystemType && sensorDesc instanceof System) {
                     addSystemValues((SystemType) abstractProcess, (System) sensorDesc);
@@ -319,11 +319,9 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                 SensorMLDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         final net.opengis.sensorML.x101.SensorMLDocument.SensorML xbSensorML = sensorMLDoc.addNewSensorML();
         xbSensorML.setVersion(SensorMLConstants.VERSION_V101);
-        // TODO: Eike: set all other elements
         if (smlSensorDesc.isSetMembers()) {
             for (final AbstractProcess sml : smlSensorDesc.getMembers()) {
                 if (sml instanceof System) {
-                    // TODO create a method for each type
                     final SystemType xbSystem =
                             (SystemType) xbSensorML
                                     .addNewMember()
@@ -331,7 +329,6 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                                     .substitute(new QName(SensorMLConstants.NS_SML, SensorMLConstants.EN_SYSTEM),
                                             SystemType.type);
                     final System smlSystem = (System) sml;
-                    // TODO howTo without explicit setting
                     addAbstractProcessValues(xbSystem, smlSystem);
                     addSystemValues(xbSystem, smlSystem);
                 } else if (sml instanceof ProcessModel) {
@@ -345,10 +342,6 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                     final ProcessModel smlProcessModel = (ProcessModel) sml;
                     addAbstractProcessValues(xbProcessModel, smlProcessModel);
                     addProcessModelValues(xbProcessModel, smlProcessModel);
-
-                    // FIXME continue implementation here
-                    // FIXME What is missing here?
-                    LOGGER.debug("CONTINUE IMPLEMENTATION HERE");
                 }
             }
         }
@@ -1020,7 +1013,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         return SensorMLConstants.ABSTRACT_PROCESS_QNAME;
     }
 
-    protected void addSpecialCapabilities(AbstractProcess abstractProcess) {
+    protected void addSpecialCapabilities(final AbstractProcess abstractProcess) {
         if (abstractProcess.isSetFeaturesOfInterest()) {
         	abstractProcess.addCapabilities(createCapabilitiesFrom(                    
             		SensorMLConstants.ELEMENT_NAME_FEATURES_OF_INTEREST,
@@ -1045,19 +1038,19 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         }        
     }
 
-    protected Map<String,String> convertOfferingsToMap(Set<SosOffering> offerings) {
+    protected Map<String,String> convertOfferingsToMap(final Set<SosOffering> offerings) {
     	final Map<String,String> valueNamePairs = new HashMap<String,String>();
-    	for (SosOffering offering : offerings) {
+    	for (final SosOffering offering : offerings) {
     		valueNamePairs.put(offering.getOfferingIdentifier(), offering.getOfferingName());
     	}
     	return valueNamePairs;
     }
 
     protected SosSMLCapabilities createCapabilitiesFrom(final String elementName,
-            final String fieldDefinition, final String fieldName, Set<String> values) {
+            final String fieldDefinition, final String fieldName, final Set<String> values) {
     	final Map<String,String> valueNamePairs = new HashMap<String,String>();
     	int counter = 0;
-    	for (String value : values) {
+    	for (final String value : values) {
     		final String name = values.size() > 1 ? fieldName + ++counter : fieldName; 
     		valueNamePairs.put(value, name);
     	}
@@ -1065,14 +1058,14 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
     }
 
     protected SosSMLCapabilities createCapabilitiesFrom(final String elementName,
-            final String fieldDefinition, Map<String,String> valueNamePairs ) {
+            final String fieldDefinition, final Map<String,String> valueNamePairs ) {
         final SosSMLCapabilities capabilities = new SosSMLCapabilities();
         capabilities.setName(elementName);
         final SosSweSimpleDataRecord simpleDataRecord = new SosSweSimpleDataRecord();
         final List<SosSweField> fields = new ArrayList<SosSweField>(valueNamePairs.size());
-        List<String> values = new ArrayList<String>(valueNamePairs.keySet());
+        final List<String> values = new ArrayList<String>(valueNamePairs.keySet());
         Collections.sort(values);
-        for (String value : values) {
+        for (final String value : values) {
             final SosSweText text = new SosSweText();
             text.setDefinition(fieldDefinition);
             text.setValue(value);
