@@ -41,6 +41,7 @@ import net.opengis.swe.x20.CountType;
 import net.opengis.swe.x20.DataArrayPropertyType;
 import net.opengis.swe.x20.DataArrayType;
 import net.opengis.swe.x20.DataArrayType.ElementType;
+import net.opengis.swe.x20.DataRecordPropertyType;
 import net.opengis.swe.x20.DataRecordType;
 import net.opengis.swe.x20.DataRecordType.Field;
 import net.opengis.swe.x20.QuantityType;
@@ -49,6 +50,7 @@ import net.opengis.swe.x20.TextEncodingType;
 import net.opengis.swe.x20.TextType;
 import net.opengis.swe.x20.TimeRangeType;
 import net.opengis.swe.x20.TimeType;
+import net.opengis.swe.x20.UnitReference;
 import net.opengis.swe.x20.VectorType.Coordinate;
 
 import org.apache.xmlbeans.XmlException;
@@ -232,6 +234,12 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
             final DataArrayPropertyType dataArrayProperty = DataArrayPropertyType.Factory.newInstance();
             dataArrayProperty.setDataArray1((DataArrayType) abstractDataComponentType);
             return dataArrayProperty;
+        }
+        if ((abstractDataComponentType instanceof DataRecordType) && additionalValues
+                .containsKey(HelperValues.FOR_OBSERVATION)) {
+            final DataRecordPropertyType dataRecordProperty = DataRecordPropertyType.Factory.newInstance();
+            dataRecordProperty.setDataRecord((DataRecordType)abstractDataComponentType);
+            return dataRecordProperty;
         }
         return abstractDataComponentType;
     }
@@ -427,7 +435,7 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
             xbQuantity.setValue(Double.valueOf(quantity.getValue()));
         }
         if (quantity.isSetUom()) {
-            xbQuantity.addNewUom().setCode(quantity.getUom());
+            xbQuantity.setUom(createUnitReference(quantity.getUom()));
         }
         if (quantity.getQuality() != null) {
             // TODO implement
@@ -450,7 +458,7 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
             xbTime.setValue(sosTime.getValue());
         }
         if (sosTime.isSetUom()) {
-            xbTime.addNewUom().setHref(sosTime.getUom());
+            xbTime.setUom(createUnitReference(sosTime.getUom()));
         }
         if (sosTime.getQuality() != null) {
             // TODO implement
@@ -517,5 +525,15 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
             xbTextEncoding.setTokenSeparator(sosTextEncoding.getTokenSeparator());
         }
         return xbTextEncoding;
+    }
+
+    private UnitReference createUnitReference(String uom) {
+        UnitReference unitReference = UnitReference.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        if (uom.startsWith("urn:") || uom.startsWith("http://")) {
+            unitReference.setHref(uom);
+        } else {
+            unitReference.setCode(uom);
+        }
+        return unitReference;
     }
 }

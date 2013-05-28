@@ -104,6 +104,11 @@ public abstract class AbstractOmEncoderv20 implements ObservationEncoder<XmlObje
         }
     }
     
+    @Override
+    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
+        nameSpacePrefixMap.put(OMConstants.NS_OM_2, OMConstants.NS_OM_PREFIX);
+    }
+    
     protected XmlObject createOmObservation(SosObservation sosObservation, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
         OMObservationType xbObservation =

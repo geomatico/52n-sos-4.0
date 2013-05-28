@@ -120,11 +120,6 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
     }
 
     @Override
-    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
-        nameSpacePrefixMap.put(OMConstants.NS_OM_2, OMConstants.NS_OM_PREFIX);
-    }
-
-    @Override
     public boolean isObservationAndMeasurmentV20Type() {
         return true;
     }
