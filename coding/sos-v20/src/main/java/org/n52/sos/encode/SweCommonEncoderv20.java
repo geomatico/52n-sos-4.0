@@ -84,6 +84,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.NcNameResolver;
 import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -346,7 +347,7 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
         final DataRecordType.Field xbField =
                              DataRecordType.Field.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (sweField.getName() != null) {
-            xbField.setName(sweField.getName());
+            xbField.setName(NcNameResolver.fixNcName(sweField.getName()));
         }
         final AbstractDataComponentType xbDCD = xbField.addNewAbstractDataComponent();
         xbDCD
