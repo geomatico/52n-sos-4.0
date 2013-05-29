@@ -31,6 +31,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.n52.sos.ogc.OGCConstants;
+import org.n52.sos.util.SchemaLocation;
 
 /**
  * Class contains element names and namespaces used to encode the O&M responses.
@@ -40,17 +41,19 @@ public interface OMConstants {
     String PARAMETER_NOT_SET = "PARAMETER_NOT_SET";
     // //////////////////////////////
     // namespaces and schema locations
-    String SCHEMA_LOCATION_OM = "http://schemas.opengis.net/om/1.0.0/om.xsd";
-    String SCHEMA_LOCATION_OM_CONSTRAINT =
-           "http://schemas.opengis.net/om/1.0.0/extensions/observationSpecialization_constraint.xsd";
-    String SCHEMA_LOCATION_OM_2 = "http://schemas.opengis.net/om/2.0/observation.xsd";
-    String SCHEMA_LOCATION_OM_2_OM_OBSERVATION = SCHEMA_LOCATION_OM_2 + "#OM_Observation";
     String NS_OM = "http://www.opengis.net/om/1.0";
     String NS_OM_2 = "http://www.opengis.net/om/2.0";
     String NS_OM_PREFIX = "om";
     String NS_GMD = "http://www.isotc211.org/2005/gmd";
     String NS_GMD_PREFIX = "gmd";
     String NS_WV = "http://www.n52.org/wv";
+    String SCHEMA_LOCATION_URL_OM = "http://schemas.opengis.net/om/1.0.0/om.xsd";
+    String SCHEMA_LOCATION_URL_OM_CONSTRAINT =
+           "http://schemas.opengis.net/om/1.0.0/extensions/observationSpecialization_constraint.xsd";
+    String SCHEMA_LOCATION_URL_OM_20 = "http://schemas.opengis.net/om/2.0/observation.xsd";
+    String SCHEMA_LOCATION_URL_OM_20_OM_OBSERVATION = SCHEMA_LOCATION_URL_OM_20 + "#OM_Observation";
+    SchemaLocation OM_100_SCHEMA_LOCATION = new SchemaLocation(NS_OM, SCHEMA_LOCATION_URL_OM);
+    SchemaLocation OM_20_SCHEMA_LOCATION = new SchemaLocation(NS_OM_2, SCHEMA_LOCATION_URL_OM_20);
     // //////////////////////////////////////////////////////////////////////
     // other
     String AN_ID = "id";

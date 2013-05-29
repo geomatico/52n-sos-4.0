@@ -28,9 +28,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPConstants;
@@ -55,6 +57,7 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.OwsHelper;
+import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.W3CConstants;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -83,6 +86,13 @@ public class Soap12Encoder extends AbstractSoapEncoder {
 
 
     @Override
+    public Set<SchemaLocation> getSchemaLocations() {
+        // TODO return valid schemaLocation
+        return Collections.emptySet();
+    }
+
+
+    @Override
     public ServiceResponse encode(final SoapResponse response, final Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
         if (response == null) {
@@ -101,10 +111,7 @@ public class Soap12Encoder extends AbstractSoapEncoder {
                     action = getExceptionActionURI(firstException.getCode());
                 }
                 body.set(createSOAP12FaultFromExceptionResponse(response.getException()));
-                final List<String> schemaLocations = new ArrayList<String>(2);
-                schemaLocations.add(N52XmlHelper.getSchemaLocationForSOAP12());
-                schemaLocations.add(N52XmlHelper.getSchemaLocationForOWS110Exception());
-                N52XmlHelper.setSchemaLocationsToDocument(envelopeDoc, schemaLocations);
+                N52XmlHelper.setSchemaLocationsToDocument(envelopeDoc, CollectionHelper.set(N52XmlHelper.getSchemaLocationForSOAP12(), N52XmlHelper.getSchemaLocationForOWS110Exception()));
             } else {
                 action = response.getSoapAction();
                 final XmlObject bodyContent = createSOAP12Body(response.getSoapBodyContent());
@@ -121,10 +128,13 @@ public class Soap12Encoder extends AbstractSoapEncoder {
                 if (nodeToRemove != null) {
                     attributeMap.removeNamedItem(nodeToRemove.getNodeName());
                 }
-                final List<String> schemaLocations = new ArrayList<String>(2);
+                final Set<SchemaLocation> schemaLocations = CollectionHelper.set();
                 schemaLocations.add(N52XmlHelper.getSchemaLocationForSOAP12());
                 if (value != null && !value.isEmpty()) {
-                    schemaLocations.add(value);
+                    String[] split = value.split(" ");
+                    for (int i = 0; i < split.length; i += 2) {
+                        schemaLocations.add( new SchemaLocation(split[i], split[i+1]));
+                    }
                 }
                 N52XmlHelper.setSchemaLocationsToDocument(envelopeDoc, schemaLocations);
                 body.set(bodyContent);

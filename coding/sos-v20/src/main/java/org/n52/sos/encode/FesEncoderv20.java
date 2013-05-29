@@ -72,6 +72,8 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -113,6 +115,11 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
     @Override
     public String getContentType() {
         return SosConstants.CONTENT_TYPE_XML;
+    }
+
+    @Override
+    public Set<SchemaLocation> getSchemaLocations() {
+        return CollectionHelper.set(FilterConstants.FES_20_SCHEMA_LOCATION);
     }
 
     @Override

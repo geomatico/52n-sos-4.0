@@ -59,6 +59,7 @@ import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -116,6 +117,11 @@ public class SamplingEncoderv100 implements Encoder<XmlObject, SosAbstractFeatur
     @Override
     public String getContentType() {
         return SosConstants.CONTENT_TYPE_XML;
+    }
+
+    @Override
+    public Set<SchemaLocation> getSchemaLocations() {
+        return CollectionHelper.set(SFConstants.SA_SCHEMA_LOCATION);
     }
 
     @Override

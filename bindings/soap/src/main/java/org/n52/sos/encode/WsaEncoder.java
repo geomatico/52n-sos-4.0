@@ -36,6 +36,7 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.wsa.WsaConstants;
 import org.n52.sos.wsa.WsaHeader;
@@ -75,6 +76,12 @@ public class WsaEncoder implements Encoder<Map<QName, String>, WsaHeader> {
     @Override
     public String getContentType() {
         return SosConstants.CONTENT_TYPE_XML;
+    }
+
+    @Override
+    public Set<SchemaLocation> getSchemaLocations() {
+        // TODO return valid schemaLocation
+        return Collections.emptySet();
     }
 
     @Override

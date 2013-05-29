@@ -26,6 +26,7 @@ package org.n52.sos.ogc.gml;
 import javax.xml.namespace.QName;
 
 import org.n52.sos.ogc.om.OMConstants;
+import org.n52.sos.util.SchemaLocation;
 
 public interface GMLConstants {
 
@@ -36,10 +37,14 @@ public interface GMLConstants {
 
     String NS_GML_PREFIX = "gml";
 
-    String SCHEMA_LOCATION_GML = "http://schemas.opengis.net/gml/3.1.1/base/gml.xsd";
+    String SCHEMA_LOCATION_URL_GML_311 = "http://schemas.opengis.net/gml/3.1.1/base/gml.xsd";
 
-    String SCHEMA_LOCATION_GML_32 = "http://schemas.opengis.net/gml/3.2.1/gml.xsd";
-
+    String SCHEMA_LOCATION_URL_GML_32 = "http://schemas.opengis.net/gml/3.2.1/gml.xsd";
+    
+    SchemaLocation GML_311_SCHEMAL_LOCATION = new SchemaLocation(NS_GML, SCHEMA_LOCATION_URL_GML_311);
+    
+    SchemaLocation GML_32_SCHEMAL_LOCATION = new SchemaLocation(NS_GML_32, SCHEMA_LOCATION_URL_GML_32);
+            
     String GML_ID_ATT = "id";
 
     /* element names used in GML */

@@ -77,6 +77,7 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
+import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -119,6 +120,12 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
     @Override
     public String getContentType() {
         return SosConstants.CONTENT_TYPE_XML;
+    }
+
+    @Override
+    public Set<SchemaLocation> getSchemaLocations() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
@@ -218,7 +225,7 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
             setContents(xbCaps.addNewContents(), sosCapabilities.getContents(), response.getVersion());
         }
 
-        N52XmlHelper.setSchemaLocationToDocument(xbCapsDoc, N52XmlHelper.getSchemaLocationForSOS100());
+        N52XmlHelper.setSchemaLocationsToDocument(xbCapsDoc, CollectionHelper.set(N52XmlHelper.getSchemaLocationForSOS100()));
 
         return xbCapsDoc;
     }

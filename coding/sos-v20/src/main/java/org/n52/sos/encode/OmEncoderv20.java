@@ -63,6 +63,7 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.OMHelper;
+import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.SweHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -141,6 +142,11 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
     @Override
     public String getContentType() {
         return OMConstants.CONTENT_TYPE_OM_2;
+    }
+
+    @Override
+    public Set<SchemaLocation> getSchemaLocations() {
+        return CollectionHelper.set(OMConstants.OM_20_SCHEMA_LOCATION);
     }
 
     @Override

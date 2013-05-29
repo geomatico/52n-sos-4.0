@@ -49,7 +49,9 @@ import org.n52.sos.response.InsertSensorResponse;
 import org.n52.sos.response.UpdateSensorResponse;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
+import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -94,6 +96,11 @@ public class SwesEncoderv20 implements Encoder<XmlObject, AbstractServiceRespons
     }
 
     @Override
+    public Set<SchemaLocation> getSchemaLocations() {
+        return CollectionHelper.set(SWEConstants.SWES_20_SCHEMA_LOCATION);
+    }
+
+    @Override
     public XmlObject encode(AbstractServiceResponse response) throws OwsExceptionReport {
         return encode(response, null);
     }
@@ -121,8 +128,10 @@ public class SwesEncoderv20 implements Encoder<XmlObject, AbstractServiceRespons
         XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getOutputFormat(), response.getSensorDescription());
         describeSensorResponse.addNewDescription().addNewSensorDescription().addNewData().set(xmlObject);
         // set schema location
-        N52XmlHelper.setSchemaLocationsToDocument(xbDescSensorRespDoc,
-                Collections.singletonList(N52XmlHelper.getSchemaLocationForSWES200()));
+        Set<SchemaLocation> schemaLocations = CollectionHelper.set();
+        schemaLocations.add(SWEConstants.SWES_20_DESCRIBE_SENSOR_SCHEMA_LOCATION);
+        N52XmlHelper.addSchemaLocationsForTo(xbDescSensorRespDoc, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(xbDescSensorRespDoc, schemaLocations);
         return xbDescSensorRespDoc;
     }
 
@@ -133,8 +142,10 @@ public class SwesEncoderv20 implements Encoder<XmlObject, AbstractServiceRespons
         xbInsSenResp.setAssignedProcedure(response.getAssignedProcedure());
         xbInsSenResp.setAssignedOffering(response.getAssignedOffering());
         // set schema location
-        N52XmlHelper.setSchemaLocationsToDocument(xbInsSenRespDoc, Collections
-                .singletonList(N52XmlHelper.getSchemaLocationForSWES200()));
+        Set<SchemaLocation> schemaLocations = CollectionHelper.set();
+        schemaLocations.add(SWEConstants.SWES_20_INSERT_SENSOR_SCHEMA_LOCATION);
+        N52XmlHelper.addSchemaLocationsForTo(xbInsSenRespDoc, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(xbInsSenRespDoc, schemaLocations);
         return xbInsSenRespDoc;
     }
 
@@ -145,8 +156,10 @@ public class SwesEncoderv20 implements Encoder<XmlObject, AbstractServiceRespons
         UpdateSensorDescriptionResponseType xbUpSenResp = xbUpSenRespDoc.addNewUpdateSensorDescriptionResponse();
         xbUpSenResp.setUpdatedProcedure(response.getUpdatedProcedure());
         // set schema location
-        N52XmlHelper.setSchemaLocationsToDocument(xbUpSenRespDoc, Collections
-                .singletonList(N52XmlHelper.getSchemaLocationForSWES200()));
+        Set<SchemaLocation> schemaLocations = CollectionHelper.set();
+        schemaLocations.add(SWEConstants.SWES_20_UPDATE_SENSOR_DESCRIPTION_SCHEMA_LOCATION);
+        N52XmlHelper.addSchemaLocationsForTo(xbUpSenRespDoc, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(xbUpSenRespDoc, schemaLocations);
         return xbUpSenRespDoc;
     }
 
@@ -156,8 +169,10 @@ public class SwesEncoderv20 implements Encoder<XmlObject, AbstractServiceRespons
         DeleteSensorResponseType xbDelSenResp = xbDelSenRespDoc.addNewDeleteSensorResponse();
         xbDelSenResp.setDeletedProcedure(response.getDeletedProcedure());
         // set schema location
-        N52XmlHelper.setSchemaLocationsToDocument(xbDelSenRespDoc, Collections
-                .singletonList(N52XmlHelper.getSchemaLocationForSWES200()));
+        Set<SchemaLocation> schemaLocations = CollectionHelper.set();
+        schemaLocations.add(SWEConstants.SWES_20_DELETE_SENSOR_SCHEMA_LOCATION);
+        N52XmlHelper.addSchemaLocationsForTo(xbDelSenRespDoc, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(xbDelSenRespDoc, schemaLocations);
         return xbDelSenRespDoc;
     }
 

@@ -90,6 +90,7 @@ import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.GmlHelper;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.OMHelper;
+import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.SweHelper;
 import org.n52.sos.util.XmlHelper;
@@ -178,6 +179,11 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
     }
 
     @Override
+    public Set<SchemaLocation> getSchemaLocations() {
+        return CollectionHelper.set(OMConstants.OM_100_SCHEMA_LOCATION);
+    }
+
+    @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
         return encode(element, new EnumMap<HelperValues, String>(HelperValues.class));
     }
@@ -240,9 +246,9 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
                         || (StringHelper.isNotEmpty(resultModel) && resultModel.equals(observationType))) {
                     xbObservationCollection.addNewMember().set(createObservation(sosObservation, null));
                 } else {
-                   throw new InvalidParameterValueException().at(
-                            Sos1Constants.GetObservationParams.resultModel).withMessage(
-                            "The requested resultModel '%s' is invalid for the resulting observations!", OMHelper.getEncodedResultModelFor(resultModel));
+                    throw new InvalidParameterValueException().at(Sos1Constants.GetObservationParams.resultModel)
+                            .withMessage("The requested resultModel '%s' is invalid for the resulting observations!",
+                                    OMHelper.getEncodedResultModelFor(resultModel));
                 }
             }
         } else {
@@ -250,12 +256,10 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
             xbObservation.setHref(GMLConstants.NIL_INAPPLICABLE);
         }
         XmlHelper.makeGmlIdsUnique(xbObservationCollectionDoc.getDomNode());
-        List<String> schemaLocations = new ArrayList<String>(3);
-        schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS100());
-        schemaLocations.add(N52XmlHelper.getSchemaLocationForOM100());
-        schemaLocations.add(N52XmlHelper.getSchemaLocationForSA100());
-        // schemaLocations.add(N52XmlHelper.getSchemaLocationForSWE101());
-        N52XmlHelper.setSchemaLocationsToDocument(xbObservationCollectionDoc, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(
+                xbObservationCollectionDoc,
+                CollectionHelper.set(N52XmlHelper.getSchemaLocationForSOS100(),
+                        N52XmlHelper.getSchemaLocationForOM100(), N52XmlHelper.getSchemaLocationForSA100()));
         return xbObservationCollectionDoc;
     }
 

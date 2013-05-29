@@ -23,6 +23,8 @@
  */
 package org.n52.sos.ogc.om.features;
 
+import org.n52.sos.util.SchemaLocation;
+
 /**
  * Constants class for SamplingFeature
  * 
@@ -42,12 +44,18 @@ public interface SFConstants {
 
     String NS_SAMS_PREFIX = "sams";
 
-    String SCHEMA_LOCATION_SA = "http://schemas.opengis.net/sampling/1.0.0/sampling.xsd";
+    String SCHEMA_LOCATION_URL_SA = "http://schemas.opengis.net/sampling/1.0.0/sampling.xsd";
 
-    String SCHEMA_LOCATION_SF = "http://schemas.opengis.net/sampling/2.0/samplingFeature.xsd";
+    String SCHEMA_LOCATION_URL_SF = "http://schemas.opengis.net/sampling/2.0/samplingFeature.xsd";
 
-    String SCHEMA_LOCATION_SAMS =
+    String SCHEMA_LOCATION_URL_SAMS =
             "http://schemas.opengis.net/samplingSpatial/2.0/spatialSamplingFeature.xsd";
+    
+    SchemaLocation SA_SCHEMA_LOCATION = new SchemaLocation(NS_SA, SCHEMA_LOCATION_URL_SA);
+    
+    SchemaLocation SF_SCHEMA_LOCATION = new SchemaLocation(NS_SF, SCHEMA_LOCATION_URL_SF);
+    
+    SchemaLocation SAMS_SCHEMA_LOCATION = new SchemaLocation(NS_SAMS, SCHEMA_LOCATION_URL_SAMS);
     
     // feature types
     String SAMPLING_FEAT_TYPE_SF_SAMPLING_FEATURE =

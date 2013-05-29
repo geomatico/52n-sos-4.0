@@ -133,6 +133,7 @@ import org.n52.sos.service.operator.ServiceOperatorRepository;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.HTTPConstants.StatusCode;
+import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.XmlHelper;
@@ -184,6 +185,11 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
     @Override
     public String getContentType() {
         return SensorMLConstants.SENSORML_CONTENT_TYPE;
+    }
+
+    @Override
+    public Set<SchemaLocation> getSchemaLocations() {
+        return CollectionHelper.set(SensorMLConstants.SML_101_SCHEMA_LOCATION);
     }
 
     @Override

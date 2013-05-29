@@ -45,12 +45,14 @@ import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.ObservationEncoder;
 import org.n52.sos.encode.ResponseFormatKeyType;
+import org.n52.sos.encode.XmlEncoderKey;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.service.operator.ServiceOperatorRepository;
 import org.n52.sos.util.Activatable;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.SetMultiMap;
 import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;
@@ -61,30 +63,43 @@ import org.slf4j.LoggerFactory;
  */
 public class CodingRepository {
     private static final Logger LOG = LoggerFactory.getLogger(CodingRepository.class);
+
     private static CodingRepository instance;
+
     @SuppressWarnings("rawtypes")
     private final ServiceLoader<Decoder> serviceLoaderDecoder;
+
     @SuppressWarnings("rawtypes")
     private final ServiceLoader<Encoder> serviceLoaderEncoder;
+
     private final Set<Decoder<?, ?>> decoders;
+
     private final Set<Encoder<?, ?>> encoders;
+
     private final SetMultiMap<DecoderKey, Decoder<?, ?>> decoderByKey = newSetMultiMap();
+
     private final SetMultiMap<EncoderKey, Encoder<?, ?>> encoderByKey = newSetMultiMap();
+
     private SetMultiMap<SupportedTypeKey, Activatable<String>> typeMap = newSetMultiMap(SupportedTypeKey.class);
+
     private final Set<ObservationEncoder<?, ?>> observationEncoders = set();
+
     private final Map<String, Map<String, Set<String>>> responseFormats = map();
+
     private final Map<ResponseFormatKeyType, Boolean> responseFormatStatus = map();
+
+    private final Map<String, Set<SchemaLocation>> schemaLocations = map();
 
     /**
      * @return Returns a singleton instance of the CodingRepository.
      */
     public static CodingRepository getInstance() {
-    	if (instance == null) {
-    		instance = new CodingRepository();
-    	}
-    	return instance;
-    }    
-    
+        if (instance == null) {
+            instance = new CodingRepository();
+        }
+        return instance;
+    }
+
     /**
      * private constructor for singleton
      */
@@ -97,6 +112,7 @@ public class CodingRepository {
         initEncoderMap();
         generateTypeMap();
         generateResponseFormatMaps();
+        generateSchemaLocationMap();
     }
 
     @SuppressWarnings("unchecked")
@@ -112,8 +128,8 @@ public class CodingRepository {
             List<Decoder<?, ?>> list = new ArrayList<Decoder<?, ?>>(matches);
             Collections.sort(list, new DecoderComparator(key));
             Decoder<?, ?> dec = list.iterator().next();
-            LOG.warn("Requested ambiguous Decoder implementations for {}: Found {}; Choosing {}.",
-                     key, StringHelper.join(", ", matches), dec);
+            LOG.warn("Requested ambiguous Decoder implementations for {}: Found {}; Choosing {}.", key,
+                    StringHelper.join(", ", matches), dec);
             return unsafeCast(dec);
         } else {
             return unsafeCast(matches.iterator().next());
@@ -128,8 +144,8 @@ public class CodingRepository {
             List<Encoder<?, ?>> list = new ArrayList<Encoder<?, ?>>(matches);
             Collections.sort(list, new EncoderComparator(key));
             Encoder<?, ?> enc = list.iterator().next();
-            LOG.warn("Requested ambiguous Encoder implementations for {}: Found {}; Choosing {}.",
-                     key, StringHelper.join(", ", matches), enc);
+            LOG.warn("Requested ambiguous Encoder implementations for {}: Found {}; Choosing {}.", key,
+                    StringHelper.join(", ", matches), enc);
             return unsafeCast(enc);
         } else {
             return unsafeCast(matches.iterator().next());
@@ -152,14 +168,15 @@ public class CodingRepository {
         initEncoderMap();
         generateTypeMap();
         generateResponseFormatMaps();
+        generateSchemaLocationMap();
         LOG.debug("Reloaded Encoder implementations");
     }
 
     private void generateResponseFormatMaps() {
         this.responseFormatStatus.clear();
         this.responseFormats.clear();
-        final Set<ServiceOperatorKeyType> serviceOperatorKeyTypes = ServiceOperatorRepository.getInstance()
-                .getServiceOperatorKeyTypes();
+        final Set<ServiceOperatorKeyType> serviceOperatorKeyTypes =
+                ServiceOperatorRepository.getInstance().getServiceOperatorKeyTypes();
         for (Encoder<?, ?> e : getEncoders()) {
             if (e instanceof ObservationEncoder) {
                 final ObservationEncoder<?, ?> oe = (ObservationEncoder<?, ?>) e;
@@ -169,6 +186,20 @@ public class CodingRepository {
                         for (String rf : rfs) {
                             addResponseFormat(new ResponseFormatKeyType(sokt, rf));
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    private void generateSchemaLocationMap() {
+        schemaLocations.clear();
+        for (Encoder<?, ?> encoder : this.encoders) {
+            if (CollectionHelper.isNotEmpty(encoder.getEncoderKeyType())) {
+                EncoderKey next = encoder.getEncoderKeyType().iterator().next();
+                if (next instanceof XmlEncoderKey) {
+                    if (CollectionHelper.isNotEmpty(encoder.getSchemaLocations())) {
+                        schemaLocations.put(((XmlEncoderKey) next).getNamespace(), encoder.getSchemaLocations());
                     }
                 }
             }
@@ -205,11 +236,11 @@ public class CodingRepository {
             LOG.warn(text, sce);
             throw new ConfigurationException(text, sce);
         }
-//        if (loadedDecoders.isEmpty()) {
-//            String exceptionText = "No Decoder implementations is loaded!";
-//            LOG.error(exceptionText);
-//            throw new ConfigurationException(exceptionText);
-//        }
+        // if (loadedDecoders.isEmpty()) {
+        // String exceptionText = "No Decoder implementations is loaded!";
+        // LOG.error(exceptionText);
+        // throw new ConfigurationException(exceptionText);
+        // }
         return loadedDecoders;
     }
 
@@ -226,11 +257,11 @@ public class CodingRepository {
             LOG.warn(text, sce);
             throw new ConfigurationException(text, sce);
         }
-//        if (loadedEncoders.isEmpty()) {
-//            String exceptionText = "No Encoder implementations is loaded!";
-//            LOG.error(exceptionText);
-//            throw new ConfigurationException(exceptionText);
-//        }
+        // if (loadedEncoders.isEmpty()) {
+        // String exceptionText = "No Encoder implementations is loaded!";
+        // LOG.error(exceptionText);
+        // throw new ConfigurationException(exceptionText);
+        // }
         return loadedEncoders;
     }
 
@@ -334,6 +365,13 @@ public class CodingRepository {
         }
     }
 
+    public Set<SchemaLocation> getSchemaLocation(String namespace) {
+        if (schemaLocations.containsKey(namespace)) {
+            return schemaLocations.get(namespace);
+        }
+        return set();
+    }
+
     private <F, T> Decoder<F, T> getDecoderSingleKey(DecoderKey key) {
         return processDecoderMatches(findDecodersForSingleKey(key), key);
     }
@@ -378,28 +416,30 @@ public class CodingRepository {
 
     private Set<Encoder<?, ?>> findEncodersForCompositeKey(CompositeEncoderKey ck) {
         if (!encoderByKey.containsKey(ck)) {
-            // first request; search for matching encoders and save result for later quries
+            // first request; search for matching encoders and save result for
+            // later quries
             for (Encoder<?, ?> encoder : encoders) {
                 if (ck.matches(encoder.getEncoderKeyType())) {
                     encoderByKey.add(ck, encoder);
                 }
             }
             LOG.debug("Found {} Encoders for CompositeKey: {}", encoderByKey.get(ck).size(),
-                      StringHelper.join(", ", encoderByKey.get(ck)));
+                    StringHelper.join(", ", encoderByKey.get(ck)));
         }
         return encoderByKey.get(ck);
     }
 
     private Set<Decoder<?, ?>> findDecodersForCompositeKey(CompositeDecoderKey ck) {
         if (!decoderByKey.containsKey(ck)) {
-            // first request; search for matching decoders and save result for later queries
+            // first request; search for matching decoders and save result for
+            // later queries
             for (Decoder<?, ?> decoder : decoders) {
                 if (ck.matches(decoder.getDecoderKeyTypes())) {
                     decoderByKey.add(ck, decoder);
                 }
             }
             LOG.debug("Found {} Decoders for CompositeKey: {}", decoderByKey.get(ck).size(),
-                      StringHelper.join(", ", decoderByKey.get(ck)));
+                    StringHelper.join(", ", decoderByKey.get(ck)));
         }
         return decoderByKey.get(ck);
     }
@@ -448,8 +488,7 @@ public class CodingRepository {
 
     public Map<ServiceOperatorKeyType, Set<String>> getSupportedResponseFormats() {
         Map<ServiceOperatorKeyType, Set<String>> map = map();
-        for (ServiceOperatorKeyType sokt : ServiceOperatorRepository.getInstance()
-                .getServiceOperatorKeyTypes()) {
+        for (ServiceOperatorKeyType sokt : ServiceOperatorRepository.getInstance().getServiceOperatorKeyTypes()) {
             map.put(sokt, getSupportedResponseFormats(sokt));
         }
         return map;
@@ -457,8 +496,7 @@ public class CodingRepository {
 
     public Map<ServiceOperatorKeyType, Set<String>> getAllSupportedResponseFormats() {
         Map<ServiceOperatorKeyType, Set<String>> map = map();
-        for (ServiceOperatorKeyType sokt : ServiceOperatorRepository.getInstance()
-                .getServiceOperatorKeyTypes()) {
+        for (ServiceOperatorKeyType sokt : ServiceOperatorRepository.getInstance().getServiceOperatorKeyTypes()) {
             map.put(sokt, getAllSupportedResponseFormats(sokt));
         }
         return map;
@@ -503,16 +541,15 @@ public class CodingRepository {
         public int compare(T o1, T o2) {
             int s1 = getSimilarity(o1);
             int s2 = getSimilarity(o2);
-            if( s1 == s2 ){
-        		if( o1.getClass().isAssignableFrom(o2.getClass()) ){
-        			return 1;
-        		} else if ( o2.getClass().isAssignableFrom(o1.getClass()) ){
-        			return -1;
-            	}            	
+            if (s1 == s2) {
+                if (o1.getClass().isAssignableFrom(o2.getClass())) {
+                    return 1;
+                } else if (o2.getClass().isAssignableFrom(o1.getClass())) {
+                    return -1;
+                }
             }
-            return (s1 == 0) ? -1 : (s2 == 0) ? 1 : (s1 < 0)
-                                                    ? ((s2 < 0) ? 0 : 1) : (s2 < 0) ? -1 : ((s1 < s2)
-                                                                                           ? -1 : 1);
+            return (s1 == 0) ? -1 : (s2 == 0) ? 1 : (s1 < 0) ? ((s2 < 0) ? 0 : 1) : (s2 < 0) ? -1 : ((s1 < s2) ? -1
+                    : 1);
         }
 
         protected abstract int getSimilarity(T t);
@@ -583,17 +620,15 @@ public class CodingRepository {
         public boolean equals(Object obj) {
             if (obj != null && obj.getClass() == getClass()) {
                 CompositeEncoderKey key = (CompositeEncoderKey) obj;
-                return keys.size() == key.getKeys().size()
-                       && keys.containsAll(key.getKeys())
-                       && key.getKeys().containsAll(keys);
+                return keys.size() == key.getKeys().size() && keys.containsAll(key.getKeys())
+                        && key.getKeys().containsAll(keys);
             }
             return false;
         }
 
         @Override
         public String toString() {
-            return String.format("%s[%s]", getClass().getSimpleName(),
-                                 StringHelper.join(", ", keys));
+            return String.format("%s[%s]", getClass().getSimpleName(), StringHelper.join(", ", keys));
         }
 
         @Override
@@ -648,16 +683,14 @@ public class CodingRepository {
         public boolean equals(Object obj) {
             if (obj != null && obj.getClass() == getClass()) {
                 CompositeDecoderKey key = (CompositeDecoderKey) obj;
-                return keys.containsAll(key.getKeys())
-                       && key.getKeys().containsAll(keys);
+                return keys.containsAll(key.getKeys()) && key.getKeys().containsAll(keys);
             }
             return false;
         }
 
         @Override
         public String toString() {
-            return String.format("%s[%s]", getClass().getSimpleName(),
-                                 StringHelper.join(", ", keys));
+            return String.format("%s[%s]", getClass().getSimpleName(), StringHelper.join(", ", keys));
         }
 
         @Override

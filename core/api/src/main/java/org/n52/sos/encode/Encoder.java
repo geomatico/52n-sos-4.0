@@ -31,6 +31,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.ConformanceClass;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.SchemaLocation;
 
 /**
  * Generic interface for Encoders.
@@ -90,4 +91,6 @@ public interface Encoder<T, S> extends ConformanceClass {
      * @return the content type of the encoded response.
      */
     String getContentType();
+    
+    Set<SchemaLocation> getSchemaLocations();
 }

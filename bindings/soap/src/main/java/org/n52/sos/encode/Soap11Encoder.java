@@ -27,7 +27,9 @@ package org.n52.sos.encode;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPConstants;
@@ -47,6 +49,7 @@ import org.n52.sos.soap.SoapHelper;
 import org.n52.sos.soap.SoapResponse;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.N52XmlHelper;
+import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.W3CConstants;
 import org.n52.sos.wsa.WsaConstants;
@@ -65,6 +68,12 @@ public class Soap11Encoder extends AbstractSoapEncoder {
         super(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE);
         LOGGER.debug("Encoder for the following keys initialized successfully: {}!",
                      StringHelper.join(", ", getEncoderKeyType()));
+    }
+
+    @Override
+    public Set<SchemaLocation> getSchemaLocations() {
+        // TODO return valid schemaLocation
+        return Collections.emptySet();
     }
 
     @Override

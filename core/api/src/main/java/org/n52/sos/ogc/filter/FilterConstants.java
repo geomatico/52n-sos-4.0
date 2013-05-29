@@ -23,6 +23,8 @@
  */
 package org.n52.sos.ogc.filter;
 
+import org.n52.sos.util.SchemaLocation;
+
 /**
  * Constants class for filter
  */
@@ -37,6 +39,11 @@ public interface FilterConstants {
      * element name ValueReference
      */
     String EN_VALUE_REFERENCE = "ValueReference";
+    
+    
+    String SCHEMA_LOCATION_URL_FES_20 = "http://schemas.opengis.net/filter/2.0/filterAll.xsd";
+    
+    SchemaLocation FES_20_SCHEMA_LOCATION = new SchemaLocation(NS_FES_2, SCHEMA_LOCATION_URL_FES_20);
 
     /**
      * Enumeration for conformance class constraint names

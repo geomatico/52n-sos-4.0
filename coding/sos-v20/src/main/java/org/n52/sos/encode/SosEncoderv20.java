@@ -116,6 +116,7 @@ import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
+import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.W3CConstants;
 import org.n52.sos.util.XmlHelper;
@@ -162,6 +163,11 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
     @Override
     public String getContentType() {
         return SosConstants.CONTENT_TYPE_XML;
+    }
+
+    @Override
+    public Set<SchemaLocation> getSchemaLocations() {
+        return CollectionHelper.set(Sos2Constants.SOS_SCHEMA_LOCATION);
     }
 
     @Override
@@ -258,13 +264,15 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
                 setExensions(xbCaps.addNewExtension(), extension);
             }
         }
-
-        N52XmlHelper.setSchemaLocationToDocument(xbCapsDoc, N52XmlHelper.getSchemaLocationForSOS200());
-
+        Set<SchemaLocation> schemaLocations = CollectionHelper.set();
+        schemaLocations.add(Sos2Constants.SOS_GET_CAPABILITIES_SCHEMA_LOCATION);
+        N52XmlHelper.addSchemaLocationsForTo(xbCapsDoc, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(xbCapsDoc, schemaLocations);
         return xbCapsDoc;
     }
 
-    private XmlObject createGetObservationResponseDocument(final GetObservationResponse response) throws OwsExceptionReport {
+    private XmlObject createGetObservationResponseDocument(final GetObservationResponse response)
+            throws OwsExceptionReport {
         final GetObservationResponseDocument xbGetObsRespDoc =
                 GetObservationResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         final GetObservationResponseType xbGetObsResp = xbGetObsRespDoc.addNewGetObservationResponse();
@@ -284,9 +292,10 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         }
         // set schema location
         XmlHelper.makeGmlIdsUnique(xbGetObsRespDoc.getDomNode());
-        N52XmlHelper.setSchemaLocationsToDocument(xbGetObsRespDoc, CollectionHelper.list(
-                N52XmlHelper.getSchemaLocationForSOS200(), N52XmlHelper.getSchemaLocationForOM200(),
-                N52XmlHelper.getSchemaLocationForSF200(), N52XmlHelper.getSchemaLocationForSAMS200()));
+        Set<SchemaLocation> schemaLocations = CollectionHelper.set();
+        schemaLocations.add(Sos2Constants.SOS_GET_OBSERVATION_SCHEMA_LOCATION);
+        N52XmlHelper.addSchemaLocationsForTo(xbGetObsRespDoc, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(xbGetObsRespDoc, schemaLocations);
         return xbGetObsRespDoc;
     }
 
@@ -295,10 +304,12 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         final GetFeatureOfInterestResponseDocument xbGetFoiResponseDoc =
                 GetFeatureOfInterestResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance()
                         .getXmlOptions());
-        final GetFeatureOfInterestResponseType xbGetFoiResponse = xbGetFoiResponseDoc.addNewGetFeatureOfInterestResponse();
+        final GetFeatureOfInterestResponseType xbGetFoiResponse =
+                xbGetFoiResponseDoc.addNewGetFeatureOfInterestResponse();
         final SosAbstractFeature sosAbstractFeature = response.getAbstractFeature();
         if (sosAbstractFeature instanceof SosFeatureCollection) {
-            final Map<String, SosAbstractFeature> sosFeatColMap = ((SosFeatureCollection) sosAbstractFeature).getMembers();
+            final Map<String, SosAbstractFeature> sosFeatColMap =
+                    ((SosFeatureCollection) sosAbstractFeature).getMembers();
             for (final String sosFeatID : sosFeatColMap.keySet()) {
                 final SosAbstractFeature feature = sosFeatColMap.get(sosFeatID);
                 addFeatureOfInterestGetFeatureOfInterestResponse(feature, xbGetFoiResponse);
@@ -309,10 +320,10 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
             }
         }
         // set schemLocation
-        N52XmlHelper.setSchemaLocationsToDocument(
-                xbGetFoiResponseDoc,
-                CollectionHelper.list(N52XmlHelper.getSchemaLocationForSOS200(),
-                        N52XmlHelper.getSchemaLocationForSAMS200()));
+        Set<SchemaLocation> schemaLocations = CollectionHelper.set();
+        schemaLocations.add(Sos2Constants.SOS_GET_FEATURE_OF_INTEREST_SCHEMA_LOCATION);
+        N52XmlHelper.addSchemaLocationsForTo(xbGetFoiResponseDoc, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(xbGetFoiResponseDoc, schemaLocations);
         return xbGetFoiResponseDoc;
     }
 
@@ -330,7 +341,8 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         getFoiResponse.addNewFeatureMember().set(encodeObjectToXml);
     }
 
-    private XmlObject createGetObservationByIdResponse(final GetObservationByIdResponse response) throws OwsExceptionReport {
+    private XmlObject createGetObservationByIdResponse(final GetObservationByIdResponse response)
+            throws OwsExceptionReport {
         final GetObservationByIdResponseDocument xbGetObsByIdRespDoc =
                 GetObservationByIdResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         final GetObservationByIdResponseType xbGetObsByIdResp = xbGetObsByIdRespDoc.addNewGetObservationByIdResponse();
@@ -361,9 +373,10 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         }
         XmlHelper.makeGmlIdsUnique(xbGetObsByIdResp.getDomNode());
         // set schema location
-        N52XmlHelper.setSchemaLocationsToDocument(xbGetObsByIdResp, CollectionHelper.list(
-                N52XmlHelper.getSchemaLocationForSOS200(), N52XmlHelper.getSchemaLocationForOM200(),
-                N52XmlHelper.getSchemaLocationForSF200(), N52XmlHelper.getSchemaLocationForSAMS200()));
+        Set<SchemaLocation> schemaLocations = CollectionHelper.set();
+        schemaLocations.add(Sos2Constants.SOS_GET_OBSERVATION_BY_ID_SCHEMA_LOCATION);
+        N52XmlHelper.addSchemaLocationsForTo(xbGetObsByIdRespDoc, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(xbGetObsByIdRespDoc, schemaLocations);
         return xbGetObsByIdRespDoc;
     }
 
@@ -373,7 +386,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         xbInsObsRespDoc.addNewInsertObservationResponse();
         // set schema location
         N52XmlHelper.setSchemaLocationsToDocument(xbInsObsRespDoc,
-                Collections.singletonList(N52XmlHelper.getSchemaLocationForSOS200()));
+                CollectionHelper.set(N52XmlHelper.getSchemaLocationForSOS200()));
 
         return xbInsObsRespDoc;
     }
@@ -387,19 +400,24 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
                 insertResultTemplateResponseDoc.addNewInsertResultTemplateResponse();
         insertResultTemplateResponse.setAcceptedTemplate(response.getAcceptedTemplate());
         // set schema location
-        N52XmlHelper.setSchemaLocationsToDocument(insertResultTemplateResponseDoc,
-                Collections.singletonList(N52XmlHelper.getSchemaLocationForSOS200()));
+        Set<SchemaLocation> schemaLocations = CollectionHelper.set();
+        schemaLocations.add(Sos2Constants.SOS_INSERT_RESULT_TEMPLATE_SCHEMA_LOCATION);
+        N52XmlHelper.addSchemaLocationsForTo(insertResultTemplateResponseDoc, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(insertResultTemplateResponseDoc, schemaLocations);
         return insertResultTemplateResponseDoc;
     }
 
-    private XmlObject createInsertResultResponseDocument(final InsertResultResponse response) throws OwsExceptionReport {
-        final InsertResultResponseDocument insertResultTemplateResponseDoc =
+    private XmlObject createInsertResultResponseDocument(final InsertResultResponse response)
+            throws OwsExceptionReport {
+        final InsertResultResponseDocument insertResultResponseDoc =
                 InsertResultResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        insertResultTemplateResponseDoc.addNewInsertResultResponse();
+        insertResultResponseDoc.addNewInsertResultResponse();
         // set schema location
-        N52XmlHelper.setSchemaLocationsToDocument(insertResultTemplateResponseDoc,
-                Collections.singletonList(N52XmlHelper.getSchemaLocationForSOS200()));
-        return insertResultTemplateResponseDoc;
+        Set<SchemaLocation> schemaLocations = CollectionHelper.set();
+        schemaLocations.add(Sos2Constants.SOS_INSERT_RESULT_SCHEMA_LOCATION);
+        N52XmlHelper.addSchemaLocationsForTo(insertResultResponseDoc, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(insertResultResponseDoc, schemaLocations);
+        return insertResultResponseDoc;
     }
 
     private XmlObject createGetResultResponseDocument(final GetResultResponse response) {
@@ -413,8 +431,10 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
             resultValues.set(xmlString);
         }
         // set schema location
-        N52XmlHelper.setSchemaLocationsToDocument(getResultResponseDoc,
-                Collections.singletonList(N52XmlHelper.getSchemaLocationForSOS200()));
+        Set<SchemaLocation> schemaLocations = CollectionHelper.set();
+        schemaLocations.add(Sos2Constants.SOS_GET_RESULT_SCHEMA_LOCATION);
+        N52XmlHelper.addSchemaLocationsForTo(getResultResponseDoc, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(getResultResponseDoc, schemaLocations);
         return getResultResponseDoc;
     }
 
@@ -427,8 +447,10 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         getResultTemplateResponse.setResultEncoding(createResultEncoding(response.getResultEncoding()));
         getResultTemplateResponse.setResultStructure(createResultStructure(response.getResultStructure()));
         // set schema location
-        N52XmlHelper.setSchemaLocationsToDocument(getResultTemplateResponseDoc,
-                Collections.singletonList(N52XmlHelper.getSchemaLocationForSOS200()));
+        Set<SchemaLocation> schemaLocations = CollectionHelper.set();
+        schemaLocations.add(Sos2Constants.SOS_GET_RESULT_TEMPLATE_SCHEMA_LOCATION);
+        N52XmlHelper.addSchemaLocationsForTo(getResultTemplateResponseDoc, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(getResultTemplateResponseDoc, schemaLocations);
         return getResultTemplateResponseDoc;
     }
 
@@ -487,8 +509,8 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
      * @throws OwsExceptionReport
      *             * if an error occurs.
      */
-    private void setContents(final Contents xbContents, final Collection<SosObservationOffering> offerings, final String version)
-            throws OwsExceptionReport {
+    private void setContents(final Contents xbContents, final Collection<SosObservationOffering> offerings,
+            final String version) throws OwsExceptionReport {
         final ContentsType xbContType = xbContents.addNewContents();
 
         int offeringCounter = 0; // for gml:id generation
@@ -581,9 +603,10 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
                     }
                 }
                 xbContType.addNewOffering().setAbstractOffering(xbObsOff);
-//                Offering addNewOffering = xbContType.addNewOffering();
-//                addNewOffering.addNewAbstractOffering().set(xbObsOff);
-//                XmlHelper.substituteElement(addNewOffering.getAbstractOffering(), xbObsOff);
+                // Offering addNewOffering = xbContType.addNewOffering();
+                // addNewOffering.addNewAbstractOffering().set(xbObsOff);
+                // XmlHelper.substituteElement(addNewOffering.getAbstractOffering(),
+                // xbObsOff);
             }
         }
         // FIXME: change swes:AbstractOffering to sos:ObservationOffering and
@@ -603,8 +626,8 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
      * @param role
      *            Features role
      */
-    private void createRelatedFeature(final FeatureRelationshipType featureRelationchip, final String relatedFeatureTarget,
-            final Collection<String> roles) {
+    private void createRelatedFeature(final FeatureRelationshipType featureRelationchip,
+            final String relatedFeatureTarget, final Collection<String> roles) {
         featureRelationchip.addNewTarget().setHref(relatedFeatureTarget);
         if (roles != null) {
             for (final String role : roles) {
@@ -617,12 +640,14 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         if (extension instanceof SosInsertionCapabilities) {
             addNewExtension.set(createInsertionCapabilities((SosInsertionCapabilities) extension));
         } else {
-            throw new OptionNotSupportedException().withMessage("The extension element is not supported by this service!");
+            throw new OptionNotSupportedException()
+                    .withMessage("The extension element is not supported by this service!");
         }
     }
 
     private XmlObject createInsertionCapabilities(final SosInsertionCapabilities sosInsertionCapabilities) {
-        final InsertionCapabilitiesDocument insertionCapabilitiesDoc = InsertionCapabilitiesDocument.Factory.newInstance();
+        final InsertionCapabilitiesDocument insertionCapabilitiesDoc =
+                InsertionCapabilitiesDocument.Factory.newInstance();
         // InsertionCapabilitiesType insertionCapabilities =
         // InsertionCapabilitiesType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         final InsertionCapabilitiesType insertionCapabilities = insertionCapabilitiesDoc.addNewInsertionCapabilities();
@@ -725,16 +750,18 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
 
     private void createTemporalFilter(final net.opengis.sos.x20.GetResultType.TemporalFilter temporalFilter,
             final TemporalFilter sosTemporalFilter) throws OwsExceptionReport {
-        final Encoder<XmlObject, TemporalFilter> encoder = CodingRepository.getInstance().getEncoder(
-        		CodingHelper.getEncoderKey(FilterConstants.NS_FES_2, sosTemporalFilter));
+        final Encoder<XmlObject, TemporalFilter> encoder =
+                CodingRepository.getInstance().getEncoder(
+                        CodingHelper.getEncoderKey(FilterConstants.NS_FES_2, sosTemporalFilter));
         final XmlObject encodedObject = encoder.encode(sosTemporalFilter);
         temporalFilter.set(encodedObject);
     }
 
-    private void createSpatialFilter(final SpatialFilter spatialFilter, final org.n52.sos.ogc.filter.SpatialFilter sosSpatialFilter)
-            throws OwsExceptionReport {
-        final Encoder<XmlObject, org.n52.sos.ogc.filter.SpatialFilter> encoder = CodingRepository.getInstance()
-        		.getEncoder(CodingHelper.getEncoderKey(FilterConstants.NS_FES_2, sosSpatialFilter));
+    private void createSpatialFilter(final SpatialFilter spatialFilter,
+            final org.n52.sos.ogc.filter.SpatialFilter sosSpatialFilter) throws OwsExceptionReport {
+        final Encoder<XmlObject, org.n52.sos.ogc.filter.SpatialFilter> encoder =
+                CodingRepository.getInstance().getEncoder(
+                        CodingHelper.getEncoderKey(FilterConstants.NS_FES_2, sosSpatialFilter));
         final XmlObject encodedObject = encoder.encode(sosSpatialFilter);
         spatialFilter.set(encodedObject);
     }
@@ -754,8 +781,9 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
                         "ResultEncoding element encoding is not supported!");
             }
         } else {
-            final Encoder<XmlObject, Object> encoder = CodingRepository.getInstance().getEncoder(
-            		CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, sosResultEncoding.getEncoding()));
+            final Encoder<XmlObject, Object> encoder =
+                    CodingRepository.getInstance().getEncoder(
+                            CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, sosResultEncoding.getEncoding()));
             if (encoder == null) {
                 throw new NoApplicableCodeException().withMessage("Missing encoder for ResultEncoding!");
             }
@@ -771,7 +799,8 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         return resultEncoding;
     }
 
-    private ResultStructure createResultStructure(final SosResultStructure sosResultStructure) throws OwsExceptionReport {
+    private ResultStructure createResultStructure(final SosResultStructure sosResultStructure)
+            throws OwsExceptionReport {
         final ResultStructure resultStructure =
                 ResultStructure.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         // TODO move encoding to SWECommonEncoder
@@ -786,8 +815,11 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
                         .withMessage("ResultStructure element encoding is not supported!");
             }
         } else {
-            final Encoder<XmlObject, Object> encoder = CodingRepository.getInstance().getEncoder(
-            		CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20,sosResultStructure.getResultStructure()));
+            final Encoder<XmlObject, Object> encoder =
+                    CodingRepository.getInstance()
+                            .getEncoder(
+                                    CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20,
+                                            sosResultStructure.getResultStructure()));
             if (encoder == null) {
                 throw new NoApplicableCodeException().withMessage("Missing encoder for ResultStructure!");
             }

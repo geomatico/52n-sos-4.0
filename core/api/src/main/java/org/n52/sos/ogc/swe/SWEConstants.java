@@ -25,6 +25,8 @@ package org.n52.sos.ogc.swe;
 
 import javax.xml.namespace.QName;
 
+import org.n52.sos.util.SchemaLocation;
+
 
 /**
  * Constants class for SWE
@@ -43,11 +45,33 @@ public interface SWEConstants {
 
     String NS_SWES_PREFIX = "swes";
 
-    String SCHEMA_LOCATION_SWE_101 = "http://schemas.opengis.net/sweCommon/1.0.1/swe.xsd";
+    String SCHEMA_LOCATION_URL_SWE_101 = "http://schemas.opengis.net/sweCommon/1.0.1/swe.xsd";
 
-    String SCHEMA_LOCATION_SWE_200 = "http://schemas.opengis.net/sweCommon/2.0/swe.xsd";
+    String SCHEMA_LOCATION_URL_SWE_20 = "http://schemas.opengis.net/sweCommon/2.0/swe.xsd";
     
-    String SCHEMA_LOCATION_SWES_200 = "http://schemas.opengis.net/swes/2.0/swes.xsd";
+    String SCHEMA_LOCATION_URL_SWES_20 = "http://schemas.opengis.net/swes/2.0/swes.xsd";
+    
+    String SCHEMA_LOCATION_URL_SWES_20_DESCRIBE_SENSOR = "http://schemas.opengis.net/swes/2.0/swesDescribeSensor.xsd";
+    
+    String SCHEMA_LOCATION_URL_SWES_20_DELETE_SENSOR = "http://schemas.opengis.net/swes/2.0/swesDeleteSensor.xsd";
+    
+    String SCHEMA_LOCATION_URL_SWES_20_INSERT_SENSOR = "http://schemas.opengis.net/swes/2.0/swesInsertSensor.xsd";
+    
+    String SCHEMA_LOCATION_URL_SWES_20_UPDATE_SENSOR_DESCRIPTION = "http://schemas.opengis.net/swes/2.0/swesUpdateSensorDescription.xsd";
+    
+    SchemaLocation SWE_101_SCHEMA_LOCATION = new SchemaLocation(NS_SWE_101, SCHEMA_LOCATION_URL_SWE_101);
+    
+    SchemaLocation SWE_20_SCHEMA_LOCATION = new SchemaLocation(NS_SWE_20, SCHEMA_LOCATION_URL_SWE_20);
+    
+    SchemaLocation SWES_20_SCHEMA_LOCATION = new SchemaLocation(NS_SWES_20, SCHEMA_LOCATION_URL_SWES_20);
+    
+    SchemaLocation SWES_20_DESCRIBE_SENSOR_SCHEMA_LOCATION = new SchemaLocation(NS_SWES_20, SCHEMA_LOCATION_URL_SWES_20_DESCRIBE_SENSOR);
+
+    SchemaLocation SWES_20_INSERT_SENSOR_SCHEMA_LOCATION = new SchemaLocation(NS_SWES_20, SCHEMA_LOCATION_URL_SWES_20_INSERT_SENSOR);
+
+    SchemaLocation SWES_20_UPDATE_SENSOR_DESCRIPTION_SCHEMA_LOCATION = new SchemaLocation(NS_SWES_20, SCHEMA_LOCATION_URL_SWES_20_UPDATE_SENSOR_DESCRIPTION);
+
+    SchemaLocation SWES_20_DELETE_SENSOR_SCHEMA_LOCATION = new SchemaLocation(NS_SWES_20, SCHEMA_LOCATION_URL_SWES_20_DELETE_SENSOR);
 
     // element names
     String EN_ABSTRACT_OFFERING = "AbstractOffering";
@@ -170,7 +194,7 @@ public interface SWEConstants {
     String SOAP_REASON_INVALID_REQUEST = "The request did not conform to its XML Schema definition.";
 
     String SOAP_REASON_REQUEST_EXTENSION_NOT_SUPPORTED = ""; //FIXME emtpy constant
-    
+
     /**
      * Enum for SensorML types
      */

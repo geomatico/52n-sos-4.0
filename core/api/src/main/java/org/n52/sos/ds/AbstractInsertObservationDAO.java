@@ -43,7 +43,7 @@ public abstract class AbstractInsertObservationDAO extends AbstractOperationDAO 
         opsMeta.addPossibleValuesParameter(Sos2Constants.InsertObservationParams.offering, getCache().getOfferings());
         opsMeta.addAnyParameterValue(Sos2Constants.InsertObservationParams.observation);
         opsMeta.addDataTypeParameter(Sos2Constants.InsertObservationParams.observation,
-                OMConstants.SCHEMA_LOCATION_OM_2_OM_OBSERVATION);
+                OMConstants.SCHEMA_LOCATION_URL_OM_20_OM_OBSERVATION);
     }
     
     public abstract InsertObservationResponse insertObservation(InsertObservationRequest request)

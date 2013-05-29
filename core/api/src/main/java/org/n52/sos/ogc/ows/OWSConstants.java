@@ -26,6 +26,7 @@ package org.n52.sos.ogc.ows;
 import javax.xml.namespace.QName;
 
 import org.n52.sos.exception.ows.OwsExceptionCode;
+import org.n52.sos.util.SchemaLocation;
 
 /**
  * Constants for OWS.
@@ -37,10 +38,14 @@ public interface OWSConstants {
 
     String NS_OWS_PREFIX = "ows";
 
-    String SCHEMA_LOCATION_OWS = "http://schemas.opengis.net/ows/1.1.0/owsAll.xsd";
+    String SCHEMA_LOCATION_URL_OWS = "http://schemas.opengis.net/ows/1.1.0/owsAll.xsd";
 
-    String SCHEMA_LOCATION_OWS_EXCEPTIONREPORT =
+    String SCHEMA_LOCATION_URL_OWS_EXCEPTIONREPORT =
             "http://schemas.opengis.net/ows/1.1.0/owsExceptionReport.xsd";
+    
+    SchemaLocation OWS_110_SCHEMA_LOCATION = new SchemaLocation(NS_OWS, SCHEMA_LOCATION_URL_OWS);
+    
+    SchemaLocation OWS_110_EXCEPTION_REPORT_SCHEMA_LOCATION = new SchemaLocation(NS_OWS_PREFIX, SCHEMA_LOCATION_URL_OWS_EXCEPTIONREPORT);
 
     // exception messages
     String SOAP_REASON_INVALID_PARAMETER_VALUE =

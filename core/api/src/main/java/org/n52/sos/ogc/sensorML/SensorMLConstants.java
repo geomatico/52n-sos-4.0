@@ -25,6 +25,8 @@ package org.n52.sos.ogc.sensorML;
 
 import javax.xml.namespace.QName;
 
+import org.n52.sos.util.SchemaLocation;
+
 /**
  * Constants class for SensorML
  * 
@@ -36,7 +38,9 @@ public interface SensorMLConstants {
 
     String NS_SML_PREFIX = "sml";
 
-    String SCHEMA_LOCATION_SML = "http://schemas.opengis.net/sensorML/1.0.1/sensorML.xsd";
+    String SCHEMA_LOCATION_URL_SML_101 = "http://schemas.opengis.net/sensorML/1.0.1/sensorML.xsd";
+    
+    SchemaLocation SML_101_SCHEMA_LOCATION = new SchemaLocation(NS_SML_PREFIX, SCHEMA_LOCATION_URL_SML_101);
 
     String SENSORML_OUTPUT_FORMAT_MIME_TYPE = "text/xml;subtype=\"sensorML/1.0.1\"";
 

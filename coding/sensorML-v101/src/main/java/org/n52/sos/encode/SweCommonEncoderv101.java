@@ -98,6 +98,8 @@ import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -144,6 +146,11 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
     @Override
     public String getContentType() {
         return SosConstants.CONTENT_TYPE_XML;
+    }
+
+    @Override
+    public Set<SchemaLocation> getSchemaLocations() {
+        return CollectionHelper.set(SWEConstants.SWE_101_SCHEMA_LOCATION);
     }
 
     @Override

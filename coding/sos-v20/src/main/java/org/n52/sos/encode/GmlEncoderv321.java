@@ -75,11 +75,13 @@ import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.MinMax;
 import org.n52.sos.util.OMHelper;
+import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.XmlHelper;
@@ -139,6 +141,11 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
     @Override
     public String getContentType() {
         return SosConstants.CONTENT_TYPE_XML;
+    }
+
+    @Override
+    public Set<SchemaLocation> getSchemaLocations() {
+        return CollectionHelper.set(GMLConstants.GML_32_SCHEMAL_LOCATION);
     }
 
     @Override

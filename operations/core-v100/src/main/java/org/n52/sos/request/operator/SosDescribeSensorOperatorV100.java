@@ -25,9 +25,7 @@ package org.n52.sos.request.operator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
@@ -45,6 +43,7 @@ import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.response.DescribeSensorResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -87,10 +86,7 @@ public class SosDescribeSensorOperatorV100 extends
         }
         
         XmlObject encodedObject = encoder.encode(response.getSensorDescription());
-        List<String> schemaLocations = new ArrayList<String>(3);
-        schemaLocations.add(N52XmlHelper.getSchemaLocationForSML101());
-        schemaLocations.add(N52XmlHelper.getSchemaLocationForSWE101());
-        N52XmlHelper.setSchemaLocationsToDocument(encodedObject, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(encodedObject, CollectionHelper.set(N52XmlHelper.getSchemaLocationForSML101(), N52XmlHelper.getSchemaLocationForSWE101()));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             encodedObject.save(baos, XmlOptionsHelper.getInstance().getXmlOptions());

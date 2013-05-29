@@ -26,13 +26,13 @@ package org.n52.sos.wsdl;
 import static org.n52.sos.ogc.ows.OWSConstants.NS_OWS;
 import static org.n52.sos.ogc.ows.OWSConstants.NS_OWS_PREFIX;
 import static org.n52.sos.ogc.ows.OWSConstants.QN_EXCEPTION;
-import static org.n52.sos.ogc.ows.OWSConstants.SCHEMA_LOCATION_OWS;
+import static org.n52.sos.ogc.ows.OWSConstants.SCHEMA_LOCATION_URL_OWS;
 import static org.n52.sos.ogc.sos.Sos2Constants.NS_SOS_20;
-import static org.n52.sos.ogc.sos.Sos2Constants.SCHEMA_LOCATION_SOS;
+import static org.n52.sos.ogc.sos.Sos2Constants.SCHEMA_LOCATION_URL_SOS;
 import static org.n52.sos.ogc.sos.SosConstants.NS_SOS_PREFIX;
 import static org.n52.sos.ogc.swe.SWEConstants.NS_SWES_20;
 import static org.n52.sos.ogc.swe.SWEConstants.NS_SWES_PREFIX;
-import static org.n52.sos.ogc.swe.SWEConstants.SCHEMA_LOCATION_SWES_200;
+import static org.n52.sos.ogc.swe.SWEConstants.SCHEMA_LOCATION_URL_SWES_20;
 import static org.n52.sos.wsdl.WSDLConstants.*;
 
 import java.io.StringWriter;
@@ -229,9 +229,9 @@ public class WSDLBuilder {
     }
 
     private void setDefaultImports() throws WSDLException {
-        addSchemaImport(NS_SOS_20, SCHEMA_LOCATION_SOS);
-        addSchemaImport(NS_OWS, SCHEMA_LOCATION_OWS);
-        addSchemaImport(NS_SWES_20, SCHEMA_LOCATION_SWES_200);
+        addSchemaImport(NS_SOS_20, SCHEMA_LOCATION_URL_SOS);
+        addSchemaImport(NS_OWS, SCHEMA_LOCATION_URL_OWS);
+        addSchemaImport(NS_SWES_20, SCHEMA_LOCATION_URL_SWES_20);
     }
 
     public WSDLBuilder addSchemaImport(String namespace, String schemaLocation) throws WSDLException {

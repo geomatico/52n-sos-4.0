@@ -49,7 +49,7 @@ public abstract class AbstractInsertSensorDAO extends AbstractOperationDAO {
             opsMeta.addAnyParameterValue(Sos2Constants.InsertSensorParams.observableProperty);
             opsMeta.addAnyParameterValue(Sos2Constants.InsertSensorParams.metadata);
             opsMeta.addDataTypeParameter(Sos2Constants.InsertSensorParams.metadata,
-                    Sos2Constants.SCHEMA_LOCATION_INSERTION_CAPABILITIES);
+                    Sos2Constants.SCHEMA_LOCATION_URL_SOS_INSERTION_CAPABILITIES);
         }
     }
 

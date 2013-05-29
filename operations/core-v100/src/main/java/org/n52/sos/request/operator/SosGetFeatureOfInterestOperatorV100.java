@@ -48,6 +48,7 @@ import org.n52.sos.request.GetFeatureOfInterestRequest;
 import org.n52.sos.response.GetFeatureOfInterestResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 
@@ -99,11 +100,11 @@ public class SosGetFeatureOfInterestOperatorV100 extends
                 String contentType = encoder.getContentType();
 
                 XmlObject encodedObject = encoder.encode(response.getAbstractFeature());
-                List<String> schemaLocations = new ArrayList<String>(3);
-                schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS100());
-                schemaLocations.add(N52XmlHelper.getSchemaLocationForGML311());
-                schemaLocations.add(N52XmlHelper.getSchemaLocationForSA100());
-                N52XmlHelper.setSchemaLocationsToDocument(encodedObject, schemaLocations);
+                N52XmlHelper.setSchemaLocationsToDocument(
+                        encodedObject,
+                        CollectionHelper.set(N52XmlHelper.getSchemaLocationForSOS100(),
+                        N52XmlHelper.getSchemaLocationForGML311(),
+                        N52XmlHelper.getSchemaLocationForSA100()));
                 encodedObject.save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
                 return new ServiceResponse(baos, contentType, applyZIPcomp, true);
             } else {

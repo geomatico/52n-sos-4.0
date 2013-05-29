@@ -76,8 +76,10 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.N52XmlHelper;
+import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -127,6 +129,11 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
     @Override
     public String getContentType() {
         return SosConstants.CONTENT_TYPE_XML;
+    }
+
+    @Override
+    public Set<SchemaLocation> getSchemaLocations() {
+        return CollectionHelper.set(OWSConstants.OWS_110_SCHEMA_LOCATION);
     }
 
     @Override
@@ -353,7 +360,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
             exceptionTypes.add(encodeOwsException(e).getException());
         }
         er.setExceptionArray(exceptionTypes.toArray(new ExceptionType[exceptionTypes.size()]));
-        N52XmlHelper.setSchemaLocationToDocument(erd, N52XmlHelper.getSchemaLocationForOWS110());
+        N52XmlHelper.setSchemaLocationsToDocument(erd, Collections.singletonList(N52XmlHelper.getSchemaLocationForOWS110()));
         return erd;
     }
 
