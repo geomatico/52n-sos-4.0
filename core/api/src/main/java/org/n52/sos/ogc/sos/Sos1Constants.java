@@ -29,6 +29,7 @@ import static org.n52.sos.util.CollectionHelper.set;
 import java.util.Set;
 
 import org.n52.sos.ogc.om.OMConstants;
+import org.n52.sos.util.SchemaLocation;
 
 /**
  * SosConstants holds all important and often used constants (e.g. name of the
@@ -41,6 +42,8 @@ public interface Sos1Constants {
     /** Constant for the schema repository of the SOS */
     String SCHEMA_LOCATION_SOS = "http://schemas.opengis.net/sos/1.0.0/sosAll.xsd";
 
+    SchemaLocation SOS1_SCHEMA_LOCATION = new SchemaLocation(NS_SOS, SCHEMA_LOCATION_SOS);
+    
     /** Constant for the content types of the response formats */
     Set<String> RESPONSE_FORMATS = unmodifiableSet(set(OMConstants.CONTENT_TYPE_OM, SosConstants.CONTENT_TYPE_ZIP));
 
