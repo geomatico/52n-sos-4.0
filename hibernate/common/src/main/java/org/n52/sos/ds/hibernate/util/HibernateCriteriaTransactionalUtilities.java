@@ -268,9 +268,29 @@ public class HibernateCriteriaTransactionalUtilities {
 
     public static ObservationConstellation updateObservationConstellation(
             ObservationConstellation hObservationConstellation, String observationType, Session session) {
-        ObservationType obsType = HibernateCriteriaQueryUtilities.getObservationTypeObject(observationType, session);
+        ObservationType obsType = HibernateCriteriaQueryUtilities.getObservationTypeObject(observationType, session);        
         hObservationConstellation.setObservationType(obsType);
         session.saveOrUpdate(hObservationConstellation);
+        
+        //update hidden child observation constellations
+        Set<String> offerings = new HashSet<String>(Configurator.getInstance().getCache().getOfferingsForProcedure(
+                hObservationConstellation.getProcedure().getIdentifier()));
+        offerings.remove(hObservationConstellation.getOffering().getIdentifier());
+        
+        @SuppressWarnings("unchecked")
+        List<ObservationConstellation> hiddenChildObsConsts = session.createCriteria(ObservationConstellation.class)
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                .add(Restrictions.eq(ObservationConstellation.OBSERVABLE_PROPERTY, hObservationConstellation.getObservableProperty()))
+                .add(Restrictions.eq(ObservationConstellation.PROCEDURE, hObservationConstellation.getProcedure()))
+                .add(Restrictions.eq(ObservationConstellation.HIDDEN_CHILD, true))
+                .createCriteria(ObservationConstellation.OFFERING)
+                    .add(Restrictions.in(Offering.IDENTIFIER, offerings))
+                .list();
+        for (ObservationConstellation hiddenChildObsConst : hiddenChildObsConsts) {
+            hiddenChildObsConst.setObservationType(obsType);
+            session.saveOrUpdate(hiddenChildObsConst);
+        }
+        
         return hObservationConstellation;
     }
 
@@ -443,12 +463,16 @@ public class HibernateCriteriaTransactionalUtilities {
             hObservation.setSetId(setId);
         }
         Iterator<ObservationConstellation> iterator = observationConstellations.iterator();
+        boolean firstObsConst = true;
         while (iterator.hasNext()) {
             ObservationConstellation observationConstellation = iterator.next();
-            hObservation.setObservableProperty(observationConstellation.getObservableProperty());
-            hObservation.setProcedure(observationConstellation.getProcedure());
-            hObservation.setOfferings(CollectionHelper.asSet(observationConstellation.getOffering()));
-            break;
+            if (firstObsConst) {
+                //TODO should subsequent obsConsts be checked for obsProp and procedure agreement with the first?
+                hObservation.setObservableProperty(observationConstellation.getObservableProperty());
+                hObservation.setProcedure(observationConstellation.getProcedure());
+                firstObsConst = false;
+            }
+            hObservation.getOfferings().add(observationConstellation.getOffering());
         }
         hObservation.setFeatureOfInterest(feature);
         HibernateUtilities.addPhenomeonTimeAndResultTimeToObservation(hObservation,

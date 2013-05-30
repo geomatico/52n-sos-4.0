@@ -112,8 +112,13 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
                                                                     request.getResultValues(), session);
             response.setObservation(o);
             List<SosObservation> observations = getSingleObservationsFromObservation(o);
-            
-            Set<ObservationConstellation> obsConsts = CollectionHelper.asSet(HibernateCriteriaQueryUtilities.getObservationConstellation(resultTemplate.getProcedure(), resultTemplate.getObservableProperty(), resultTemplate.getOffering(), session));
+
+            Set<ObservationConstellation> obsConsts = CollectionHelper.asSet(
+                    HibernateCriteriaQueryUtilities.getObservationConstellation(
+                            resultTemplate.getProcedure(), resultTemplate.getObservableProperty(),
+                            Configurator.getInstance().getCache().getOfferingsForProcedure(
+                                    resultTemplate.getProcedure().getIdentifier()), session));
+
             int insertion = 0, size = observations.size();
             LOGGER.debug("Start saving {} observations.", size);
             for (SosObservation observation : observations) {
@@ -147,8 +152,8 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
         SosResultStructure resultStructure = new SosResultStructure(resultTemplate.getResultStructure());
         String[] blockValues = getBlockValues(resultValues, resultEncoding.getEncoding());
         SosObservation singleObservation =
-                       getObservation(resultTemplate,
-                                      blockValues, resultStructure.getResultStructure(), resultEncoding.getEncoding());
+                       getObservation(resultTemplate, blockValues, resultStructure.getResultStructure(),
+                               resultEncoding.getEncoding(), session);
         SosAbstractFeature feature = getSosAbstractFeature(resultTemplate.getFeatureOfInterest(), version, session);
         singleObservation.getObservationConstellation().setFeatureOfInterest(feature);
         return singleObservation;
@@ -171,13 +176,16 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
     }
 
     private SosObservationConstellation getSosObservationConstellation(
-            ResultTemplate resultTemplate) {
+            ResultTemplate resultTemplate, Session session) {
+        ObservationConstellation obsConst = HibernateObservationUtilities.getObservationConstellation(
+                resultTemplate.getProcedure(), resultTemplate.getObservableProperty(),
+                Collections.singleton(resultTemplate.getOffering()), session);
         SosProcedureDescription procedure = createProcedure(resultTemplate.getProcedure());
         Set<String> offerings = Collections.singleton(resultTemplate.getOffering().getIdentifier());
-//        String observationType = resultTemplate.getObservationType().getObservationType();
         AbstractSosPhenomenon observablePropety = new SosObservableProperty(resultTemplate.getObservableProperty().getIdentifier());
         SosAbstractFeature feature = new SosSamplingFeature(new CodeWithAuthority(resultTemplate.getFeatureOfInterest().getIdentifier()));
-        return new SosObservationConstellation(procedure, observablePropety, offerings, feature, null);
+        return new SosObservationConstellation(procedure, observablePropety, offerings, feature,
+                obsConst.getObservationType().getObservationType());
     }
     
     private SosProcedureDescription createProcedure(Procedure hProcedure) {
@@ -187,7 +195,8 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
     }
 
     private SosObservation getObservation(ResultTemplate resultTemplate, String[] blockValues,
-            SosSweAbstractDataComponent resultStructure, SosSweAbstractEncoding encoding) throws OwsExceptionReport {
+            SosSweAbstractDataComponent resultStructure, SosSweAbstractEncoding encoding, Session session)
+                    throws OwsExceptionReport {
         int resultTimeIndex = ResultHandlingHelper.hasResultTime(resultStructure);
         int phenomenonTimeIndex = ResultHandlingHelper.hasPhenomenonTime(resultStructure);
 
@@ -222,7 +231,7 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
                         units);
 
         SosObservation observation = new SosObservation();
-        observation.setObservationConstellation(getSosObservationConstellation(resultTemplate));
+        observation.setObservationConstellation(getSosObservationConstellation(resultTemplate, session));
         observation.setResultType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
         observation.setValue(sosValues);
         return observation;

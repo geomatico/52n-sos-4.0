@@ -546,7 +546,7 @@ public class HibernateObservationUtilities {
         return newObservation;
     }
 
-    private static ObservationConstellation getObservationConstellation(final Procedure procedure,
+    public static ObservationConstellation getObservationConstellation(final Procedure procedure,
             final ObservableProperty observableProperty, final Collection<Offering> offerings, final Session session) {
         @SuppressWarnings("unchecked")
         final List<ObservationConstellation> observationConstellations =

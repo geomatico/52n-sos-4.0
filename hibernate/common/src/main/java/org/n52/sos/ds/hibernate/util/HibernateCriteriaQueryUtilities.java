@@ -738,12 +738,13 @@ public class HibernateCriteriaQueryUtilities {
 
     @SuppressWarnings("unchecked")
     public static List<ObservationConstellation> getObservationConstellation(Procedure procedure,
-            ObservableProperty observableProperty, Offering offering, Session session) {
+            ObservableProperty observableProperty, Collection<String> offerings, Session session) {
         return session.createCriteria(ObservationConstellation.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .add(Restrictions.eq(ObservationConstellation.PROCEDURE, procedure))
                 .add(Restrictions.eq(ObservationConstellation.OBSERVABLE_PROPERTY, observableProperty))
-                .add(Restrictions.eq(ObservationConstellation.OFFERING, offering))
+                .createAlias(ObservationConstellation.OFFERING, "o")
+                .add(Restrictions.in("o." + Offering.IDENTIFIER, offerings))
                 .add(Restrictions.eq(ObservationConstellation.DELETED, false)).list();
     }
 

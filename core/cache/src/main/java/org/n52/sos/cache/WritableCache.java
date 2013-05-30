@@ -468,7 +468,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void addObservationTypesForOffering(String offering, String observationType) {
         notNullOrEmpty("offering", offering);
-        notNullOrEmpty("observableProperty", observationType);
+        notNullOrEmpty("observationType", observationType);
         LOG.trace("Adding observationType {} to offering {}", observationType, offering);
         getObservationTypesForOfferingsMap().add(offering, observationType);
     }
