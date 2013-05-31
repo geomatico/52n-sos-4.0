@@ -31,7 +31,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.n52.sos.ogc.OGCConstants.*;
-import static org.n52.sos.ogc.sensorML.SensorMLConstants.NS_SML;
+import static org.n52.sos.ogc.sensorML.SensorMLConstants.*;
 import static org.n52.sos.ogc.sensorML.elements.SosSMLClassifier.*;
 import static org.n52.sos.util.StringHelper.join;
 
@@ -257,12 +257,12 @@ public class HibernateProcedureConverterTest {
 
 	private String shortNameIdentifierOf(final ProcessModel pModel)
 	{
-		return getIdentifier(pModel, "shortName", "urn:ogc:def:identifier:OGC:1.0:shortname");
+		return getIdentifier(pModel, ELEMENT_NAME_SHORT_NAME, "urn:ogc:def:identifier:OGC:1.0:shortname");
 	}
 
 	private String longNameIdentifierOf(final ProcessModel pModel)
 	{
-		return getIdentifier(pModel, "longname", "urn:ogc:def:identifier:OGC:1.0:longname");
+		return getIdentifier(pModel, ELEMENT_NAME_LONG_NAME, "urn:ogc:def:identifier:OGC:1.0:longname");
 	}
 
 	private String uniqueIdIdentifierOf(final ProcessModel pModel)

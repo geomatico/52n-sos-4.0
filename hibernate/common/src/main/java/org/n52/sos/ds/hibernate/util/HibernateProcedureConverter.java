@@ -213,11 +213,8 @@ public class HibernateProcedureConverter {
 
         setCommonValues(procedure, smlSystem);
 
-        // 8 set position --> from procedure
         smlSystem.setPosition(createPosition(procedure));
 
-        // 9 set observed area --> from features
-        // TODO implement generation of observed area from available features
         return smlSystem;
     }
 
@@ -434,9 +431,9 @@ public class HibernateProcedureConverter {
                 new SosSMLIdentifier(OGCConstants.URN_UNIQUE_IDENTIFIER_END, OGCConstants.URN_UNIQUE_IDENTIFIER,
                         identifier);
         final SosSMLIdentifier idShortName =
-                new SosSMLIdentifier("shortname", procedureSettings().getIdentifierShortNameDefinition(), identifier);
+                new SosSMLIdentifier(SensorMLConstants.ELEMENT_NAME_SHORT_NAME, procedureSettings().getIdentifierShortNameDefinition(), identifier);
         final SosSMLIdentifier idLongName =
-                new SosSMLIdentifier("longname", procedureSettings().getIdentifierLongNameDefinition(), identifier);
+                new SosSMLIdentifier(SensorMLConstants.ELEMENT_NAME_LONG_NAME, procedureSettings().getIdentifierLongNameDefinition(), identifier);
         return CollectionHelper.list(idUniqueId, idLongName, idShortName);
     }
 
