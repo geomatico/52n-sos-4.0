@@ -143,7 +143,7 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
     }
                 
     @Override
-    public Object decode(Object element) throws OwsExceptionReport {
+    public Object decode(final Object element) throws OwsExceptionReport {
         if (element instanceof DataArrayDocument) {
             return parseAbstractDataComponentType(((DataArrayDocument) element).getDataArray1());
         } else if (element instanceof AbstractDataComponentType) {
@@ -181,7 +181,7 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         }
     }
     
-    private SosSweAbstractDataComponent parseAbstractDataComponentType(AbstractDataComponentType abstractDataComponent)
+    private SosSweAbstractDataComponent parseAbstractDataComponentType(final AbstractDataComponentType abstractDataComponent)
             throws OwsExceptionReport {
         SosSweAbstractDataComponent sosAbstractDataComponent = null;
         if (abstractDataComponent instanceof net.opengis.swe.x101.BooleanDocument.Boolean) {
@@ -237,22 +237,22 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
 //        return null;
 //    }
 
-    private SosSweDataRecord parseDataRecordProperty(DataRecordPropertyType dataRecordProperty) throws
+    private SosSweDataRecord parseDataRecordProperty(final DataRecordPropertyType dataRecordProperty) throws
             OwsExceptionReport {
-        DataRecordType dataRecord = dataRecordProperty.getDataRecord();
+        final DataRecordType dataRecord = dataRecordProperty.getDataRecord();
         return parseDataRecord(dataRecord);
     }
 
-    private SosSweDataRecord parseDataRecord(DataRecordType dataRecord) throws OwsExceptionReport {
-        SosSweDataRecord sosDataRecord = new SosSweDataRecord();
+    private SosSweDataRecord parseDataRecord(final DataRecordType dataRecord) throws OwsExceptionReport {
+        final SosSweDataRecord sosDataRecord = new SosSweDataRecord();
         if (dataRecord.getFieldArray() != null) {
             sosDataRecord.setFields(parseDataComponentPropertyArray(dataRecord.getFieldArray()));
         }
         return sosDataRecord;
     }
 
-    private SosSweAbstractDataComponent parseEnvelope(EnvelopeType envelopeType) throws OwsExceptionReport {
-        SosSweEnvelope envelope = new SosSweEnvelope();
+    private SosSweAbstractDataComponent parseEnvelope(final EnvelopeType envelopeType) throws OwsExceptionReport {
+        final SosSweEnvelope envelope = new SosSweEnvelope();
         if (envelopeType.isSetReferenceFrame()) {
             envelope.setReferenceFrame(envelopeType.getReferenceFrame());
         }
@@ -268,33 +268,33 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         return envelope;
     }
 
-    private SosSweVector parseVectorProperty(VectorPropertyType vectorPropertyType) throws OwsExceptionReport {
+    private SosSweVector parseVectorProperty(final VectorPropertyType vectorPropertyType) throws OwsExceptionReport {
         return parseVector(vectorPropertyType.getVector());
     }
 
-    private SosSweVector parseVector(VectorType vectorType) throws OwsExceptionReport {
+    private SosSweVector parseVector(final VectorType vectorType) throws OwsExceptionReport {
         return new SosSweVector(parseCoordinates(vectorType.getCoordinateArray()));
     }
 
-    private SosSweSimpleDataRecord parseSimpleDataRecord(SimpleDataRecordType simpleDataRecord) throws
+    private SosSweSimpleDataRecord parseSimpleDataRecord(final SimpleDataRecordType simpleDataRecord) throws
             OwsExceptionReport {
-        SosSweSimpleDataRecord sosSimpleDataRecord = new SosSweSimpleDataRecord();
+        final SosSweSimpleDataRecord sosSimpleDataRecord = new SosSweSimpleDataRecord();
         if (simpleDataRecord.getFieldArray() != null) {
             sosSimpleDataRecord.setFields(parseAnyScalarPropertyArray(simpleDataRecord.getFieldArray()));
         }
         return sosSimpleDataRecord;
     }
 
-    private SosSweDataArray parseSweDataArrayType(DataArrayType xbDataArray) throws OwsExceptionReport {
-        SosSweDataArray dataArray = new SosSweDataArray();
+    private SosSweDataArray parseSweDataArrayType(final DataArrayType xbDataArray) throws OwsExceptionReport {
+        final SosSweDataArray dataArray = new SosSweDataArray();
         // TODO
         return dataArray;
     }
 
-    private List<SosSweField> parseDataComponentPropertyArray(DataComponentPropertyType[] fieldArray)
+    private List<SosSweField> parseDataComponentPropertyArray(final DataComponentPropertyType[] fieldArray)
             throws OwsExceptionReport {
-        List<SosSweField> sosFields = new ArrayList<SosSweField>(fieldArray.length);
-        for (DataComponentPropertyType xbField : fieldArray) {
+        final List<SosSweField> sosFields = new ArrayList<SosSweField>(fieldArray.length);
+        for (final DataComponentPropertyType xbField : fieldArray) {
             SosSweAbstractDataComponent sosAbstractDataComponentType = null;
             if (xbField.isSetBoolean()) {
                 sosAbstractDataComponentType = parseAbstractDataComponentType(xbField.getBoolean());
@@ -324,9 +324,9 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         return sosFields;
     }
 
-    private SosSweAbstractSimpleType<Boolean> parseBoolean(net.opengis.swe.x101.BooleanDocument.Boolean xbBoolean)
+    private SosSweAbstractSimpleType<Boolean> parseBoolean(final net.opengis.swe.x101.BooleanDocument.Boolean xbBoolean)
             throws OwsExceptionReport {
-        SosSweBoolean sosBoolean = new SosSweBoolean();
+        final SosSweBoolean sosBoolean = new SosSweBoolean();
         if (xbBoolean.isSetValue()) {
             sosBoolean.setValue(xbBoolean.getValue());
 
@@ -334,8 +334,8 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         return sosBoolean;
     }
 
-    private SosSweAbstractSimpleType<String> parseCategory(Category category) throws OwsExceptionReport {
-        SosSweCategory sosCategory = new SosSweCategory();
+    private SosSweAbstractSimpleType<String> parseCategory(final Category category) throws OwsExceptionReport {
+        final SosSweCategory sosCategory = new SosSweCategory();
         if (category.isSetValue()) {
             sosCategory.setValue(category.getValue());
         }
@@ -345,8 +345,8 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         return sosCategory;
     }
 
-    private SosSweAbstractSimpleType<Integer> parseCount(Count xbCount) throws OwsExceptionReport {
-        SosSweCount sosCount = new SosSweCount();
+    private SosSweAbstractSimpleType<Integer> parseCount(final Count xbCount) throws OwsExceptionReport {
+        final SosSweCount sosCount = new SosSweCount();
         if (xbCount.getQualityArray() != null) {
             sosCount.setQuality(parseQuality(xbCount.getQualityArray()));
         }
@@ -356,19 +356,19 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         return sosCount;
     }
 
-    private SosSweAbstractSimpleType<RangeValue<Integer>> parseCountRange(CountRange countRange) throws
+    private SosSweAbstractSimpleType<RangeValue<Integer>> parseCountRange(final CountRange countRange) throws
             OwsExceptionReport {
         //FIXME count range
         throw new NotYetSupportedException("CountRange");
     }
 
-    private SosSweAbstractSimpleType<String> parseObservableProperty(ObservableProperty observableProperty) {
-        SosSweObservableProperty sosObservableProperty = new SosSweObservableProperty();
+    private SosSweAbstractSimpleType<String> parseObservableProperty(final ObservableProperty observableProperty) {
+        final SosSweObservableProperty sosObservableProperty = new SosSweObservableProperty();
         return sosObservableProperty;
     }
 
-    private SosSweAbstractSimpleType<Double> parseQuantity(Quantity xbQuantity) {
-        SosSweQuantity sosQuantity = new SosSweQuantity();
+    private SosSweAbstractSimpleType<Double> parseQuantity(final Quantity xbQuantity) {
+        final SosSweQuantity sosQuantity = new SosSweQuantity();
         if (xbQuantity.isSetAxisID()) {
             sosQuantity.setAxisID(xbQuantity.getAxisID());
         }
@@ -384,21 +384,21 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         return sosQuantity;
     }
 
-    private SosSweAbstractSimpleType<RangeValue<Double>> parseQuantityRange(QuantityRange quantityRange) throws
+    private SosSweAbstractSimpleType<RangeValue<Double>> parseQuantityRange(final QuantityRange quantityRange) throws
             OwsExceptionReport {
         throw new NotYetSupportedException("QuantityRange");
     }
 
-    private SosSweAbstractSimpleType<?> parseText(Text xbText) {
-        SosSweText sosText = new SosSweText();
+    private SosSweAbstractSimpleType<?> parseText(final Text xbText) {
+        final SosSweText sosText = new SosSweText();
         if (xbText.isSetValue()) {
             sosText.setValue(xbText.getValue());
         }
         return sosText;
     }
 
-    private SosSweAbstractSimpleType<DateTime> parseTime(Time time) throws OwsExceptionReport {
-        SosSweTime sosTime = new SosSweTime();
+    private SosSweAbstractSimpleType<DateTime> parseTime(final Time time) throws OwsExceptionReport {
+        final SosSweTime sosTime = new SosSweTime();
         if (time.isSetValue()) {
             sosTime.setValue(DateTimeHelper.parseIsoString2DateTime(time.getValue().toString()));
         }
@@ -408,15 +408,15 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         return sosTime;
     }
 
-    private SosSweAbstractSimpleType<RangeValue<DateTime>> parseTimeRange(TimeRange timeRange) throws OwsExceptionReport {
-        SosSweTimeRange sosTimeRange = new SosSweTimeRange();
+    private SosSweAbstractSimpleType<RangeValue<DateTime>> parseTimeRange(final TimeRange timeRange) throws OwsExceptionReport {
+        final SosSweTimeRange sosTimeRange = new SosSweTimeRange();
         if (timeRange.isSetValue()) {
             // FIXME check if this parses correct
-            List<?> value = timeRange.getValue();
+            final List<?> value = timeRange.getValue();
             if (value != null && !value.isEmpty()) {
-                RangeValue<DateTime> range = new RangeValue<DateTime>();
+                final RangeValue<DateTime> range = new RangeValue<DateTime>();
                 boolean first = true;
-                for (Object object : value) {
+                for (final Object object : value) {
                     if (first) {
                         range.setRangeStart(DateTimeHelper.parseIsoString2DateTime(timeRange.getValue().toString()));
                         first = false;
@@ -432,12 +432,12 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         return sosTimeRange;
     }
 
-    private SosSweQuality parseQuality(XmlObject[] qualityArray) {
+    private SosSweQuality parseQuality(final XmlObject[] qualityArray) {
         return new SosSweQuality();
     }
 
-    private SosSMLPosition parsePosition(PositionType position) throws OwsExceptionReport {
-        SosSMLPosition sosSMLPosition = new SosSMLPosition();
+    private SosSMLPosition parsePosition(final PositionType position) throws OwsExceptionReport {
+        final SosSMLPosition sosSMLPosition = new SosSMLPosition();
         if (position.isSetReferenceFrame()) {
             sosSMLPosition.setReferenceFrame(position.getReferenceFrame());
         }
@@ -451,12 +451,12 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
     }
 
     @SuppressWarnings("unchecked")
-    private List<SosSweCoordinate<?>> parseCoordinates(Coordinate[] coordinateArray) throws OwsExceptionReport {
-        List<SosSweCoordinate<?>> sosCoordinates = new ArrayList<SosSweCoordinate<?>>(coordinateArray.length);
-        for (Coordinate xbCoordinate : coordinateArray) {
+    private List<SosSweCoordinate<?>> parseCoordinates(final Coordinate[] coordinateArray) throws OwsExceptionReport {
+        final List<SosSweCoordinate<?>> sosCoordinates = new ArrayList<SosSweCoordinate<?>>(coordinateArray.length);
+        for (final Coordinate xbCoordinate : coordinateArray) {
             if (xbCoordinate.isSetQuantity()) {
                 sosCoordinates.add(new SosSweCoordinate<Double>(checkCoordinateName(xbCoordinate.getName()),
-                        (SosSweAbstractSimpleType)parseAbstractDataComponentType(xbCoordinate.getQuantity())));
+                        (SosSweAbstractSimpleType<Double>)parseAbstractDataComponentType(xbCoordinate.getQuantity())));
             } else {
                 throw new InvalidParameterValueException().at("Position")
                         .withMessage("Error when parsing the Coordinates of Position: It must be of type Quantity!");
@@ -465,7 +465,7 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         return sosCoordinates;
     }
 
-    private SweCoordinateName checkCoordinateName(String name) throws OwsExceptionReport {
+    private SweCoordinateName checkCoordinateName(final String name) throws OwsExceptionReport {
         if (name.equals(SweCoordinateName.easting.name())) {
             return SweCoordinateName.easting;
         } else if (name.equals(SweCoordinateName.northing.name())) {
@@ -478,10 +478,10 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         }
     }
 
-    private List<SosSweField> parseAnyScalarPropertyArray(AnyScalarPropertyType[] fieldArray)
+    private List<SosSweField> parseAnyScalarPropertyArray(final AnyScalarPropertyType[] fieldArray)
             throws OwsExceptionReport {
-        List<SosSweField> sosFields = new ArrayList<SosSweField>(fieldArray.length);
-        for (AnyScalarPropertyType xbField : fieldArray) {
+        final List<SosSweField> sosFields = new ArrayList<SosSweField>(fieldArray.length);
+        for (final AnyScalarPropertyType xbField : fieldArray) {
             SosSweAbstractDataComponent sosAbstractDataComponentType = null;
             if (xbField.isSetBoolean()) {
                 sosAbstractDataComponentType = parseAbstractDataComponentType(xbField.getBoolean());
