@@ -75,7 +75,6 @@ public class SoapBinding extends Binding {
 			final String soapAction = SoapHelper.checkSoapHeader(request);
 			final XmlObject doc = XmlHelper.parseXmlSosRequest(request);
 			LOGGER.debug("SOAP-REQUEST: {}", doc.xmlText());
-			// TODO add null check to decoder
 			final Decoder<?,XmlObject> decoder = getDecoder(CodingHelper.getDecoderKey(doc));
 			// decode SOAP message
 			final Object abstractRequest = decoder.decode(doc);
@@ -100,8 +99,13 @@ public class SoapBinding extends Binding {
 				soapResponse.setHeader(soapRequest.getSoapHeader());
 				if (soapRequest.getSoapFault() == null) {
 					final XmlObject xmlObject = soapRequest.getSoapBodyContent();
-					// TODO add null check to decoder
 					final Decoder<?, XmlObject> bodyDecoder = getDecoder(CodingHelper.getDecoderKey(xmlObject));
+					if (bodyDecoder == null) 
+					{
+						throw new NoApplicableCodeException()
+						.withMessage("No decoder found for object of type '{}'.", xmlObject!=null?xmlObject.getClass().getName():null)
+						.setStatus(BAD_REQUEST);
+					}
 					// Decode SOAPBody content
 					final Object aBodyRequest = bodyDecoder.decode(xmlObject);
 					if (!(aBodyRequest instanceof AbstractServiceRequest)) {
@@ -131,9 +135,9 @@ public class SoapBinding extends Binding {
 								
 								//soap injection
 								if (bodyResponse instanceof CommunicationObjectWithSoapHeader) {
-									CommunicationObjectWithSoapHeader soapHeaderObject = (CommunicationObjectWithSoapHeader) bodyResponse;
+									final CommunicationObjectWithSoapHeader soapHeaderObject = bodyResponse;
 									if (soapHeaderObject.isSetSoapHeader()) {
-										Map<String, SoapHeader> header = ((CommunicationObjectWithSoapHeader) soapResponse).getSoapHeader();
+										final Map<String, SoapHeader> header = ((CommunicationObjectWithSoapHeader) soapResponse).getSoapHeader();
 										//TODO do things
 										soapResponse.setHeader(header);
 									}
