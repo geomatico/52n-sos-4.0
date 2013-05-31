@@ -108,4 +108,6 @@ public interface SensorMLConstants {
 	String ELEMENT_NAME_SHORT_NAME = "shortName";
 	
 	String ELEMENT_NAME_LONG_NAME = "longName";
+	
+	String ELEMENT_NAME_OBSERVED_BBOX = "observedBBOX";
 }

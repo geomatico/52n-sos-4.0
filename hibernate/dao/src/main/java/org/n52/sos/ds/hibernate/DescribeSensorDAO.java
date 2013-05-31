@@ -42,9 +42,17 @@ import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
+import org.n52.sos.ogc.sensorML.AbstractSensorML;
 import org.n52.sos.ogc.sensorML.SensorML;
+import org.n52.sos.ogc.sensorML.SensorMLConstants;
+import org.n52.sos.ogc.sensorML.elements.SosSMLCapabilities;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
+import org.n52.sos.ogc.swe.DataRecord;
+import org.n52.sos.ogc.swe.SosSweDataRecord;
+import org.n52.sos.ogc.swe.SosSweEnvelope;
+import org.n52.sos.ogc.swe.SosSweField;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.response.DescribeSensorResponse;
 import org.n52.sos.service.Configurator;
@@ -132,11 +140,79 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
        // enrich with offerings
        if (procedureSettings().isEnrichWithOfferings())
        {
-    	   procedureDescription.addOfferings(getOfferingsForProcedure(procedureDescription.getIdentifier()));
+    	   final Collection<SosOffering> offerings = getOfferingsForProcedure(procedureDescription.getIdentifier());
+    	   if (offerings != null && !offerings.isEmpty())
+    	   {
+    		   procedureDescription.addOfferings(offerings);
+    	   }
+       }
+       
+       // enrich according to OGC#09-033 Profile for sensor discovery
+       if (procedureSettings().isEnrichWithDiscoveryInformation() && procedureDescription instanceof AbstractSensorML)
+       {
+    	   // TODO Eike: implement enrichment according OGC#09-033 and move already implemented stuff from ProcedureConverter to this class
+    	   final SosSMLCapabilities observedBBox = createObservedBBOXCapability((AbstractSensorML)procedureDescription);
+    	   if (observedBBox != null)
+    	   {
+    		   ((AbstractSensorML)procedureDescription).addCapabilities(observedBBox);
+    	   }
        }
     }
     
-    protected Collection<SosOffering> getOfferingsForProcedure(final String procedureIdentifier) {
+	private SosSMLCapabilities createObservedBBOXCapability(final AbstractSensorML procedureDescription)
+	{
+		// get all offerings for this procedure
+		final Collection<SosOffering> offeringsForProcedure = getOfferingsForProcedure(procedureDescription.getIdentifier());
+		
+		if (offeringsForProcedure == null)
+		{
+			return null;
+		}
+		
+		// get bbox for each offering and merge to one bbox
+		final SosEnvelope mergedBBox = getMergedBBox(offeringsForProcedure);
+		
+		if (mergedBBox == null) 
+		{
+			return null;
+		}
+		// add merged bbox to capabilities as swe:envelope
+		final SosSweEnvelope envelope = new SosSweEnvelope(mergedBBox,"deg"); // FIXME "deg"<-- configure or compute somehow
+		
+		final SosSweField field = new SosSweField(SensorMLConstants.ELEMENT_NAME_OBSERVED_BBOX, envelope);
+
+		final DataRecord datarecord = new SosSweDataRecord();
+		datarecord.addField(field);
+		
+		final SosSMLCapabilities capability = new SosSMLCapabilities();
+		capability.setName(SensorMLConstants.ELEMENT_NAME_OBSERVED_BBOX);
+		capability.setDataRecord(datarecord);
+		
+		return capability;
+	}
+
+	protected SosEnvelope getMergedBBox(final Collection<SosOffering> offeringsForProcedure)
+	{
+		SosEnvelope mergedEnvelope = null;
+		for (final SosOffering sosOffering : offeringsForProcedure)
+		{
+			final SosEnvelope offeringEnvelope = Configurator.getInstance().getCache().getEnvelopeForOffering(sosOffering.getOfferingIdentifier());
+			if (offeringEnvelope != null && offeringEnvelope.isSetEnvelope())
+			{
+				if (mergedEnvelope == null) 
+				{
+					mergedEnvelope = offeringEnvelope;
+				}
+				else 
+				{
+					mergedEnvelope.expandToInclude(offeringEnvelope.getEnvelope());
+				}
+			}
+		}
+		return mergedEnvelope;
+	}
+
+	protected Collection<SosOffering> getOfferingsForProcedure(final String procedureIdentifier) {
     	final Collection<String> offeringIds = Configurator.getInstance().getCache().getOfferingsForProcedure(procedureIdentifier);
     	final Collection<SosOffering> offerings = CollectionHelper.list();
     	for (final String offeringIdentifier : offeringIds) {

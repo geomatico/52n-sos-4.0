@@ -61,4 +61,6 @@ public interface OGCConstants {
 	String URN_UNIQUE_IDENTIFIER_END = "uniqueID";
 
 	String URN_UNIQUE_IDENTIFIER_START = "urn:ogc:def:identifier:OGC:";
+
+	String URN_OBSERVED_BBOX = "urn:ogc:def:property:OGC:1.0:observedBBOX";
 }
