@@ -24,7 +24,13 @@
 
 package org.n52.sos.ogc.swe;
 
+import java.util.List;
+
+import org.n52.sos.ogc.sos.SosEnvelope;
+import org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName;
+import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
+import org.n52.sos.util.CollectionHelper;
 
 public class SosSweEnvelope extends SosSweAbstractDataComponent {
     private String referenceFrame;
@@ -34,6 +40,43 @@ public class SosSweEnvelope extends SosSweAbstractDataComponent {
 
     public SosSweEnvelope(final String referenceFrame, final SosSweVector upperCorner, final SosSweVector lowerCorner) {
         this(referenceFrame, upperCorner, lowerCorner, null);
+    }
+    
+    public SosSweEnvelope(final SosEnvelope sosEnvelope, final String uom)
+    {
+    	referenceFrame = Integer.toString(sosEnvelope.getSrid());
+
+    	List<SosSweCoordinate<?>> coordinates = CollectionHelper.list();
+		SosSweQuantity xCoord = new SosSweQuantity();
+		xCoord.setValue(sosEnvelope.getEnvelope().getMinX());
+		xCoord.setUom(uom);
+		xCoord.setAxisID("x");
+		coordinates.add(new SosSweCoordinate<Double>(SweCoordinateName.easting, xCoord));
+		
+		SosSweQuantity yCoord = new SosSweQuantity();
+		yCoord.setValue(sosEnvelope.getEnvelope().getMinY());
+		yCoord.setUom(uom);
+		yCoord.setAxisID("y");
+		coordinates.add(new SosSweCoordinate<Double>(SweCoordinateName.northing, yCoord));
+		
+		lowerCorner = new SosSweVector();
+		lowerCorner.setCoordinates(coordinates);
+		
+		coordinates = CollectionHelper.list();
+		xCoord = new SosSweQuantity();
+		xCoord.setValue(sosEnvelope.getEnvelope().getMaxX());
+		xCoord.setUom(uom);
+		coordinates.add(new SosSweCoordinate<Double>(SweCoordinateName.easting, xCoord));
+		
+		yCoord = new SosSweQuantity();
+		yCoord.setValue(sosEnvelope.getEnvelope().getMaxY());
+		yCoord.setUom(uom);
+		yCoord.setAxisID("y");
+		coordinates.add(new SosSweCoordinate<Double>(SweCoordinateName.northing, yCoord));
+		
+		upperCorner = new SosSweVector();
+		upperCorner.setCoordinates(coordinates);
+		
     }
 
 
