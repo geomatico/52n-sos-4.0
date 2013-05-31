@@ -88,7 +88,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	.setDescription("Should the service enrich each procedure description with available observed feature " +
 					"information: listing all features observed by this procedure,for example. If disabled, " + 
 					"the returned description of an DescribeSensor response might differ from the document " +
-					" used during the related InsertSensor call."););
+					" used during the related InsertSensor call.");
 
 	private static final StringSettingDefinition IDENTIFIER_LONG_NAME_DEFINITION_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
