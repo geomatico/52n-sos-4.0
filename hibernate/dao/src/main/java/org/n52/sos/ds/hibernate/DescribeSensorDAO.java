@@ -108,10 +108,14 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
 
     private void addValuesToSensorDescription(final SosProcedureDescription procedureDescription, final String version, final String procedureDescriptionFormat,
             final Session session) throws OwsExceptionReport {
-        final Collection<String> features = getFeatureOfInterestIDsForProcedure(procedureDescription.getIdentifier(), version, session);
-        if (features != null && !features.isEmpty()) {
-            procedureDescription.addFeaturesOfInterest(new HashSet<String>(features));
-        }
+    	// enrich with features
+    	if (procedureSettings().isEnrichWithFeatures())
+    	{
+    		final Collection<String> features = getFeatureOfInterestIDsForProcedure(procedureDescription.getIdentifier(), version, session);
+    		if (features != null && !features.isEmpty()) {
+    			procedureDescription.addFeaturesOfInterest(new HashSet<String>(features));
+    		}
+    	}
 
         // parent procs
         final Collection<String> parentProcedures = getParentProcedures(procedureDescription.getIdentifier(), version);
