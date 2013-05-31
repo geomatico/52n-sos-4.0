@@ -44,12 +44,9 @@ import net.opengis.swe.x101.CountDocument.Count;
 import net.opengis.swe.x101.DataArrayDocument;
 import net.opengis.swe.x101.DataArrayType;
 import net.opengis.swe.x101.DataComponentPropertyType;
-import net.opengis.swe.x101.DataRecordDocument;
 import net.opengis.swe.x101.DataRecordType;
 import net.opengis.swe.x101.DataValuePropertyType;
-import net.opengis.swe.x101.EnvelopeDocument;
 import net.opengis.swe.x101.EnvelopeType;
-import net.opengis.swe.x101.TimeGeometricPrimitivePropertyType;
 import net.opengis.swe.x101.ObservablePropertyDocument.ObservableProperty;
 import net.opengis.swe.x101.QuantityDocument.Quantity;
 import net.opengis.swe.x101.QuantityRangeDocument.QuantityRange;
@@ -57,6 +54,7 @@ import net.opengis.swe.x101.SimpleDataRecordType;
 import net.opengis.swe.x101.TextBlockDocument.TextBlock;
 import net.opengis.swe.x101.TextDocument.Text;
 import net.opengis.swe.x101.TimeDocument.Time;
+import net.opengis.swe.x101.TimeGeometricPrimitivePropertyType;
 import net.opengis.swe.x101.TimeRangeDocument.TimeRange;
 import net.opengis.swe.x101.VectorPropertyType;
 import net.opengis.swe.x101.VectorType;
@@ -116,7 +114,7 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             SosSweBoolean.class, SosSweCategory.class, SosSweCount.class, SosSweObservableProperty.class,
             SosSweQuantity.class, SosSweQuantityRange.class, SosSweText.class, SosSweTime.class,
             SosSweTimeRange.class, SosSweEnvelope.class, SosSweCoordinate.class, SosSweDataArray.class,
-            SosSweSimpleDataRecord.class, TimePeriod.class);
+            SosSweDataRecord.class, SosSweSimpleDataRecord.class, TimePeriod.class);
 
     public SweCommonEncoderv101() {
         LOGGER.debug("Encoder for the following keys initialized successfully: {}!",
@@ -183,6 +181,8 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             return createCoordinate((SosSweCoordinate<?>) element);
         } else if (element instanceof SosSweDataArray) {
             return createDataArray((SosSweDataArray) element);
+        } else if (element instanceof SosSweDataRecord) {
+        	return createDataRecord((SosSweDataRecord) element);
         } else if (element instanceof SosSweEnvelope) {
             return createEnvelope((SosSweEnvelope) element);
         } else if (element instanceof SosSweSimpleDataRecord) {
@@ -437,10 +437,8 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
         return xbDateTime;
     }
 
-    private EnvelopeDocument createEnvelope(final SosSweEnvelope sosSweEnvelope) {
-        final EnvelopeDocument envelopeDocument =
-                EnvelopeDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        final EnvelopeType envelopeType = envelopeDocument.addNewEnvelope();
+    private EnvelopeType createEnvelope(final SosSweEnvelope sosSweEnvelope) {
+        final EnvelopeType envelopeType = EnvelopeType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         addAbstractDataComponentValues(envelopeType, sosSweEnvelope);
         if (sosSweEnvelope.isReferenceFrameSet()) {
             envelopeType.setReferenceFrame(sosSweEnvelope.getReferenceFrame());
@@ -454,7 +452,7 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
         if (sosSweEnvelope.isTimeSet()) {
             envelopeType.addNewTime().setTimeRange(createTimeRange(sosSweEnvelope.getTime()));
         }
-        return envelopeDocument;
+        return envelopeType;
     }
 
     private VectorPropertyType createVectorProperty(final SosSweVector sosSweVector) {
@@ -527,13 +525,11 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
     }
 
     // TODO check types for SWE101
-    private DataRecordDocument createDataRecord(final SosSweDataRecord sosDataRecord) throws OwsExceptionReport {
+    private DataRecordType createDataRecord(final SosSweDataRecord sosDataRecord) throws OwsExceptionReport {
 
         final List<SosSweField> sosFields = sosDataRecord.getFields();
 
-        final DataRecordDocument xbDataRecordDoc =
-                DataRecordDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        final DataRecordType xbDataRecord = xbDataRecordDoc.addNewDataRecord();
+        final DataRecordType xbDataRecord = DataRecordType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
 
         if (sosDataRecord.isSetFields()) {
             final DataComponentPropertyType[] xbFields = new DataComponentPropertyType[sosFields.size()];
@@ -545,7 +541,7 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             }
             xbDataRecord.setFieldArray(xbFields);
         }
-        return xbDataRecordDoc;
+        return xbDataRecord;
     }
 
     private DataArrayDocument createDataArray(final SosSweDataArray sosDataArray) throws OwsExceptionReport {
@@ -564,9 +560,9 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
                 final DataComponentPropertyType xbElementType = xbDataArray.addNewElementType();
                 xbDataArray.getElementType().setName("Components");
 
-                final DataRecordDocument xbDataRecordDoc =
+                final DataRecordType xbDataRecord =
                         createDataRecord((SosSweDataRecord) sosDataArray.getElementType());
-                xbElementType.set(xbDataRecordDoc);
+                xbElementType.set(xbDataRecord);
             }
 
             if (sosDataArray.getEncoding() != null) {
@@ -670,8 +666,8 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
         return xbTextEncodingType;
     }
 
-    private XmlObject createTimeGeometricPrimitivePropertyType(TimePeriod timePeriod) throws OwsExceptionReport {
-        TimeGeometricPrimitivePropertyType xbTimeGeometricPrimitiveProperty =
+    private XmlObject createTimeGeometricPrimitivePropertyType(final TimePeriod timePeriod) throws OwsExceptionReport {
+        final TimeGeometricPrimitivePropertyType xbTimeGeometricPrimitiveProperty =
                 TimeGeometricPrimitivePropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (timePeriod.isSetStart() && timePeriod.isSetEnd()) {
             xbTimeGeometricPrimitiveProperty.addNewTimeGeometricPrimitive().set(
@@ -679,8 +675,8 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
         }
         // TODO check GML 311 rename nodename of geometric primitive to
         // gml:timePeriod
-        XmlCursor timeCursor = xbTimeGeometricPrimitiveProperty.newCursor();
-        boolean hasTimePrimitive =
+        final XmlCursor timeCursor = xbTimeGeometricPrimitiveProperty.newCursor();
+        final boolean hasTimePrimitive =
                 timeCursor.toChild(new QName(GMLConstants.NS_GML, GMLConstants.EN_ABSTRACT_TIME_GEOM_PRIM));
         if (hasTimePrimitive) {
             timeCursor.setName(new QName(GMLConstants.NS_GML, GMLConstants.EN_TIME_PERIOD));
