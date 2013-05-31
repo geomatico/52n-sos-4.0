@@ -75,7 +75,9 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	.setKey(ENRICH_WITH_OFFERINGS)
 	.setDefaultValue(TRUE)
 	.setTitle("Enrich with offering information?")
-	.setDescription("Should the service enrich each procedure description with available offering information: listing all procedure related offering ids, for example.");
+	.setDescription("Should the service enrich each procedure description with available offering information: " +
+			"listing all procedure related offering ids, for example. If disabled, the returned description of " +
+			"an DescribeSensor response might differ from the document used during the related InsertSensor call.");
 	
 	private static final BooleanSettingDefinition ENRICH_WITH_FEATURES_DEFINITION = new BooleanSettingDefinition()
 	.setGroup(GROUP)
@@ -83,7 +85,10 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	.setKey(ENRICH_WITH_FEATURES)
 	.setDefaultValue(TRUE)
 	.setTitle("Enrich with feature information?")
-	.setDescription("Should the service enrich each procedure description with available observed feature information: listing all features observed by this procedure,for example.");
+	.setDescription("Should the service enrich each procedure description with available observed feature " +
+					"information: listing all features observed by this procedure,for example. If disabled, " + 
+					"the returned description of an DescribeSensor response might differ from the document " +
+					" used during the related InsertSensor call."););
 
 	private static final StringSettingDefinition IDENTIFIER_LONG_NAME_DEFINITION_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
