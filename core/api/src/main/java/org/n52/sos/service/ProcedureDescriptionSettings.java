@@ -67,6 +67,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	public static final String USE_SERVICE_CONTACT_AS_SENSOR_CONTACT = "procedureDesc.USE_SERVICE_CONTACT_AS_SENSOR_CONTACT";
 	public static final String PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE = "procedureDesc.PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE";
 	public static final String ENRICH_WITH_OFFERINGS = "procedureDesc.ENRICH_WITH_OFFERINGS";
+	public static final String ENRICH_WITH_FEATURES = "procedureDesc.ENRICH_WITH_FEATURES";
 	
 	private static final BooleanSettingDefinition ENRICH_WITH_OFFERINGS_DEFINITION = new BooleanSettingDefinition()
 	.setGroup(GROUP)
@@ -74,7 +75,15 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	.setKey(ENRICH_WITH_OFFERINGS)
 	.setDefaultValue(TRUE)
 	.setTitle("Enrich with offering information?")
-	.setDescription("Should the service enrich each procedure description with available offering information: Listing all procedure related offering ids, for example.");
+	.setDescription("Should the service enrich each procedure description with available offering information: listing all procedure related offering ids, for example.");
+	
+	private static final BooleanSettingDefinition ENRICH_WITH_FEATURES_DEFINITION = new BooleanSettingDefinition()
+	.setGroup(GROUP)
+	.setOrder(7.5f)
+	.setKey(ENRICH_WITH_FEATURES)
+	.setDefaultValue(TRUE)
+	.setTitle("Enrich with feature information?")
+	.setDescription("Should the service enrich each procedure description with available observed feature information: listing all features observed by this procedure,for example.");
 
 	private static final StringSettingDefinition IDENTIFIER_LONG_NAME_DEFINITION_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
@@ -185,6 +194,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 
 	private static final Set<? extends SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
 			ENRICH_WITH_OFFERINGS_DEFINITION,
+			ENRICH_WITH_FEATURES_DEFINITION,
 			IDENTIFIER_LONG_NAME_DEFINITION_DEFINITION,
 			IDENTIFIER_SHORT_NAME_DEFINITION_DEFINITION,
 			DESCRIPTION_TEMPLATE_DEFINITION,
@@ -212,6 +222,8 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
     private String altitudeUom;
 	private String processMethodRulesDefinitionDescriptionTemplate;
 	private boolean enrichWithOfferings;
+
+	private boolean enrichWithFeatures;
 
 	private static ProcedureDescriptionSettings instance = null;
 
@@ -390,6 +402,18 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	public boolean isEnrichWithOfferings()
 	{
 		return enrichWithOfferings;
+	}
+	
+	@Setting(ENRICH_WITH_FEATURES)
+	public void setEnrichWithFeatures(final boolean enrichWithFeatures)
+	{
+		Validation.notNull(ENRICH_WITH_FEATURES, enrichWithFeatures);
+		this.enrichWithFeatures = enrichWithFeatures;
+	}
+	
+	public boolean isEnrichWithFeatures()
+	{
+		return enrichWithFeatures;
 	}
 
 }
