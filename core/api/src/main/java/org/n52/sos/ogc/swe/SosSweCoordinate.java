@@ -25,6 +25,7 @@ package org.n52.sos.ogc.swe;
 
 import org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SosSweAbstractUomType;
 
 /**
  * SOS internal representation of SWE coordinates
@@ -40,6 +41,7 @@ public class SosSweCoordinate<T> {
 
     /**
      * Coordinate value
+     * TODO is this assignment to generic? maybe, we switch to {@link SosSweAbstractUomType}?
      */
     private SosSweAbstractSimpleType<T> value;
 
@@ -51,7 +53,7 @@ public class SosSweCoordinate<T> {
      * @param value
      *            Coordinate value
      */
-    public SosSweCoordinate(SweCoordinateName name, SosSweAbstractSimpleType<T> value) {
+    public SosSweCoordinate(final SweCoordinateName name, final SosSweAbstractSimpleType<T> value) {
         super();
         this.name = name;
         this.value = value;
@@ -68,7 +70,7 @@ public class SosSweCoordinate<T> {
      * @param name
      *            the name to set
      */
-    public void setName(SweCoordinateName name) {
+    public void setName(final SweCoordinateName name) {
         this.name = name;
     }
 
@@ -83,7 +85,7 @@ public class SosSweCoordinate<T> {
      * @param value
      *            the value to set
      */
-    public void setValue(SosSweAbstractSimpleType<T> value) {
+    public void setValue(final SosSweAbstractSimpleType<T> value) {
         this.value = value;
     }
 
