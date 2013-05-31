@@ -68,6 +68,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	public static final String PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE = "procedureDesc.PROCESS_METHOD_RULES_DEFINITION_DESCRIPTION_TEMPLATE";
 	public static final String ENRICH_WITH_OFFERINGS = "procedureDesc.ENRICH_WITH_OFFERINGS";
 	public static final String ENRICH_WITH_FEATURES = "procedureDesc.ENRICH_WITH_FEATURES";
+	public static final String ENRICH_WITH_DISCOVERY_INFORMATION = "procedureDesc.ENRICH_WITH_DISCOVERY_INFORMATION";
 	
 	private static final BooleanSettingDefinition ENRICH_WITH_OFFERINGS_DEFINITION = new BooleanSettingDefinition()
 	.setGroup(GROUP)
@@ -75,7 +76,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	.setKey(ENRICH_WITH_OFFERINGS)
 	.setDefaultValue(TRUE)
 	.setTitle("Enrich with offering information?")
-	.setDescription("Should the service enrich each procedure description with available offering information: " +
+	.setDescription("If selected, the service enriches each procedure description with available offering information: " +
 			"listing all procedure related offering ids, for example. If disabled, the returned description of " +
 			"an DescribeSensor response might differ from the document used during the related InsertSensor call.");
 	
@@ -85,10 +86,20 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	.setKey(ENRICH_WITH_FEATURES)
 	.setDefaultValue(TRUE)
 	.setTitle("Enrich with feature information?")
-	.setDescription("Should the service enrich each procedure description with available observed feature " +
-					"information: listing all features observed by this procedure,for example. If disabled, " + 
+	.setDescription("If selected, the service enriches each procedure description with available observed feature " +
+					"information: listing all features observed by this procedure, for example. If disabled, " + 
 					"the returned description of an DescribeSensor response might differ from the document " +
 					" used during the related InsertSensor call.");
+	
+	private static final BooleanSettingDefinition ENRICH_WITH_DISCOVERY_INFORMATION_DEFINITION = new BooleanSettingDefinition()
+	.setGroup(GROUP)
+	.setOrder(7.75f)
+	.setKey(ENRICH_WITH_DISCOVERY_INFORMATION)
+	.setDefaultValue(TRUE)
+	.setTitle("Enrich with discovery information?")
+	.setDescription("If selected, the service enriches each procedure description with discovery relevant information" +
+			" according to <a target=\"_blank\" href=\"https://portal.opengeospatial.org/files/?artifact_id=33284\">OGC#09-033 " +
+			"'SensorML Profile for Discovery'</a>.");
 
 	private static final StringSettingDefinition IDENTIFIER_LONG_NAME_DEFINITION_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
@@ -200,6 +211,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	private static final Set<? extends SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
 			ENRICH_WITH_OFFERINGS_DEFINITION,
 			ENRICH_WITH_FEATURES_DEFINITION,
+			ENRICH_WITH_DISCOVERY_INFORMATION_DEFINITION,
 			IDENTIFIER_LONG_NAME_DEFINITION_DEFINITION,
 			IDENTIFIER_SHORT_NAME_DEFINITION_DEFINITION,
 			DESCRIPTION_TEMPLATE_DEFINITION,
@@ -227,8 +239,8 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
     private String altitudeUom;
 	private String processMethodRulesDefinitionDescriptionTemplate;
 	private boolean enrichWithOfferings;
-
 	private boolean enrichWithFeatures;
+	private boolean enrichWithDiscoveryInformation;
 
 	private static ProcedureDescriptionSettings instance = null;
 
@@ -419,6 +431,18 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	public boolean isEnrichWithFeatures()
 	{
 		return enrichWithFeatures;
+	}
+	
+	@Setting(ENRICH_WITH_DISCOVERY_INFORMATION)
+	public void setEnrichWithDiscoveryInformation(final boolean enrichWithDiscoveryInformation)
+	{
+		Validation.notNull(ENRICH_WITH_DISCOVERY_INFORMATION, enrichWithDiscoveryInformation);
+		this.enrichWithDiscoveryInformation = enrichWithDiscoveryInformation;
+	}
+
+	public boolean isEnrichWithDiscoveryInformation()
+	{
+		return enrichWithDiscoveryInformation;
 	}
 
 }
