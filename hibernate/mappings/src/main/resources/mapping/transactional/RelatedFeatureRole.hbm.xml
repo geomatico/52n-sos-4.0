@@ -2,15 +2,15 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="org.n52.sos.ds.hibernate.entities.RelatedFeatureRole" table="related_feature_role">
+    <class name="org.n52.sos.ds.hibernate.entities.RelatedFeatureRole" table="relatedFeatureRole">
         <id name="relatedFeatureRoleId" type="long">
-            <column name="related_feature_role_id" />
+            <column name="relatedFeatureRoleId" />
             <generator class="sequence">
-            	<param name="sequence">related_feature_role_id_seq</param>
+            	<param name="sequence">relatedFeatureRoleId_seq</param>
             </generator>
         </id>
         <property name="relatedFeatureRole" type="string">
-            <column name="related_feature_role" not-null="true" unique="true" />
+            <column name="relatedFeatureRole" not-null="true" unique="true" />
         </property>
     </class>
 </hibernate-mapping>

@@ -5,9 +5,9 @@
 <hibernate-mapping>
     <class name="org.n52.sos.ds.hibernate.entities.Codespace" table="codespace">
         <id name="codespaceId" type="long">
-            <column name="codespace_id" />
+            <column name="codespaceId" />
             <generator class="sequence">
-            	<param name="sequence">codespace_id_seq</param>
+            	<param name="sequence">codespaceId_seq</param>
             </generator>
         </id>
         <property name="codespace" type="string">

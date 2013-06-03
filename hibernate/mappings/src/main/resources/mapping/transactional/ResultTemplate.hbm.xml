@@ -2,33 +2,33 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="org.n52.sos.ds.hibernate.entities.ResultTemplate" table="result_template">
+    <class name="org.n52.sos.ds.hibernate.entities.ResultTemplate" table="resultTemplate">
         <id name="resultTemplateId" type="long">
-            <column name="result_template_id" />
+            <column name="resultTemplateId" />
             <generator class="sequence">
-            	<param name="sequence">result_template_id_seq</param>
+            	<param name="sequence">resultTemplateId_seq</param>
             </generator>
         </id>
-        <many-to-one name="offering" class="org.n52.sos.ds.hibernate.entities.Offering" fetch="join" foreign-key="result_template_offering_idx">
-            <column index="result_template_offering_idx" name="offering_id" not-null="true" />
+        <many-to-one name="offering" class="org.n52.sos.ds.hibernate.entities.Offering" fetch="join" foreign-key="resultTemplateOfferingIdx">
+            <column index="resultTempOfferingIdx" name="offeringId" not-null="true" />
         </many-to-one>
-        <many-to-one name="observableProperty" class="org.n52.sos.ds.hibernate.entities.ObservableProperty" fetch="join" foreign-key="result_template_observable_property_fk">
-            <column index="result_template_observable_property_idx" name="observable_property_id" not-null="true" />
+        <many-to-one name="observableProperty" class="org.n52.sos.ds.hibernate.entities.ObservableProperty" fetch="join" foreign-key="resultTemplateObsPropFk">
+            <column index="resultTempeObsPropIdx" name="observablePropertyId" not-null="true" />
         </many-to-one>
-        <many-to-one name="procedure" class="org.n52.sos.ds.hibernate.entities.Procedure" fetch="join" foreign-key="result_template_procedure_fk">
-            <column index="result_template_procedure_idx" name="procedure_id" not-null="true" />
+        <many-to-one name="procedure" class="org.n52.sos.ds.hibernate.entities.Procedure" fetch="join" foreign-key="resultTemplateProcedureFk">
+            <column index="resultTempProcedureIdx" name="procedureId" not-null="true" />
         </many-to-one>
-        <many-to-one name="featureOfInterest" class="org.n52.sos.ds.hibernate.entities.FeatureOfInterest" fetch="join" foreign-key="result_template_feature_of_interest_idx">
-            <column name="feature_of_interest_id" not-null="true" />
+        <many-to-one name="featureOfInterest" class="org.n52.sos.ds.hibernate.entities.FeatureOfInterest" fetch="join" foreign-key="resultTemplateFeatureIdx">
+            <column name="featureOfInterestId" not-null="true" />
         </many-to-one>
         <property name="identifier" type="string">
-            <column index="result_template_identifier_idx" name="identifier" not-null="true" />
+            <column index="resultTempIdentifierIdx" name="identifier" not-null="true" />
         </property>
         <property name="resultStructure" type="org.hibernate.type.StringClobType">
-            <column name="result_structure" not-null="true" />
+            <column name="resultStructure" not-null="true" />
         </property>
         <property name="resultEncoding" type="org.hibernate.type.StringClobType">
-            <column name="result_encoding" not-null="true" />
+            <column name="resultEncoding" not-null="true" />
         </property>
     </class>
 </hibernate-mapping>

@@ -4,14 +4,14 @@
 <hibernate-mapping>
     <class name="org.n52.sos.ds.hibernate.entities.Offering" table="offering">
         <id name="offeringId" type="long">
-            <column name="offering_id" />
+            <column name="offeringId" />
             <generator class="sequence">
-            	<param name="sequence">offering_id_seq</param>
+            	<param name="sequence">offeringId_seq</param>
             </generator>
         </id>
-        <discriminator column="hibernate_discriminator" type="boolean" />
+        <discriminator column="hibernateDiscriminator" type="org.hibernate.type.TrueFalseType" />
         <property name="identifier" type="string">
-            <column index="offering_identifier_idx" name="identifier" not-null="true" unique="true" />
+            <column name="identifier" not-null="true" unique="true" />
         </property>
         <property name="name" type="string">
             <column name="name" />

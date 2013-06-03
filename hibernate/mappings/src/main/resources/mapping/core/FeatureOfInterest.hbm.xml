@@ -2,31 +2,31 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="org.n52.sos.ds.hibernate.entities.FeatureOfInterest" table="feature_of_interest">
+    <class name="org.n52.sos.ds.hibernate.entities.FeatureOfInterest" table="featureOfInterest">
         <id name="featureOfInterestId" type="long">
-            <column name="feature_of_interest_id" />
+            <column name="featureOfInterestId" />
             <generator class="sequence">
-            	<param name="sequence">feature_of_interest_id_seq</param>
+            	<param name="sequence">featureOfInterestId_seq</param>
             </generator>
         </id>
-        <discriminator column="hibernate_discriminator" type="boolean" />
-        <many-to-one name="featureOfInterestType" class="org.n52.sos.ds.hibernate.entities.FeatureOfInterestType" fetch="join" foreign-key="feature_of_interest_feature_of_interest_type_fk">
-            <column name="feature_of_interest_type_id" not-null="true" />
+        <discriminator column="hibernateDiscriminator" type="org.hibernate.type.TrueFalseType" />
+        <many-to-one name="featureOfInterestType" class="org.n52.sos.ds.hibernate.entities.FeatureOfInterestType" fetch="join" foreign-key="featureFeatureTypeFk">
+            <column name="featureOfInterestTypeId" not-null="true" />
         </many-to-one>
         <property name="identifier" type="string">
-            <column index="feature_of_interest_identifier_idx" name="identifier" />
+            <column index="featureOfInterestIdentifierIdx" name="identifier" />
         </property>
-        <many-to-one name="codespace" class="org.n52.sos.ds.hibernate.entities.Codespace" fetch="select" foreign-key="feature_of_interest_codespace_fk">
-            <column name="codespace_id" />
+        <many-to-one name="codespace" class="org.n52.sos.ds.hibernate.entities.Codespace" fetch="select" foreign-key="featureCodespaceFk">
+            <column name="codespaceId" />
         </many-to-one>
         <property name="names" type="org.hibernate.type.StringClobType">
             <column name="names" />
         </property>
         <property name="geom" type="org.hibernate.spatial.GeometryType">
-            <column index="feature_of_interest_geom_idx" name="geom" />
+            <column name="geom" />
         </property>
         <property name="descriptionXml" type="org.hibernate.type.StringClobType">
-            <column name="description_xml" />
+            <column name="descriptionXml" />
         </property>
         <property name="url" type="string">
             <column name="url" unique="true" />

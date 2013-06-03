@@ -3,26 +3,26 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
 <subclass name="org.n52.sos.ds.hibernate.entities.TProcedure" extends="org.n52.sos.ds.hibernate.entities.Procedure" discriminator-value="true">
-	<set name="validProcedureTimes" table="valid_procedure_time" inverse="true" lazy="true" fetch="select">
+	<set name="validProcedureTimes" table="validProcedureTime" inverse="true" lazy="true" fetch="select">
 		<key>
-		    <column name="procedure_id" not-null="true" />
+		    <column name="procedureId" not-null="true" />
 		</key>
 		<one-to-many class="org.n52.sos.ds.hibernate.entities.ValidProcedureTime" />
 	</set>
-	<set name="childs" table="sensor_system" inverse="false" lazy="true" fetch="select">
+	<set name="childs" table="sensorSystem" inverse="false" lazy="true" fetch="select">
 	    <key>
-	        <column name="parent_sensor_id" not-null="true" />
+	        <column name="parentSensorId" not-null="true" />
 	    </key>
-	    <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.TProcedure" foreign-key="procedure_child_fk">
-	        <column name="child_sensor_id" not-null="true" />
+	    <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.TProcedure" foreign-key="procedureChildFk">
+	        <column name="childSensorId" not-null="true" />
 	    </many-to-many>
 	</set>
-	<set name="parents" table="sensor_system" inverse="false" lazy="true" fetch="select">
+	<set name="parents" table="sensorSystem" inverse="false" lazy="true" fetch="select">
 	    <key>
-	        <column name="child_sensor_id" not-null="true" />
+	        <column name="childSensorId" not-null="true" />
 	    </key>
-	    <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.TProcedure" foreign-key="procedure_parenf_fk">
-	        <column name="parent_sensor_id" not-null="true" />
+	    <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.TProcedure" foreign-key="procedureParenfFk">
+	        <column name="parentSensorId" not-null="true" />
 	    </many-to-many>
 	</set>
 </subclass>

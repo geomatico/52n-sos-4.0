@@ -2,15 +2,15 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="org.n52.sos.ds.hibernate.entities.FeatureOfInterestType" table="feature_of_interest_type">
+    <class name="org.n52.sos.ds.hibernate.entities.FeatureOfInterestType" table="featureOfInterestType">
         <id name="featureOfInterestTypeId" type="long">
-            <column name="feature_of_interest_type_id" />
+            <column name="featureOfInterestTypeId" />
             <generator class="sequence">
-            	<param name="sequence">feature_of_interest_type_id_seq</param>
+            	<param name="sequence">featureOfInterestTypeId_seq</param>
             </generator>
         </id>
         <property name="featureOfInterestType" type="string">
-            <column name="feature_of_interest_type" not-null="true" unique="true" />
+            <column name="featureOfInterestType" not-null="true" unique="true" />
         </property>
     </class>
 </hibernate-mapping>

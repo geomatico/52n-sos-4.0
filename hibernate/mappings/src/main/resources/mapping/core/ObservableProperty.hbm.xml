@@ -2,16 +2,16 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="org.n52.sos.ds.hibernate.entities.ObservableProperty" table="observable_property">
+    <class name="org.n52.sos.ds.hibernate.entities.ObservableProperty" table="observableProperty">
         <id name="observablePropertyId" type="long">
-            <column name="observable_property_id"/>
+            <column name="observablePropertyId" />
             <generator class="sequence">
-            	<param name="sequence">observable_property_id_seq</param>
+            	<param name="sequence">observablePropertyId_seq</param>
             </generator>
         </id>
-        <discriminator column="hibernate_discriminator" type="boolean" />
+        <discriminator column="hibernateDiscriminator" type="org.hibernate.type.TrueFalseType" />
         <property name="identifier" type="string">
-            <column index="observable_property_identifier_idx" name="identifier" not-null="true" unique="true" />
+            <column name="identifier" not-null="true" unique="true" />
         </property>
         <property name="description" type="string">
             <column name="description" />

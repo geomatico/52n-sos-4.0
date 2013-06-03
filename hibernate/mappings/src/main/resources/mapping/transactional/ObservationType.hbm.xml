@@ -2,15 +2,15 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="org.n52.sos.ds.hibernate.entities.ObservationType" table="observation_type">
+    <class name="org.n52.sos.ds.hibernate.entities.ObservationType" table="observationType">
         <id name="observationTypeId" type="long">
-            <column name="observation_type_id" />
+            <column name="observationTypeId" />
             <generator class="sequence">
-            	<param name="sequence">observation_type_id_seq</param>
+            	<param name="sequence">observationTypeId_seq</param>
             </generator>
         </id>
         <property name="observationType" type="string">
-            <column name="observation_type" not-null="true" unique="true" />
+            <column name="observationType" not-null="true" unique="true" />
         </property>
     </class>
 </hibernate-mapping>

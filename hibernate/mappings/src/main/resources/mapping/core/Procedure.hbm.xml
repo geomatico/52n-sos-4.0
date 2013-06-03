@@ -4,37 +4,37 @@
 <hibernate-mapping>
     <class name="org.n52.sos.ds.hibernate.entities.Procedure" table="procedure">
         <id name="procedureId" type="long">
-            <column name="procedure_id" />
+            <column name="procedureId" />
             <generator class="sequence">
-            	<param name="sequence">procedure_id_seq</param>
+            	<param name="sequence">procedureId_seq</param>
             </generator>
         </id>
-        <discriminator column="hibernate_discriminator" type="boolean" />
-        <many-to-one name="procedureDescriptionFormat" class="org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat" fetch="join" foreign-key="procedure_procedure_description_format_fk">
-            <column name="procedure_description_format_id" not-null="true" />
+        <discriminator column="hibernateDiscriminator" type="org.hibernate.type.TrueFalseType" />
+        <many-to-one name="procedureDescriptionFormat" class="org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat" fetch="join" foreign-key="procProcDescFormatFk">
+            <column name="procedureDescriptionFormatId" not-null="true" />
         </many-to-one>
         <property name="identifier" type="string">
-            <column index="procedrue_identifier_idx" name="identifier" not-null="true" unique="true" />
+            <column name="identifier" not-null="true" unique="true" />
         </property>
-        <property name="deleted" type="boolean">
-            <column name="deleted" not-null="true" default="false"/>
+        <property name="deleted" type="org.hibernate.type.TrueFalseType">
+            <column name="deleted" not-null="true" default="'F'" check="deleted in ('T','F')"/>
         </property>
         <property name="descriptionFile" type="org.hibernate.type.StringClobType">
-            <column name="description_file" />
+            <column name="descriptionFile" />
         </property>
         <!-- optional properties, used for automatic sensor description creation if available -->
         <!-- <property name="geom" type="org.hibernate.spatial.GeometryType">
             <column name="geom" unique="true" />
         </property> -->
-        <!-- supports types big_decimal and string -->
+        <!-- supports types bigDecimal and string -->
         <!--  
-        <property name="longitude" type="big_decimal">
+        <property name="longitude" type="bigDecimal">
            <column name="longitude" unique="true" />
         </property>
-        <property name="latitude" type="big_decimal">
+        <property name="latitude" type="bigDecimal">
         	<column name="latitude" unique="true" />
         </property>
-        <property name="altitude" type="big_decimal">
+        <property name="altitude" type="bigDecimal">
         	<column name="altitude" unique="true" />
         </property>
         <property name="srid" type="integer">
