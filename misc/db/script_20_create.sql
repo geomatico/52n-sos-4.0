@@ -67,12 +67,13 @@ alter table featureRelation add constraint FKFD198312DA85B80E foreign key (child
 alter table featureRelation add constraint featureOfInterestChildFk foreign key (childFeatureId) references observableProperty;
 alter table geometryValue add constraint observationGeometryValueFk foreign key (observationId) references observation;
 alter table numericValue add constraint observationNumericValueFk foreign key (observationId) references observation;
+create index obsResultTimeIdx on observation (resultTime);
 create index obsPhenTimeEndIdx on observation (phenomenonTimeEnd);
 create index obsPhenTimeStartIdx on observation (phenomenonTimeStart);
-create index obsnResultTimeIdx on observation (resultTime);
 create index observationSetIdx on observation (setId);
 create index obsCodespaceIdx on observation (codespaceId);
 create index obsObsPropIdx on observation (observablePropertyId);
+create index observationIdentifierIdx on observation (identifier);
 create index obsFeatureIdx on observation (featureOfInterestId);
 create index obsProcedureIdx on observation (procedureId);
 alter table observation add constraint observationUnitFk foreign key (unitId) references unit;
