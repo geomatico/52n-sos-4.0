@@ -23,9 +23,8 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getObservationIdentifiers;
-
 import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
+import org.n52.sos.ds.hibernate.dao.ObservationDAO;
 
 /**
  *
@@ -35,6 +34,6 @@ public class ObservationIdentifiersCacheUpdate extends AbstractDatasourceCacheUp
 
     @Override
     public void execute() {
-        getCache().addObservationIdentifiers(getObservationIdentifiers(getSession()));
+        getCache().addObservationIdentifiers(new ObservationDAO().getObservationIdentifiers(getSession()));
     }
 }

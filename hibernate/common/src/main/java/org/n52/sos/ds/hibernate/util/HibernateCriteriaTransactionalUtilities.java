@@ -36,6 +36,13 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
+import org.n52.sos.ds.hibernate.dao.CodespaceDAO;
+import org.n52.sos.ds.hibernate.dao.FeatureOfInterestDAO;
+import org.n52.sos.ds.hibernate.dao.FeatureOfInterestTypeDAO;
+import org.n52.sos.ds.hibernate.dao.ObservablePropertyDAO;
+import org.n52.sos.ds.hibernate.dao.OfferingDAO;
+import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
+import org.n52.sos.ds.hibernate.dao.ResultTemplateDAO;
 import org.n52.sos.ds.hibernate.entities.Codespace;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
@@ -71,18 +78,20 @@ import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CollectionHelper;
 
+@Deprecated
 public class HibernateCriteriaTransactionalUtilities {
-
+    @Deprecated
     public static Procedure getOrInsertProcedure(String identifier, ProcedureDescriptionFormat pdf,
             Collection<String> parentProcedures, Session session) {
-        Procedure result = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(identifier, session);
+        ProcedureDAO procedureDAO = new ProcedureDAO();
+        Procedure result = procedureDAO.getProcedureForIdentifier(identifier, session);
         if (result == null) {
             TProcedure newResult = new TProcedure();
             newResult.setProcedureDescriptionFormat(pdf);
             newResult.setIdentifier(identifier);
             if (CollectionHelper.isNotEmpty(parentProcedures)) {
-                newResult.setParents(CollectionHelper.asSet(HibernateCriteriaQueryUtilities
-                        .getProceduresForIdentifiers(parentProcedures, session)));
+                newResult.setParents(CollectionHelper.asSet(
+                        procedureDAO.getProceduresForIdentifiers(parentProcedures, session)));
             }
             result = newResult;
         }
@@ -92,7 +101,7 @@ public class HibernateCriteriaTransactionalUtilities {
         session.refresh(result);
         return result;
     }
-
+    @Deprecated
     public static void insertValidProcedureTime(Procedure proc, String xmlDescription, DateTime validStartTime,
             Session session) {
         ValidProcedureTime vpd = new ValidProcedureTime();
@@ -102,12 +111,12 @@ public class HibernateCriteriaTransactionalUtilities {
         session.save(vpd);
         session.flush();
     }
-
+    @Deprecated
     public static Offering getAndUpdateOrInsertNewOffering(String offeringIdentifier, String offeringName,
             List<RelatedFeature> relatedFeatures, List<ObservationType> observationTypes,
             List<FeatureOfInterestType> featureOfInterestTypes, Session session) {
 
-        TOffering offering = HibernateCriteriaQueryUtilities.getTOfferingForIdentifier(offeringIdentifier, session);
+        TOffering offering = new OfferingDAO().getTOfferingForIdentifier(offeringIdentifier, session);
         if (offering == null) {
             offering = new TOffering();
             offering.setIdentifier(offeringIdentifier);
@@ -137,7 +146,7 @@ public class HibernateCriteriaTransactionalUtilities {
         session.refresh(offering);
         return offering;
     }
-
+    @Deprecated
     public static List<RelatedFeature> getOrInsertRelatedFeature(SosAbstractFeature feature,
             List<RelatedFeatureRole> roles, Session session) throws OwsExceptionReport {
         // TODO: create featureOfInterest and link to relatedFeature
@@ -164,7 +173,7 @@ public class HibernateCriteriaTransactionalUtilities {
         }
         return relFeats;
     }
-
+    @Deprecated
     public static List<RelatedFeatureRole> getOrInsertRelatedFeatureRole(String role, Session session) {
         List<RelatedFeatureRole> relFeatRoles = HibernateCriteriaQueryUtilities.getRelatedFeatureRole(role, session);
         if (relFeatRoles == null) {
@@ -179,7 +188,7 @@ public class HibernateCriteriaTransactionalUtilities {
         }
         return relFeatRoles;
     }
-
+    @Deprecated
     public static List<ObservableProperty> getOrInsertObservableProperty(
             List<SosObservableProperty> observableProperty, Session session) {
         List<String> identifiers = new ArrayList<String>(observableProperty.size());
@@ -187,7 +196,7 @@ public class HibernateCriteriaTransactionalUtilities {
             identifiers.add(sosObservableProperty.getIdentifier());
         }
         List<ObservableProperty> obsProps =
-                HibernateCriteriaQueryUtilities.getObservableProperties(identifiers, session);
+                new ObservablePropertyDAO().getObservableProperties(identifiers, session);
         for (SosObservableProperty sosObsProp : observableProperty) {
             boolean exists = false;
             for (ObservableProperty obsProp : obsProps) {
@@ -209,7 +218,7 @@ public class HibernateCriteriaTransactionalUtilities {
 
         return obsProps;
     }
-
+    @Deprecated
     public static Unit getOrInsertUnit(String unit, Session session) {
         Unit result = HibernateCriteriaQueryUtilities.getUnit(unit, session);
         if (result == null) {
@@ -221,9 +230,9 @@ public class HibernateCriteriaTransactionalUtilities {
         }
         return result;
     }
-
+    @Deprecated
     public static Codespace getOrInsertCodespace(String codespace, Session session) {
-        Codespace result = HibernateCriteriaQueryUtilities.getCodespace(codespace, session);
+        Codespace result = new CodespaceDAO().getCodespace(codespace, session);
         if (result == null) {
             result = new Codespace();
             result.setCodespace(codespace);
@@ -233,7 +242,7 @@ public class HibernateCriteriaTransactionalUtilities {
         }
         return result;
     }
-
+    @Deprecated
     public static ObservationConstellation checkOrInsertObservationConstellation(Procedure hProcedure,
             ObservableProperty hObservableProperty, Offering hOffering, boolean hiddenChild, Session session) {
         ObservationConstellation obsConst =
@@ -261,11 +270,11 @@ public class HibernateCriteriaTransactionalUtilities {
         }
         return obsConst;
     }
-
+    @Deprecated
     public static void updateValidProcedureTime(ValidProcedureTime validProcedureTime, Session session) {
         session.saveOrUpdate(validProcedureTime);
     }
-
+    @Deprecated
     public static ObservationConstellation updateObservationConstellation(
             ObservationConstellation hObservationConstellation, String observationType, Session session) {
         ObservationType obsType = HibernateCriteriaQueryUtilities.getObservationTypeObject(observationType, session);        
@@ -294,9 +303,9 @@ public class HibernateCriteriaTransactionalUtilities {
         
         return hObservationConstellation;
     }
-
+    @Deprecated
     public static FeatureOfInterest getOrInsertFeatureOfInterest(String featureIdentifier, String url, Session session) {
-        FeatureOfInterest feature = HibernateCriteriaQueryUtilities.getFeatureOfInterest(featureIdentifier, session);
+        FeatureOfInterest feature = new FeatureOfInterestDAO().getFeatureOfInterest(featureIdentifier, session);
         if (feature == null) {
             feature = new FeatureOfInterest();
             feature.setIdentifier(featureIdentifier);
@@ -312,7 +321,7 @@ public class HibernateCriteriaTransactionalUtilities {
         }
         return feature;
     }
-
+    @Deprecated
     public static List<FeatureOfInterestType> getOrInsertFeatureOfInterestTypes(Set<String> featureOfInterestTypes,
             Session session) {
         List<FeatureOfInterestType> featureTypes = new LinkedList<FeatureOfInterestType>();
@@ -321,10 +330,10 @@ public class HibernateCriteriaTransactionalUtilities {
         }
         return featureTypes;
     }
-
+    @Deprecated
     public static FeatureOfInterestType getOrInsertFeatureOfInterestType(String featureType, Session session) {
         FeatureOfInterestType featureOfInterestType =
-                HibernateCriteriaQueryUtilities.getFeatureOfInterestTypeObject(featureType, session);
+                new FeatureOfInterestTypeDAO().getFeatureOfInterestTypeObject(featureType, session);
         if (featureOfInterestType == null) {
             featureOfInterestType = new FeatureOfInterestType();
             featureOfInterestType.setFeatureOfInterestType(featureType);
@@ -333,7 +342,7 @@ public class HibernateCriteriaTransactionalUtilities {
         }
         return featureOfInterestType;
     }
-
+    @Deprecated
     public static ObservationType getOrInsertObservationType(String obsType, Session session) {
         ObservationType observationType = HibernateCriteriaQueryUtilities.getObservationTypeObject(obsType, session);
         if (observationType == null) {
@@ -344,7 +353,7 @@ public class HibernateCriteriaTransactionalUtilities {
         }
         return observationType;
     }
-
+    @Deprecated
     public static List<ObservationType> getOrInsertObservationTypes(Set<String> observationTypes, Session session) {
         List<ObservationType> obsTypes = new LinkedList<ObservationType>();
         for (String observationType : observationTypes) {
@@ -352,7 +361,7 @@ public class HibernateCriteriaTransactionalUtilities {
         }
         return obsTypes;
     }
-
+    @Deprecated
     public static ProcedureDescriptionFormat getOrInsertProcedureDescriptionFormat(String procDescFormat,
             Session session) {
         ProcedureDescriptionFormat procedureDescriptionFormat =
@@ -365,19 +374,19 @@ public class HibernateCriteriaTransactionalUtilities {
         }
         return procedureDescriptionFormat;
     }
-
+    @Deprecated
     public static void insertFeatureOfInterestRelationShip(TFeatureOfInterest parentFeature,
             FeatureOfInterest childFeature, Session session) {
         parentFeature.getChilds().add(childFeature);
         session.saveOrUpdate(parentFeature);
         session.flush();
     }
-
+    @Deprecated
     public static void checkOrInsertResultTemplate(InsertResultTemplateRequest request,
             ObservationConstellation hObservationConstellation, FeatureOfInterest featureOfInterest, Session session)
             throws OwsExceptionReport {
         List<ResultTemplate> resultTemplates =
-                HibernateCriteriaQueryUtilities.getResultTemplateObject(hObservationConstellation.getOffering()
+                new ResultTemplateDAO().getResultTemplateObject(hObservationConstellation.getOffering()
                         .getIdentifier(), hObservationConstellation.getObservableProperty().getIdentifier(), null,
                         session);
         if (!resultTemplateListContainsElements(resultTemplates)) {
@@ -418,11 +427,11 @@ public class HibernateCriteriaTransactionalUtilities {
             }
         }
     }
-
+    @Deprecated
     private static boolean resultTemplateListContainsElements(List<ResultTemplate> resultTemplates) {
         return resultTemplates != null && !resultTemplates.isEmpty();
     }
-
+    @Deprecated
     private static void createAndSaveResultTemplate(InsertResultTemplateRequest request,
             ObservationConstellation obsConst, FeatureOfInterest featureOfInterest, Session session) {
         ResultTemplate resultTemplate = new ResultTemplate();
@@ -436,12 +445,12 @@ public class HibernateCriteriaTransactionalUtilities {
         session.save(resultTemplate);
         session.flush();
     }
-
+    @Deprecated
     public static void insertObservationSingleValue(Set<ObservationConstellation> observationConstellations,
             FeatureOfInterest feature, SosObservation observation, Session session) throws CodedException {
         insertObservationSingleValueWithSetId(observationConstellations, feature, observation, null, session);
     }
-
+    @Deprecated
     @SuppressWarnings("rawtypes")
     private static void insertObservationSingleValueWithSetId(Set<ObservationConstellation> observationConstellations,
             FeatureOfInterest feature, SosObservation sosObservation, String setId, Session session) throws CodedException {
@@ -492,6 +501,7 @@ public class HibernateCriteriaTransactionalUtilities {
 
     // TODO setID not yet tested - request observations of subset by id is
     // working
+    @Deprecated
     public static void insertObservationMutliValue(Set<ObservationConstellation> hObsConsts,
             FeatureOfInterest feature, SosObservation containerObservation, Session session) throws OwsExceptionReport {
         List<SosObservation> unfoldObservations =
@@ -505,7 +515,7 @@ public class HibernateCriteriaTransactionalUtilities {
             subObservationIndex++;
         }
     }
-
+    @Deprecated
     private static void setIdentifier(SosObservation containerObservation, SosObservation sosObservation,
             String antiSubsettingId, String idExtension) {
         if (containerObservation.isSetIdentifier()) {
@@ -515,7 +525,7 @@ public class HibernateCriteriaTransactionalUtilities {
             sosObservation.setIdentifier(subObsIdentifier);
         }
     }
-
+    @Deprecated
     private static String getSetId(SosObservation containerObservation) {
         String antiSubsettingId = null;
         if (containerObservation.getIdentifier() != null) {
@@ -529,10 +539,10 @@ public class HibernateCriteriaTransactionalUtilities {
         }
         return antiSubsettingId;
     }
-
+    @Deprecated
     public static void setValidProcedureDescriptionEndTime(String procedureIdentifier, Session session) {
         TProcedure procedure =
-                HibernateCriteriaQueryUtilities.getTProcedureForIdentifier(procedureIdentifier, session);
+                new ProcedureDAO().getTProcedureForIdentifier(procedureIdentifier, session);
         Set<ValidProcedureTime> validProcedureTimes = procedure.getValidProcedureTimes();
         for (ValidProcedureTime validProcedureTime : validProcedureTimes) {
             if (validProcedureTime.getEndTime() == null) {
@@ -541,7 +551,7 @@ public class HibernateCriteriaTransactionalUtilities {
             }
         }
     }
-
+    @Deprecated
     private HibernateCriteriaTransactionalUtilities() {
     }
 }

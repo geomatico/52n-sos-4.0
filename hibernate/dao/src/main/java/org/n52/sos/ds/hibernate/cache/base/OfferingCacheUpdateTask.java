@@ -23,8 +23,6 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,12 +35,16 @@ import org.hibernate.Session;
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ds.hibernate.ThreadLocalSessionFactory;
 import org.n52.sos.ds.hibernate.cache.DatasourceCacheUpdateHelper;
+import org.n52.sos.ds.hibernate.dao.FeatureOfInterestDAO;
+import org.n52.sos.ds.hibernate.dao.ObservablePropertyDAO;
+import org.n52.sos.ds.hibernate.dao.ObservationDAO;
+import org.n52.sos.ds.hibernate.dao.OfferingDAO;
+import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.TOffering;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.exception.ows.concrete.GenericThrowableWrapperException;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -160,18 +162,19 @@ class OfferingCacheUpdateTask extends RunnableAction {
         getCache().setEnvelopeForOffering(offeringId, getEnvelopeForOffering(dsOfferingId, session));
         // Features of Interest
         List<String> featureOfInterestIdentifiers =
-                HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(dsOfferingId, session);
+                new FeatureOfInterestDAO().getFeatureOfInterestIdentifiersForOffering(dsOfferingId, session);
         getCache().setFeaturesOfInterestForOffering(offeringId,
                 getValidFeaturesOfInterestFrom(featureOfInterestIdentifiers));
         // Temporal Envelope
+        OfferingDAO offeringDAO = new OfferingDAO();
         getCache().setMinPhenomenonTimeForOffering(offeringId,
-                HibernateCriteriaQueryUtilities.getMinDate4Offering(dsOfferingId, session));
+                offeringDAO.getMinDate4Offering(dsOfferingId, session));
         getCache().setMaxPhenomenonTimeForOffering(offeringId,
-                HibernateCriteriaQueryUtilities.getMaxDate4Offering(dsOfferingId, session));
+                offeringDAO.getMaxDate4Offering(dsOfferingId, session));
         getCache().setMinResultTimeForOffering(offeringId,
-                HibernateCriteriaQueryUtilities.getMinResultTime4Offering(dsOfferingId, session));
+                offeringDAO.getMinResultTime4Offering(dsOfferingId, session));
         getCache().setMaxResultTimeForOffering(offeringId,
-                HibernateCriteriaQueryUtilities.getMaxResultTime4Offering(dsOfferingId, session));
+                offeringDAO.getMaxResultTime4Offering(dsOfferingId, session));
     }
 
     protected Map<ProcedureFlag, Set<String>> getProcedureIdentifier(Session session) {
@@ -186,7 +189,7 @@ class OfferingCacheUpdateTask extends RunnableAction {
                 }
             }
         } else {
-            List<String> list = HibernateCriteriaQueryUtilities.getProcedureIdentifiersForOffering(getOffering().getIdentifier(), session);
+            List<String> list = new ProcedureDAO().getProcedureIdentifiersForOffering(getOffering().getIdentifier(), session);
             if (list.size() > 1) {
                 throw new RuntimeException(String.format("There are more than one procedures defined for the offering '%s'!", getOffering().getIdentifier()));
             }
@@ -224,7 +227,7 @@ class OfferingCacheUpdateTask extends RunnableAction {
             return DatasourceCacheUpdateHelper.getAllObservablePropertyIdentifiersFrom(getObservationConstellations());
         } else {
             Set<String> observableProperties = CollectionHelper.set();
-            List<String> list = HibernateCriteriaQueryUtilities.getObservablePropertyIdentifiersForOffering(getOffering().getIdentifier(), session);
+            List<String> list = new ObservablePropertyDAO().getObservablePropertyIdentifiersForOffering(getOffering().getIdentifier(), session);
             for (String observablePropertyIdentifier : list) {
                 observableProperties.add(CacheHelper.addPrefixOrGetObservablePropertyIdentifier(observablePropertyIdentifier));
             }
@@ -247,27 +250,28 @@ class OfferingCacheUpdateTask extends RunnableAction {
     }
 
     private Set<String> getObservationTypesFromObservations(Session session) {
+        ObservationDAO observationDAO = new ObservationDAO();
         Set<String> observationTypes = CollectionHelper.set();
-        if (HibernateCriteriaQueryUtilities.checkNumericObservationsFor(getOffering().getIdentifier(), session)){
+        if (observationDAO.checkNumericObservationsFor(getOffering().getIdentifier(), session)){
             observationTypes.add(OMConstants.OBS_TYPE_MEASUREMENT);
-        } else if (HibernateCriteriaQueryUtilities.checkCategoryObservationsFor(getOffering().getIdentifier(), session)) {
+        } else if (observationDAO.checkCategoryObservationsFor(getOffering().getIdentifier(), session)) {
             observationTypes.add(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION);
-        } else if (HibernateCriteriaQueryUtilities.checkCountObservationsFor(getOffering().getIdentifier(), session)) {
+        } else if (observationDAO.checkCountObservationsFor(getOffering().getIdentifier(), session)) {
             observationTypes.add(OMConstants.OBS_TYPE_COUNT_OBSERVATION);
-        } else if (HibernateCriteriaQueryUtilities.checkTextObservationsFor(getOffering().getIdentifier(), session)) {
+        } else if (observationDAO.checkTextObservationsFor(getOffering().getIdentifier(), session)) {
             observationTypes.add(OMConstants.OBS_TYPE_TEXT_OBSERVATION);
-        } else if (HibernateCriteriaQueryUtilities.checkBooleanObservationsFor(getOffering().getIdentifier(), session)) {
+        } else if (observationDAO.checkBooleanObservationsFor(getOffering().getIdentifier(), session)) {
             observationTypes.add(OMConstants.OBS_TYPE_TRUTH_OBSERVATION);
-        } else if (HibernateCriteriaQueryUtilities.checkBlobObservationsFor(getOffering().getIdentifier(), session)) {
+        } else if (observationDAO.checkBlobObservationsFor(getOffering().getIdentifier(), session)) {
             observationTypes.add(OMConstants.OBS_TYPE_OBSERVATION);
-        } else if (HibernateCriteriaQueryUtilities.checkGeometryObservationsFor(getOffering().getIdentifier(), session)) {
+        } else if (observationDAO.checkGeometryObservationsFor(getOffering().getIdentifier(), session)) {
             observationTypes.add(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION);
         }
         return observationTypes;
     }
 
     protected SosEnvelope getEnvelopeForOffering(String offeringID, Session session) throws OwsExceptionReport {
-        List<String> featureIDs = getFeatureOfInterestIdentifiersForOffering(offeringID, session);
+        List<String> featureIDs = new FeatureOfInterestDAO().getFeatureOfInterestIdentifiersForOffering(offeringID, session);
         if (featureIDs != null && !featureIDs.isEmpty()) {
             return Configurator.getInstance().getFeatureQueryHandler().getEnvelopeForFeatureIDs(featureIDs, session);
         }

@@ -36,12 +36,13 @@ import org.hibernate.Transaction;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.AbstractInsertResultDAO;
 import org.n52.sos.ds.FeatureQueryHandler;
+import org.n52.sos.ds.hibernate.dao.ObservationConstellationDAO;
+import org.n52.sos.ds.hibernate.dao.ObservationDAO;
+import org.n52.sos.ds.hibernate.dao.ResultTemplateDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
@@ -106,7 +107,7 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
         try {
             session = sessionHolder.getSession();
             ResultTemplate resultTemplate =
-                    HibernateCriteriaQueryUtilities.getResultTemplateObject(request.getTemplateIdentifier(), session);
+                    new ResultTemplateDAO().getResultTemplateObject(request.getTemplateIdentifier(), session);
             transaction = session.beginTransaction();
             SosObservation o = getSingleObservationFromResultValues(response.getVersion(), resultTemplate,
                                                                     request.getResultValues(), session);
@@ -114,7 +115,7 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
             List<SosObservation> observations = getSingleObservationsFromObservation(o);
 
             Set<ObservationConstellation> obsConsts = CollectionHelper.asSet(
-                    HibernateCriteriaQueryUtilities.getObservationConstellation(
+                    new ObservationConstellationDAO().getObservationConstellation(
                             resultTemplate.getProcedure(), resultTemplate.getObservableProperty(),
                             Configurator.getInstance().getCache().getOfferingsForProcedure(
                                     resultTemplate.getProcedure().getIdentifier()), session));
@@ -122,7 +123,7 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
             int insertion = 0, size = observations.size();
             LOGGER.debug("Start saving {} observations.", size);
             for (SosObservation observation : observations) {
-                HibernateCriteriaTransactionalUtilities.insertObservationSingleValue(
+                new ObservationDAO().insertObservationSingleValue(
                         obsConsts, resultTemplate.getFeatureOfInterest(),
                         observation, session);
                 if ((++insertion % FLUSH_THRESHOLD) == 0) {

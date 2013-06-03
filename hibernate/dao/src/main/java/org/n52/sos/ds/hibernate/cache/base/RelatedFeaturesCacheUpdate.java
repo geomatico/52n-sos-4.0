@@ -23,13 +23,12 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getRelatedFeatureObjects;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
+import org.n52.sos.ds.hibernate.dao.RelatedFeatureDAO;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
 
@@ -41,7 +40,7 @@ public class RelatedFeaturesCacheUpdate extends AbstractDatasourceCacheUpdate {
     @Override
     public void execute() {
         // TODO Carsten: use RelatedFeatures and query...
-        List<RelatedFeature> relatedFeatures = getRelatedFeatureObjects(getSession());
+        List<RelatedFeature> relatedFeatures = new RelatedFeatureDAO().getRelatedFeatureObjects(getSession());
         for (RelatedFeature relatedFeature : relatedFeatures) {
             Set<String> roles = new HashSet<String>(relatedFeature.getRelatedFeatureRoles().size());
             for (RelatedFeatureRole relatedFeatureRole : relatedFeature.getRelatedFeatureRoles()) {

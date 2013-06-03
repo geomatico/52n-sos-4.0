@@ -40,6 +40,7 @@ import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.n52.sos.cache.ContentCache;
 import org.n52.sos.ds.FeatureQueryHandler;
+import org.n52.sos.ds.hibernate.dao.ResultTemplateDAO;
 import org.n52.sos.ds.hibernate.entities.BlobObservation;
 import org.n52.sos.ds.hibernate.entities.BooleanObservation;
 import org.n52.sos.ds.hibernate.entities.CategoryObservation;
@@ -252,7 +253,7 @@ public class HibernateObservationUtilities {
                         if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)
                                 || observationType.equals(OMConstants.OBS_TYPE_OBSERVATION)) {
                             final List<ResultTemplate> hResultTemplates =
-                                    HibernateCriteriaQueryUtilities
+                                    new ResultTemplateDAO()
                                             .getResultTemplateObjectsForObservationConstellationAndFeature(
                                                     hObservationConstellation, obsConst.getFeatureOfInterest(),
                                                     session);

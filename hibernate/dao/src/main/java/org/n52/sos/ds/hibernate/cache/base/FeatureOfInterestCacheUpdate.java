@@ -23,14 +23,13 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getFeatureOfInterestObjects;
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getProceduresForFeatureOfInterest;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
+import org.n52.sos.ds.hibernate.dao.FeatureOfInterestDAO;
+import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.TFeatureOfInterest;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -44,10 +43,10 @@ public class FeatureOfInterestCacheUpdate extends AbstractDatasourceCacheUpdate 
     @Override
     public void execute() {
         // FIXME shouldn't the identifiers be translated using CacheHelper.addPrefixAndGetFeatureIdentifier()?
-        for (FeatureOfInterest featureOfInterest : getFeatureOfInterestObjects(getSession())) {
+        for (FeatureOfInterest featureOfInterest : new FeatureOfInterestDAO().getFeatureOfInterestObjects(getSession())) {
             getCache().addFeatureOfInterest(featureOfInterest.getIdentifier());
             getCache().setProceduresForFeatureOfInterest(featureOfInterest.getIdentifier(),
-                                                         getProceduresForFeatureOfInterest(getSession(), featureOfInterest));
+                    new ProcedureDAO().getProceduresForFeatureOfInterest(getSession(), featureOfInterest));
             if (featureOfInterest instanceof TFeatureOfInterest) {
                 getCache().setFeatureHierarchy(featureOfInterest.getIdentifier(),
                                                getFeatureIdentifiers(((TFeatureOfInterest)featureOfInterest).getChilds()));

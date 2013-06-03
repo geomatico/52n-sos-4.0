@@ -41,6 +41,7 @@ package org.n52.sos.util;
  * @since 4.0.0
  */
 public class NcNameResolver {
+
     /**
      * Checks whether the supplied String is an NCName (Namespace Classified
      * Name) as specified at <a
@@ -118,7 +119,7 @@ public class NcNameResolver {
     }
 
     private static final boolean _isAsciiBaseChar(char c) {
-        return _charInRange(c, 0x0041, 0x005A) || _charInRange(c, 0x0061, 0x007A);
+        return _charInRange(c, 0X0041, 0X005A) || _charInRange(c, 0X0061, 0X007A);
     }
 
     private static final boolean _isNonAsciiBaseChar(char c) {
@@ -247,7 +248,7 @@ public class NcNameResolver {
     }
 
     private static final boolean _isAsciiDigit(char c) {
-        return _charInRange(c, 0x0030, 0x0039);
+        return _charInRange(c, 0X0030, 0X0039);
     }
 
     private static final boolean _isNonAsciiDigit(char c) {
@@ -261,7 +262,7 @@ public class NcNameResolver {
     }
 
     private static final boolean isExtender(char c) {
-        return c == 0x00B7 || c == 0x02D0 || c == 0x02D1 || c == 0x0387 || c == 0x0640 || c == 0x0E46 || c == 0x0EC6
+        return c == 0X00B7 || c == 0X02D0 || c == 0x02D1 || c == 0x0387 || c == 0x0640 || c == 0x0E46 || c == 0x0EC6
                 || c == 0x3005 || _charInRange(c, 0x3031, 0x3035) || _charInRange(c, 0x309D, 0x309E)
                 || _charInRange(c, 0x30FC, 0x30FE);
     }

@@ -28,6 +28,7 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.n52.sos.ds.hibernate.dao.RelatedFeatureDAO;
 import org.n52.sos.ds.hibernate.entities.BlobObservation;
 import org.n52.sos.ds.hibernate.entities.BooleanObservation;
 import org.n52.sos.ds.hibernate.entities.CategoryObservation;
@@ -66,7 +67,10 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.StringHelper;
 
+@Deprecated
 public class HibernateUtilities {
+    
+    @Deprecated
     public static ObservationConstellation checkObservationConstellation(SosObservationConstellation soc,
                                                                          String offering, Session session,
                                                                          String parameterName) throws OwsExceptionReport {
@@ -123,6 +127,7 @@ public class HibernateUtilities {
         return null;
     }
 
+    @Deprecated
     public static FeatureOfInterest checkOrInsertFeatureOfInterest(SosAbstractFeature featureOfInterest, Session session)
             throws OwsExceptionReport {
         if (featureOfInterest instanceof SosSamplingFeature) {
@@ -138,10 +143,11 @@ public class HibernateUtilities {
         }
     }
 
+    @Deprecated
     public static void checkOrInsertFeatureOfInterestRelatedFeatureRelation(FeatureOfInterest featureOfInterest,
                                                                             Offering offering, Session session) {
         List<RelatedFeature> relatedFeatures =
-                             HibernateCriteriaQueryUtilities
+                             new RelatedFeatureDAO()
                 .getRelatedFeatureForOffering(offering.getIdentifier(), session);
         if (relatedFeatures != null) {
             for (RelatedFeature relatedFeature : relatedFeatures) {
@@ -151,12 +157,14 @@ public class HibernateUtilities {
         }
     }
 
+    @Deprecated
     public static void addPhenomeonTimeAndResultTimeToObservation(Observation hObservation, ITime phenomenonTime,
                                                                   TimeInstant resultTime) throws CodedException {
         addPhenomenonTimeToObservation(hObservation, phenomenonTime);
         addResultTimeToObservation(hObservation, resultTime, phenomenonTime);
     }
 
+    @Deprecated
     public static void addPhenomenonTimeToObservation(Observation hObservation, ITime phenomenonTime) {
         if (phenomenonTime instanceof TimeInstant) {
             TimeInstant time = (TimeInstant) phenomenonTime;
@@ -168,7 +176,8 @@ public class HibernateUtilities {
             hObservation.setPhenomenonTimeEnd(time.getEnd().toDate());
         }
     }
-
+    
+    @Deprecated
     public static void addResultTimeToObservation(Observation hObservation, TimeInstant resultTime, ITime phenomenonTime) throws CodedException {
         if (resultTime != null) {
             if (resultTime.getValue() != null) {
@@ -188,6 +197,7 @@ public class HibernateUtilities {
         }
     }
 
+    @Deprecated
     public static void addValidTimeToObservation(Observation hObservation, TimePeriod validTime) {
         if (validTime != null) {
             hObservation.setValidTimeStart(validTime.getStart().toDate());
@@ -195,6 +205,7 @@ public class HibernateUtilities {
         }
     }
 
+    @Deprecated
     public static Observation createObservationFromValue(Value<?> value, Session session) {
         if (value instanceof BooleanValue) {
             BooleanObservation observation = new BooleanObservation();
@@ -228,6 +239,7 @@ public class HibernateUtilities {
         return new Observation();
     }
     
+    @Deprecated
     public static Criteria getObservationClassCriteriaForResultModel(String resultModel, Session session) {
         if (StringHelper.isNotEmpty(resultModel)) {
              if (resultModel.equals(OMConstants.OBS_TYPE_MEASUREMENT)) {
@@ -249,6 +261,7 @@ public class HibernateUtilities {
         return createCriteriaForObservationClass(Observation.class, session);
     }
     
+    @Deprecated
     @SuppressWarnings("rawtypes") 
     public static Criteria createCriteriaForObservationClass(Class clazz, Session session) {
         return session.createCriteria(clazz)
@@ -256,6 +269,7 @@ public class HibernateUtilities {
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
     }
 
+    @Deprecated
     private HibernateUtilities() {
     }
 }

@@ -35,6 +35,9 @@ import org.hibernate.criterion.Restrictions;
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ds.hibernate.ThreadLocalSessionFactory;
 import org.n52.sos.ds.hibernate.cache.DatasourceCacheUpdateHelper;
+import org.n52.sos.ds.hibernate.dao.ObservablePropertyDAO;
+import org.n52.sos.ds.hibernate.dao.OfferingDAO;
+import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
@@ -81,9 +84,10 @@ class ProcedureCacheUpdateTask extends RunnableAction {
         cache.setObservationIdentifiersForProcedure(id, getObservationIdentifiers(session, id));        
 
         // Temporal Envelope
-        cache.setMinPhenomenonTimeForProcedure(id, HibernateCriteriaQueryUtilities
+        ProcedureDAO procedureDAO = new ProcedureDAO();
+        cache.setMinPhenomenonTimeForProcedure(id, procedureDAO
                 .getMinDate4Procedure(id, session));
-        cache.setMaxPhenomenonTimeForProcedure(id, HibernateCriteriaQueryUtilities
+        cache.setMaxPhenomenonTimeForProcedure(id, procedureDAO
                 .getMaxDate4Procedure(id, session));
     }
 
@@ -112,7 +116,7 @@ class ProcedureCacheUpdateTask extends RunnableAction {
         if (CollectionHelper.isNotEmpty(set)) {
             return DatasourceCacheUpdateHelper.getAllObservablePropertyIdentifiersFrom(set);
         } else {
-            return CollectionHelper.asSet(HibernateCriteriaQueryUtilities.getObservablePropertyIdentifiersForProcedure(procedure.getIdentifier(), session));
+            return CollectionHelper.asSet(new ObservablePropertyDAO().getObservablePropertyIdentifiersForProcedure(procedure.getIdentifier(), session));
         }
     }
 
@@ -142,7 +146,7 @@ class ProcedureCacheUpdateTask extends RunnableAction {
             }
             return offerings;
         } else {
-            return CollectionHelper.asSet(HibernateCriteriaQueryUtilities.getOfferingIdentifiersForProcedure(procedure.getIdentifier(), session));
+            return CollectionHelper.asSet(new OfferingDAO().getOfferingIdentifiersForProcedure(procedure.getIdentifier(), session));
         }
     }
     

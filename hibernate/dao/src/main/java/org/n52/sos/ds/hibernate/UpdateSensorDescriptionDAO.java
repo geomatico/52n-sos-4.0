@@ -30,12 +30,11 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.AbstractUpdateSensorDescriptionDAO;
-import org.n52.sos.ds.hibernate.HibernateSessionHolder;
+import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
+import org.n52.sos.ds.hibernate.dao.ValidProcedureTimeDAO;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.TProcedure;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -69,17 +68,18 @@ public class UpdateSensorDescriptionDAO extends AbstractUpdateSensorDescriptionD
                 // ITime validTime =
                 // getValidTimeForProcedure(procedureDescription);
                 Procedure procedure =
-                        HibernateCriteriaQueryUtilities.getProcedureForIdentifier(request.getProcedureIdentifier(),
+                        new ProcedureDAO().getProcedureForIdentifier(request.getProcedureIdentifier(),
                                 session);
                 if (procedure instanceof TProcedure) {
                     Set<ValidProcedureTime> validProcedureTimes = ((TProcedure)procedure).getValidProcedureTimes();
+                    ValidProcedureTimeDAO validProcedureTimeDAO = new ValidProcedureTimeDAO();
                     for (ValidProcedureTime validProcedureTime : validProcedureTimes) {
                         if (validProcedureTime.getEndTime() == null) {
                             validProcedureTime.setEndTime(currentTime.toDate());
-                            HibernateCriteriaTransactionalUtilities.updateValidProcedureTime(validProcedureTime, session);
+                            validProcedureTimeDAO.updateValidProcedureTime(validProcedureTime, session);
                         }
                     }
-                    HibernateCriteriaTransactionalUtilities.insertValidProcedureTime(procedure,
+                    validProcedureTimeDAO.insertValidProcedureTime(procedure,
                             procedureDescription.getSensorDescriptionXmlString(), currentTime, session);
                 }
             }

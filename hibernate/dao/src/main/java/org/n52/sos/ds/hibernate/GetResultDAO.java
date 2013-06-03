@@ -23,7 +23,8 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import static org.n52.sos.util.CollectionHelper.*;
+import static org.n52.sos.util.CollectionHelper.isEmpty;
+import static org.n52.sos.util.CollectionHelper.isNotEmpty;
 import static org.n52.sos.util.HTTPConstants.StatusCode.INTERNAL_SERVER_ERROR;
 
 import java.util.List;
@@ -35,12 +36,12 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.AbstractGetResultDAO;
+import org.n52.sos.ds.hibernate.dao.ResultTemplateDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
 import org.n52.sos.ds.hibernate.util.TemporalRestrictions;
@@ -93,7 +94,7 @@ public class GetResultDAO extends AbstractGetResultDAO {
     private List<ResultTemplate> queryResultTemplate(final GetResultRequest request, final Set<String> featureIdentifier,
             final Session session) {
         final List<ResultTemplate> resultTemplates =
-                HibernateCriteriaQueryUtilities.getResultTemplateObject(request.getOffering(),
+                new ResultTemplateDAO().getResultTemplateObject(request.getOffering(),
                         request.getObservedProperty(), featureIdentifier, session);
         return resultTemplates;
     }

@@ -23,16 +23,16 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getObservablePropertyObjects;
-
 import java.util.Set;
 
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.DatasourceCacheUpdateHelper;
+import org.n52.sos.ds.hibernate.dao.ObservablePropertyDAO;
+import org.n52.sos.ds.hibernate.dao.OfferingDAO;
+import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.util.CollectionHelper;
 
 /**
@@ -42,15 +42,15 @@ import org.n52.sos.util.CollectionHelper;
 public class ObservablePropertiesCacheUpdate extends AbstractDatasourceCacheUpdate {
     @Override
     public void execute() {
-        for (ObservableProperty op : getObservablePropertyObjects(getSession())) {
+        for (ObservableProperty op : new ObservablePropertyDAO().getObservablePropertyObjects(getSession())) {
             final String identifier = op.getIdentifier();
             final Set<ObservationConstellation> ocs = getObservationConstellations(op);
             if (CollectionHelper.isNotEmpty(ocs)) {
                 getCache().setOfferingsForObservableProperty(identifier, DatasourceCacheUpdateHelper.getAllOfferingIdentifiersFrom(ocs));
                 getCache().setProceduresForObservableProperty(identifier, DatasourceCacheUpdateHelper.getAllProcedureIdentifiersFrom(ocs));
             } else {
-                getCache().setOfferingsForObservableProperty(identifier, HibernateCriteriaQueryUtilities.getOfferingIdentifiersForObservableProperty(op.getIdentifier(), getSession()));
-                getCache().setProceduresForObservableProperty(identifier, HibernateCriteriaQueryUtilities.getProcedureIdentifiersForObservableProperty(op.getIdentifier(), getSession()));
+                getCache().setOfferingsForObservableProperty(identifier, new OfferingDAO().getOfferingIdentifiersForObservableProperty(op.getIdentifier(), getSession()));
+                getCache().setProceduresForObservableProperty(identifier, new ProcedureDAO().getProcedureIdentifiersForObservableProperty(op.getIdentifier(), getSession()));
             }
         }
     }

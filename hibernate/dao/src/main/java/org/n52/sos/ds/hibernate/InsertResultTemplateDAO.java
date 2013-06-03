@@ -27,11 +27,11 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.n52.sos.ds.AbstractInsertResultTemplateDAO;
-import org.n52.sos.ds.hibernate.HibernateSessionHolder;
+import org.n52.sos.ds.hibernate.dao.FeatureOfInterestDAO;
+import org.n52.sos.ds.hibernate.dao.ObservationConstellationDAO;
+import org.n52.sos.ds.hibernate.dao.ResultTemplateDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
-import org.n52.sos.ds.hibernate.util.HibernateUtilities;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.InvalidObservationTypeException;
 import org.n52.sos.ogc.om.SosObservationConstellation;
@@ -73,15 +73,16 @@ public class InsertResultTemplateDAO extends AbstractInsertResultTemplateDAO {
             ObservationConstellation obsConst = null;
             for (String offeringID : sosObsConst.getOfferings()) {
                 obsConst =
-                HibernateUtilities.checkObservationConstellation(sosObsConst, offeringID,
+                new ObservationConstellationDAO().checkObservationConstellation(sosObsConst, offeringID,
                         session, Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
                 if (obsConst != null) {
+                    FeatureOfInterestDAO featureOfInterestDAO = new FeatureOfInterestDAO();
                     FeatureOfInterest feature =
-                            HibernateUtilities.checkOrInsertFeatureOfInterest(sosObsConst.getFeatureOfInterest(),
+                            featureOfInterestDAO.checkOrInsertFeatureOfInterest(sosObsConst.getFeatureOfInterest(),
                                     session);
-                    HibernateUtilities.checkOrInsertFeatureOfInterestRelatedFeatureRelation(feature,
+                    featureOfInterestDAO.checkOrInsertFeatureOfInterestRelatedFeatureRelation(feature,
                             obsConst.getOffering(), session);
-                    HibernateCriteriaTransactionalUtilities.checkOrInsertResultTemplate(request, obsConst, feature, session);
+                    new ResultTemplateDAO().checkOrInsertResultTemplate(request, obsConst, feature, session);
                 } else {
                     // TODO make better exception.
                     throw new InvalidObservationTypeException(request.getObservationTemplate().getObservationType());

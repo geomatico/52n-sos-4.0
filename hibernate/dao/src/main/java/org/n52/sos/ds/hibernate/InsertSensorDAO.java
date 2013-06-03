@@ -32,6 +32,16 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.AbstractInsertSensorDAO;
+import org.n52.sos.ds.hibernate.dao.FeatureOfInterestTypeDAO;
+import org.n52.sos.ds.hibernate.dao.ObservablePropertyDAO;
+import org.n52.sos.ds.hibernate.dao.ObservationConstellationDAO;
+import org.n52.sos.ds.hibernate.dao.ObservationTypeDAO;
+import org.n52.sos.ds.hibernate.dao.OfferingDAO;
+import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
+import org.n52.sos.ds.hibernate.dao.ProcedureDescriptionFormatDAO;
+import org.n52.sos.ds.hibernate.dao.RelatedFeatureDAO;
+import org.n52.sos.ds.hibernate.dao.RelatedFeatureRoleDAO;
+import org.n52.sos.ds.hibernate.dao.ValidProcedureTimeDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.ObservationType;
@@ -40,7 +50,6 @@ import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.om.SosObservableProperty;
@@ -77,32 +86,33 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
             session = sessionHolder.getSession();
             transaction = session.beginTransaction();
             ProcedureDescriptionFormat procedureDescriptionFormat =
-                    HibernateCriteriaTransactionalUtilities.getOrInsertProcedureDescriptionFormat(
+                    new ProcedureDescriptionFormatDAO().getOrInsertProcedureDescriptionFormat(
                             request.getProcedureDescriptionFormat(), session);
             List<ObservationType> observationTypes =
-                    HibernateCriteriaTransactionalUtilities.getOrInsertObservationTypes(request.getMetadata()
+                    new ObservationTypeDAO().getOrInsertObservationTypes(request.getMetadata()
                             .getObservationTypes(), session);
             List<FeatureOfInterestType> featureOfInterestTypes =
-                    HibernateCriteriaTransactionalUtilities.getOrInsertFeatureOfInterestTypes(request.getMetadata()
+                    new FeatureOfInterestTypeDAO().getOrInsertFeatureOfInterestTypes(request.getMetadata()
                             .getFeatureOfInterestTypes(), session);
             if (procedureDescriptionFormat != null && observationTypes != null && featureOfInterestTypes != null) {
                 Procedure hProcedure =
-                        HibernateCriteriaTransactionalUtilities.getOrInsertProcedure(assignedProcedureID,
+                        new ProcedureDAO().getOrInsertProcedure(assignedProcedureID,
                                 procedureDescriptionFormat, request.getProcedureDescription().getParentProcedures()
                                 ,session);
                 // TODO: set correct validTime,
-                HibernateCriteriaTransactionalUtilities.insertValidProcedureTime(
+                new ValidProcedureTimeDAO().insertValidProcedureTime(
                         hProcedure,
                         getSensorDescriptionFromProcedureDescription(request.getProcedureDescription(),
                                 assignedProcedureID), new DateTime(), session);
                 List<ObservableProperty> hObservableProperties =
                         getOrInsertNewObservableProperties(request.getObservableProperty(), session);
+                ObservationConstellationDAO observationConstellationDAO = new ObservationConstellationDAO();
                 for (SosOffering assignedOffering : request.getAssignedOfferings()) {
                     Offering hOffering =
                             getAndUpdateOrInsertNewOffering(assignedOffering, request.getRelatedFeatures(), observationTypes,
                                     featureOfInterestTypes, session);
                     for (ObservableProperty hObservableProperty : hObservableProperties) {
-                        HibernateCriteriaTransactionalUtilities.checkOrInsertObservationConstellation(
+                        observationConstellationDAO.checkOrInsertObservationConstellation(
                                 hProcedure, hObservableProperty, hOffering, assignedOffering.isParentOffering(),
                                 session);
                     }
@@ -135,15 +145,17 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
             throws OwsExceptionReport {
         List<RelatedFeature> hRelatedFeatures = new LinkedList<RelatedFeature>();
         if (relatedFeatures != null && !relatedFeatures.isEmpty()) {
+            RelatedFeatureDAO relatedFeatureDAO = new RelatedFeatureDAO();
+            RelatedFeatureRoleDAO relatedFeatureRoleDAO = new RelatedFeatureRoleDAO();
             for (SosFeatureRelationship relatedFeature : relatedFeatures) {
                 List<RelatedFeatureRole> relatedFeatureRoles =
-                        HibernateCriteriaTransactionalUtilities.getOrInsertRelatedFeatureRole(
+                        relatedFeatureRoleDAO.getOrInsertRelatedFeatureRole(
                                 relatedFeature.getRole(), session);
-                hRelatedFeatures.addAll(HibernateCriteriaTransactionalUtilities.getOrInsertRelatedFeature(
+                hRelatedFeatures.addAll(relatedFeatureDAO.getOrInsertRelatedFeature(
                         relatedFeature.getFeature(), relatedFeatureRoles, session));
             }
         }
-        return HibernateCriteriaTransactionalUtilities.getAndUpdateOrInsertNewOffering(assignedOffering.getOfferingIdentifier(),
+        return new OfferingDAO().getAndUpdateOrInsertNewOffering(assignedOffering.getOfferingIdentifier(),
                 assignedOffering.getOfferingName(), hRelatedFeatures, observationTypes, featureOfInterestTypes,
                 session);
     }
@@ -153,7 +165,7 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
         for (String observableProperty : obsProps) {
             observableProperties.add(new SosObservableProperty(observableProperty));
         }
-        return HibernateCriteriaTransactionalUtilities.getOrInsertObservableProperty(observableProperties, session);
+        return new ObservablePropertyDAO().getOrInsertObservableProperty(observableProperties, session);
     }
 
     private String getSensorDescriptionFromProcedureDescription(SosProcedureDescription procedureDescription,

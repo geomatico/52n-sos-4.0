@@ -23,9 +23,8 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.*;
-
 import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
+import org.n52.sos.ds.hibernate.dao.ObservationDAO;
 
 /**
  *
@@ -35,10 +34,11 @@ public class ObservationTimeCacheUpdate extends AbstractDatasourceCacheUpdate {
 
     @Override
     public void execute() {
-        getCache().setMinPhenomenonTime(getMinPhenomenonTime(getSession()));
-        getCache().setMaxPhenomenonTime(getMaxPhenomenonTime(getSession()));
-        getCache().setMinResultTime(getMinResultTime(getSession()));
-        getCache().setMaxResultTime(getMaxResultTime(getSession()));
+        ObservationDAO observationDAO = new ObservationDAO();
+        getCache().setMinPhenomenonTime(observationDAO.getMinPhenomenonTime(getSession()));
+        getCache().setMaxPhenomenonTime(observationDAO.getMaxPhenomenonTime(getSession()));
+        getCache().setMinResultTime(observationDAO.getMinResultTime(getSession()));
+        getCache().setMaxResultTime(observationDAO.getMaxResultTime(getSession()));
     }
     
 }

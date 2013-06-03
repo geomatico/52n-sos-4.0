@@ -24,9 +24,6 @@
 
 package org.n52.sos.ds.hibernate.util;
 
-import static org.n52.sos.ogc.filter.FilterConstants.SpatialOperator.BBOX;
-import static org.n52.sos.ogc.filter.FilterConstants.SpatialOperator.Beyond;
-
 import org.hibernate.criterion.Criterion;
 import org.n52.sos.exception.ows.concrete.UnsupportedOperatorException;
 import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;

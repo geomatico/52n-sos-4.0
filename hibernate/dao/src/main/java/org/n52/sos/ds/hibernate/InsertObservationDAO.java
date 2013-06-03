@@ -38,11 +38,12 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
 import org.n52.sos.ds.AbstractInsertObservationDAO;
+import org.n52.sos.ds.hibernate.dao.FeatureOfInterestDAO;
+import org.n52.sos.ds.hibernate.dao.ObservationConstellationDAO;
+import org.n52.sos.ds.hibernate.dao.ObservationDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
-import org.n52.sos.ds.hibernate.util.HibernateUtilities;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
@@ -97,16 +98,17 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
                     ObservationConstellation hObservationConstellation = null;
                     try {
                         hObservationConstellation =
-                                HibernateUtilities.checkObservationConstellation(sosObsConst, offeringID, session,
+                                new ObservationConstellationDAO().checkObservationConstellation(sosObsConst, offeringID, session,
                                         Sos2Constants.InsertObservationParams.observationType.name());
                     } catch (final OwsExceptionReport owse) {
                         exceptions.add(owse);
                     }
                     if (hObservationConstellation != null) {
+                        FeatureOfInterestDAO featureOfInterestDAO = new FeatureOfInterestDAO();
                         hFeature =
-                                HibernateUtilities.checkOrInsertFeatureOfInterest(sosObservation
+                                featureOfInterestDAO.checkOrInsertFeatureOfInterest(sosObservation
                                         .getObservationConstellation().getFeatureOfInterest(), session);
-                        HibernateUtilities.checkOrInsertFeatureOfInterestRelatedFeatureRelation(hFeature,
+                        featureOfInterestDAO.checkOrInsertFeatureOfInterestRelatedFeatureRelation(hFeature,
                                 hObservationConstellation.getOffering(), session);
                         if (isSweArrayObservation(hObservationConstellation)) {
                             final ResultTemplate resultTemplate =
@@ -119,11 +121,12 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
                 }
 
                 if (!hObservationConstellations.isEmpty()) {
+                    ObservationDAO observationDAO = new ObservationDAO();
                     if (sosObservation.getValue() instanceof SosSingleObservationValue) {
-                        HibernateCriteriaTransactionalUtilities.insertObservationSingleValue(
+                        observationDAO.insertObservationSingleValue(
                                 hObservationConstellations, hFeature, sosObservation, session);
                     } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
-                        HibernateCriteriaTransactionalUtilities.insertObservationMutliValue(
+                        observationDAO.insertObservationMutliValue(
                                 hObservationConstellations, hFeature, sosObservation, session);
                     }
                 }

@@ -39,15 +39,15 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.AbstractGetObservationDAO;
+import org.n52.sos.ds.hibernate.dao.FeatureOfInterestDAO;
+import org.n52.sos.ds.hibernate.dao.ObservationDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
-import org.n52.sos.ds.hibernate.util.HibernateUtilities;
 import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.ds.hibernate.util.TemporalRestrictions;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
@@ -212,7 +212,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
     private List<String> getAndCheckFeatureOfInterest(final ObservationConstellation observationConstellation,
             final Set<String> featureIdentifier, final Session session) {
         final List<String> featuresForConstellation =
-                HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForObservationConstellation(
+                new FeatureOfInterestDAO().getFeatureOfInterestIdentifiersForObservationConstellation(
                         observationConstellation, session);
         if (featureIdentifier == null) {
             return featuresForConstellation;
@@ -244,7 +244,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
             final Set<String> features) throws HibernateException {
 
         final Criteria c =
-                HibernateUtilities.getObservationClassCriteriaForResultModel(request.getResultModel(), session);
+                new ObservationDAO().getObservationClassCriteriaForResultModel(request.getResultModel(), session);
         if (request.isSetOffering()) {
             c.createCriteria(Observation.OFFERINGS).add(Restrictions.in(Offering.IDENTIFIER, request.getOfferings()));
         }
@@ -305,7 +305,12 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         }
     }
 
-    protected Order getOrder(final FirstLatest fl) {
-        return HibernateCriteriaQueryUtilities.getOrderForEnum(fl);
+    protected Order getOrder(final FirstLatest firstLatest) {
+        if (firstLatest.equals(FirstLatest.first)) {
+            return Order.asc(Observation.PHENOMENON_TIME_START);
+        } else if (firstLatest.equals(FirstLatest.latest)) {
+            return Order.desc(Observation.PHENOMENON_TIME_END);
+        }
+        return null;
     }
 }

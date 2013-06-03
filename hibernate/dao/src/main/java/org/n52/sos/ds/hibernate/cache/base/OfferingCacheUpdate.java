@@ -23,14 +23,13 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getOfferingObjects;
-
 import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.hibernate.cache.AbstractQueuingDatasourceCacheUpdate;
+import org.n52.sos.ds.hibernate.dao.OfferingDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Offering;
@@ -57,7 +56,7 @@ public class OfferingCacheUpdate extends AbstractQueuingDatasourceCacheUpdate<Of
 
     @Override
     protected List<Offering> getObjectsToQueue() {
-        return getOfferingObjects(getSession());
+        return new OfferingDAO().getOfferingObjects(getSession());
     }    
 
     @Override    

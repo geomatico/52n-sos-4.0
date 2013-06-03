@@ -21,11 +21,36 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ds.hibernate.util;
+package org.n52.sos.ds.hibernate.dao;
+
+import java.sql.Timestamp;
+
+import org.joda.time.DateTime;
+import org.n52.sos.ogc.gml.time.TimePeriod;
 
 /**
- * Constants class for Hibernate constants. Include SQL query statements, table
- * and column names, ...
+ * Abstract class to create a time period object
+ * @author CarstenHollmann
+ * @since 4.0.0
  */
-public interface HibernateConstants {
+public abstract class TimeCreator {
+
+    /**
+     * Creates a time period object from sources
+     * @param minStart Min start timestamp
+     * @param maxStart Max start timestamp
+     * @param maxEnd Max end timestamp
+     * @return Time period object
+     */
+    public TimePeriod createTimePeriod(Timestamp minStart, Timestamp maxStart, Timestamp maxEnd) {
+        DateTime start = new DateTime(minStart);
+        DateTime end = new DateTime(maxStart);
+        if (maxEnd != null) {
+            DateTime endTmp = new DateTime(maxEnd);
+            if (endTmp.isAfter(end)) {
+                end = endTmp;
+            }
+        }
+        return new TimePeriod(start, end);
+    }
 }

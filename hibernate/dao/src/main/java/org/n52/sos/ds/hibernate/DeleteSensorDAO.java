@@ -23,8 +23,6 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities.setValidProcedureDescriptionEndTime;
-
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -32,11 +30,11 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.AbstractDeleteSensorDAO;
-import org.n52.sos.ds.hibernate.HibernateSessionHolder;
+import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
+import org.n52.sos.ds.hibernate.dao.ValidProcedureTimeDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.ScrollableIterable;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -62,7 +60,7 @@ public class DeleteSensorDAO extends AbstractDeleteSensorDAO {
             session = sessionHolder.getSession();
             transaction = session.beginTransaction();
             setDeleteSensorFlag(request.getProcedureIdentifier(), true, session);
-            setValidProcedureDescriptionEndTime(request.getProcedureIdentifier(), session);
+            new ValidProcedureTimeDAO().setValidProcedureDescriptionEndTime(request.getProcedureIdentifier(), session);
             transaction.commit();
             response.setDeletedProcedure(request.getProcedureIdentifier());
         } catch (HibernateException he) {
@@ -79,7 +77,7 @@ public class DeleteSensorDAO extends AbstractDeleteSensorDAO {
 
     private void setDeleteSensorFlag(String identifier, boolean deleteFlag, Session session)
             throws OwsExceptionReport {
-        Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(identifier, session);
+        Procedure procedure = new ProcedureDAO().getProcedureForIdentifier(identifier, session);
         if (procedure != null) {
             procedure.setDeleted(deleteFlag);
             session.saveOrUpdate(procedure);

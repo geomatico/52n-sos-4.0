@@ -26,9 +26,8 @@ package org.n52.sos.ds.hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.n52.sos.ds.AbstractGetResultTemplateDAO;
-import org.n52.sos.ds.hibernate.HibernateSessionHolder;
+import org.n52.sos.ds.hibernate.dao.ResultTemplateDAO;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.sos.concrete.NoSweCommonEncodingForOfferingObservablePropertyCombination;
@@ -50,7 +49,7 @@ public class GetResultTemplateDAO extends AbstractGetResultTemplateDAO {
         try {
             session = sessionHolder.getSession();
             ResultTemplate resultTemplate =
-                           HibernateCriteriaQueryUtilities.getResultTemplateObject(request.getOffering(),
+                           new ResultTemplateDAO().getResultTemplateObject(request.getOffering(),
                                                                                    request.getObservedProperty(), session);
             if (resultTemplate != null) {
                 GetResultTemplateResponse response = new GetResultTemplateResponse();

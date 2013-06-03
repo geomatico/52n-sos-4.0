@@ -30,9 +30,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.AbstractGetObservationByIdDAO;
+import org.n52.sos.ds.hibernate.dao.ObservationDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
-import org.n52.sos.ds.hibernate.util.HibernateUtilities;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -71,7 +71,7 @@ public class GetObservationByIdDAO extends AbstractGetObservationByIdDAO {
 
     @SuppressWarnings("unchecked")
     private List<Observation> queryObservation(GetObservationByIdRequest request, Session session) {
-        final Criteria c = HibernateUtilities.getObservationClassCriteriaForResultModel(request.getResultModel(), session);
+        final Criteria c = new ObservationDAO().getObservationClassCriteriaForResultModel(request.getResultModel(), session);
         return c.add(Restrictions.or(Restrictions.in(Observation.IDENTIFIER, request.getObservationIdentifier()),
                                      Restrictions.in(Observation.SET_ID, request.getObservationIdentifier()))).list();
     }

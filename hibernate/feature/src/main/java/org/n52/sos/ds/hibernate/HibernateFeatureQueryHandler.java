@@ -43,9 +43,11 @@ import org.hibernate.spatial.criterion.SpatialProjections;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.FeatureQueryHandler;
+import org.n52.sos.ds.hibernate.dao.CodespaceDAO;
+import org.n52.sos.ds.hibernate.dao.FeatureOfInterestDAO;
+import org.n52.sos.ds.hibernate.dao.FeatureOfInterestTypeDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.TFeatureOfInterest;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.SpatialRestrictions;
 import org.n52.sos.exception.ConfigurationException;
@@ -166,7 +168,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
                 } else {
                     Envelope envelope = new Envelope();
                     List<FeatureOfInterest> featuresOfInterest =
-                            HibernateCriteriaQueryUtilities.getFeatureOfInterestObject(featureIDs, session);
+                            new FeatureOfInterestDAO().getFeatureOfInterestObject(featureIDs, session);
                     for (FeatureOfInterest feature : featuresOfInterest) {
                         try {
                             Geometry geom = getGeomtery(feature);
@@ -304,7 +306,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
             if (samplingFeature.isSetIdentifier()) {
                 feature.setIdentifier(newId);
                 if (samplingFeature.getIdentifier().isSetCodeSpace()) {
-                    feature.setCodespace(HibernateCriteriaTransactionalUtilities.getOrInsertCodespace(samplingFeature
+                    feature.setCodespace(new CodespaceDAO().getOrInsertCodespace(samplingFeature
                             .getIdentifier().getCodeSpace(), session));
                 }
             }
@@ -318,7 +320,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
                 feature.setDescriptionXml(samplingFeature.getXmlDescription());
             }
             if (samplingFeature.isSetFeatureType()) {
-                feature.setFeatureOfInterestType(HibernateCriteriaTransactionalUtilities
+                feature.setFeatureOfInterestType(new FeatureOfInterestTypeDAO()
                         .getOrInsertFeatureOfInterestType(samplingFeature.getFeatureType(), session));
             }
             
@@ -479,7 +481,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
                 envelopes.add(getFilterForNonSpatialDatasource(filter));
             }
         }
-        List<FeatureOfInterest> featuresOfInterest = HibernateCriteriaQueryUtilities
+        List<FeatureOfInterest> featuresOfInterest = new FeatureOfInterestDAO()
                 .getFeatureOfInterestObject(featureIDs, session);
         for (FeatureOfInterest feature : featuresOfInterest) {
             SosSamplingFeature sosAbstractFeature = (SosSamplingFeature) createSosAbstractFeature(feature, version);

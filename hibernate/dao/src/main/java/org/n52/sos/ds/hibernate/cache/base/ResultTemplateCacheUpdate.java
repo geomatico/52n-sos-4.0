@@ -23,11 +23,10 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getResultTemplateObjects;
-
 import java.util.List;
 
 import org.n52.sos.ds.hibernate.cache.AbstractDatasourceCacheUpdate;
+import org.n52.sos.ds.hibernate.dao.ResultTemplateDAO;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.util.Action;
 
@@ -48,7 +47,7 @@ public class ResultTemplateCacheUpdate extends AbstractDatasourceCacheUpdate {
 
     @Override
     public void execute() {
-        List<ResultTemplate> resultTemplates = getResultTemplateObjects(getSession());
+        List<ResultTemplate> resultTemplates = new ResultTemplateDAO().getResultTemplateObjects(getSession());
         for (ResultTemplate resultTemplate : resultTemplates) {
             String id = resultTemplate.getIdentifier();
             getCache().addResultTemplate(id);

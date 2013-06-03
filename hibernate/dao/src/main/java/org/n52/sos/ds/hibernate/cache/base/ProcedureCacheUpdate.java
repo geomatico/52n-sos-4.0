@@ -23,11 +23,10 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getProcedureObjects;
-
 import java.util.List;
 
 import org.n52.sos.ds.hibernate.cache.AbstractQueuingDatasourceCacheUpdate;
+import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 
 
@@ -49,7 +48,7 @@ public class ProcedureCacheUpdate extends AbstractQueuingDatasourceCacheUpdate<P
 
     @Override
     protected List<Procedure> getObjectsToQueue() {
-        return getProcedureObjects(getSession());
+        return new ProcedureDAO().getProcedureObjects(getSession());
     }
 
     @Override

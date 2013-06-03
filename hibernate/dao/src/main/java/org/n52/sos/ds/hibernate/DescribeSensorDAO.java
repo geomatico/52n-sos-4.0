@@ -33,10 +33,10 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.AbstractDescribeSensorDAO;
+import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateProcedureConverter;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.om.SosOffering;
@@ -110,7 +110,7 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
 
     private SosProcedureDescription queryProcedure(final DescribeSensorRequest request, final Session session)
             throws OwsExceptionReport {
-        final Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(request.getProcedure(), session);
+        final Procedure procedure = new ProcedureDAO().getProcedureForIdentifier(request.getProcedure(), session);
         return procedureConverter.createSosProcedureDescription(procedure, request.getProcedure(), request.getProcedureDescriptionFormat());
     }
 
@@ -264,7 +264,7 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
         final Collection<String> childProcedureIds = getCache().getChildProcedures(procID, false, false);
         if (childProcedureIds != null && !childProcedureIds.isEmpty()) {
             for (final String childProcID : childProcedureIds) {
-                final Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(childProcID, session);
+                final Procedure procedure = new ProcedureDAO().getProcedureForIdentifier(childProcID, session);
                 final SosProcedureDescription childProcedure = procedureConverter.createSosProcedureDescription(procedure, childProcID, outputFormat);
                 addValuesToSensorDescription(childProcedure, version, outputFormat, session);
 				childProcedures.add(childProcedure);

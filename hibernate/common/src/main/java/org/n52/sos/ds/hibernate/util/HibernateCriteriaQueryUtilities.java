@@ -72,6 +72,7 @@ import org.slf4j.LoggerFactory;
  * Utility class for Hiberntate Criteria queries.
  * 
  */
+@Deprecated
 public class HibernateCriteriaQueryUtilities {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateCriteriaQueryUtilities.class);
@@ -83,6 +84,7 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return min time
      */
+    @Deprecated
     public static DateTime getMinPhenomenonTime(Session session) {
         Object min =
                 session.createCriteria(Observation.class)
@@ -102,6 +104,7 @@ public class HibernateCriteriaQueryUtilities {
      * 
      * @return min time
      */
+    @Deprecated
     public static DateTime getMinResultTime(Session session) {
         Object min =
                 session.createCriteria(Observation.class).setProjection(Projections.min(Observation.RESULT_TIME))
@@ -120,6 +123,7 @@ public class HibernateCriteriaQueryUtilities {
      * 
      * @return max time
      */
+    @Deprecated
     public static DateTime getMaxResultTime(Session session) {
         Object max =
                 session.createCriteria(Observation.class).setProjection(Projections.max(Observation.RESULT_TIME))
@@ -138,6 +142,7 @@ public class HibernateCriteriaQueryUtilities {
      * @return the global getEqualRestiction bounding box over all observations,
      *         or <tt>null</tt>
      */
+    @Deprecated
     public static TimePeriod getGlobalTemporalBoundingBox(Session session) {
         if (session != null) {
             Criteria criteria = session.createCriteria(Observation.class);
@@ -175,6 +180,7 @@ public class HibernateCriteriaQueryUtilities {
     /**
      * @return a Map containing the bounding box for each offering
      */
+    @Deprecated
     public static Map<String, TimePeriod> getTemporalBoundingBoxesForOfferings(Session session) {
         if (session != null) {
             Criteria criteria =
@@ -204,7 +210,7 @@ public class HibernateCriteriaQueryUtilities {
         }
         return new HashMap<String, TimePeriod>(0);
     }
-
+    @Deprecated
     private static TimePeriod createTimePeriod(Timestamp minStart, Timestamp maxStart, Timestamp maxEnd) {
         DateTime start = new DateTime(minStart);
         DateTime end = new DateTime(maxStart);
@@ -225,6 +231,7 @@ public class HibernateCriteriaQueryUtilities {
      * 
      * @return max time
      */
+    @Deprecated
     public static DateTime getMaxPhenomenonTime(Session session) {
         Object maxStart =
                 session.createCriteria(Observation.class)
@@ -257,6 +264,7 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return min time for offering
      */
+    @Deprecated
     public static DateTime getMinDate4Offering(String offering, Session session) {
         Criteria criteria =
                 session.createCriteria(Observation.class)
@@ -279,6 +287,7 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return min time for procedure
      */
+    @Deprecated
     public static DateTime getMinDate4Procedure(String procedure, Session session) {
         Criteria criteria =
                 session.createCriteria(Observation.class)
@@ -293,68 +302,6 @@ public class HibernateCriteriaQueryUtilities {
     }
 
     /**
-     * Get min result time from observations for offering
-     * 
-     * @param offering
-     *            Offering identifier
-     * @param session
-     *            Hibernate session
-     * 
-     * @return min result time for offering
-     */
-    public static DateTime getMinResultTime4Offering(String offering, Session session) {
-        Criteria criteria =
-                session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false))
-                        .setProjection(Projections.min(Observation.RESULT_TIME));
-
-        criteria.createCriteria(Observation.OFFERINGS).add(Restrictions.eq(Offering.IDENTIFIER, offering));
-
-        Object min = criteria.uniqueResult();
-        if (min != null) {
-            return new DateTime(min);
-        }
-        return null;
-    }
-
-    /**
-     * Get max time from observations for offering
-     * 
-     * @param offering
-     *            Offering identifier
-     * @param session
-     *            Hibernate session
-     * @return max time for offering
-     */
-    public static DateTime getMaxDate4Offering(String offering, Session session) {
-        Criteria cstart =
-                session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false))
-                        .setProjection(Projections.max(Observation.PHENOMENON_TIME_START))
-                        .createCriteria(Observation.OFFERINGS).add(Restrictions.eq(Offering.IDENTIFIER, offering));
-
-        Object maxStart = cstart.uniqueResult();
-
-        Criteria cend =
-                session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false))
-                        .setProjection(Projections.max(Observation.PHENOMENON_TIME_END))
-                        .createCriteria(Observation.OFFERINGS).add(Restrictions.eq(Offering.IDENTIFIER, offering));
-
-        Object maxEnd = cend.uniqueResult();
-
-        if (maxStart == null && maxEnd == null) {
-            return null;
-        } else {
-            DateTime start = new DateTime(maxStart);
-            if (maxEnd != null) {
-                DateTime end = new DateTime(maxEnd);
-                if (end.isAfter(start)) {
-                    return end;
-                }
-            }
-            return start;
-        }
-    }
-
-    /**
      * Get max time from observations for procedure
      * 
      * @param procedure
@@ -363,6 +310,7 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return max time for procedure
      */
+    @Deprecated
     public static DateTime getMaxDate4Procedure(String procedure, Session session) {
         Criteria cstart =
                 session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false))
@@ -402,6 +350,7 @@ public class HibernateCriteriaQueryUtilities {
      * 
      * @return max result time for offering
      */
+    @Deprecated
     public static DateTime getMaxResultTime4Offering(String offering, Session session) {
         Criteria c =
                 session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false))
@@ -424,11 +373,12 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return Procedure object
      */
+    @Deprecated
     public static Procedure getProcedureForIdentifier(String identifier, Session session) {
         return (Procedure) session.createCriteria(Procedure.class)
                 .add(Restrictions.eq(Procedure.IDENTIFIER, identifier)).uniqueResult();
     }
-
+    @Deprecated
     public static TProcedure getTProcedureForIdentifier(String identifier, Session session) {
         return (TProcedure) session.createCriteria(TProcedure.class)
                 .add(Restrictions.eq(Procedure.IDENTIFIER, identifier)).uniqueResult();
@@ -443,6 +393,7 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return Procedure objects
      */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<Procedure> getProceduresForIdentifiers(Collection<String> identifiers, Session session) {
         if (identifiers == null || identifiers.isEmpty()) {
@@ -461,6 +412,7 @@ public class HibernateCriteriaQueryUtilities {
      * 
      * @return Related procedure identifiers
      */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<String> getProceduresForFeatureOfInterest(Session session, FeatureOfInterest feature) {
         return session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false))
@@ -468,20 +420,20 @@ public class HibernateCriteriaQueryUtilities {
                 .add(Restrictions.eq(FeatureOfInterest.IDENTIFIER, feature.getIdentifier()))
                 .setProjection(Projections.distinct(Projections.property(FeatureOfInterest.IDENTIFIER))).list();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<String> getObservationIdentifiers(Session session) {
         return session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false))
                 .add(Restrictions.isNotNull(Observation.IDENTIFIER))
                 .setProjection(Projections.distinct(Projections.property(Observation.IDENTIFIER))).list();
     }
-
+    @Deprecated
     public static ProcedureDescriptionFormat getProcedureDescriptionFormatObject(String procDescFormat, Session session) {
         return (ProcedureDescriptionFormat) session.createCriteria(ProcedureDescriptionFormat.class)
                 .add(Restrictions.eq(ProcedureDescriptionFormat.PROCEDURE_DESCRIPTION_FORMAT, procDescFormat))
                 .uniqueResult();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<FeatureOfInterest> getFeatureOfInterestObject(Collection<String> featureOfInterestIDs,
             Session session) {
@@ -501,6 +453,7 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return FOI identifiers for offering
      */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<String> getFeatureOfInterestIdentifiersForOffering(String offeringID, Session session) {
         Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
@@ -509,7 +462,7 @@ public class HibernateCriteriaQueryUtilities {
         c.createCriteria(Observation.OFFERINGS).add(Restrictions.eq(Offering.IDENTIFIER, offeringID));
         return c.list();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<String> getProcedureIdentifiersForOffering(String offeringID, Session session) {
         Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
@@ -518,7 +471,7 @@ public class HibernateCriteriaQueryUtilities {
         c.createCriteria(Observation.OFFERINGS).add(Restrictions.eq(Offering.IDENTIFIER, offeringID));
         return c.list();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<String> getObservablePropertyIdentifiersForOffering(String offeringID, Session session) {
         Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
@@ -527,7 +480,7 @@ public class HibernateCriteriaQueryUtilities {
         c.createCriteria(Observation.OFFERINGS).add(Restrictions.eq(Offering.IDENTIFIER, offeringID));
         return c.list();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<String> getFeatureOfInterestIdentifiersForObservationConstellation(ObservationConstellation oc,
             Session session) {
@@ -541,20 +494,20 @@ public class HibernateCriteriaQueryUtilities {
                 Projections.distinct(Projections.property(FeatureOfInterest.IDENTIFIER)));
         return criteria.list();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<FeatureOfInterestType> getFeatureOfInterestTypeObjects(List<String> featureOfInterestType,
             Session session) {
         return session.createCriteria(FeatureOfInterestType.class)
                 .add(Restrictions.in(FeatureOfInterestType.FEATURE_OF_INTEREST_TYPE, featureOfInterestType)).list();
     }
-
+    @Deprecated
     public static FeatureOfInterestType getFeatureOfInterestTypeObject(String featureOfInterestType, Session session) {
         return (FeatureOfInterestType) session.createCriteria(FeatureOfInterestType.class)
                 .add(Restrictions.eq(FeatureOfInterestType.FEATURE_OF_INTEREST_TYPE, featureOfInterestType))
                 .uniqueResult();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<String> getFeatureOfInterestTypes(Session session) {
         return session
@@ -564,7 +517,7 @@ public class HibernateCriteriaQueryUtilities {
                         Projections.distinct(Projections.property(FeatureOfInterestType.FEATURE_OF_INTEREST_TYPE)))
                 .list();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<String> getFeatureOfInterestTypesForFeatureOfInterest(Collection<String> featureOfInterestIDs,
             Session session) {
@@ -576,92 +529,93 @@ public class HibernateCriteriaQueryUtilities {
                         Projections.distinct(Projections.property(FeatureOfInterestType.FEATURE_OF_INTEREST_TYPE)))
                 .list();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<ObservationType> getObservationTypeObjects(List<String> observationTypes, Session session) {
         return session.createCriteria(ObservationType.class)
                 .add(Restrictions.in(ObservationType.OBSERVATION_TYPE, observationTypes)).list();
     }
-
+    @Deprecated
     public static ObservationType getObservationTypeObject(String observationType, Session session) {
         return (ObservationType) session.createCriteria(ObservationType.class)
                 .add(Restrictions.eq(ObservationType.OBSERVATION_TYPE, observationType)).uniqueResult();
     }
-
+    @Deprecated
     public static Unit getUnit(String unit, Session session) {
         return (Unit) session.createCriteria(Unit.class).add(Restrictions.eq(Unit.UNIT, unit)).uniqueResult();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<RelatedFeatureRole> getRelatedFeatureRole(String role, Session session) {
         return session.createCriteria(RelatedFeatureRole.class)
                 .add(Restrictions.eq(RelatedFeatureRole.RELATED_FEATURE_ROLE, role)).list();
     }
 
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<RelatedFeature> getRelatedFeatures(String targetIdentifier, Session session) {
         return session.createCriteria(RelatedFeature.class).createCriteria(RelatedFeature.FEATURE_OF_INTEREST)
                 .add(Restrictions.eq(FeatureOfInterest.IDENTIFIER, targetIdentifier)).list();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<ObservableProperty> getObservableProperties(List<String> identifiers, Session session) {
         return session.createCriteria(ObservableProperty.class)
                 .add(Restrictions.in(ObservableProperty.IDENTIFIER, identifiers)).list();
     }
-
+    @Deprecated
     public static FeatureOfInterest getFeatureOfInterest(String identifier, Session session) {
         return (FeatureOfInterest) session.createCriteria(FeatureOfInterest.class)
                 .add(Restrictions.eq(FeatureOfInterest.IDENTIFIER, identifier)).uniqueResult();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<RelatedFeature> getRelatedFeatureForOffering(String offering, Session session) {
         return session.createCriteria(RelatedFeature.class).createCriteria(RelatedFeature.OFFERINGS)
                 .add(Restrictions.eq(Offering.IDENTIFIER, offering)).list();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<Procedure> getProcedureObjects(Session session) {
         return session.createCriteria(Procedure.class).list();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<FeatureOfInterest> getFeatureOfInterestObjects(Session session) {
         return session.createCriteria(FeatureOfInterest.class).list();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<RelatedFeature> getRelatedFeatureObjects(Session session) {
         return session.createCriteria(RelatedFeature.class).list();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<Offering> getOfferingObjects(Session session) {
         return session.createCriteria(Offering.class).list();
     }
-
+    @Deprecated
     public static Offering getOfferingForIdentifier(String identifier, Session session) {
         return (Offering) session.createCriteria(Offering.class).add(Restrictions.eq(Offering.IDENTIFIER, identifier))
                 .uniqueResult();
     }
-
+    @Deprecated
     public static TOffering getTOfferingForIdentifier(String identifier, Session session) {
         return (TOffering) session.createCriteria(TOffering.class)
                 .add(Restrictions.eq(Offering.IDENTIFIER, identifier)).uniqueResult();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<ObservableProperty> getObservablePropertyObjects(Session session) {
         return session.createCriteria(ObservableProperty.class).list();
     }
-
+    @Deprecated
     public static ResultTemplate getResultTemplateObject(String identifier, Session session) {
         return (ResultTemplate) session.createCriteria(ResultTemplate.class)
                 .add(Restrictions.eq(ResultTemplate.IDENTIFIER, identifier))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).uniqueResult();
     }
-
+    @Deprecated
     public static List<ResultTemplate> getResultTemplateObjects(Session session) {
         List<ObservationConstellation> observationConstellations = getObservationConstellations(session);
         List<ResultTemplate> resultTemplates = CollectionHelper.list();
@@ -674,7 +628,7 @@ public class HibernateCriteriaQueryUtilities {
         }
         return resultTemplates;
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     private static List<ObservationConstellation> getObservationConstellations(Session session) {
         return session.createCriteria(ObservationConstellation.class)
@@ -682,20 +636,20 @@ public class HibernateCriteriaQueryUtilities {
                 .add(Restrictions.eq(ObservationConstellation.DELETED, false)).list();
 
     }
-
+    @Deprecated
     public static ResultTemplate getResultTemplateObjectsForObservationConstellation(
             ObservationConstellation observationConstellation, Session session) {
         return getResultTemplateObject(observationConstellation.getOffering().getIdentifier(),
                 observationConstellation.getObservableProperty().getIdentifier(), session);
     }
-
+    @Deprecated
     public static List<ResultTemplate> getResultTemplateObjectsForObservationConstellationAndFeature(
             ObservationConstellation observationConstellation, SosAbstractFeature sosAbstractFeature, Session session) {
         return getResultTemplateObject(observationConstellation.getOffering().getIdentifier(),
                 observationConstellation.getObservableProperty().getIdentifier(),
                 CollectionHelper.asList(sosAbstractFeature.getIdentifier().getValue()), session);
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static ResultTemplate getResultTemplateObject(String offering, String observedProperty, Session session) {
         Criteria rtc = session.createCriteria(ResultTemplate.class).setMaxResults(1);
@@ -706,7 +660,7 @@ public class HibernateCriteriaQueryUtilities {
         List<ResultTemplate> templates = (List<ResultTemplate>) rtc.list();
         return templates.isEmpty() ? null : templates.iterator().next();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<ResultTemplate> getResultTemplateObject(String offering, String observedProperty,
             Collection<String> featureOfInterest, Session session) {
@@ -721,7 +675,7 @@ public class HibernateCriteriaQueryUtilities {
         }
         return rtc.list();
     }
-
+    @Deprecated
     public static Order getOrderForEnum(FirstLatest firstLatest) {
         if (firstLatest.equals(FirstLatest.first)) {
             return Order.asc(Observation.PHENOMENON_TIME_START);
@@ -730,12 +684,12 @@ public class HibernateCriteriaQueryUtilities {
         }
         return null;
     }
-
+    @Deprecated
     public static Codespace getCodespace(String codespace, Session session) {
         return (Codespace) session.createCriteria(Codespace.class)
                 .add(Restrictions.eq(Codespace.CODESPACE, codespace)).uniqueResult();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<ObservationConstellation> getObservationConstellation(Procedure procedure,
             ObservableProperty observableProperty, Collection<String> offerings, Session session) {
@@ -747,7 +701,7 @@ public class HibernateCriteriaQueryUtilities {
                 .add(Restrictions.in("o." + Offering.IDENTIFIER, offerings))
                 .add(Restrictions.eq(ObservationConstellation.DELETED, false)).list();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<String> getObservablePropertyIdentifiersForProcedure(String procedureID, Session session) {
         Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
@@ -756,7 +710,7 @@ public class HibernateCriteriaQueryUtilities {
         c.createCriteria(Observation.PROCEDURE).add(Restrictions.eq(Procedure.IDENTIFIER, procedureID));
         return c.list();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static List<String> getOfferingIdentifiersForProcedure(String procedureID, Session session) {
         Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
@@ -765,7 +719,7 @@ public class HibernateCriteriaQueryUtilities {
         c.createCriteria(Observation.PROCEDURE).add(Restrictions.eq(Procedure.IDENTIFIER, procedureID));
         return c.list();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static Collection<String> getOfferingIdentifiersForObservableProperty(String observablePropertyID,
             Session session) {
@@ -776,7 +730,7 @@ public class HibernateCriteriaQueryUtilities {
                 Restrictions.eq(ObservableProperty.IDENTIFIER, observablePropertyID));
         return c.list();
     }
-
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static Collection<String> getProcedureIdentifiersForObservableProperty(String observablePropertyID,
             Session session) {
@@ -787,35 +741,35 @@ public class HibernateCriteriaQueryUtilities {
                 Restrictions.eq(ObservableProperty.IDENTIFIER, observablePropertyID));
         return c.list();
     }
-
+    @Deprecated
     public static boolean checkNumericObservationsFor(String offeringID, Session session) {
         return checkObservationFor(NumericObservation.class, offeringID, session);
     }
-
+    @Deprecated
     public static boolean checkBooleanObservationsFor(String offeringID, Session session) {
         return checkObservationFor(BooleanObservation.class, offeringID, session);
     }
-
+    @Deprecated
     public static boolean checkCountObservationsFor(String offeringID, Session session) {
         return checkObservationFor(CountObservation.class, offeringID, session);
     }
-
+    @Deprecated
     public static boolean checkCategoryObservationsFor(String offeringID, Session session) {
         return checkObservationFor(CategoryObservation.class, offeringID, session);
     }
-
+    @Deprecated
     public static boolean checkTextObservationsFor(String offeringID, Session session) {
         return checkObservationFor(TextObservation.class, offeringID, session);
     }
-
+    @Deprecated
     public static boolean checkBlobObservationsFor(String offeringID, Session session) {
         return checkObservationFor(BlobObservation.class, offeringID, session);
     }
-
+    @Deprecated
     public static boolean checkGeometryObservationsFor(String offeringID, Session session) {
         return checkObservationFor(GeometryObservation.class, offeringID, session);
     }
-
+    @Deprecated
     @SuppressWarnings("rawtypes")
     private static boolean checkObservationFor(Class clazz, String offeringID, Session session) {
         Criteria c = session.createCriteria(clazz).add(Restrictions.eq(Observation.DELETED, false));
