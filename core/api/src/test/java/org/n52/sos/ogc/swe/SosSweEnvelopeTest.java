@@ -29,7 +29,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName;
-import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
+import org.n52.sos.ogc.swe.simpleType.SweQuantity;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -50,7 +50,7 @@ public class SosSweEnvelopeTest {
 		final double x2 = 4;
 		final String uom = "deg";
 		final SosEnvelope sosEnvelope = new SosEnvelope(new Envelope(x1, x2, y1, y2), srid);
-		final SosSweEnvelope sweEnvelope = new SosSweEnvelope(sosEnvelope,uom);
+		final SweEnvelope sweEnvelope = new SweEnvelope(sosEnvelope,uom);
 		
 		// srid
 		assertThat(sweEnvelope.getReferenceFrame(), is(Integer.toString(srid)));
@@ -63,10 +63,10 @@ public class SosSweEnvelopeTest {
 		// y2
 		assertThat((Double)sweEnvelope.getUpperCorner().getCoordinates().get(1).getValue().getValue(), is(new Double(y2)));
 		// uom
-		assertThat(((SosSweQuantity)sweEnvelope.getLowerCorner().getCoordinates().get(0).getValue()).getUom(), is(uom));
-		assertThat(((SosSweQuantity)sweEnvelope.getLowerCorner().getCoordinates().get(1).getValue()).getUom(), is(uom));
-		assertThat(((SosSweQuantity)sweEnvelope.getUpperCorner().getCoordinates().get(0).getValue()).getUom(), is(uom));
-		assertThat(((SosSweQuantity)sweEnvelope.getUpperCorner().getCoordinates().get(1).getValue()).getUom(), is(uom));
+		assertThat(((SweQuantity)sweEnvelope.getLowerCorner().getCoordinates().get(0).getValue()).getUom(), is(uom));
+		assertThat(((SweQuantity)sweEnvelope.getLowerCorner().getCoordinates().get(1).getValue()).getUom(), is(uom));
+		assertThat(((SweQuantity)sweEnvelope.getUpperCorner().getCoordinates().get(0).getValue()).getUom(), is(uom));
+		assertThat(((SweQuantity)sweEnvelope.getUpperCorner().getCoordinates().get(1).getValue()).getUom(), is(uom));
 		// northing
 		assertThat(sweEnvelope.getLowerCorner().getCoordinates().get(0).getName(), is(SweCoordinateName.easting));
 		assertThat(sweEnvelope.getUpperCorner().getCoordinates().get(0).getName(), is(SweCoordinateName.easting));

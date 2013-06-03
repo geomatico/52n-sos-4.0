@@ -56,7 +56,7 @@ import org.n52.sos.ogc.filter.FilterConstants.ComparisonOperator;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.GMLConstants;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -380,7 +380,7 @@ public class ITRequestEncoder {
      *
      * @throws OwsExceptionReport
      */
-    public static void addTimeObject(ITime sosTime, BinaryTemporalOpType xb_binaryTempOps) throws OwsExceptionReport {
+    public static void addTimeObject(Time sosTime, BinaryTemporalOpType xb_binaryTempOps) throws OwsExceptionReport {
         if (sosTime == null) {
             return;
         } else if (sosTime instanceof TimeInstant) {

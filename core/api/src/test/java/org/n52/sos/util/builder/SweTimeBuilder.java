@@ -23,7 +23,7 @@
  */
 package org.n52.sos.util.builder;
 
-import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.ogc.swe.simpleType.SweTime;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
@@ -36,9 +36,9 @@ public class SweTimeBuilder {
 		return new SweTimeBuilder();
 	}
 
-	public SosSweTime build()
+	public SweTime build()
 	{
-		return new SosSweTime();
+		return new SweTime();
 	}
 
 }

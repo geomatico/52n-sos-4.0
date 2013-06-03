@@ -26,7 +26,7 @@ package org.n52.sos.util;
 import javax.xml.namespace.QName;
 
 import org.n52.sos.ogc.gml.GMLConstants;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 
@@ -50,7 +50,7 @@ public final class GmlHelper {
     }
     
 
-    public static QName getGml321QnameForITime(ITime iTime) {
+    public static QName getGml321QnameForITime(Time iTime) {
         if (iTime instanceof TimeInstant) {
             return GMLConstants.QN_TIME_INSTANT_32;
         } else if (iTime instanceof TimePeriod) {
@@ -59,7 +59,7 @@ public final class GmlHelper {
         return GMLConstants.QN_ABSTRACT_TIME_32;
     }
     
-    public static QName getGml311QnameForITime(ITime iTime) {
+    public static QName getGml311QnameForITime(Time iTime) {
         if (iTime instanceof TimeInstant) {
             return GMLConstants.QN_TIME_INSTANT;
         } else if (iTime instanceof TimePeriod) {

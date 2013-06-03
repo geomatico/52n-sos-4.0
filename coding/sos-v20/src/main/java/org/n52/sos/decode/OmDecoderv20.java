@@ -39,7 +39,7 @@ import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.exception.ows.OwsExceptionCode;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.AbstractSosPhenomenon;
@@ -61,7 +61,7 @@ import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
-import org.n52.sos.ogc.swe.SosSweDataArray;
+import org.n52.sos.ogc.swe.SweDataArray;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
@@ -192,7 +192,7 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
         return null;
     }
 
-    private ITime getPhenomenonTime(OMObservationType omObservation) throws OwsExceptionReport {
+    private Time getPhenomenonTime(OMObservationType omObservation) throws OwsExceptionReport {
         TimeObjectPropertyType phenomenonTime = omObservation.getPhenomenonTime();
         if (phenomenonTime.isSetHref() && phenomenonTime.getHref().startsWith("#")) {
             TimeInstant timeInstant = new TimeInstant();
@@ -206,8 +206,8 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
             return timeInstant;
         } else if (phenomenonTime.isSetAbstractTimeObject()) {
             Object decodedObject = CodingHelper.decodeXmlObject(phenomenonTime.getAbstractTimeObject());
-            if (decodedObject instanceof ITime) {
-                return (ITime) decodedObject;
+            if (decodedObject instanceof Time) {
+                return (Time) decodedObject;
             }
             // FIXME else
         }
@@ -260,7 +260,7 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
     }
 
     private ObservationValue<?> getObservationValue(OMObservationType omObservation) throws OwsExceptionReport {
-        ITime phenomenonTime = getPhenomenonTime(omObservation);
+        Time phenomenonTime = getPhenomenonTime(omObservation);
         ObservationValue<?> observationValue;
         if (phenomenonTime.getIndeterminateValue() != null 
                 && phenomenonTime.getIndeterminateValue().equals("template")) {
@@ -296,10 +296,10 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
             Object decodedObject = CodingHelper.decodeXmlObject(omObservation.getResult());
             if (decodedObject instanceof ObservationValue) {
                 return (ObservationValue) decodedObject;
-            } else if (decodedObject instanceof SosSweDataArray) {
-                SosMultiObservationValues<SosSweDataArray> result = new SosMultiObservationValues<SosSweDataArray>();
+            } else if (decodedObject instanceof SweDataArray) {
+                SosMultiObservationValues<SweDataArray> result = new SosMultiObservationValues<SweDataArray>();
                 SweDataArrayValue value = new SweDataArrayValue();
-                value.setValue((SosSweDataArray) decodedObject);
+                value.setValue((SweDataArray) decodedObject);
                 result.setValue(value);
                 return result;
             }

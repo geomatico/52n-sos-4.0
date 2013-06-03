@@ -48,7 +48,7 @@ import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.swe.SosSweDataArray;
+import org.n52.sos.ogc.swe.SweDataArray;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetObservationByIdRequest;
 
@@ -152,8 +152,8 @@ public class HibernateObservationUtilitiesTest extends HibernateTestCase {
             assertThat(resultList, is(notNullValue()));
             assertThat(resultList.size(), is(1));
             Object value = resultList.get(0).getValue().getValue();
-            Double val = Double.parseDouble(((SosSweDataArray) value).getValues().get(0).get(1));
-            assertThat(value, is(instanceOf(SosSweDataArray.class)));
+            Double val = Double.parseDouble(((SweDataArray) value).getValues().get(0).get(1));
+            assertThat(value, is(instanceOf(SweDataArray.class)));
             assertThat(val, is(closeTo(1.0, 0.00001)));
         } finally {
             returnSession(session);

@@ -35,7 +35,7 @@ import java.util.TreeSet;
 
 import javax.xml.namespace.QName;
 
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.util.QNameComparator;
 
 /**
@@ -113,9 +113,9 @@ public class SosObservationOffering implements Comparable<SosObservationOffering
     /**
      * TimePeriod of data in the offering
      */
-    private ITime phenomenonTime;
+    private Time phenomenonTime;
 
-    private ITime resultTime;
+    private Time resultTime;
 
     /**
      * All featuresOfinterest contained in the offering
@@ -235,14 +235,14 @@ public class SosObservationOffering implements Comparable<SosObservationOffering
      * @param phenomenonTime
      *            the phenomenon time
      */
-    public void setPhenomenonTime(ITime phenomenonTime) {
+    public void setPhenomenonTime(Time phenomenonTime) {
         this.phenomenonTime = phenomenonTime;
     }
 
     /**
      * @return the phenomenon time
      */
-    public ITime getPhenomenonTime() {
+    public Time getPhenomenonTime() {
         return phenomenonTime;
     }
 
@@ -250,14 +250,14 @@ public class SosObservationOffering implements Comparable<SosObservationOffering
      * @param resultTime
      *            the result time
      */
-    public void setResultTime(ITime resultTime) {
+    public void setResultTime(Time resultTime) {
         this.resultTime = resultTime;
     }
 
     /**
      * @return the result time
      */
-    public ITime getResultTime() {
+    public Time getResultTime() {
         return resultTime;
     }
 

@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
-import static org.n52.sos.ogc.sensorML.elements.SosSMLClassifier.*;
+import static org.n52.sos.ogc.sensorML.elements.SmlClassifier.*;
 import static org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName.*;
 import static org.n52.sos.util.HTTPConstants.StatusCode.*;
 
@@ -67,19 +67,19 @@ import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.SmlContact;
 import org.n52.sos.ogc.sensorML.SmlResponsibleParty;
 import org.n52.sos.ogc.sensorML.System;
-import org.n52.sos.ogc.sensorML.elements.SosSMLClassifier;
-import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
-import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
-import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
+import org.n52.sos.ogc.sensorML.elements.SmlClassifier;
+import org.n52.sos.ogc.sensorML.elements.SmlIdentifier;
+import org.n52.sos.ogc.sensorML.elements.SmlIo;
+import org.n52.sos.ogc.sensorML.elements.SmlPosition;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
-import org.n52.sos.ogc.swe.SosSweCoordinate;
-import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
-import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
-import org.n52.sos.ogc.swe.simpleType.SosSweCategory;
-import org.n52.sos.ogc.swe.simpleType.SosSweCount;
-import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
-import org.n52.sos.ogc.swe.simpleType.SosSweText;
+import org.n52.sos.ogc.swe.SweCoordinate;
+import org.n52.sos.ogc.swe.simpleType.SweAbstractSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SweBoolean;
+import org.n52.sos.ogc.swe.simpleType.SweCategory;
+import org.n52.sos.ogc.swe.simpleType.SweCount;
+import org.n52.sos.ogc.swe.simpleType.SweQuantity;
+import org.n52.sos.ogc.swe.simpleType.SweText;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ProcedureDescriptionSettings;
 import org.n52.sos.service.ServiceConfiguration;
@@ -252,9 +252,9 @@ public class HibernateProcedureConverter {
         abstractSensorML.setOutputs(createOutputs(procedure, observableProperties));
 	}
 
-    private List<SosSMLIo<?>> createOutputs(final Procedure procedure, final String[] observableProperties)
+    private List<SmlIo<?>> createOutputs(final Procedure procedure, final String[] observableProperties)
             throws OwsExceptionReport {
-        final ArrayList<SosSMLIo<?>> outputs = new ArrayList<SosSMLIo<?>>(observableProperties.length);
+        final ArrayList<SmlIo<?>> outputs = new ArrayList<SmlIo<?>>(observableProperties.length);
         int i = 1;
         for (final String observableProperty : observableProperties) {
             Observation exampleObservation;
@@ -265,35 +265,35 @@ public class HibernateProcedureConverter {
                         procedure.getIdentifier(), observableProperty);
                 continue;
             }
-            SosSMLIo<?> output = null;
+            SmlIo<?> output = null;
             if (exampleObservation instanceof BlobObservation) {
                 // TODO implement BlobObservations
                 logTypeNotSupported(BlobObservation.class);
                 continue;
             } else if (exampleObservation instanceof BooleanObservation) {
-                final SosSweBoolean bool = new SosSweBoolean();
+                final SweBoolean bool = new SweBoolean();
                 bool.setDefinition(observableProperty);
-                output = new SosSMLIo<Boolean>(bool);
+                output = new SmlIo<Boolean>(bool);
             } else if (exampleObservation instanceof CategoryObservation) {
-                final SosSweCategory category = new SosSweCategory();
+                final SweCategory category = new SweCategory();
                 category.setDefinition(observableProperty);
-                output = new SosSMLIo<String>(category);
+                output = new SmlIo<String>(category);
             } else if (exampleObservation instanceof CountObservation) {
-                final SosSweCount count = new SosSweCount();
+                final SweCount count = new SweCount();
                 count.setDefinition(observableProperty);
-                output = new SosSMLIo<Integer>(count);
+                output = new SmlIo<Integer>(count);
             } else if (exampleObservation instanceof GeometryObservation) {
                 // TODO implement GeometryObservations
                 logTypeNotSupported(GeometryObservation.class);
                 continue;
             } else if (exampleObservation instanceof NumericObservation) {
-                final SosSweQuantity quantity = new SosSweQuantity();
+                final SweQuantity quantity = new SweQuantity();
                 quantity.setDefinition(observableProperty);
-                output = new SosSMLIo<Double>(quantity);
+                output = new SmlIo<Double>(quantity);
             } else if (exampleObservation instanceof TextObservation) {
-                final SosSweText text = new SosSweText();
+                final SweText text = new SweText();
                 text.setDefinition(observableProperty);
-                output = new SosSMLIo<String>(text);
+                output = new SmlIo<String>(text);
             }
             if (output != null) {
                 output.setIoName("output#" + i++);
@@ -329,9 +329,9 @@ public class HibernateProcedureConverter {
         }
     }
 
-    private SosSMLPosition createPosition(final Procedure procedure) {
-        SosSMLPosition smlPosition = null;
-        smlPosition = new SosSMLPosition();
+    private SmlPosition createPosition(final Procedure procedure) {
+        SmlPosition smlPosition = null;
+        smlPosition = new SmlPosition();
         smlPosition.setName("sensorPosition");
         smlPosition.setFixed(true);
         int srid = 4326;
@@ -356,21 +356,21 @@ public class HibernateProcedureConverter {
         return smlPosition;
     }
 
-    private List<SosSweCoordinate<?>> createCoordinatesForPosition(final Object longitude, final Object latitude,
+    private List<SweCoordinate<?>> createCoordinatesForPosition(final Object longitude, final Object latitude,
             final Object oAltitude) {
-        final List<SosSweCoordinate<?>> sweCoordinates = new ArrayList<SosSweCoordinate<?>>(3);
-        sweCoordinates.add(new SosSweCoordinate<Double>(northing, createSweQuantity(JavaHelper.asDouble(latitude),
+        final List<SweCoordinate<?>> sweCoordinates = new ArrayList<SweCoordinate<?>>(3);
+        sweCoordinates.add(new SweCoordinate<Double>(northing, createSweQuantity(JavaHelper.asDouble(latitude),
                 "y", procedureSettings().getLatLongUom())));
-        sweCoordinates.add(new SosSweCoordinate<Double>(easting, createSweQuantity(JavaHelper.asDouble(longitude), "x",
+        sweCoordinates.add(new SweCoordinate<Double>(easting, createSweQuantity(JavaHelper.asDouble(longitude), "x",
                 procedureSettings().getLatLongUom())));
-        sweCoordinates.add(new SosSweCoordinate<Double>(altitude, createSweQuantity(JavaHelper.asDouble(oAltitude),
+        sweCoordinates.add(new SweCoordinate<Double>(altitude, createSweQuantity(JavaHelper.asDouble(oAltitude),
                 "z", procedureSettings().getAltitudeUom())));
         // TODO add Integer: Which SweSimpleType to use?
         return sweCoordinates;
     }
 
-    private SosSweAbstractSimpleType<Double> createSweQuantity(final Double value, final String asixID, final String uom) {
-        final SosSweQuantity quantity = new SosSweQuantity();
+    private SweAbstractSimpleType<Double> createSweQuantity(final Double value, final String asixID, final String uom) {
+        final SweQuantity quantity = new SweQuantity();
         quantity.setValue(JavaHelper.asDouble(value));
         quantity.setAxisID(asixID);
         quantity.setUom(uom);
@@ -408,12 +408,12 @@ public class HibernateProcedureConverter {
 
     private void createClassifier(final AbstractSensorML abstractSensorML) {
         if (!procedureSettings().getClassifierIntendedApplicationValue().isEmpty()) {
-            abstractSensorML.addClassification(new SosSMLClassifier(INTENDED_APPLICATION, 
+            abstractSensorML.addClassification(new SmlClassifier(INTENDED_APPLICATION, 
             		procedureSettings().getClassifierIntendedApplicationDefinition(),
             		procedureSettings().getClassifierIntendedApplicationValue()));
         }
         if (!procedureSettings().getClassifierProcedureTypeValue().isEmpty()) {
-            abstractSensorML.addClassification(new SosSMLClassifier(PROCEDURE_TYPE,
+            abstractSensorML.addClassification(new SmlClassifier(PROCEDURE_TYPE,
             		procedureSettings().getClassifierSensorTypeDefinition(),
             		procedureSettings().getClassifierProcedureTypeValue()));
         }
@@ -425,15 +425,15 @@ public class HibernateProcedureConverter {
                 StringHelper.join(",", CollectionHelper.list(observableProperties))));
     }
 
-    private List<SosSMLIdentifier> createIdentifications(final String identifier) {
+    private List<SmlIdentifier> createIdentifications(final String identifier) {
         // get long and short name definition from misc settings
-        final SosSMLIdentifier idUniqueId =
-                new SosSMLIdentifier(OGCConstants.URN_UNIQUE_IDENTIFIER_END, OGCConstants.URN_UNIQUE_IDENTIFIER,
+        final SmlIdentifier idUniqueId =
+                new SmlIdentifier(OGCConstants.URN_UNIQUE_IDENTIFIER_END, OGCConstants.URN_UNIQUE_IDENTIFIER,
                         identifier);
-        final SosSMLIdentifier idShortName =
-                new SosSMLIdentifier(SensorMLConstants.ELEMENT_NAME_SHORT_NAME, procedureSettings().getIdentifierShortNameDefinition(), identifier);
-        final SosSMLIdentifier idLongName =
-                new SosSMLIdentifier(SensorMLConstants.ELEMENT_NAME_LONG_NAME, procedureSettings().getIdentifierLongNameDefinition(), identifier);
+        final SmlIdentifier idShortName =
+                new SmlIdentifier(SensorMLConstants.ELEMENT_NAME_SHORT_NAME, procedureSettings().getIdentifierShortNameDefinition(), identifier);
+        final SmlIdentifier idLongName =
+                new SmlIdentifier(SensorMLConstants.ELEMENT_NAME_LONG_NAME, procedureSettings().getIdentifierLongNameDefinition(), identifier);
         return CollectionHelper.list(idUniqueId, idLongName, idShortName);
     }
 

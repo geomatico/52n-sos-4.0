@@ -50,13 +50,13 @@ import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
-import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
+import org.n52.sos.ogc.sensorML.elements.SmlIo;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
-import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
-import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.ogc.swe.simpleType.SweAbstractSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SweQuantity;
+import org.n52.sos.ogc.swe.simpleType.SweTime;
 import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConfiguration;
@@ -445,8 +445,8 @@ public class SosHelper {
                 .setMinimum(envelope.getMinX() + " " + envelope.getMinY());
     }
 
-    public static SosObservableProperty createSosOberavablePropertyFromSosSMLIo(final SosSMLIo<?> output) {
-        final SosSweAbstractSimpleType<?> ioValue = output.getIoValue();
+    public static SosObservableProperty createSosOberavablePropertyFromSosSMLIo(final SmlIo<?> output) {
+        final SweAbstractSimpleType<?> ioValue = output.getIoValue();
         final String identifier = ioValue.getDefinition();
         final String description = ioValue.getDescription();
         String unit = null;
@@ -468,7 +468,7 @@ public class SosHelper {
             valueType = "swe:ObservableProperty";
             break;
         case Quantity:
-            unit = ((SosSweQuantity) ioValue).getUom();
+            unit = ((SweQuantity) ioValue).getUom();
             valueType = "swe:Quantity";
             break;
         case QuantityRange:
@@ -478,7 +478,7 @@ public class SosHelper {
             valueType = "swe:Text";
             break;
         case Time:
-            unit = ((SosSweTime) ioValue).getUom();
+            unit = ((SweTime) ioValue).getUom();
             valueType = "swe:Time";
             break;
         case TimeRange:

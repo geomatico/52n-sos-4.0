@@ -26,7 +26,7 @@ package org.n52.sos.cache.ctrl.action;
 import java.util.List;
 
 import org.n52.sos.cache.WritableContentCache;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
@@ -86,8 +86,8 @@ public class ObservationInsertionUpdate extends InMemoryCacheUpdate {
                     .getIdentifier();
             final String observationType = observation.getObservationConstellation().getObservationType();
             final String procedure = observation.getObservationConstellation().getProcedure().getIdentifier();
-            final ITime phenomenonTime = observation.getPhenomenonTime();
-            final ITime resultTime = observation.getResultTime();
+            final Time phenomenonTime = observation.getPhenomenonTime();
+            final Time resultTime = observation.getResultTime();
 
             cache.updatePhenomenonTime(phenomenonTime);
             cache.updateResultTime(resultTime);

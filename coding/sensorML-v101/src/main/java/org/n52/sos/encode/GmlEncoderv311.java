@@ -62,7 +62,7 @@ import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.GMLConstants;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.features.SFConstants;
@@ -101,7 +101,7 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GmlEncoderv311.class);
 
     private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(GMLConstants.NS_GML,
-            org.n52.sos.ogc.gml.time.ITime.class, com.vividsolutions.jts.geom.Geometry.class,
+            org.n52.sos.ogc.gml.time.Time.class, com.vividsolutions.jts.geom.Geometry.class,
             org.n52.sos.ogc.om.values.CategoryValue.class, org.n52.sos.ogc.gml.ReferenceType.class,
             org.n52.sos.ogc.om.values.QuantityValue.class, org.n52.sos.ogc.gml.CodeWithAuthority.class,
             org.n52.sos.ogc.gml.CodeType.class, SosAbstractFeature.class, SosEnvelope.class);
@@ -148,8 +148,8 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
 
     @Override
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
-        if (element instanceof ITime) {
-            return createTime((ITime) element, additionalValues);
+        if (element instanceof Time) {
+            return createTime((Time) element, additionalValues);
         } else if (element instanceof Geometry) {
             return createPosition((Geometry) element, additionalValues.get(HelperValues.GMLID));
         } else if (element instanceof CategoryValue) {
@@ -171,7 +171,7 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
         }
     }
 
-    private XmlObject createTime(ITime time, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+    private XmlObject createTime(Time time, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         if (time != null) {
             if (time instanceof TimeInstant) {
                 if (additionalValues.containsKey(HelperValues.DOCUMENT)) {

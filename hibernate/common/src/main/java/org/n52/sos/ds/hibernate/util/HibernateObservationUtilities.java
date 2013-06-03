@@ -57,7 +57,7 @@ import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.entities.TextObservation;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.AbstractSosPhenomenon;
@@ -85,15 +85,15 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
 import org.n52.sos.ogc.sos.SosResultTemplate;
-import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
-import org.n52.sos.ogc.swe.SosSweDataRecord;
-import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
-import org.n52.sos.ogc.swe.simpleType.SosSweCategory;
-import org.n52.sos.ogc.swe.simpleType.SosSweCount;
-import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
-import org.n52.sos.ogc.swe.simpleType.SosSweText;
-import org.n52.sos.ogc.swe.simpleType.SosSweTime;
-import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
+import org.n52.sos.ogc.swe.SweAbstractDataComponent;
+import org.n52.sos.ogc.swe.SweDataRecord;
+import org.n52.sos.ogc.swe.simpleType.SweBoolean;
+import org.n52.sos.ogc.swe.simpleType.SweCategory;
+import org.n52.sos.ogc.swe.simpleType.SweCount;
+import org.n52.sos.ogc.swe.simpleType.SweQuantity;
+import org.n52.sos.ogc.swe.simpleType.SweText;
+import org.n52.sos.ogc.swe.simpleType.SweTime;
+import org.n52.sos.ogc.swe.simpleType.SweTimeRange;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.service.profile.Profile;
@@ -364,7 +364,7 @@ public class HibernateObservationUtilities {
         return sosObservation;
     }
 
-    private static ITime getPhenomenonTime(final Observation hObservation) {
+    private static Time getPhenomenonTime(final Observation hObservation) {
         // create time element
         final DateTime phenStartTime = new DateTime(hObservation.getPhenomenonTimeStart());
         DateTime phenEndTime;
@@ -373,7 +373,7 @@ public class HibernateObservationUtilities {
         } else {
             phenEndTime = phenStartTime;
         }
-        ITime phenomenonTime;
+        Time phenomenonTime;
         if (phenStartTime.equals(phenEndTime)) {
             phenomenonTime = new TimeInstant(phenStartTime, "");
         } else {
@@ -431,10 +431,10 @@ public class HibernateObservationUtilities {
                     ((SweDataArrayValue) ((SosMultiObservationValues) multiObservation.getValue()).getValue());
             final List<List<String>> values = arrayValue.getValue().getValues();
             final List<SosObservation> observationCollection = new ArrayList<SosObservation>(values.size());
-            SosSweDataRecord elementType = null;
+            SweDataRecord elementType = null;
             if (arrayValue.getValue().getElementType() != null
-                    && arrayValue.getValue().getElementType() instanceof SosSweDataRecord) {
-                elementType = (SosSweDataRecord) arrayValue.getValue().getElementType();
+                    && arrayValue.getValue().getElementType() instanceof SweDataRecord) {
+                elementType = (SweDataRecord) arrayValue.getValue().getElementType();
             } else {
                 throw new NoApplicableCodeException().withMessage("sweElementType type \"%s\" not supported",
                         elementType != null ? elementType.getClass().getName() : "null");
@@ -442,7 +442,7 @@ public class HibernateObservationUtilities {
 
             for (final List<String> block : values) {
                 int tokenIndex = 0;
-                ITime phenomenonTime = null;
+                Time phenomenonTime = null;
                 final List<Value<?>> observedValues = new LinkedList<Value<?>>();
                 // map to store the observed properties
                 final Map<Value<?>, String> definitionsForObservedValues = new HashMap<Value<?>, String>();
@@ -450,12 +450,12 @@ public class HibernateObservationUtilities {
                 for (final String token : block) {
                     // get values from block via definition in
                     // SosSweDataArray#getElementType
-                    final SosSweAbstractDataComponent fieldForToken =
+                    final SweAbstractDataComponent fieldForToken =
                             elementType.getFields().get(tokenIndex).getElement();
                     /*
                      * get phenomenon time
                      */
-                    if (fieldForToken instanceof SosSweTime) {
+                    if (fieldForToken instanceof SweTime) {
                         try {
                             phenomenonTime = new TimeInstant(DateTimeHelper.parseIsoString2DateTime(token));
                         } catch (final OwsExceptionReport e) {
@@ -468,7 +468,7 @@ public class HibernateObservationUtilities {
                             throw new NoApplicableCodeException().causedBy(e).withMessage(
                                     "Error while parse time String to DateTime!");
                         }
-                    } else if (fieldForToken instanceof SosSweTimeRange) {
+                    } else if (fieldForToken instanceof SweTimeRange) {
                         try {
                             final String[] subTokens = token.split("/");
                             phenomenonTime =
@@ -488,17 +488,17 @@ public class HibernateObservationUtilities {
                     /*
                      * observation values
                      */
-                    else if (fieldForToken instanceof SosSweQuantity) {
+                    else if (fieldForToken instanceof SweQuantity) {
                         observedValue = new QuantityValue(new BigDecimal(token));
-                        observedValue.setUnit(((SosSweQuantity) fieldForToken).getUom());
-                    } else if (fieldForToken instanceof SosSweBoolean) {
+                        observedValue.setUnit(((SweQuantity) fieldForToken).getUom());
+                    } else if (fieldForToken instanceof SweBoolean) {
                         observedValue = new BooleanValue(Boolean.parseBoolean(token));
-                    } else if (fieldForToken instanceof SosSweText) {
+                    } else if (fieldForToken instanceof SweText) {
                         observedValue = new TextValue(token);
-                    } else if (fieldForToken instanceof SosSweCategory) {
+                    } else if (fieldForToken instanceof SweCategory) {
                         observedValue = new CategoryValue(token);
-                        observedValue.setUnit(((SosSweCategory) fieldForToken).getCodeSpace());
-                    } else if (fieldForToken instanceof SosSweCount) {
+                        observedValue.setUnit(((SweCategory) fieldForToken).getCodeSpace());
+                    } else if (fieldForToken instanceof SweCount) {
                         observedValue = new CountValue(Integer.parseInt(token));
                     } else {
                         throw new NoApplicableCodeException().withMessage("sweField type '%s' not supported",
@@ -523,7 +523,7 @@ public class HibernateObservationUtilities {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static SosObservation createSingleValueObservation(final SosObservation multiObservation,
-            final ITime phenomenonTime, final Value<?> iValue) {
+            final Time phenomenonTime, final Value<?> iValue) {
         final ObservationValue<?> value = new SosSingleObservationValue(phenomenonTime, iValue);
         final SosObservation newObservation = new SosObservation();
         newObservation.setNoDataValue(multiObservation.getNoDataValue());

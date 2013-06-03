@@ -65,7 +65,7 @@ import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
-import org.n52.sos.ogc.swe.SosFeatureRelationship;
+import org.n52.sos.ogc.swes.SwesFeatureRelationship;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.request.InsertObservationRequest;
@@ -364,7 +364,7 @@ public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
         assertFalse("offering -> related feature relations NOT in cache",
                     getCache().getRelatedFeaturesForOffering(getAssignedOfferingId()).isEmpty());
 
-        for (SosFeatureRelationship relatedFeature : ((InsertSensorRequest) request).getRelatedFeatures()) {
+        for (SwesFeatureRelationship relatedFeature : ((InsertSensorRequest) request).getRelatedFeatures()) {
             assertTrue("single \"offering -> related features relation\" NOT in cache",
                        getCache().getRelatedFeaturesForOffering(getAssignedOfferingId())
                     .contains(relatedFeature.getFeature().getIdentifier().getValue()));

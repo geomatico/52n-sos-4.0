@@ -46,7 +46,7 @@ import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.GMLConstants;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.NamedValue;
@@ -195,7 +195,7 @@ public abstract class AbstractOmEncoderv20 implements ObservationEncoder<XmlObje
         addObservationType(xbObservation, sosObservation.getObservationConstellation().getObservationType());
 
         // set phenomenonTime
-        ITime phenomenonTime = sosObservation.getPhenomenonTime();
+        Time phenomenonTime = sosObservation.getPhenomenonTime();
         if (phenomenonTime.getGmlId() == null) {
             phenomenonTime.setGmlId(OMConstants.PHENOMENON_TIME_NAME + "_" + observationID);
         }
@@ -307,9 +307,9 @@ public abstract class AbstractOmEncoderv20 implements ObservationEncoder<XmlObje
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    private void addPhenomenonTime(TimeObjectPropertyType timeObjectPropertyType, ITime time)
+    private void addPhenomenonTime(TimeObjectPropertyType timeObjectPropertyType, Time time)
             throws OwsExceptionReport {
-        Encoder<?, ITime> encoder =
+        Encoder<?, Time> encoder =
                 CodingRepository.getInstance().getEncoder(CodingHelper.getEncoderKey(GMLConstants.NS_GML_32, time));
         if (encoder != null) {
             XmlObject xmlObject = (XmlObject) encoder.encode(time);
@@ -335,7 +335,7 @@ public abstract class AbstractOmEncoderv20 implements ObservationEncoder<XmlObje
      */
     private void addResultTime(OMObservationType xbObs, SosObservation sosObservation) throws OwsExceptionReport {
         TimeInstant resultTime = sosObservation.getResultTime();
-        ITime phenomenonTime = sosObservation.getPhenomenonTime();
+        Time phenomenonTime = sosObservation.getPhenomenonTime();
         // get result time from SOS result time representation
         if (sosObservation.getResultTime() != null) {
             if (resultTime.equals(phenomenonTime)) {

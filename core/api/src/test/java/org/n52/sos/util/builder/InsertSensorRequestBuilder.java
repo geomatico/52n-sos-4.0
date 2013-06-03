@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.sos.SosInsertionMetadata;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
-import org.n52.sos.ogc.swe.SosFeatureRelationship;
-import org.n52.sos.ogc.swe.SosMetadata;
+import org.n52.sos.ogc.swes.SwesFeatureRelationship;
 import org.n52.sos.request.InsertSensorRequest;
 
 /**
@@ -41,7 +41,7 @@ public class InsertSensorRequestBuilder {
 	private SosProcedureDescription procedureDescription;
 	private List<String> observableProperties;
 	private List<String> observationTypes;
-	private ArrayList<SosFeatureRelationship> featureRelationships;
+	private ArrayList<SwesFeatureRelationship> featureRelationships;
 	
 	public static InsertSensorRequestBuilder anInsertSensorRequest()
 	{
@@ -79,9 +79,9 @@ public class InsertSensorRequestBuilder {
 	{
 		if (featureRelationships == null) 
 		{
-			featureRelationships = new ArrayList<SosFeatureRelationship>();
+			featureRelationships = new ArrayList<SwesFeatureRelationship>();
 		}
-		SosFeatureRelationship rel = new SosFeatureRelationship(); 
+		SwesFeatureRelationship rel = new SwesFeatureRelationship(); 
 		rel.setFeature(relatedFeature);
 		rel.setRole(featureRole);
 		featureRelationships.add(rel);
@@ -103,10 +103,10 @@ public class InsertSensorRequestBuilder {
 		{
 			request.setRelatedFeature(featureRelationships);
 		}
-		SosMetadata meta = null;
+		SosInsertionMetadata meta = null;
 		if (observationTypes != null && !observationTypes.isEmpty())
 		{
-			meta = new SosMetadata();
+			meta = new SosInsertionMetadata();
 			meta.setObservationTypes(observationTypes);
 		}
 		if (meta != null)

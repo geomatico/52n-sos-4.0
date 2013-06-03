@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.n52.sos.ogc.gml.CodeType;
-import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
+import org.n52.sos.ogc.sensorML.elements.SmlIo;
 
 public class AbstractProcess extends AbstractSensorML {
 
@@ -35,9 +35,9 @@ public class AbstractProcess extends AbstractSensorML {
 
     private List<CodeType> names = new ArrayList<CodeType>(0);
 
-    private List<SosSMLIo<?>> inputs = new ArrayList<SosSMLIo<?>>(0);
+    private List<SmlIo<?>> inputs = new ArrayList<SmlIo<?>>(0);
 
-    private List<SosSMLIo<?>> outputs = new ArrayList<SosSMLIo<?>>(0);
+    private List<SmlIo<?>> outputs = new ArrayList<SmlIo<?>>(0);
 
     private List<String> parameters = new ArrayList<String>(0);
 
@@ -64,20 +64,20 @@ public class AbstractProcess extends AbstractSensorML {
         return this;
     }
 
-    public List<SosSMLIo<?>> getInputs() {
+    public List<SmlIo<?>> getInputs() {
         return inputs;
     }
 
-    public AbstractProcess setInputs(final List<SosSMLIo<?>> inputs) {
+    public AbstractProcess setInputs(final List<SmlIo<?>> inputs) {
         this.inputs = inputs;
         return this;
     }
 
-    public List<SosSMLIo<?>> getOutputs() {
+    public List<SmlIo<?>> getOutputs() {
         return outputs;
     }
 
-    public AbstractProcess setOutputs(final List<SosSMLIo<?>> outputs) {
+    public AbstractProcess setOutputs(final List<SmlIo<?>> outputs) {
         this.outputs = outputs;
         return this;
     }

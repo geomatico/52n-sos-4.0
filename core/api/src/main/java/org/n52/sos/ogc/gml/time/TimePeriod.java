@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * Class represents a GML conform timePeriod element.
  * 
  */
-public class TimePeriod extends ITime {
+public class TimePeriod extends Time {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TimePeriod.class);
     private static final long serialVersionUID = -1784577421975774171L;
@@ -230,8 +230,8 @@ public class TimePeriod extends ITime {
      * 
      * @param times
      */
-    public void extendToContain(Collection<ITime> times) {
-        for (ITime time : times) {
+    public void extendToContain(Collection<Time> times) {
+        for (Time time : times) {
             extendToContain(time);
         }
     }
@@ -241,7 +241,7 @@ public class TimePeriod extends ITime {
      * 
      * @param time
      */
-    public void extendToContain(ITime time) {
+    public void extendToContain(Time time) {
         if (time instanceof TimeInstant) {
             extendToContain((TimeInstant) time);
         } else if (time instanceof TimePeriod) {
@@ -329,7 +329,7 @@ public class TimePeriod extends ITime {
     }
 
     @Override
-    public int compareTo(ITime o) {
+    public int compareTo(Time o) {
         if (o instanceof TimeInstant) {
             TimeInstant ti = (TimeInstant) o;
             if (end.isBefore(ti.getValue())) {

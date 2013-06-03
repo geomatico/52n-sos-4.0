@@ -48,7 +48,7 @@ import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OWSOperation;
+import org.n52.sos.ogc.ows.OwsOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -105,7 +105,7 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
     }
 
     @Override
-    public OWSOperation getOperationMetadata(String service, String version) throws OwsExceptionReport {
+    public OwsOperation getOperationMetadata(String service, String version) throws OwsExceptionReport {
         return getDao().getOperationsMetadata(service, version);
     }
 

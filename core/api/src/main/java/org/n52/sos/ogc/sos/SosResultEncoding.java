@@ -29,7 +29,7 @@ import org.apache.xmlbeans.XmlObject.Factory;
 import org.n52.sos.exception.ows.concrete.DecoderResponseUnsupportedException;
 import org.n52.sos.exception.ows.concrete.XmlDecodingException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
+import org.n52.sos.ogc.swe.encoding.SweAbstractEncoding;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.SosHelper;
 import org.slf4j.Logger;
@@ -41,7 +41,7 @@ public class SosResultEncoding {
     
     private String xml;
 
-    private SosSweAbstractEncoding encoding;
+    private SweAbstractEncoding encoding;
     
     public SosResultEncoding() {
     }
@@ -58,11 +58,11 @@ public class SosResultEncoding {
         return xml;
     }
 
-    public void setEncoding(SosSweAbstractEncoding encoding) {
+    public void setEncoding(SweAbstractEncoding encoding) {
         this.encoding = encoding;
     }
 
-    public SosSweAbstractEncoding getEncoding() throws OwsExceptionReport {
+    public SweAbstractEncoding getEncoding() throws OwsExceptionReport {
         if (encoding == null && xml != null && !xml.isEmpty()) {
             encoding = parseResultEncoding();
         }
@@ -73,11 +73,11 @@ public class SosResultEncoding {
         this.xml = xml;
     }
     
-    private SosSweAbstractEncoding parseResultEncoding() throws OwsExceptionReport {
+    private SweAbstractEncoding parseResultEncoding() throws OwsExceptionReport {
         try {
             Object decodedObject = CodingHelper.decodeXmlObject(Factory.parse(xml));
-            if (decodedObject instanceof SosSweAbstractEncoding) {
-                return (SosSweAbstractEncoding) decodedObject;
+            if (decodedObject instanceof SweAbstractEncoding) {
+                return (SweAbstractEncoding) decodedObject;
             } else {
                 throw new DecoderResponseUnsupportedException(xml, decodedObject);
             }

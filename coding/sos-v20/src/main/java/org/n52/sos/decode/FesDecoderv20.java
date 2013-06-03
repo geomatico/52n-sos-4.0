@@ -46,7 +46,7 @@ import org.n52.sos.ogc.filter.FilterConstants.TimeOperator2;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.GMLConstants;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
@@ -171,9 +171,9 @@ public class FesDecoderv20 implements Decoder<Object, XmlObject> {
                 for (int i = 0; i < nodes.getLength(); i++) {
                     if (nodes.item(i).getNamespaceURI() != null && !nodes.item(i).getLocalName().equals(FilterConstants.EN_VALUE_REFERENCE)) {
                         Object timeObject = CodingHelper.decodeXmlObject(Factory.parse(nodes.item(i)));
-                        if (timeObject instanceof ITime) {
+                        if (timeObject instanceof Time) {
                             TimeOperator operator;
-                            ITime time = (ITime) timeObject;
+                            Time time = (Time) timeObject;
                             String localName = XmlHelper.getLocalName(xbTemporalOpsType);
                             if (localName.equals(TimeOperator2.After.name())) {
                                 operator = TimeOperator.TM_After;

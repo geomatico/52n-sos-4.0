@@ -23,9 +23,9 @@
  */
 package org.n52.sos.util.builder;
 
-import org.n52.sos.ogc.swe.SosSweDataRecord;
-import org.n52.sos.ogc.swe.SosSweField;
-import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.ogc.swe.SweDataRecord;
+import org.n52.sos.ogc.swe.SweField;
+import org.n52.sos.ogc.swe.simpleType.SweTime;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
@@ -33,23 +33,23 @@ import org.n52.sos.ogc.swe.simpleType.SosSweTime;
  */
 public class DataRecordBuilder {
 
-	private SosSweTime field;
+	private SweTime field;
 	
 	public static DataRecordBuilder aDataRecord()
 	{
 		return new DataRecordBuilder();
 	}
 
-	public DataRecordBuilder addField(SosSweTime timeFieldToAdd)
+	public DataRecordBuilder addField(SweTime timeFieldToAdd)
 	{
 		this.field = timeFieldToAdd;
 		return this;
 	}
 
-	public SosSweDataRecord build()
+	public SweDataRecord build()
 	{
-		SosSweDataRecord record = new SosSweDataRecord();
-		record.addField(new SosSweField(null, field));
+		SweDataRecord record = new SweDataRecord();
+		record.addField(new SweField(null, field));
 		return record;
 	}
 

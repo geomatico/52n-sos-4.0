@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.n52.sos.ogc.ows.OWSOperation;
+import org.n52.sos.ogc.ows.OwsOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -47,7 +47,7 @@ public abstract class AbstractGetCapabilitiesDAO extends AbstractOperationDAO {
     }
 
     @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
+    protected void setOperationsMetadata(OwsOperation opsMeta, String service, String version)
             throws OwsExceptionReport {
         // set param Sections
         List<String> sectionsValues = new LinkedList<String>();

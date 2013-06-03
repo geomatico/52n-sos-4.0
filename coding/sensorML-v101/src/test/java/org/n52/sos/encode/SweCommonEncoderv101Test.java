@@ -37,14 +37,14 @@ import org.junit.Test;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.swe.SosSweField;
-import org.n52.sos.ogc.swe.SosSweSimpleDataRecord;
-import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
-import org.n52.sos.ogc.swe.simpleType.SosSweCategory;
-import org.n52.sos.ogc.swe.simpleType.SosSweCount;
-import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
-import org.n52.sos.ogc.swe.simpleType.SosSweText;
-import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.ogc.swe.SweField;
+import org.n52.sos.ogc.swe.SweSimpleDataRecord;
+import org.n52.sos.ogc.swe.simpleType.SweBoolean;
+import org.n52.sos.ogc.swe.simpleType.SweCategory;
+import org.n52.sos.ogc.swe.simpleType.SweCount;
+import org.n52.sos.ogc.swe.simpleType.SweQuantity;
+import org.n52.sos.ogc.swe.simpleType.SweText;
+import org.n52.sos.ogc.swe.simpleType.SweTime;
 
 
 /**
@@ -61,7 +61,7 @@ public class SweCommonEncoderv101Test {
 	@Test
 	public final void should_encode_simpleDataRecord() throws OwsExceptionReport
 	{
-		final XmlObject encode = new SweCommonEncoderv101().encode(new SosSweSimpleDataRecord());
+		final XmlObject encode = new SweCommonEncoderv101().encode(new SweSimpleDataRecord());
 		
 		assertThat(encode,instanceOf(SimpleDataRecordType.class));
 	}
@@ -75,15 +75,15 @@ public class SweCommonEncoderv101Test {
 		final Boolean field1Value = Boolean.TRUE;
 		
 		final XmlObject encode = new SweCommonEncoderv101().encode(
-				new SosSweSimpleDataRecord()
+				new SweSimpleDataRecord()
 				.addField(
-						new SosSweField(field0Name, 
-								new SosSweText()
+						new SweField(field0Name, 
+								new SweText()
 						.setValue(field0Value)
 						))
 				.addField(
-						new SosSweField(field1Name,
-								new SosSweBoolean()
+						new SweField(field1Name,
+								new SweBoolean()
 						.setValue(field1Value)
 						))
 						);
@@ -110,10 +110,10 @@ public class SweCommonEncoderv101Test {
 		final Boolean field1Value = Boolean.TRUE;
 		
 		final XmlObject encode = new SweCommonEncoderv101().encode(
-				new SosSweSimpleDataRecord()
+				new SweSimpleDataRecord()
 				.addField(
-						new SosSweField(field1Name,
-								new SosSweBoolean()
+						new SweField(field1Name,
+								new SweBoolean()
 						.setValue(field1Value)
 						))
 						);
@@ -136,10 +136,10 @@ public class SweCommonEncoderv101Test {
 		final String field1Value = "field-1-value";
 		
 		final XmlObject encode = new SweCommonEncoderv101().encode(
-				new SosSweSimpleDataRecord()
+				new SweSimpleDataRecord()
 				.addField(
-						new SosSweField(field1Name,
-								new SosSweText()
+						new SweField(field1Name,
+								new SweText()
 						.setValue(field1Value)
 						))
 						);
@@ -163,10 +163,10 @@ public class SweCommonEncoderv101Test {
 		
 		final String codeSpace = "field-1-codespace";
 		final XmlObject encode = new SweCommonEncoderv101().encode(
-				new SosSweSimpleDataRecord()
+				new SweSimpleDataRecord()
 				.addField(
-						new SosSweField(name,
-								new SosSweCategory()
+						new SweField(name,
+								new SweCategory()
 						.setValue(value)
 						.setCodeSpace(codeSpace)
 						))
@@ -192,10 +192,10 @@ public class SweCommonEncoderv101Test {
 		final int value = 42;
 		
 		final XmlObject encode = new SweCommonEncoderv101().encode(
-				new SosSweSimpleDataRecord()
+				new SweSimpleDataRecord()
 				.addField(
-						new SosSweField(name,
-								new SosSweCount()
+						new SweField(name,
+								new SweCount()
 						.setValue(value)
 						))
 						);
@@ -218,10 +218,10 @@ public class SweCommonEncoderv101Test {
 		final double value = 42.5;
 		
 		final XmlObject encode = new SweCommonEncoderv101().encode(
-				new SosSweSimpleDataRecord()
+				new SweSimpleDataRecord()
 				.addField(
-						new SosSweField(name,
-								new SosSweQuantity()
+						new SweField(name,
+								new SweQuantity()
 						.setValue(value)
 						))
 						);
@@ -244,10 +244,10 @@ public class SweCommonEncoderv101Test {
 		final DateTime value = new DateTime();
 		
 		final XmlObject encode = new SweCommonEncoderv101().encode(
-				new SosSweSimpleDataRecord()
+				new SweSimpleDataRecord()
 				.addField(
-						new SosSweField(name,
-								new SosSweTime()
+						new SweField(name,
+								new SweTime()
 						.setValue(value)
 						))
 						);
@@ -267,8 +267,8 @@ public class SweCommonEncoderv101Test {
 	public void should_throw_exception_if_received_simpleDataRecord_with_field_with_null_element()
 			throws OwsExceptionReport{
 		new SweCommonEncoderv101().encode(
-				new SosSweSimpleDataRecord()
-				.addField(new SosSweField("field-name",null))
+				new SweSimpleDataRecord()
+				.addField(new SweField("field-name",null))
 				);
 	}
 }

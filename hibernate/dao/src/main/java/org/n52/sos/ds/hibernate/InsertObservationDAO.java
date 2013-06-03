@@ -59,9 +59,9 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.swe.SWEConstants;
-import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
-import org.n52.sos.ogc.swe.SosSweDataArray;
-import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
+import org.n52.sos.ogc.swe.SweAbstractDataComponent;
+import org.n52.sos.ogc.swe.SweDataArray;
+import org.n52.sos.ogc.swe.encoding.SweAbstractEncoding;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.response.InsertObservationResponse;
 import org.n52.sos.service.CodingRepository;
@@ -192,11 +192,11 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
         resultTemplate.setProcedure(hObsConst.getProcedure());
         resultTemplate.setOffering(hObsConst.getOffering());
         resultTemplate.setFeatureOfInterest(feature);
-        final SosSweDataArray dataArray = ((SweDataArrayValue) observation.getValue().getValue()).getValue();
+        final SweDataArray dataArray = ((SweDataArrayValue) observation.getValue().getValue()).getValue();
 
         if (dataArray.getElementType().getXml() == null) {
             final EncoderKey key = CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, dataArray.getElementType());
-            final Encoder<XmlObject, SosSweAbstractDataComponent> encoder = CodingRepository.getInstance().getEncoder(key);
+            final Encoder<XmlObject, SweAbstractDataComponent> encoder = CodingRepository.getInstance().getEncoder(key);
             if (encoder == null) {
                 throw new NoEncoderForKeyException(key);
             }
@@ -213,7 +213,7 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
         }
         if (dataArray.getEncoding().getXml() == null) {
             final EncoderKey key = CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, dataArray.getEncoding());
-            final Encoder<XmlObject, SosSweAbstractEncoding> encoder = CodingRepository.getInstance().getEncoder(key);
+            final Encoder<XmlObject, SweAbstractEncoding> encoder = CodingRepository.getInstance().getEncoder(key);
             if (encoder == null) {
                 throw new NoEncoderForKeyException(key);
             }

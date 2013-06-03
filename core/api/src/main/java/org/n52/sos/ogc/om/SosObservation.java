@@ -27,7 +27,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.n52.sos.ogc.gml.CodeWithAuthority;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.values.TVPValue;
@@ -161,7 +161,7 @@ public class SosObservation implements Serializable {
      * 
      * @return the phenomenonTime
      */
-    public ITime getPhenomenonTime() {
+    public Time getPhenomenonTime() {
         return value.getPhenomenonTime();
     }
 

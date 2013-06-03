@@ -45,7 +45,7 @@ import org.n52.sos.exception.ows.concrete.UnsupportedTimeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedValueReferenceException;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.filter.TemporalFilter;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 
 /**
  * Factory methods to create {@link Criterion Criterions} for {@link TemporalFilter TemporalFilters}.
@@ -123,7 +123,7 @@ public class TemporalRestrictions {
      * @see BeforeRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion before(String begin, String end, ITime value) throws UnsupportedTimeException {
+    public static Criterion before(String begin, String end, Time value) throws UnsupportedTimeException {
         return filter(new BeforeRestriction(), begin, end, value);
     }
 
@@ -138,7 +138,7 @@ public class TemporalRestrictions {
      * @see BeforeRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion before(String property, ITime value) throws UnsupportedTimeException {
+    public static Criterion before(String property, Time value) throws UnsupportedTimeException {
         return filter(new BeforeRestriction(), property, value);
     }
 
@@ -153,7 +153,7 @@ public class TemporalRestrictions {
      * @see BeforeRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion before(TimePrimitiveFieldDescriptor property, ITime value) throws UnsupportedTimeException {
+    public static Criterion before(TimePrimitiveFieldDescriptor property, Time value) throws UnsupportedTimeException {
         return filter(new BeforeRestriction(), property, value);
     }
 
@@ -169,7 +169,7 @@ public class TemporalRestrictions {
      * @see AfterRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion after(String begin, String end, ITime value) throws UnsupportedTimeException {
+    public static Criterion after(String begin, String end, Time value) throws UnsupportedTimeException {
         return filter(new AfterRestriction(), begin, end, value);
     }
 
@@ -184,7 +184,7 @@ public class TemporalRestrictions {
      * @see AfterRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion after(String property, ITime value) throws UnsupportedTimeException {
+    public static Criterion after(String property, Time value) throws UnsupportedTimeException {
         return filter(new AfterRestriction(), property, value);
     }
 
@@ -199,7 +199,7 @@ public class TemporalRestrictions {
      * @see AfterRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion after(TimePrimitiveFieldDescriptor property, ITime value) throws UnsupportedTimeException {
+    public static Criterion after(TimePrimitiveFieldDescriptor property, Time value) throws UnsupportedTimeException {
         return filter(new AfterRestriction(), property, value);
     }
 
@@ -215,7 +215,7 @@ public class TemporalRestrictions {
      * @see BeginsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion begins(String begin, String end, ITime value) throws UnsupportedTimeException {
+    public static Criterion begins(String begin, String end, Time value) throws UnsupportedTimeException {
         return filter(new BeginsRestriction(), begin, end, value);
     }
 
@@ -230,7 +230,7 @@ public class TemporalRestrictions {
      * @see BeginsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion begins(String property, ITime value) throws UnsupportedTimeException {
+    public static Criterion begins(String property, Time value) throws UnsupportedTimeException {
         return filter(new BeginsRestriction(), property, value);
     }
 
@@ -245,7 +245,7 @@ public class TemporalRestrictions {
      * @see BeginsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion begins(TimePrimitiveFieldDescriptor property, ITime value) throws UnsupportedTimeException {
+    public static Criterion begins(TimePrimitiveFieldDescriptor property, Time value) throws UnsupportedTimeException {
         return filter(new BeginsRestriction(), property, value);
     }
 
@@ -261,7 +261,7 @@ public class TemporalRestrictions {
      * @see EndsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion ends(String begin, String end, ITime value) throws UnsupportedTimeException {
+    public static Criterion ends(String begin, String end, Time value) throws UnsupportedTimeException {
         return filter(new EndsRestriction(), begin, end, value);
     }
 
@@ -276,7 +276,7 @@ public class TemporalRestrictions {
      * @see EndsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion ends(String property, ITime value) throws UnsupportedTimeException {
+    public static Criterion ends(String property, Time value) throws UnsupportedTimeException {
         return filter(new EndsRestriction(), property, value);
     }
 
@@ -291,7 +291,7 @@ public class TemporalRestrictions {
      * @see EndsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion ends(TimePrimitiveFieldDescriptor property, ITime value) throws UnsupportedTimeException {
+    public static Criterion ends(TimePrimitiveFieldDescriptor property, Time value) throws UnsupportedTimeException {
         return filter(new EndsRestriction(), property, value);
     }
 
@@ -307,7 +307,7 @@ public class TemporalRestrictions {
      * @see EndedByRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion endedBy(String begin, String end, ITime value) throws UnsupportedTimeException {
+    public static Criterion endedBy(String begin, String end, Time value) throws UnsupportedTimeException {
         return filter(new EndedByRestriction(), begin, end, value);
     }
 
@@ -322,7 +322,7 @@ public class TemporalRestrictions {
      * @see EndedByRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion endedBy(String property, ITime value) throws UnsupportedTimeException {
+    public static Criterion endedBy(String property, Time value) throws UnsupportedTimeException {
         return filter(new EndedByRestriction(), property, value);
     }
 
@@ -337,7 +337,7 @@ public class TemporalRestrictions {
      * @see EndedByRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion endedBy(TimePrimitiveFieldDescriptor property, ITime value) throws UnsupportedTimeException {
+    public static Criterion endedBy(TimePrimitiveFieldDescriptor property, Time value) throws UnsupportedTimeException {
         return filter(new EndedByRestriction(), property, value);
     }
 
@@ -353,7 +353,7 @@ public class TemporalRestrictions {
      * @see BegunByRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion begunBy(String begin, String end, ITime value) throws UnsupportedTimeException {
+    public static Criterion begunBy(String begin, String end, Time value) throws UnsupportedTimeException {
         return filter(new BegunByRestriction(), begin, end, value);
     }
 
@@ -368,7 +368,7 @@ public class TemporalRestrictions {
      * @see BegunByRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion begunBy(String property, ITime value) throws UnsupportedTimeException {
+    public static Criterion begunBy(String property, Time value) throws UnsupportedTimeException {
         return filter(new BegunByRestriction(), property, value);
     }
 
@@ -383,7 +383,7 @@ public class TemporalRestrictions {
      * @see BegunByRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion begunBy(TimePrimitiveFieldDescriptor property, ITime value) throws UnsupportedTimeException {
+    public static Criterion begunBy(TimePrimitiveFieldDescriptor property, Time value) throws UnsupportedTimeException {
         return filter(new BegunByRestriction(), property, value);
     }
 
@@ -399,7 +399,7 @@ public class TemporalRestrictions {
      * @see DuringRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion during(String begin, String end, ITime value) throws UnsupportedTimeException {
+    public static Criterion during(String begin, String end, Time value) throws UnsupportedTimeException {
         return filter(new DuringRestriction(), begin, end, value);
     }
 
@@ -414,7 +414,7 @@ public class TemporalRestrictions {
      * @see DuringRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion during(String property, ITime value) throws UnsupportedTimeException {
+    public static Criterion during(String property, Time value) throws UnsupportedTimeException {
         return filter(new DuringRestriction(), property, value);
     }
 
@@ -429,7 +429,7 @@ public class TemporalRestrictions {
      * @see DuringRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion during(TimePrimitiveFieldDescriptor property, ITime value) throws UnsupportedTimeException {
+    public static Criterion during(TimePrimitiveFieldDescriptor property, Time value) throws UnsupportedTimeException {
         return filter(new DuringRestriction(), property, value);
     }
 
@@ -445,7 +445,7 @@ public class TemporalRestrictions {
      * @see TEqualsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion tEquals(String begin, String end, ITime value) throws UnsupportedTimeException {
+    public static Criterion tEquals(String begin, String end, Time value) throws UnsupportedTimeException {
         return filter(new TEqualsRestriction(), begin, end, value);
     }
 
@@ -460,7 +460,7 @@ public class TemporalRestrictions {
      * @see TEqualsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion tEquals(String property, ITime value) throws UnsupportedTimeException {
+    public static Criterion tEquals(String property, Time value) throws UnsupportedTimeException {
         return filter(new TEqualsRestriction(), property, value);
     }
 
@@ -475,7 +475,7 @@ public class TemporalRestrictions {
      * @see TEqualsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion tEquals(TimePrimitiveFieldDescriptor property, ITime value) throws UnsupportedTimeException {
+    public static Criterion tEquals(TimePrimitiveFieldDescriptor property, Time value) throws UnsupportedTimeException {
         return filter(new TEqualsRestriction(), property, value);
     }
 
@@ -491,7 +491,7 @@ public class TemporalRestrictions {
      * @see ContainsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion contains(String begin, String end, ITime value) throws UnsupportedTimeException {
+    public static Criterion contains(String begin, String end, Time value) throws UnsupportedTimeException {
         return filter(new ContainsRestriction(), begin, end, value);
     }
 
@@ -506,7 +506,7 @@ public class TemporalRestrictions {
      * @see ContainsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion contains(String property, ITime value) throws UnsupportedTimeException {
+    public static Criterion contains(String property, Time value) throws UnsupportedTimeException {
         return filter(new ContainsRestriction(), property, value);
     }
 
@@ -521,7 +521,7 @@ public class TemporalRestrictions {
      * @see ContainsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion contains(TimePrimitiveFieldDescriptor property, ITime value) throws UnsupportedTimeException {
+    public static Criterion contains(TimePrimitiveFieldDescriptor property, Time value) throws UnsupportedTimeException {
         return filter(new ContainsRestriction(), property, value);
     }
 
@@ -537,7 +537,7 @@ public class TemporalRestrictions {
      * @see OverlapsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion overlaps(String begin, String end, ITime value) throws UnsupportedTimeException {
+    public static Criterion overlaps(String begin, String end, Time value) throws UnsupportedTimeException {
         return filter(new OverlapsRestriction(), begin, end, value);
     }
 
@@ -552,7 +552,7 @@ public class TemporalRestrictions {
      * @see OverlapsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion overlaps(String property, ITime value) throws UnsupportedTimeException {
+    public static Criterion overlaps(String property, Time value) throws UnsupportedTimeException {
         return filter(new OverlapsRestriction(), property, value);
     }
 
@@ -567,7 +567,7 @@ public class TemporalRestrictions {
      * @see OverlapsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion overlaps(TimePrimitiveFieldDescriptor property, ITime value) throws UnsupportedTimeException {
+    public static Criterion overlaps(TimePrimitiveFieldDescriptor property, Time value) throws UnsupportedTimeException {
         return filter(new OverlapsRestriction(), property, value);
     }
 
@@ -583,7 +583,7 @@ public class TemporalRestrictions {
      * @see MeetsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion meets(String begin, String end, ITime value) throws UnsupportedTimeException {
+    public static Criterion meets(String begin, String end, Time value) throws UnsupportedTimeException {
         return filter(new MeetsRestriction(), begin, end, value);
     }
 
@@ -598,7 +598,7 @@ public class TemporalRestrictions {
      * @see MeetsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion meets(String property, ITime value) throws UnsupportedTimeException {
+    public static Criterion meets(String property, Time value) throws UnsupportedTimeException {
         return filter(new MeetsRestriction(), property, value);
     }
 
@@ -613,7 +613,7 @@ public class TemporalRestrictions {
      * @see MeetsRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion meets(TimePrimitiveFieldDescriptor property, ITime value) throws UnsupportedTimeException {
+    public static Criterion meets(TimePrimitiveFieldDescriptor property, Time value) throws UnsupportedTimeException {
         return filter(new MeetsRestriction(), property, value);
     }
 
@@ -629,7 +629,7 @@ public class TemporalRestrictions {
      * @see MetByRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion metBy(String begin, String end, ITime value) throws UnsupportedTimeException {
+    public static Criterion metBy(String begin, String end, Time value) throws UnsupportedTimeException {
         return filter(new MetByRestriction(), begin, end, value);
     }
 
@@ -644,7 +644,7 @@ public class TemporalRestrictions {
      * @see MetByRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion metBy(String property, ITime value) throws UnsupportedTimeException {
+    public static Criterion metBy(String property, Time value) throws UnsupportedTimeException {
         return filter(new MetByRestriction(), property, value);
     }
 
@@ -659,7 +659,7 @@ public class TemporalRestrictions {
      * @see MetByRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion metBy(TimePrimitiveFieldDescriptor property, ITime value) throws UnsupportedTimeException {
+    public static Criterion metBy(TimePrimitiveFieldDescriptor property, Time value) throws UnsupportedTimeException {
         return filter(new MetByRestriction(), property, value);
     }
 
@@ -675,7 +675,7 @@ public class TemporalRestrictions {
      * @see OverlappedByRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion overlappedBy(String begin, String end, ITime value) throws UnsupportedTimeException {
+    public static Criterion overlappedBy(String begin, String end, Time value) throws UnsupportedTimeException {
         return filter(new OverlappedByRestriction(), begin, end, value);
     }
 
@@ -690,7 +690,7 @@ public class TemporalRestrictions {
      * @see OverlappedByRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion overlappedBy(String property, ITime value) throws UnsupportedTimeException {
+    public static Criterion overlappedBy(String property, Time value) throws UnsupportedTimeException {
         return filter(new OverlappedByRestriction(), property, value);
     }
 
@@ -705,7 +705,7 @@ public class TemporalRestrictions {
      * @see OverlappedByRestriction
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    public static Criterion overlappedBy(TimePrimitiveFieldDescriptor property, ITime value) throws
+    public static Criterion overlappedBy(TimePrimitiveFieldDescriptor property, Time value) throws
             UnsupportedTimeException {
         return filter(new OverlappedByRestriction(), property, value);
     }
@@ -722,7 +722,7 @@ public class TemporalRestrictions {
      *
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    private static Criterion filter(TemporalRestriction restriction, String begin, String end, ITime value) throws
+    private static Criterion filter(TemporalRestriction restriction, String begin, String end, Time value) throws
             UnsupportedTimeException {
         return filter(restriction, new TimePrimitiveFieldDescriptor(begin, end), value);
     }
@@ -737,7 +737,7 @@ public class TemporalRestrictions {
      *
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    private static Criterion filter(TemporalRestriction restriction, String property, ITime value) throws
+    private static Criterion filter(TemporalRestriction restriction, String property, Time value) throws
             UnsupportedTimeException {
         return filter(restriction, new TimePrimitiveFieldDescriptor(property), value);
     }
@@ -753,7 +753,7 @@ public class TemporalRestrictions {
      *
      * @throws UnsupportedTimeException if the value and property combination is not applicable for this restriction
      */
-    private static Criterion filter(TemporalRestriction restriction, TimePrimitiveFieldDescriptor property, ITime value)
+    private static Criterion filter(TemporalRestriction restriction, TimePrimitiveFieldDescriptor property, Time value)
             throws UnsupportedTimeException {
         return restriction.get(property, value);
     }
@@ -775,7 +775,7 @@ public class TemporalRestrictions {
                                                                  UnsupportedValueReferenceException,
                                                                  UnsupportedOperatorException {
         TimePrimitiveFieldDescriptor property = getFields(filter.getValueReference());
-        ITime value = filter.getTime();
+        Time value = filter.getTime();
         switch (filter.getOperator()) {
             case TM_Before:
                 return before(property, value);

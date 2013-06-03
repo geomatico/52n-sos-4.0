@@ -31,8 +31,8 @@ import javax.xml.namespace.QName;
 
 import org.joda.time.DateTime;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.ows.OWSOperation;
-import org.n52.sos.ogc.ows.OWSParameterValueRange;
+import org.n52.sos.ogc.ows.OwsOperation;
+import org.n52.sos.ogc.ows.OwsParameterValueRange;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -57,7 +57,7 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
     }
 
     @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
+    protected void setOperationsMetadata(OwsOperation opsMeta, String service, String version)
             throws OwsExceptionReport {
 
         Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeaturesOfInterest(), version);
@@ -78,7 +78,7 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
 
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
             // SOS 2.0 parameter
-            OWSParameterValueRange temporalFilter = new OWSParameterValueRange(getPhenomenonTime());
+            OwsParameterValueRange temporalFilter = new OwsParameterValueRange(getPhenomenonTime());
             opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.temporalFilter, temporalFilter);
             SosEnvelope envelope = null;
             if (featureIDs != null && !featureIDs.isEmpty()) {

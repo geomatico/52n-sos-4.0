@@ -32,7 +32,7 @@ import org.n52.sos.cache.ContentCache;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.DCP;
-import org.n52.sos.ogc.ows.OWSOperation;
+import org.n52.sos.ogc.ows.OwsOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -64,13 +64,13 @@ public abstract class AbstractOperationDAO implements OperationDAO {
     }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version) throws OwsExceptionReport {
+    public OwsOperation getOperationsMetadata(String service, String version) throws OwsExceptionReport {
         Map<String, Set<DCP>> dcp = getDCP(new OperationDecoderKey(service, version, getOperationDAOKeyType().getOperationName()));
         if (dcp == null || dcp.isEmpty()) {
             LOG.debug("Operation {} for Service {} not available due to empty DCP map.", getOperationName(), getOperationDAOKeyType().getService());
             return null;
         }
-        OWSOperation operation = new OWSOperation();
+        OwsOperation operation = new OwsOperation();
         operation.setDcp(dcp);
         operation.setOperationName(getOperationName());
         setOperationsMetadata(operation, service, version);
@@ -126,6 +126,6 @@ public abstract class AbstractOperationDAO implements OperationDAO {
         return dcps;
     }
 
-    protected abstract void setOperationsMetadata(OWSOperation operation, String service, String version) throws
+    protected abstract void setOperationsMetadata(OwsOperation operation, String service, String version) throws
             OwsExceptionReport;
 }

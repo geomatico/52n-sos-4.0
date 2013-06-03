@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.n52.sos.ogc.ows.OWSOperation;
+import org.n52.sos.ogc.ows.OwsOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -44,7 +44,7 @@ public abstract class AbstractGetFeatureOfInterestDAO extends AbstractOperationD
     }
 
     @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
+    protected void setOperationsMetadata(OwsOperation opsMeta, String service, String version) throws OwsExceptionReport {
 
         Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeaturesOfInterest(), version);
 

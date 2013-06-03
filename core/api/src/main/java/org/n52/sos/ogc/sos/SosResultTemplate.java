@@ -26,10 +26,10 @@ package org.n52.sos.ogc.sos;
 import org.n52.sos.exception.ows.concrete.DecoderResponseUnsupportedException;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
-import org.n52.sos.ogc.swe.SosSweDataRecord;
-import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
-import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
+import org.n52.sos.ogc.swe.SweAbstractDataComponent;
+import org.n52.sos.ogc.swe.SweDataRecord;
+import org.n52.sos.ogc.swe.encoding.SweAbstractEncoding;
+import org.n52.sos.ogc.swe.encoding.SweTextEncoding;
 import org.n52.sos.util.CodingHelper;
 
 public class SosResultTemplate {
@@ -40,9 +40,9 @@ public class SosResultTemplate {
 
     private String xmResultEncoding;
 
-    private SosSweAbstractDataComponent resultStructure;
+    private SweAbstractDataComponent resultStructure;
 
-    private SosSweAbstractEncoding resultEncoding;
+    private SweAbstractEncoding resultEncoding;
 
     public CodeWithAuthority getIdentifier() {
         return identifier;
@@ -56,14 +56,14 @@ public class SosResultTemplate {
         return xmResultEncoding;
     }
 
-    public SosSweAbstractDataComponent getResultStructure() throws OwsExceptionReport {
+    public SweAbstractDataComponent getResultStructure() throws OwsExceptionReport {
         if (resultStructure == null) {
             this.resultStructure = parseResultStructure();
         }
         return resultStructure;
     }
 
-    public SosSweAbstractEncoding getResultEncoding() throws OwsExceptionReport {
+    public SweAbstractEncoding getResultEncoding() throws OwsExceptionReport {
         if (resultEncoding == null) {
             this.resultEncoding = parseResultEncoding();
         }
@@ -82,26 +82,26 @@ public class SosResultTemplate {
         this.xmResultEncoding = xmResultEncoding;
     }
 
-    public void setResultStructure(SosSweAbstractDataComponent resultStructure) {
+    public void setResultStructure(SweAbstractDataComponent resultStructure) {
         this.resultStructure = resultStructure;
     }
 
-    public void setResultEncoding(SosSweAbstractEncoding resultEncoding) {
+    public void setResultEncoding(SweAbstractEncoding resultEncoding) {
         this.resultEncoding = resultEncoding;
     }
 
-    private SosSweAbstractDataComponent parseResultStructure() throws OwsExceptionReport {
+    private SweAbstractDataComponent parseResultStructure() throws OwsExceptionReport {
         Object decodedObject = CodingHelper.decodeXmlObject(xmlResultStructure);
-        if (decodedObject instanceof SosSweDataRecord) {
-            return (SosSweDataRecord) decodedObject;
+        if (decodedObject instanceof SweDataRecord) {
+            return (SweDataRecord) decodedObject;
         }
         throw new DecoderResponseUnsupportedException(xmlResultStructure, decodedObject);
     }
 
-    private SosSweAbstractEncoding parseResultEncoding() throws OwsExceptionReport {
+    private SweAbstractEncoding parseResultEncoding() throws OwsExceptionReport {
         Object decodedObject = CodingHelper.decodeXmlObject(xmResultEncoding);
-        if (decodedObject instanceof SosSweTextEncoding) {
-            return (SosSweTextEncoding) decodedObject;
+        if (decodedObject instanceof SweTextEncoding) {
+            return (SweTextEncoding) decodedObject;
         }
         throw new DecoderResponseUnsupportedException(xmResultEncoding, decodedObject);
     }

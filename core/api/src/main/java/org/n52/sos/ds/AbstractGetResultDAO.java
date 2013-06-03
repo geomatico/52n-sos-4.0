@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.n52.sos.exception.ows.OperationNotSupportedException;
-import org.n52.sos.ogc.ows.OWSOperation;
+import org.n52.sos.ogc.ows.OwsOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -43,7 +43,7 @@ public abstract class AbstractGetResultDAO extends AbstractOperationDAO {
     }
 
     @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
+    protected void setOperationsMetadata(OwsOperation opsMeta, String service, String version)
             throws OwsExceptionReport {
         Set<String> resultTemplateIdentifier = getCache().getResultTemplates();
         Set<String> offerings = new HashSet<String>(0);

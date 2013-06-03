@@ -23,14 +23,14 @@
  */
 package org.n52.sos.ogc.om.values;
 
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 
 /*
  * FIXME rename (remove the leading I)
  */
 public interface IMultiValue<T> extends Value<T> {
     
-    ITime getPhenomenonTime();
+    Time getPhenomenonTime();
     
     void setValue(T value);
 

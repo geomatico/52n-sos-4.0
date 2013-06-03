@@ -32,7 +32,7 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.n52.sos.ogc.OGCConstants.*;
 import static org.n52.sos.ogc.sensorML.SensorMLConstants.*;
-import static org.n52.sos.ogc.sensorML.elements.SosSMLClassifier.*;
+import static org.n52.sos.ogc.sensorML.elements.SmlClassifier.*;
 import static org.n52.sos.util.StringHelper.join;
 
 import org.junit.BeforeClass;
@@ -50,8 +50,8 @@ import org.n52.sos.ogc.sensorML.RulesDefinition;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.System;
-import org.n52.sos.ogc.sensorML.elements.SosSMLClassifier;
-import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
+import org.n52.sos.ogc.sensorML.elements.SmlClassifier;
+import org.n52.sos.ogc.sensorML.elements.SmlIdentifier;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.service.ProcedureDescriptionSettings;
 import org.n52.sos.service.ServiceConfiguration;
@@ -234,7 +234,7 @@ public class HibernateProcedureConverterTest {
 		
 		assertThat(pModel.getClassifications().size(), is(2));
 		
-		for (final SosSMLClassifier classifier : pModel.getClassifications()) 
+		for (final SmlClassifier classifier : pModel.getClassifications()) 
 		{
 			if (classifier.getName().equalsIgnoreCase(INTENDED_APPLICATION))
 			{
@@ -272,7 +272,7 @@ public class HibernateProcedureConverterTest {
 	
 	private String getIdentifier(final ProcessModel pModel, final String idName, final String idDefinition)
 	{
-		for (final SosSMLIdentifier identifier : pModel.getIdentifications()) 
+		for (final SmlIdentifier identifier : pModel.getIdentifications()) 
 		{
 			if (identifier.getName().equalsIgnoreCase(idName) && 
 					identifier.getDefinition().equalsIgnoreCase(idDefinition))

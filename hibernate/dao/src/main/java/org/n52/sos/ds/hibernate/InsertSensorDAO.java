@@ -61,7 +61,7 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosInsertionCapabilities;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
-import org.n52.sos.ogc.swe.SosFeatureRelationship;
+import org.n52.sos.ogc.swes.SwesFeatureRelationship;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.InsertSensorResponse;
 
@@ -140,14 +140,14 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
         return response;
     }
 
-    private Offering getAndUpdateOrInsertNewOffering(SosOffering assignedOffering, List<SosFeatureRelationship> relatedFeatures,
+    private Offering getAndUpdateOrInsertNewOffering(SosOffering assignedOffering, List<SwesFeatureRelationship> relatedFeatures,
             List<ObservationType> observationTypes, List<FeatureOfInterestType> featureOfInterestTypes, Session session)
             throws OwsExceptionReport {
         List<RelatedFeature> hRelatedFeatures = new LinkedList<RelatedFeature>();
         if (relatedFeatures != null && !relatedFeatures.isEmpty()) {
             RelatedFeatureDAO relatedFeatureDAO = new RelatedFeatureDAO();
             RelatedFeatureRoleDAO relatedFeatureRoleDAO = new RelatedFeatureRoleDAO();
-            for (SosFeatureRelationship relatedFeature : relatedFeatures) {
+            for (SwesFeatureRelationship relatedFeature : relatedFeatures) {
                 List<RelatedFeatureRole> relatedFeatureRoles =
                         relatedFeatureRoleDAO.getOrInsertRelatedFeatureRole(
                                 relatedFeature.getRole(), session);

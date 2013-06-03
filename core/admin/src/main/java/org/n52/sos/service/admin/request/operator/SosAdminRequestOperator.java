@@ -47,12 +47,12 @@ import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStream
 import org.n52.sos.exception.ows.concrete.NoEncoderForResponseException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.DCP;
-import org.n52.sos.ogc.ows.OWSOperation;
-import org.n52.sos.ogc.ows.OWSOperationsMetadata;
-import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
+import org.n52.sos.ogc.ows.OwsOperation;
+import org.n52.sos.ogc.ows.OwsOperationsMetadata;
+import org.n52.sos.ogc.ows.OwsParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.ows.SosCapabilities;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosCapabilities;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.response.GetCapabilitiesResponse;
@@ -157,27 +157,27 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
         GetCapabilitiesResponse response = new GetCapabilitiesResponse();
         response.setService(SosConstants.SOS);
         SosCapabilities sosCapabilities = new SosCapabilities();
-        OWSOperationsMetadata operationsMetadata = new OWSOperationsMetadata();
-        List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>(2);
+        OwsOperationsMetadata operationsMetadata = new OwsOperationsMetadata();
+        List<OwsOperation> opsMetadata = new ArrayList<OwsOperation>(2);
         opsMetadata.add(getOpsMetadataForCapabilities());
         opsMetadata.add(getOpsMetadataForUpdate());
         operationsMetadata.setOperations(opsMetadata);
-        operationsMetadata.addCommonValue(AdministratorParams.service.name(), new OWSParameterValuePossibleValues(KEY));
+        operationsMetadata.addCommonValue(AdministratorParams.service.name(), new OwsParameterValuePossibleValues(KEY));
         sosCapabilities.setOperationsMetadata(operationsMetadata);
         response.setCapabilities(sosCapabilities);
         return createServiceResponse(response);
     }
 
-    private OWSOperation getOpsMetadataForCapabilities() {
-        OWSOperation opsMeta = new OWSOperation();
+    private OwsOperation getOpsMetadataForCapabilities() {
+        OwsOperation opsMeta = new OwsOperation();
         opsMeta.setOperationName(REQUEST_GET_CAPABILITIES);
         opsMeta.setDcp(getDCP());
         opsMeta.addAnyParameterValue(AdministratorParams.parameter);
         return opsMeta;
     }
 
-    private OWSOperation getOpsMetadataForUpdate() {
-        OWSOperation opsMeta = new OWSOperation();
+    private OwsOperation getOpsMetadataForUpdate() {
+        OwsOperation opsMeta = new OwsOperation();
         opsMeta.setOperationName(REQUEST_UPDATE);
         opsMeta.setDcp(getDCP());
         opsMeta.addPossibleValuesParameter(AdministratorParams.parameter, PARAMETERS);

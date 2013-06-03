@@ -40,7 +40,7 @@ public class SosSweCategoryTest {
 	@Test
 	public void should_return_false_for_all_isSetMethods_is_nothing_is_set()
 	{
-		final SosSweCategory category = new SosSweCategory();
+		final SweCategory category = new SweCategory();
 		
 		assertThat(category.isSetCodeSpace(), is(FALSE));
 		assertThat(category.isSetDefinition(), is(FALSE));
@@ -56,7 +56,7 @@ public class SosSweCategoryTest {
 	@Test
 	public void should_return_true_afterSetting_CodeSpace()
 	{
-		final SosSweCategory category = new SosSweCategory();
+		final SweCategory category = new SweCategory();
 		final String codeSpace = "test-code-space";
 		category.setCodeSpace(codeSpace);
 		

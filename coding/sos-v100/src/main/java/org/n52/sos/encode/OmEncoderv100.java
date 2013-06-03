@@ -56,7 +56,7 @@ import org.joda.time.DateTime;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.gml.GMLConstants;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.OMConstants;
@@ -79,7 +79,7 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.ogc.swe.SWEConstants;
-import org.n52.sos.ogc.swe.SosSweDataArray;
+import org.n52.sos.ogc.swe.SweDataArray;
 import org.n52.sos.response.GetObservationByIdResponse;
 import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.service.Configurator;
@@ -343,7 +343,7 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
         }
         String observationID = sosObservation.getObservationID();
         // set samplingTime
-        ITime samplingTime = sosObservation.getPhenomenonTime();
+        Time samplingTime = sosObservation.getPhenomenonTime();
         if (samplingTime.getGmlId() == null) {
             samplingTime.setGmlId(OMConstants.PHENOMENON_TIME_NAME + "_" + observationID);
         }
@@ -372,7 +372,7 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
         return phenComponents;
     }
 
-    private void addSamplingTime(ObservationType xbObservation, ITime iTime) throws OwsExceptionReport {
+    private void addSamplingTime(ObservationType xbObservation, Time iTime) throws OwsExceptionReport {
         XmlObject xmlObject = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML, iTime);
         XmlObject substitution =
                 xbObservation.addNewSamplingTime().addNewTimeObject()
@@ -381,7 +381,7 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
     }
 
     private void addResultTime(ObservationType xbObs, SosObservation sosObservation) throws OwsExceptionReport {
-        ITime phenomenonTime = sosObservation.getPhenomenonTime();
+        Time phenomenonTime = sosObservation.getPhenomenonTime();
         if (sosObservation.isSetResultTime()) {
             if (sosObservation.getResultTime().equals(phenomenonTime)) {
                 xbObs.addNewResultTime().setHref("#" + phenomenonTime.getGmlId());
@@ -485,7 +485,7 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
             }
         } else if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)
                 || observationType.equals(OMConstants.RESULT_MODEL_OBSERVATION)) {
-            SosSweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
+            SweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
             Map<HelperValues, String> additionalValues =
                     new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
             additionalValues.put(HelperValues.FOR_OBSERVATION, null);
@@ -498,7 +498,7 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
         Map<HelperValues, String> additionalValues =
                 new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
         additionalValues.put(HelperValues.FOR_OBSERVATION, null);
-        SosSweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
+        SweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
         xbResult.set(CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE_101, dataArray, additionalValues));
     }
 

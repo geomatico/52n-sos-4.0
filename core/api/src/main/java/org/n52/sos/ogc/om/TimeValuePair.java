@@ -23,21 +23,21 @@
  */
 package org.n52.sos.ogc.om;
 
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.om.values.Value;
 
 public class TimeValuePair implements Comparable<TimeValuePair> {
     
-    private ITime time;
+    private Time time;
     
     private Value<?> value;
 
-    public TimeValuePair(ITime time, Value<?> value) {
+    public TimeValuePair(Time time, Value<?> value) {
         this.time = time;
         this.value = value;
     }
 
-    public ITime getTime() {
+    public Time getTime() {
         return time;
     }
 
@@ -45,7 +45,7 @@ public class TimeValuePair implements Comparable<TimeValuePair> {
         return value;
     }
 
-    public void setTime(ITime time) {
+    public void setTime(Time time) {
         this.time = time;
     }
 

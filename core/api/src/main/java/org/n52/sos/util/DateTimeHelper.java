@@ -34,8 +34,8 @@ import org.joda.time.format.ISOPeriodFormat;
 import org.n52.sos.exception.ows.concrete.DateTimeException;
 import org.n52.sos.exception.ows.concrete.DateTimeFormatException;
 import org.n52.sos.exception.ows.concrete.DateTimeParseException;
-import org.n52.sos.ogc.gml.time.ITime;
-import org.n52.sos.ogc.gml.time.ITime.TimeFormat;
+import org.n52.sos.ogc.gml.time.Time;
+import org.n52.sos.ogc.gml.time.Time.TimeFormat;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.slf4j.Logger;
@@ -101,14 +101,14 @@ public final class DateTimeHelper {
      * Formats the given ITime to ISO 8601 string.
      * 
      * @param time
-     *            an {@link ITime} object to be formatted
+     *            an {@link Time} object to be formatted
      * @return an ISO 8601 conform {@link String}.
      * @throws IllegalArgumentException
      *             in the case of receiving <tt>null</tt> or not supported
      *             types.
      * @see {@link #formatDateTime2IsoString}
      */
-    public static String format(final ITime time) {
+    public static String format(final Time time) {
         if (time != null) {
             if (time instanceof TimeInstant) {
                 return formatDateTime2IsoString(((TimeInstant) time).getValue());

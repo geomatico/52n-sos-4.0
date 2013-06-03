@@ -25,7 +25,7 @@
 package org.n52.sos.exception.ows.concrete;
 
 import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
@@ -35,7 +35,7 @@ public class UnsupportedTimeException extends NoApplicableCodeException {
 
     private static final long serialVersionUID = -6897786883586612395L;
 
-    public UnsupportedTimeException(ITime time) {
+    public UnsupportedTimeException(Time time) {
         withMessage("ITime %s is not supported", time);
     }
 

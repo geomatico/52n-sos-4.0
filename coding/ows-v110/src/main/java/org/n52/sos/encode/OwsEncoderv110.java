@@ -64,11 +64,11 @@ import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.DCP;
 import org.n52.sos.ogc.ows.IOWSParameterValue;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OWSOperation;
-import org.n52.sos.ogc.ows.OWSOperationsMetadata;
-import org.n52.sos.ogc.ows.OWSParameterDataType;
-import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
-import org.n52.sos.ogc.ows.OWSParameterValueRange;
+import org.n52.sos.ogc.ows.OwsOperation;
+import org.n52.sos.ogc.ows.OwsOperationsMetadata;
+import org.n52.sos.ogc.ows.OwsParameterDataType;
+import org.n52.sos.ogc.ows.OwsParameterValuePossibleValues;
+import org.n52.sos.ogc.ows.OwsParameterValueRange;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.ows.SosServiceProvider;
@@ -91,7 +91,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
     private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(OWSConstants.NS_OWS,
                                                                                             SosServiceIdentification.class,
                                                                                             SosServiceProvider.class,
-                                                                                            OWSOperationsMetadata.class,
+                                                                                            OwsOperationsMetadata.class,
                                                                                             OwsExceptionReport.class);
     public static final String ENCODING_CONTRAINT = "encoding";
     private boolean includeStackTraceInExceptionReport = false;
@@ -147,8 +147,8 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
             return encodeServiceIdentification((SosServiceIdentification) element);
         } else if (element instanceof SosServiceProvider) {
             return encodeServiceProvider((SosServiceProvider) element);
-        } else if (element instanceof OWSOperationsMetadata) {
-            return encodeOperationsMetadata((OWSOperationsMetadata) element);
+        } else if (element instanceof OwsOperationsMetadata) {
+            return encodeOperationsMetadata((OwsOperationsMetadata) element);
         } else if (element instanceof OwsExceptionReport) {
         	if (isEncodeExceptionsOnly(additionalValues) && !((OwsExceptionReport) element).getExceptions().isEmpty())
         	{
@@ -273,11 +273,11 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
      *
      * @throws CompositeOwsException * if an error occurs
      */
-    protected OperationsMetadata encodeOperationsMetadata(final OWSOperationsMetadata operationsMetadata)
+    protected OperationsMetadata encodeOperationsMetadata(final OwsOperationsMetadata operationsMetadata)
             throws OwsExceptionReport {
         final OperationsMetadata xbMeta =
                            OperationsMetadata.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        for (final OWSOperation operationMetadata : operationsMetadata.getOperations()) {
+        for (final OwsOperation operationMetadata : operationsMetadata.getOperations()) {
             final Operation operation = xbMeta.addNewOperation();
             // name
             operation.setName(operationMetadata.getOperationName());
@@ -410,12 +410,12 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
         if (parameterValues != null && !parameterValues.isEmpty()) {
             domainType.setName(parameterName);
             for (final IOWSParameterValue parameterValue : parameterValues) {
-                if (parameterValue instanceof OWSParameterValuePossibleValues) {
-                    setParamList(domainType, (OWSParameterValuePossibleValues) parameterValue);
-                } else if (parameterValue instanceof OWSParameterValueRange) {
-                    setParamRange(domainType, (OWSParameterValueRange) parameterValue);
-                } else if (parameterValue instanceof OWSParameterDataType) {
-                    setParamDataType(domainType, (OWSParameterDataType) parameterValue);
+                if (parameterValue instanceof OwsParameterValuePossibleValues) {
+                    setParamList(domainType, (OwsParameterValuePossibleValues) parameterValue);
+                } else if (parameterValue instanceof OwsParameterValueRange) {
+                    setParamRange(domainType, (OwsParameterValueRange) parameterValue);
+                } else if (parameterValue instanceof OwsParameterDataType) {
+                    setParamDataType(domainType, (OwsParameterDataType) parameterValue);
                 }
             }
         } else {
@@ -431,7 +431,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
      * @param name           Parameter name.
      * @param parameterValue .getValues() List of values.
      */
-    private void setParamList(final DomainType domainType, final OWSParameterValuePossibleValues parameterValue) {
+    private void setParamList(final DomainType domainType, final OwsParameterValuePossibleValues parameterValue) {
         if (parameterValue.getValues() != null) {
             if (!parameterValue.getValues().isEmpty()) {
                 AllowedValues allowedValues = null;
@@ -454,7 +454,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
         }
     }
 
-    private void setParamDataType(final DomainType domainType, final OWSParameterDataType parameterValue) {
+    private void setParamDataType(final DomainType domainType, final OwsParameterDataType parameterValue) {
         if (parameterValue.getReference() != null && !parameterValue.getReference().isEmpty()) {
             domainType.addNewDataType().setReference(parameterValue.getReference());
         } else {
@@ -472,7 +472,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
      *
      * @throws CompositeOwsException
      */
-    private void setParamRange(final DomainType domainType, final OWSParameterValueRange parameterValue) throws OwsExceptionReport {
+    private void setParamRange(final DomainType domainType, final OwsParameterValueRange parameterValue) throws OwsExceptionReport {
         if (parameterValue.getMinValue() != null && parameterValue.getMaxValue() != null) {
             if (!parameterValue.getMinValue().isEmpty() && !parameterValue.getMaxValue().isEmpty()) {
                 final RangeType range = domainType.addNewAllowedValues().addNewRange();

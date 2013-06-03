@@ -26,7 +26,7 @@ package org.n52.sos.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosMultiObservationValues;
 import org.n52.sos.ogc.om.SosObservation;
@@ -43,19 +43,19 @@ import org.n52.sos.ogc.om.values.TVPValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosResultTemplate;
-import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
-import org.n52.sos.ogc.swe.SosSweDataArray;
-import org.n52.sos.ogc.swe.SosSweDataRecord;
-import org.n52.sos.ogc.swe.SosSweField;
-import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
-import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
-import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
-import org.n52.sos.ogc.swe.simpleType.SosSweCategory;
-import org.n52.sos.ogc.swe.simpleType.SosSweCount;
-import org.n52.sos.ogc.swe.simpleType.SosSweObservableProperty;
-import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
-import org.n52.sos.ogc.swe.simpleType.SosSweText;
-import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.ogc.swe.SweAbstractDataComponent;
+import org.n52.sos.ogc.swe.SweDataArray;
+import org.n52.sos.ogc.swe.SweDataRecord;
+import org.n52.sos.ogc.swe.SweField;
+import org.n52.sos.ogc.swe.encoding.SweAbstractEncoding;
+import org.n52.sos.ogc.swe.encoding.SweTextEncoding;
+import org.n52.sos.ogc.swe.simpleType.SweBoolean;
+import org.n52.sos.ogc.swe.simpleType.SweCategory;
+import org.n52.sos.ogc.swe.simpleType.SweCount;
+import org.n52.sos.ogc.swe.simpleType.SweObservableProperty;
+import org.n52.sos.ogc.swe.simpleType.SweQuantity;
+import org.n52.sos.ogc.swe.simpleType.SweText;
+import org.n52.sos.ogc.swe.simpleType.SweTime;
 import org.n52.sos.service.ServiceConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +64,7 @@ public final class SweHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SweHelper.class);
 
-    public static SosSweDataArray createSosSweDataArrayFromObservationValue(SosObservation sosObservation)
+    public static SweDataArray createSosSweDataArrayFromObservationValue(SosObservation sosObservation)
             throws OwsExceptionReport {
         if (sosObservation.getObservationConstellation().isSetResultTemplate()) {
             return createSosSweDataArrayWithResultTemplate(sosObservation);
@@ -73,13 +73,13 @@ public final class SweHelper {
         }
     }
 
-    private static SosSweDataArray createSosSweDataArrayWithResultTemplate(SosObservation sosObservation)
+    private static SweDataArray createSosSweDataArrayWithResultTemplate(SosObservation sosObservation)
             throws OwsExceptionReport {
         SosResultTemplate sosResultTemplate = sosObservation.getObservationConstellation().getResultTemplate();
         String observablePropertyIdentifier =
                 sosObservation.getObservationConstellation().getObservableProperty().getIdentifier();
         SweDataArrayValue dataArrayValue = new SweDataArrayValue();
-        SosSweDataArray dataArray = new SosSweDataArray();
+        SweDataArray dataArray = new SweDataArray();
         dataArray.setElementType(sosResultTemplate.getResultStructure());
         dataArray.setEncoding(sosResultTemplate.getResultEncoding());
         dataArrayValue.setValue(dataArray);
@@ -104,11 +104,11 @@ public final class SweHelper {
         return dataArrayValue.getValue();
     }
 
-    private static SosSweDataArray createSosSweDataArrayWithoutResultTemplate(SosObservation sosObservation) {
+    private static SweDataArray createSosSweDataArrayWithoutResultTemplate(SosObservation sosObservation) {
         String observablePropertyIdentifier =
                 sosObservation.getObservationConstellation().getObservableProperty().getIdentifier();
         SweDataArrayValue dataArrayValue = new SweDataArrayValue();
-        SosSweDataArray dataArray = new SosSweDataArray();
+        SweDataArray dataArray = new SweDataArray();
         dataArray.setEncoding(createTextEncoding(sosObservation));
         dataArrayValue.setValue(dataArray);
         if (sosObservation.getValue() instanceof SosSingleObservationValue) {
@@ -137,43 +137,43 @@ public final class SweHelper {
         return dataArray;
     }
 
-    private static SosSweAbstractDataComponent createElementType(Value<?> iValue, String name) {
-        SosSweDataRecord dataRecord = new SosSweDataRecord();
+    private static SweAbstractDataComponent createElementType(Value<?> iValue, String name) {
+        SweDataRecord dataRecord = new SweDataRecord();
         dataRecord.addField(getPhenomenonTimeField());
         dataRecord.addField(getFieldForValue(iValue, name));
         return dataRecord;
     }
 
-    private static SosSweField getPhenomenonTimeField() {
-        SosSweTime time = new SosSweTime();
+    private static SweField getPhenomenonTimeField() {
+        SweTime time = new SweTime();
         time.setDefinition(OMConstants.PHENOMENON_TIME);
         time.setUom(OMConstants.PHEN_UOM_ISO8601);
-        return new SosSweField(OMConstants.PHENOMENON_TIME_NAME, time);
+        return new SweField(OMConstants.PHENOMENON_TIME_NAME, time);
     }
 
-    private static SosSweField getFieldForValue(Value<?> iValue, String name) {
-        SosSweAbstractDataComponent value = getValue(iValue);
+    private static SweField getFieldForValue(Value<?> iValue, String name) {
+        SweAbstractDataComponent value = getValue(iValue);
         value.setDefinition(name);
-        return new SosSweField(name, value);
+        return new SweField(name, value);
     }
 
-    private static SosSweAbstractDataComponent getValue(Value<?> iValue) {
+    private static SweAbstractDataComponent getValue(Value<?> iValue) {
         if (iValue instanceof BooleanValue) {
-            return new SosSweBoolean();
+            return new SweBoolean();
         } else if (iValue instanceof CategoryValue) {
-            SosSweCategory sosSweCategory = new SosSweCategory();
+            SweCategory sosSweCategory = new SweCategory();
             sosSweCategory.setCodeSpace(((CategoryValue) iValue).getUnit());
             return sosSweCategory;
         } else if (iValue instanceof CountValue) {
-            return new SosSweCount();
+            return new SweCount();
         } else if (iValue instanceof QuantityValue) {
-            SosSweQuantity sosSweQuantity = new SosSweQuantity();
+            SweQuantity sosSweQuantity = new SweQuantity();
             sosSweQuantity.setUom(((QuantityValue) iValue).getUnit());
             return sosSweQuantity;
         } else if (iValue instanceof TextValue) {
-            return new SosSweText();
+            return new SweText();
         } else if (iValue instanceof NilTemplateValue) {
-            return new SosSweText();
+            return new SweText();
         }
         return null;
     }
@@ -187,8 +187,8 @@ public final class SweHelper {
      *            SosObservation with token and tuple separator
      * @return TextEncoding
      */
-    private static SosSweAbstractEncoding createTextEncoding(SosObservation sosObservation) {
-        SosSweTextEncoding sosTextEncoding = new SosSweTextEncoding();
+    private static SweAbstractEncoding createTextEncoding(SosObservation sosObservation) {
+        SweTextEncoding sosTextEncoding = new SweTextEncoding();
         if (sosObservation.isSetTupleSeparator()) {
             sosTextEncoding.setBlockSeparator(sosObservation.getTupleSeparator());
         } else {
@@ -202,19 +202,19 @@ public final class SweHelper {
         return sosTextEncoding;
     }
 
-    private static List<String> createBlock(SosSweAbstractDataComponent elementType, ITime phenomenonTime,
+    private static List<String> createBlock(SweAbstractDataComponent elementType, Time phenomenonTime,
             String phenID, Value<?> value) {
-        if (elementType instanceof SosSweDataRecord) {
-            SosSweDataRecord elementTypeRecord = (SosSweDataRecord) elementType;
+        if (elementType instanceof SweDataRecord) {
+            SweDataRecord elementTypeRecord = (SweDataRecord) elementType;
             List<String> block = new ArrayList<String>(elementTypeRecord.getFields().size());
-            for (SosSweField sweField : elementTypeRecord.getFields()) {
+            for (SweField sweField : elementTypeRecord.getFields()) {
                 if (!(value instanceof NilTemplateValue)) {
-                    if (sweField.getElement() instanceof SosSweTime) {
+                    if (sweField.getElement() instanceof SweTime) {
                         block.add(DateTimeHelper.format(phenomenonTime));
-                    } else if (sweField.getElement() instanceof SosSweAbstractDataComponent
+                    } else if (sweField.getElement() instanceof SweAbstractDataComponent
                             && sweField.getElement().getDefinition().equals(phenID)) {
                         block.add(value.getValue().toString());
-                    } else if (sweField.getElement() instanceof SosSweObservableProperty) {
+                    } else if (sweField.getElement() instanceof SweObservableProperty) {
                         block.add(phenID);
                     }
                 }

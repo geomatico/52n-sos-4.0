@@ -29,7 +29,7 @@ import org.apache.xmlbeans.XmlObject.Factory;
 import org.n52.sos.exception.ows.concrete.DecoderResponseUnsupportedException;
 import org.n52.sos.exception.ows.concrete.XmlDecodingException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
+import org.n52.sos.ogc.swe.SweAbstractDataComponent;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.SosHelper;
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ public class SosResultStructure {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(SosHelper.class);
     
-    private SosSweAbstractDataComponent resultStructure;
+    private SweAbstractDataComponent resultStructure;
     
     private String xml;
 
@@ -58,11 +58,11 @@ public class SosResultStructure {
         return xml;
     }
 
-    public void setResultStructure(SosSweAbstractDataComponent resultStructure) {
+    public void setResultStructure(SweAbstractDataComponent resultStructure) {
         this.resultStructure = resultStructure;
     }
 
-    public SosSweAbstractDataComponent getResultStructure() throws OwsExceptionReport {
+    public SweAbstractDataComponent getResultStructure() throws OwsExceptionReport {
         if (resultStructure == null && xml != null && !xml.isEmpty()) {
            resultStructure = parseResultStructure();
         }
@@ -73,11 +73,11 @@ public class SosResultStructure {
         this.xml = xml;
     }
     
-    private SosSweAbstractDataComponent parseResultStructure() throws OwsExceptionReport {
+    private SweAbstractDataComponent parseResultStructure() throws OwsExceptionReport {
         try {
             Object decodedObject = CodingHelper.decodeXmlObject(Factory.parse(xml));
-            if (decodedObject instanceof SosSweAbstractDataComponent) {
-                SosSweAbstractDataComponent sosSweData = (SosSweAbstractDataComponent) decodedObject;
+            if (decodedObject instanceof SweAbstractDataComponent) {
+                SweAbstractDataComponent sosSweData = (SweAbstractDataComponent) decodedObject;
                 return sosSweData;
             } else {
                 throw new DecoderResponseUnsupportedException(xml, decodedObject);

@@ -25,14 +25,14 @@ package org.n52.sos.ogc.om;
 
 import java.util.List;
 
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.om.quality.SosQuality;
 import org.n52.sos.ogc.om.values.Value;
 
 public class SosSingleObservationValue<T> implements ObservationValue<Value<T>> {
     private static final long serialVersionUID = -8162038672393523937L;
 
-    private ITime phenomenonTime;
+    private Time phenomenonTime;
 
     private Value<T> value;
 
@@ -45,19 +45,19 @@ public class SosSingleObservationValue<T> implements ObservationValue<Value<T>> 
         this.value = value;
     }
 
-    public SosSingleObservationValue(ITime phenomenonTime, Value<T> value, List<SosQuality> qualityList) {
+    public SosSingleObservationValue(Time phenomenonTime, Value<T> value, List<SosQuality> qualityList) {
         this.phenomenonTime = phenomenonTime;
         this.value = value;
         this.qualityList = qualityList;
     }
 
-    public SosSingleObservationValue(ITime phenomenonTime, Value<T> value) {
+    public SosSingleObservationValue(Time phenomenonTime, Value<T> value) {
         this.phenomenonTime = phenomenonTime;
         this.value = value;
     }
 
     @Override
-    public ITime getPhenomenonTime() {
+    public Time getPhenomenonTime() {
         return phenomenonTime;
     }
 
@@ -80,7 +80,7 @@ public class SosSingleObservationValue<T> implements ObservationValue<Value<T>> 
     }
 
     @Override
-    public void setPhenomenonTime(ITime phenomenonTime) {
+    public void setPhenomenonTime(Time phenomenonTime) {
         this.phenomenonTime = phenomenonTime;
     }
 }

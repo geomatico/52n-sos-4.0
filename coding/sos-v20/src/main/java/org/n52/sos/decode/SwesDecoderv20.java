@@ -56,10 +56,10 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.Sos2Constants.UpdateSensorDescriptionParams;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.sos.SosInsertionMetadata;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SWEConstants;
-import org.n52.sos.ogc.swe.SosFeatureRelationship;
-import org.n52.sos.ogc.swe.SosMetadata;
+import org.n52.sos.ogc.swes.SwesFeatureRelationship;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.request.DescribeSensorRequest;
@@ -252,9 +252,9 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
         return request;
     }
 
-    private SosMetadata parseMetadata(Metadata[] metadataArray) throws OwsExceptionReport {
+    private SosInsertionMetadata parseMetadata(Metadata[] metadataArray) throws OwsExceptionReport {
 
-        SosMetadata sosMetadata = new SosMetadata();
+        SosInsertionMetadata sosMetadata = new SosInsertionMetadata();
         try {
             for (Metadata metadata : metadataArray) {
                 SosInsertionMetadataType xbSosInsertionMetadata = null;
@@ -289,11 +289,11 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
         return sosMetadata;
     }
 
-    private List<SosFeatureRelationship> parseRelatedFeature(RelatedFeature[] relatedFeatureArray) {
-        List<SosFeatureRelationship> sosRelatedFeatures =
-                new ArrayList<SosFeatureRelationship>(relatedFeatureArray.length);
+    private List<SwesFeatureRelationship> parseRelatedFeature(RelatedFeature[] relatedFeatureArray) {
+        List<SwesFeatureRelationship> sosRelatedFeatures =
+                new ArrayList<SwesFeatureRelationship>(relatedFeatureArray.length);
         for (RelatedFeature relatedFeature : relatedFeatureArray) {
-            SosFeatureRelationship sosFeatureRelationship = new SosFeatureRelationship();
+            SwesFeatureRelationship sosFeatureRelationship = new SwesFeatureRelationship();
 
             FeaturePropertyType fpt = relatedFeature.getFeatureRelationship().getTarget();
             if (fpt.getHref() != null && !fpt.getHref().isEmpty()) {

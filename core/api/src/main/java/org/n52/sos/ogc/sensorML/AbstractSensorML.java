@@ -27,31 +27,31 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.n52.sos.ogc.gml.time.ITime;
-import org.n52.sos.ogc.sensorML.elements.AbstractSosSMLDocumentation;
-import org.n52.sos.ogc.sensorML.elements.SosSMLCapabilities;
-import org.n52.sos.ogc.sensorML.elements.SosSMLCharacteristics;
-import org.n52.sos.ogc.sensorML.elements.SosSMLClassifier;
-import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
+import org.n52.sos.ogc.gml.time.Time;
+import org.n52.sos.ogc.sensorML.elements.AbstractSmlDocumentation;
+import org.n52.sos.ogc.sensorML.elements.SmlCapabilities;
+import org.n52.sos.ogc.sensorML.elements.SmlCharacteristics;
+import org.n52.sos.ogc.sensorML.elements.SmlClassifier;
+import org.n52.sos.ogc.sensorML.elements.SmlIdentifier;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 
 public class AbstractSensorML extends SosProcedureDescription {
 
     private List<String> keywords = new ArrayList<String>(0);
 
-    private List<SosSMLIdentifier> identifications = new ArrayList<SosSMLIdentifier>(0);
+    private List<SmlIdentifier> identifications = new ArrayList<SmlIdentifier>(0);
 
-    private List<SosSMLClassifier> classifications = new ArrayList<SosSMLClassifier>(0);
+    private List<SmlClassifier> classifications = new ArrayList<SmlClassifier>(0);
 
-    private ITime validTime;
+    private Time validTime;
 
-    private List<SosSMLCharacteristics> characteristics = new ArrayList<SosSMLCharacteristics>(0);
+    private List<SmlCharacteristics> characteristics = new ArrayList<SmlCharacteristics>(0);
 
-    private List<SosSMLCapabilities> capabilities = new ArrayList<SosSMLCapabilities>(0);
+    private List<SmlCapabilities> capabilities = new ArrayList<SmlCapabilities>(0);
 
     private List<SmlContact> contacts = new ArrayList<SmlContact>(0);
 
-    private final List<AbstractSosSMLDocumentation> documentations = new ArrayList<AbstractSosSMLDocumentation>(0);
+    private final List<AbstractSmlDocumentation> documentations = new ArrayList<AbstractSmlDocumentation>(0);
 
     private String history;
 
@@ -70,11 +70,11 @@ public class AbstractSensorML extends SosProcedureDescription {
         return this;
     }
 
-    public List<SosSMLIdentifier> getIdentifications() {
+    public List<SmlIdentifier> getIdentifications() {
         return identifications;
     }
 
-    public AbstractSensorML setIdentifications(final List<SosSMLIdentifier> identifications) {
+    public AbstractSensorML setIdentifications(final List<SmlIdentifier> identifications) {
         if (this.identifications.isEmpty()) {
             this.identifications = identifications;
         } else {
@@ -83,11 +83,11 @@ public class AbstractSensorML extends SosProcedureDescription {
         return this;
     }
 
-    public List<SosSMLClassifier> getClassifications() {
+    public List<SmlClassifier> getClassifications() {
         return classifications;
     }
 
-    public AbstractSensorML setClassifications(final List<SosSMLClassifier> classifications) {
+    public AbstractSensorML setClassifications(final List<SmlClassifier> classifications) {
         if (isSetClassifications()) {
             this.classifications.addAll(classifications);
         }
@@ -95,25 +95,25 @@ public class AbstractSensorML extends SosProcedureDescription {
         return this;
     }
 
-    public AbstractSensorML addClassification(final SosSMLClassifier classifier) {
+    public AbstractSensorML addClassification(final SmlClassifier classifier) {
         classifications.add(classifier);
         return this;
     }
 
-    public ITime getValidTime() {
+    public Time getValidTime() {
         return validTime;
     }
 
-    public AbstractSensorML setValidTime(final ITime validTime) {
+    public AbstractSensorML setValidTime(final Time validTime) {
         this.validTime = validTime;
         return this;
     }
 
-    public List<SosSMLCharacteristics> getCharacteristics() {
+    public List<SmlCharacteristics> getCharacteristics() {
         return characteristics;
     }
 
-    public AbstractSensorML setCharacteristics(final List<SosSMLCharacteristics> characteristics) {
+    public AbstractSensorML setCharacteristics(final List<SmlCharacteristics> characteristics) {
         if (isSetCharacteristics()) {
             this.characteristics.addAll(characteristics);
         } else {
@@ -122,23 +122,23 @@ public class AbstractSensorML extends SosProcedureDescription {
         return this;
     }
 
-    public AbstractSensorML addCharacteristic(final SosSMLCharacteristics characteristic) {
+    public AbstractSensorML addCharacteristic(final SmlCharacteristics characteristic) {
         characteristics.add(characteristic);
         return this;
     }
 
-    public List<SosSMLCapabilities> getCapabilities() {
+    public List<SmlCapabilities> getCapabilities() {
         return capabilities;
     }
 
-    public AbstractSensorML addCapabilities(final List<SosSMLCapabilities> capabilities) {
+    public AbstractSensorML addCapabilities(final List<SmlCapabilities> capabilities) {
         if (capabilities != null) {
             this.capabilities.addAll(capabilities);
         }
         return this;
     }
 
-    public AbstractSensorML addCapabilities(final SosSMLCapabilities capabilities) {
+    public AbstractSensorML addCapabilities(final SmlCapabilities capabilities) {
     	return addCapabilities(Collections.singletonList(capabilities));
     }
 
@@ -164,16 +164,16 @@ public class AbstractSensorML extends SosProcedureDescription {
         return this;
     }
 
-    public List<AbstractSosSMLDocumentation> getDocumentation() {
+    public List<AbstractSmlDocumentation> getDocumentation() {
         return documentations;
     }
 
-    public AbstractSensorML setDocumentation(final List<AbstractSosSMLDocumentation> documentations) {
+    public AbstractSensorML setDocumentation(final List<AbstractSmlDocumentation> documentations) {
         this.documentations.addAll(documentations);
         return this;
     }
 
-    public AbstractSensorML addDocumentation(final AbstractSosSMLDocumentation documentation) {
+    public AbstractSensorML addDocumentation(final AbstractSmlDocumentation documentation) {
         documentations.add(documentation);
         return this;
     }
@@ -187,7 +187,7 @@ public class AbstractSensorML extends SosProcedureDescription {
         return this;
     }
 
-    public AbstractSensorML addIdentifier(final SosSMLIdentifier identifier) {
+    public AbstractSensorML addIdentifier(final SmlIdentifier identifier) {
         identifications.add(identifier);
         return this;
     }

@@ -26,32 +26,32 @@ package org.n52.sos.ogc.om.values;
 import java.util.Collection;
 import java.util.List;
 
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.swe.SosSweDataArray;
-import org.n52.sos.ogc.swe.SosSweDataRecord;
-import org.n52.sos.ogc.swe.SosSweField;
-import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.ogc.swe.SweDataArray;
+import org.n52.sos.ogc.swe.SweDataRecord;
+import org.n52.sos.ogc.swe.SweField;
+import org.n52.sos.ogc.swe.simpleType.SweTime;
 import org.n52.sos.exception.ows.concrete.DateTimeParseException;
 import org.n52.sos.util.DateTimeHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SweDataArrayValue implements IMultiValue<SosSweDataArray> {
+public class SweDataArrayValue implements IMultiValue<SweDataArray> {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(SweDataArrayValue.class);
     private static final long serialVersionUID = 3022136042762771037L;
     
-    private SosSweDataArray value;
+    private SweDataArray value;
     
     @Override
-    public void setValue(SosSweDataArray value) {
+    public void setValue(SweDataArray value) {
         this.value = value;
     }
 
     @Override
-    public SosSweDataArray getValue() {
+    public SweDataArray getValue() {
         return value;
     }
 
@@ -86,17 +86,17 @@ public class SweDataArrayValue implements IMultiValue<SosSweDataArray> {
     }
 
     @Override
-    public ITime getPhenomenonTime() {
+    public Time getPhenomenonTime() {
         TimePeriod timePeriod = new TimePeriod();
         int dateTokenIndex = -1;
         if (value != null && value.getElementType() != null && value.getEncoding() != null) {
             // get index of time token from elementtype
-            if (value.getElementType() instanceof SosSweDataRecord) {
-                SosSweDataRecord elementType = (SosSweDataRecord) value.getElementType();
-                List<SosSweField> fields = elementType.getFields();
+            if (value.getElementType() instanceof SweDataRecord) {
+                SweDataRecord elementType = (SweDataRecord) value.getElementType();
+                List<SweField> fields = elementType.getFields();
                 for (int i = 0; i < fields.size(); i++) {
-                    SosSweField sweField = fields.get(i);
-                    if (sweField.getElement() instanceof SosSweTime) {
+                    SweField sweField = fields.get(i);
+                    if (sweField.getElement() instanceof SweTime) {
                         dateTokenIndex = i;
                         break;
                     }
@@ -109,7 +109,7 @@ public class SweDataArrayValue implements IMultiValue<SosSweDataArray> {
                     // conform with ISO8601 (see WP))
                     // datetimehelper to DateTime from joda time
                     String token = block.get(dateTokenIndex);
-                    ITime time = null;
+                    Time time = null;
                     try {
                         if (token.contains("/")) {
                             String[] subTokens = token.split("/");

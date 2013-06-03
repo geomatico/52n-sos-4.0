@@ -28,9 +28,9 @@ import java.util.List;
 
 import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosInsertionMetadata;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
-import org.n52.sos.ogc.swe.SosFeatureRelationship;
-import org.n52.sos.ogc.swe.SosMetadata;
+import org.n52.sos.ogc.swes.SwesFeatureRelationship;
 
 public class InsertSensorRequest extends AbstractServiceRequest {
 
@@ -41,7 +41,7 @@ public class InsertSensorRequest extends AbstractServiceRequest {
     /** observableProperty parameter */
     private List<String> observableProperty;
     
-    private List<SosFeatureRelationship> relatedFeatures;
+    private List<SwesFeatureRelationship> relatedFeatures;
 
     /** SOS SensorML description */
     private SosProcedureDescription procedureDescription;
@@ -51,7 +51,7 @@ public class InsertSensorRequest extends AbstractServiceRequest {
     private List<SosOffering> assignedOfferings = new ArrayList<SosOffering>();
 
     /** metadata parameter */
-    private SosMetadata metadata;
+    private SosInsertionMetadata metadata;
 
     /**
      * default constructor
@@ -111,7 +111,7 @@ public class InsertSensorRequest extends AbstractServiceRequest {
      * 
      * @return the metadata
      */
-    public SosMetadata getMetadata() {
+    public SosInsertionMetadata getMetadata() {
         return metadata;
     }
 
@@ -121,7 +121,7 @@ public class InsertSensorRequest extends AbstractServiceRequest {
      * @param metadata
      *            the metadata to set
      */
-    public void setMetadata(SosMetadata metadata) {
+    public void setMetadata(SosInsertionMetadata metadata) {
         this.metadata = metadata;
     }
 
@@ -130,11 +130,11 @@ public class InsertSensorRequest extends AbstractServiceRequest {
         return operationName;
     }
 
-    public void setRelatedFeature(List<SosFeatureRelationship> relatedFeatures) {
+    public void setRelatedFeature(List<SwesFeatureRelationship> relatedFeatures) {
         this.relatedFeatures = relatedFeatures;
     }
     
-    public List<SosFeatureRelationship> getRelatedFeatures() {
+    public List<SwesFeatureRelationship> getRelatedFeatures() {
         return relatedFeatures;
     }
 

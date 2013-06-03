@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.joda.time.DateTime;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.sos.SosEnvelope;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -784,7 +784,7 @@ public interface WritableContentCache extends ContentCache {
      *
      * @param eventTime the time to include
      */
-    void updatePhenomenonTime(ITime eventTime);
+    void updatePhenomenonTime(Time eventTime);
 
     /**
      * Recalculates the global phenomenon time envelope based on the current offering phenomenon time envelopes.
@@ -804,7 +804,7 @@ public interface WritableContentCache extends ContentCache {
      *
      * @param eventTime the time to include
      */
-    void updateResultTime(ITime eventTime);
+    void updateResultTime(Time eventTime);
 
     /**
      * Recalculates the global result time envelope based on the current offering result time envelopes.
@@ -906,7 +906,7 @@ public interface WritableContentCache extends ContentCache {
      * @param offering  the offering
      * @param eventTime the time to include
      */
-    void updatePhenomenonTimeForOffering(String offering, ITime eventTime);
+    void updatePhenomenonTimeForOffering(String offering, Time eventTime);
 
     /**
      * Updates the phenomenon time envelope of the specified procedure to include the specified event time.
@@ -914,7 +914,7 @@ public interface WritableContentCache extends ContentCache {
      * @param procedure  the procedure
      * @param eventTime the time to include
      */
-    void updatePhenomenonTimeForProcedure(String procedure, ITime eventTime);
+    void updatePhenomenonTimeForProcedure(String procedure, Time eventTime);
     
     /**
      * Sets the global maximal result time.
@@ -952,7 +952,7 @@ public interface WritableContentCache extends ContentCache {
      * @param offering   the offering
      * @param resultTime the time to include
      */
-    void updateResultTimeForOffering(String offering, ITime resultTime);
+    void updateResultTimeForOffering(String offering, Time resultTime);
 
     /**
      * Sets the name of the specified offering.

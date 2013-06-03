@@ -47,7 +47,7 @@ import org.n52.sos.ds.hibernate.entities.TextObservation;
 import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.OMConstants;
@@ -158,14 +158,14 @@ public class HibernateUtilities {
     }
 
     @Deprecated
-    public static void addPhenomeonTimeAndResultTimeToObservation(Observation hObservation, ITime phenomenonTime,
+    public static void addPhenomeonTimeAndResultTimeToObservation(Observation hObservation, Time phenomenonTime,
                                                                   TimeInstant resultTime) throws CodedException {
         addPhenomenonTimeToObservation(hObservation, phenomenonTime);
         addResultTimeToObservation(hObservation, resultTime, phenomenonTime);
     }
 
     @Deprecated
-    public static void addPhenomenonTimeToObservation(Observation hObservation, ITime phenomenonTime) {
+    public static void addPhenomenonTimeToObservation(Observation hObservation, Time phenomenonTime) {
         if (phenomenonTime instanceof TimeInstant) {
             TimeInstant time = (TimeInstant) phenomenonTime;
             hObservation.setPhenomenonTimeStart(time.getValue().toDate());
@@ -178,7 +178,7 @@ public class HibernateUtilities {
     }
     
     @Deprecated
-    public static void addResultTimeToObservation(Observation hObservation, TimeInstant resultTime, ITime phenomenonTime) throws CodedException {
+    public static void addResultTimeToObservation(Observation hObservation, TimeInstant resultTime, Time phenomenonTime) throws CodedException {
         if (resultTime != null) {
             if (resultTime.getValue() != null) {
                 hObservation.setResultTime(resultTime.getValue().toDate());

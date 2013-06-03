@@ -58,7 +58,7 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.swe.SWEConstants;
-import org.n52.sos.ogc.swe.SosSweDataArray;
+import org.n52.sos.ogc.swe.SweDataArray;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
@@ -271,7 +271,7 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
             }
         } else if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)) {
             // TODO create SosSweDataArray
-            SosSweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
+            SweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
             Map<HelperValues, String> additionalValues =
                     new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
             additionalValues.put(HelperValues.FOR_OBSERVATION, null);
@@ -303,7 +303,7 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
     private XmlObject createMultiObservationValueToResult(SosObservation sosObservation) throws OwsExceptionReport {
         SosMultiObservationValues<?> observationValue = (SosMultiObservationValues) sosObservation.getValue();
         // TODO create SosSweDataArray
-        SosSweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
+        SweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
         Map<HelperValues, String> additionalValues =
                 new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
         additionalValues.put(HelperValues.FOR_OBSERVATION, null);

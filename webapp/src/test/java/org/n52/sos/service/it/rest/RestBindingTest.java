@@ -56,18 +56,18 @@ import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.System;
-import org.n52.sos.ogc.sensorML.elements.SosSMLCapabilities;
-import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
-import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
-import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
+import org.n52.sos.ogc.sensorML.elements.SmlCapabilities;
+import org.n52.sos.ogc.sensorML.elements.SmlIdentifier;
+import org.n52.sos.ogc.sensorML.elements.SmlIo;
+import org.n52.sos.ogc.sensorML.elements.SmlPosition;
 import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
-import org.n52.sos.ogc.swe.SosSweCoordinate;
-import org.n52.sos.ogc.swe.SosSweField;
-import org.n52.sos.ogc.swe.SosSweSimpleDataRecord;
-import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
-import org.n52.sos.ogc.swe.simpleType.SosSweObservableProperty;
-import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
-import org.n52.sos.ogc.swe.simpleType.SosSweText;
+import org.n52.sos.ogc.swe.SweCoordinate;
+import org.n52.sos.ogc.swe.SweField;
+import org.n52.sos.ogc.swe.SweSimpleDataRecord;
+import org.n52.sos.ogc.swe.simpleType.SweAbstractSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SweObservableProperty;
+import org.n52.sos.ogc.swe.simpleType.SweQuantity;
+import org.n52.sos.ogc.swe.simpleType.SweText;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.service.it.AbstractTransactionalTestv2;
@@ -116,16 +116,16 @@ public class RestBindingTest extends AbstractTransactionalTestv2{
 			final String offeringId) throws OwsExceptionReport
 	{
 		final System system = (System) new System()
-		.setPosition(new SosSMLPosition("test-sensor-position",true,SERVICE_CONFIG.getSrsNamePrefixSosV2()+4326,createCoordinates(52.0,7.5,42.0)))
+		.setPosition(new SmlPosition("test-sensor-position",true,SERVICE_CONFIG.getSrsNamePrefixSosV2()+4326,createCoordinates(52.0,7.5,42.0)))
 		.setInputs(createInputList("test-observable-property"))
 		.setOutputs(createOutputList("test-observable-property"))
 		.setIdentifications(createIdentifications(sensorId,offeringId))
-		.addCapabilities(new SosSMLCapabilities("InsertionMetadata", 
-				new SosSweSimpleDataRecord()
-						.addField(new SosSweField("sos:ObservationType", 
-								new SosSweText().setValue("http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement")))
-						.addField(new SosSweField("sos:FeatureOfInterestType",
-								new SosSweText().setValue("http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint")))))
+		.addCapabilities(new SmlCapabilities("InsertionMetadata", 
+				new SweSimpleDataRecord()
+						.addField(new SweField("sos:ObservationType", 
+								new SweText().setValue("http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement")))
+						.addField(new SweField("sos:FeatureOfInterestType",
+								new SweText().setValue("http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint")))))
 		.setIdentifier(sensorId);
 		final SystemType xbSystem = (SystemType) new SensorMLEncoderv101().encode(system);
 		final SensorDocument restSensor = SensorDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
@@ -166,52 +166,52 @@ public class RestBindingTest extends AbstractTransactionalTestv2{
 		return restObsDoc.xmlText();
 	}
 
-	private List<SosSMLIdentifier> createIdentifications(final String sensorId,
+	private List<SmlIdentifier> createIdentifications(final String sensorId,
 			final String offeringId)
 	{
-		return CollectionHelper.asList(new SosSMLIdentifier("uniqueId", "urn:ogc:def:identifier:OGC:1.0:uniqueID", sensorId), 
-				new SosSMLIdentifier("offerings", "urn:ogc:def:identifier:OGC:offeringID", offeringId));
+		return CollectionHelper.asList(new SmlIdentifier("uniqueId", "urn:ogc:def:identifier:OGC:1.0:uniqueID", sensorId), 
+				new SmlIdentifier("offerings", "urn:ogc:def:identifier:OGC:offeringID", offeringId));
 	}
 
-	private List<SosSMLIo<?>> createOutputList(final String string)
+	private List<SmlIo<?>> createOutputList(final String string)
 	{
-		final SosSMLIo<Double> quanti = new SosSMLIo<Double>(
-				(SosSweQuantity) new SosSweQuantity()
+		final SmlIo<Double> quanti = new SmlIo<Double>(
+				(SweQuantity) new SweQuantity()
 				.setUom("m")
 				.setDefinition("http://www.52north.org/test/observableProperty/42")
 				.setIdentifier("test-observable-property"));
-		final List<SosSMLIo<?>> outputs = new ArrayList<SosSMLIo<?>>(1);
+		final List<SmlIo<?>> outputs = new ArrayList<SmlIo<?>>(1);
 		outputs.add(quanti);
 		return Collections.unmodifiableList(outputs);
 	}
 
-	private List<SosSMLIo<?>> createInputList(final String string)
+	private List<SmlIo<?>> createInputList(final String string)
 	{
-		final SosSMLIo<String> io = new SosSMLIo<String>(
-				(SosSweObservableProperty) new SosSweObservableProperty()
+		final SmlIo<String> io = new SmlIo<String>(
+				(SweObservableProperty) new SweObservableProperty()
 				.setDefinition("http://www.52north.org/test/observableProperty/42")
 				.setIdentifier("test-observable-property"));
-		final List<SosSMLIo<?>> inputs = new ArrayList<SosSMLIo<?>>(1);
+		final List<SmlIo<?>> inputs = new ArrayList<SmlIo<?>>(1);
 		inputs.add(io);
 		return Collections.unmodifiableList(inputs);
 	}
 
-	private List<SosSweCoordinate<?>> createCoordinates(final double latitude,
+	private List<SweCoordinate<?>> createCoordinates(final double latitude,
 			final double longitude,
 			final double altitudeV)
 	{
-		final List<SosSweCoordinate<?>> sweCoordinates = new ArrayList<SosSweCoordinate<?>>(3);
-	    sweCoordinates.add(new SosSweCoordinate<Double>(northing, createSweQuantity(latitude, "y", "deg")));
-	    sweCoordinates.add(new SosSweCoordinate<Double>(easting, createSweQuantity(longitude, "x", "deg")));
-	    sweCoordinates.add(new SosSweCoordinate<Double>(altitude, createSweQuantity(altitudeV, "z", "m")));
+		final List<SweCoordinate<?>> sweCoordinates = new ArrayList<SweCoordinate<?>>(3);
+	    sweCoordinates.add(new SweCoordinate<Double>(northing, createSweQuantity(latitude, "y", "deg")));
+	    sweCoordinates.add(new SweCoordinate<Double>(easting, createSweQuantity(longitude, "x", "deg")));
+	    sweCoordinates.add(new SweCoordinate<Double>(altitude, createSweQuantity(altitudeV, "z", "m")));
 	    return sweCoordinates;
 	}
 
-	private SosSweAbstractSimpleType<Double> createSweQuantity(final Double value,
+	private SweAbstractSimpleType<Double> createSweQuantity(final Double value,
 			final String asixID,
 			final String uom)
 	{
-		return new SosSweQuantity()
+		return new SweQuantity()
 		.setValue(JavaHelper.asDouble(value))
 		.setAxisID(asixID)
 		.setUom(uom);

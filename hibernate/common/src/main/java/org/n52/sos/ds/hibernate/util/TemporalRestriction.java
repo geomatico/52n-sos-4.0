@@ -30,7 +30,7 @@ import org.hibernate.criterion.PropertyExpression;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.n52.sos.exception.ows.concrete.UnsupportedTimeException;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.util.DateTimeHelper;
@@ -64,7 +64,7 @@ public abstract class TemporalRestriction {
      *
      * @throws UnsupportedTimeException if the supplied time can not be used with this restriction
      */
-    public Criterion get(TimePrimitiveFieldDescriptor ref, ITime time) throws UnsupportedTimeException {
+    public Criterion get(TimePrimitiveFieldDescriptor ref, Time time) throws UnsupportedTimeException {
         Criterion c;
         if (time instanceof TimePeriod) {
             c = filterWithPeriod((TimePeriod) time, ref);

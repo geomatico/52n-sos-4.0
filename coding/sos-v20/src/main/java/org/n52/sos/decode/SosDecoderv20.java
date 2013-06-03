@@ -68,7 +68,7 @@ import org.n52.sos.exception.ows.concrete.MissingResultValuesException;
 import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
@@ -80,8 +80,8 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosResultEncoding;
 import org.n52.sos.ogc.sos.SosResultStructure;
-import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
-import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
+import org.n52.sos.ogc.swe.SweAbstractDataComponent;
+import org.n52.sos.ogc.swe.encoding.SweAbstractEncoding;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.request.GetFeatureOfInterestRequest;
@@ -323,7 +323,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
 
         if (insertObservationType.getObservationArray() != null) {
             int length = insertObservationType.getObservationArray().length;
-            Map<String, ITime> phenomenonTimes = new HashMap<String, ITime>(length);
+            Map<String, Time> phenomenonTimes = new HashMap<String, Time>(length);
             Map<String, TimeInstant> resultTimes = new HashMap<String, TimeInstant>(length);
             Map<String, SosAbstractFeature> features = new HashMap<String, SosAbstractFeature>(length);
             CompositeOwsException exceptions = new CompositeOwsException();
@@ -537,8 +537,8 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
 
     private SosResultStructure parseResultStructure(XmlObject resultStructure) throws OwsExceptionReport {
         Object decodedObject = CodingHelper.decodeXmlElement(resultStructure);
-        if (decodedObject instanceof SosSweAbstractDataComponent) {
-            SosSweAbstractDataComponent sosSweData = (SosSweAbstractDataComponent) decodedObject;
+        if (decodedObject instanceof SweAbstractDataComponent) {
+            SweAbstractDataComponent sosSweData = (SweAbstractDataComponent) decodedObject;
             SosResultStructure sosResultStructure = new SosResultStructure();
             sosResultStructure.setResultStructure(sosSweData);
             return sosResultStructure;
@@ -551,8 +551,8 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
 
     private SosResultEncoding parseResultEncoding(XmlObject resultEncoding) throws OwsExceptionReport {
         Object decodedObject = CodingHelper.decodeXmlElement(resultEncoding);
-        if (decodedObject instanceof SosSweAbstractEncoding) {
-            SosSweAbstractEncoding sosSweEncoding = (SosSweAbstractEncoding) decodedObject;
+        if (decodedObject instanceof SweAbstractEncoding) {
+            SweAbstractEncoding sosSweEncoding = (SweAbstractEncoding) decodedObject;
             SosResultEncoding encoding = new SosResultEncoding();
             encoding.setEncoding(sosSweEncoding);
             return encoding;
@@ -583,7 +583,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
         }
     }
 
-    private void checkAndAddPhenomenonTime(ITime phenomenonTime, Map<String, ITime> phenomenonTimes) {
+    private void checkAndAddPhenomenonTime(Time phenomenonTime, Map<String, Time> phenomenonTimes) {
         if (!phenomenonTime.isReferenced()) {
             phenomenonTimes.put(phenomenonTime.getGmlId(), phenomenonTime);
         }
@@ -601,12 +601,12 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
         }
     }
 
-    private void checkReferencedElements(List<SosObservation> observations, Map<String, ITime> phenomenonTimes,
+    private void checkReferencedElements(List<SosObservation> observations, Map<String, Time> phenomenonTimes,
                                          Map<String, TimeInstant> resultTimes, Map<String, SosAbstractFeature> features)
             throws OwsExceptionReport {
         for (SosObservation observation : observations) {
             // phenomenonTime
-            ITime phenomenonTime = observation.getPhenomenonTime();
+            Time phenomenonTime = observation.getPhenomenonTime();
             if (phenomenonTime.isReferenced()) {
                 observation.getValue().setPhenomenonTime(phenomenonTimes.get(phenomenonTime.getGmlId()));
             }
@@ -616,7 +616,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
                 if (resultTimes.containsKey(resultTime.getGmlId())) {
                     observation.setResultTime(resultTimes.get(resultTime.getGmlId()));
                 } else if (phenomenonTimes.containsKey(resultTime.getGmlId())) {
-                    ITime iTime = phenomenonTimes.get(resultTime.getGmlId());
+                    Time iTime = phenomenonTimes.get(resultTime.getGmlId());
                     if (iTime instanceof TimeInstant) {
                         observation.setResultTime((TimeInstant)iTime);
                     } else if (iTime instanceof TimePeriod) {

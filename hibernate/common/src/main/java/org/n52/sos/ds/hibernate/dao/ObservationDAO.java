@@ -50,7 +50,7 @@ import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.OMConstants;
@@ -486,7 +486,7 @@ public class ObservationDAO extends TimeCreator {
      * @throws CodedException
      *             If an error occurs
      */
-    public void addPhenomeonTimeAndResultTimeToObservation(Observation observation, ITime phenomenonTime,
+    public void addPhenomeonTimeAndResultTimeToObservation(Observation observation, Time phenomenonTime,
             TimeInstant resultTime) throws CodedException {
         addPhenomenonTimeToObservation(observation, phenomenonTime);
         addResultTimeToObservation(observation, resultTime, phenomenonTime);
@@ -500,7 +500,7 @@ public class ObservationDAO extends TimeCreator {
      * @param phenomenonTime
      *            SOS phenomenon time
      */
-    public void addPhenomenonTimeToObservation(Observation observation, ITime phenomenonTime) {
+    public void addPhenomenonTimeToObservation(Observation observation, Time phenomenonTime) {
         if (phenomenonTime instanceof TimeInstant) {
             TimeInstant time = (TimeInstant) phenomenonTime;
             observation.setPhenomenonTimeStart(time.getValue().toDate());
@@ -524,7 +524,7 @@ public class ObservationDAO extends TimeCreator {
      * @throws CodedException
      *             If an error occurs
      */
-    public void addResultTimeToObservation(Observation observation, TimeInstant resultTime, ITime phenomenonTime)
+    public void addResultTimeToObservation(Observation observation, TimeInstant resultTime, Time phenomenonTime)
             throws CodedException {
         if (resultTime != null) {
             if (resultTime.getValue() != null) {

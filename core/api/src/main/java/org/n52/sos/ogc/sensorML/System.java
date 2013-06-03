@@ -28,19 +28,19 @@ import java.util.List;
 
 import org.n52.sos.ogc.gml.EngineeringCRS;
 import org.n52.sos.ogc.sensorML.System;
-import org.n52.sos.ogc.sensorML.elements.SosSMLComponent;
+import org.n52.sos.ogc.sensorML.elements.SmlComponent;
 
 public class System extends AbstractComponent {
 
     private EngineeringCRS spatialReferenceFrame;
 
-    private final List<SosSMLComponent> components = new ArrayList<SosSMLComponent>(0);
+    private final List<SmlComponent> components = new ArrayList<SmlComponent>(0);
 
-    public List<SosSMLComponent> getComponents() {
+    public List<SmlComponent> getComponents() {
         return components;
     }
 
-    public System addComponents(final List<SosSMLComponent> components) {
+    public System addComponents(final List<SmlComponent> components) {
         if (components != null) {
             checkAndSetChildProcedures(components);
             this.components.addAll(components);
@@ -48,7 +48,7 @@ public class System extends AbstractComponent {
         return this;
     }
 
-    public System addComponent(final SosSMLComponent component) {
+    public System addComponent(final SmlComponent component) {
         if (component != null) {
             checkAndSetChildProcedures(component);
             components.add(component);
@@ -60,15 +60,15 @@ public class System extends AbstractComponent {
         return components != null && !components.isEmpty();
     }
 
-    private void checkAndSetChildProcedures(final List<SosSMLComponent> components) {
+    private void checkAndSetChildProcedures(final List<SmlComponent> components) {
         if (components != null) {
-            for (final SosSMLComponent component : components) {
+            for (final SmlComponent component : components) {
                 checkAndSetChildProcedures(component);
             }
         }
     }
 
-    private void checkAndSetChildProcedures(final SosSMLComponent component) {
+    private void checkAndSetChildProcedures(final SmlComponent component) {
         if (component != null && component.isSetName()
                 && component.getName().contains(SensorMLConstants.ELEMENT_NAME_CHILD_PROCEDURES)) {
             addChildProcedure(component.getProcess());

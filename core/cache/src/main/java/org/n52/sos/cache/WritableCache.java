@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.joda.time.DateTime;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.sos.SosEnvelope;
@@ -57,7 +57,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
      *
      * @return the period describing the abstract time
      */
-    protected static TimePeriod toTimePeriod(ITime time) {
+    protected static TimePeriod toTimePeriod(Time time) {
         if (time instanceof TimeInstant) {
             final DateTime instant = ((TimeInstant) time).getValue();
             return new TimePeriod(instant, instant);
@@ -1044,7 +1044,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void updatePhenomenonTime(ITime eventTime) {
+    public void updatePhenomenonTime(Time eventTime) {
         notNull("eventTime", eventTime);
         TimePeriod tp = toTimePeriod(eventTime);
         LOG.trace("Expanding global EventTime to include {}", tp);
@@ -1068,7 +1068,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void updatePhenomenonTimeForOffering(String offering, ITime eventTime) {
+    public void updatePhenomenonTimeForOffering(String offering, Time eventTime) {
         notNullOrEmpty("offering", offering);
         notNull("eventTime", eventTime);
         TimePeriod tp = toTimePeriod(eventTime);
@@ -1084,7 +1084,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void updatePhenomenonTimeForProcedure(String procedure, ITime eventTime) {
+    public void updatePhenomenonTimeForProcedure(String procedure, Time eventTime) {
         notNullOrEmpty("procedure", procedure);
         notNull("eventTime", eventTime);
         TimePeriod tp = toTimePeriod(eventTime);
@@ -1178,7 +1178,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void updateResultTime(ITime resultTime) {
+    public void updateResultTime(Time resultTime) {
         if (resultTime == null) {
             return;
         }
@@ -1252,7 +1252,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void updateResultTimeForOffering(String offering, ITime resultTime) {
+    public void updateResultTimeForOffering(String offering, Time resultTime) {
         notNullOrEmpty("offering", offering);
         if (resultTime == null) {
             return;

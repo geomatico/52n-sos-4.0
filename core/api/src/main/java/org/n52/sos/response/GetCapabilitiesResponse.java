@@ -23,7 +23,7 @@
  */
 package org.n52.sos.response;
 
-import org.n52.sos.ogc.ows.SosCapabilities;
+import org.n52.sos.ogc.sos.SosCapabilities;
 
 public class GetCapabilitiesResponse extends AbstractServiceResponse {
 

@@ -46,7 +46,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.System;
-import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
+import org.n52.sos.ogc.sensorML.elements.SmlIdentifier;
 import org.n52.sos.util.CodingHelper;
 
 /**
@@ -69,7 +69,7 @@ public class SensorMLEncoderV101Test {
 		SensorML sensorMl = new SensorML();
 		System system = new System();
 		sensorMl.addMember(system);		
-		system.addIdentifier(new SosSMLIdentifier(TEST_NAME_1, OGCConstants.URN_UNIQUE_IDENTIFIER, TEST_ID_1));
+		system.addIdentifier(new SmlIdentifier(TEST_NAME_1, OGCConstants.URN_UNIQUE_IDENTIFIER, TEST_ID_1));
 		SystemType xbSystem = decodeSystem(sensorMl);
 		assertThat(xbSystem.getIdentificationArray().length, is(1));
 		IdentifierList xbIdentifierList = xbSystem.getIdentificationArray()[0].getIdentifierList();

@@ -49,7 +49,7 @@ import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.GMLConstants;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -162,9 +162,9 @@ public class OgcDecoderv100 implements Decoder<Object, XmlObject> {
 	                	
 	                }
 	                
-	                if (timeObject != null && timeObject instanceof ITime) {
+	                if (timeObject != null && timeObject instanceof Time) {
 	                    TimeOperator operator;
-	                    ITime time = (ITime) timeObject;
+	                    Time time = (Time) timeObject;
 	                    String localName = XmlHelper.getLocalName(xbBinaryTemporalOp);
 	                    // change to SOS 1.0. TMDuring kind of
 	                    if (localName.equals(TimeOperator.TM_During.name()) && time instanceof TimePeriod) {

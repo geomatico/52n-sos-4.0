@@ -45,14 +45,14 @@ import org.n52.sos.ogc.sensorML.AbstractProcess;
 import org.n52.sos.ogc.sensorML.AbstractSensorML;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
-import org.n52.sos.ogc.sensorML.elements.SosSMLCapabilities;
+import org.n52.sos.ogc.sensorML.elements.SmlCapabilities;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.DataRecord;
-import org.n52.sos.ogc.swe.SosSweDataRecord;
-import org.n52.sos.ogc.swe.SosSweEnvelope;
-import org.n52.sos.ogc.swe.SosSweField;
+import org.n52.sos.ogc.swe.SweDataRecord;
+import org.n52.sos.ogc.swe.SweEnvelope;
+import org.n52.sos.ogc.swe.SweField;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.response.DescribeSensorResponse;
 import org.n52.sos.service.Configurator;
@@ -151,7 +151,7 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
        if (procedureSettings().isEnrichWithDiscoveryInformation() && procedureDescription instanceof AbstractSensorML)
        {
     	   // TODO Eike: implement enrichment according OGC#09-033 and move already implemented stuff from ProcedureConverter to this class
-    	   final SosSMLCapabilities observedBBox = createObservedBBOXCapability((AbstractSensorML)procedureDescription);
+    	   final SmlCapabilities observedBBox = createObservedBBOXCapability((AbstractSensorML)procedureDescription);
     	   if (observedBBox != null)
     	   {
     		   ((AbstractSensorML)procedureDescription).addCapabilities(observedBBox);
@@ -159,7 +159,7 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
        }
     }
     
-	private SosSMLCapabilities createObservedBBOXCapability(final AbstractSensorML procedureDescription)
+	private SmlCapabilities createObservedBBOXCapability(final AbstractSensorML procedureDescription)
 	{
 		// get all offerings for this procedure
 		final Collection<SosOffering> offeringsForProcedure = getOfferingsForProcedure(procedureDescription.getIdentifier());
@@ -177,14 +177,14 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
 			return null;
 		}
 		// add merged bbox to capabilities as swe:envelope
-		final SosSweEnvelope envelope = new SosSweEnvelope(mergedBBox,"deg"); // FIXME "deg"<-- configure or compute somehow
+		final SweEnvelope envelope = new SweEnvelope(mergedBBox,"deg"); // FIXME "deg"<-- configure or compute somehow
 		
-		final SosSweField field = new SosSweField(SensorMLConstants.ELEMENT_NAME_OBSERVED_BBOX, envelope);
+		final SweField field = new SweField(SensorMLConstants.ELEMENT_NAME_OBSERVED_BBOX, envelope);
 
-		final DataRecord datarecord = new SosSweDataRecord();
+		final DataRecord datarecord = new SweDataRecord();
 		datarecord.addField(field);
 		
-		final SosSMLCapabilities capability = new SosSMLCapabilities();
+		final SmlCapabilities capability = new SmlCapabilities();
 		capability.setName(SensorMLConstants.ELEMENT_NAME_OBSERVED_BBOX);
 		capability.setDataRecord(datarecord);
 		

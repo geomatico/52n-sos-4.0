@@ -49,7 +49,7 @@ import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.DateTimeParseException;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.AbstractSosPhenomenon;
@@ -69,14 +69,14 @@ import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.sos.SosResultEncoding;
 import org.n52.sos.ogc.sos.SosResultStructure;
 import org.n52.sos.ogc.swe.SWEConstants;
-import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
-import org.n52.sos.ogc.swe.SosSweDataArray;
-import org.n52.sos.ogc.swe.SosSweDataRecord;
-import org.n52.sos.ogc.swe.SosSweField;
-import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
-import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
-import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
-import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
+import org.n52.sos.ogc.swe.SweAbstractDataComponent;
+import org.n52.sos.ogc.swe.SweDataArray;
+import org.n52.sos.ogc.swe.SweDataRecord;
+import org.n52.sos.ogc.swe.SweField;
+import org.n52.sos.ogc.swe.encoding.SweAbstractEncoding;
+import org.n52.sos.ogc.swe.encoding.SweTextEncoding;
+import org.n52.sos.ogc.swe.simpleType.SweAbstractSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SweQuantity;
 import org.n52.sos.request.InsertResultRequest;
 import org.n52.sos.response.InsertResultResponse;
 import org.n52.sos.service.Configurator;
@@ -196,12 +196,12 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
     }
 
     private SosObservation getObservation(ResultTemplate resultTemplate, String[] blockValues,
-            SosSweAbstractDataComponent resultStructure, SosSweAbstractEncoding encoding, Session session)
+            SweAbstractDataComponent resultStructure, SweAbstractEncoding encoding, Session session)
                     throws OwsExceptionReport {
         int resultTimeIndex = ResultHandlingHelper.hasResultTime(resultStructure);
         int phenomenonTimeIndex = ResultHandlingHelper.hasPhenomenonTime(resultStructure);
 
-        SosSweDataRecord record = setRecordFrom(resultStructure);
+        SweDataRecord record = setRecordFrom(resultStructure);
 
         Map<Integer, String> observedProperties = new HashMap<Integer, String>(record.getFields().size() - 1);
         Map<Integer, SWEConstants.SweSimpleType> types =
@@ -209,13 +209,13 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
         Map<Integer, String> units = new HashMap<Integer, String>(record.getFields().size() - 1);
 
         int j = 0;
-        for (SosSweField swefield : record.getFields()) {
+        for (SweField swefield : record.getFields()) {
             if (j != resultTimeIndex && j != phenomenonTimeIndex) {
                 Integer index = Integer.valueOf(j);
-                SosSweAbstractSimpleType<?> sweAbstractSimpleType = (SosSweAbstractSimpleType) swefield.getElement();
-                if (sweAbstractSimpleType instanceof SosSweQuantity) {
+                SweAbstractSimpleType<?> sweAbstractSimpleType = (SweAbstractSimpleType) swefield.getElement();
+                if (sweAbstractSimpleType instanceof SweQuantity) {
                     /* TODO units for other SosSweSimpleTypes? */
-                    units.put(index, ((SosSweQuantity) sweAbstractSimpleType).getUom());
+                    units.put(index, ((SweQuantity) sweAbstractSimpleType).getUom());
                 }
                 types.put(index, sweAbstractSimpleType.getSimpleType());
                 observedProperties.put(index, swefield.getElement().getDefinition());
@@ -227,7 +227,7 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
 //        if (observedProperties.size() > 1) {
 //        }
 
-        SosMultiObservationValues<SosSweDataArray> sosValues =
+        SosMultiObservationValues<SweDataArray> sosValues =
                 createObservationValueFrom(blockValues, record, encoding, resultTimeIndex, phenomenonTimeIndex, types,
                         units);
 
@@ -238,12 +238,12 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
         return observation;
     }
 
-    private SosMultiObservationValues<SosSweDataArray> createObservationValueFrom(String[] blockValues,
-            SosSweAbstractDataComponent recordFromResultStructure, SosSweAbstractEncoding encoding,
+    private SosMultiObservationValues<SweDataArray> createObservationValueFrom(String[] blockValues,
+            SweAbstractDataComponent recordFromResultStructure, SweAbstractEncoding encoding,
             int resultTimeIndex, int phenomenonTimeIndex, Map<Integer, SWEConstants.SweSimpleType> types,
                                                                                   Map<Integer, String> units) throws
             OwsExceptionReport {
-        SosSweDataArray dataArray = new SosSweDataArray();
+        SweDataArray dataArray = new SweDataArray();
         dataArray.setElementType(recordFromResultStructure);
         dataArray.setEncoding(encoding);
 
@@ -256,19 +256,19 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
                 dataArrayValue.addBlock(Arrays.asList(singleValues));
             }
         }
-        SosMultiObservationValues<SosSweDataArray> sosValues = new SosMultiObservationValues<SosSweDataArray>();
+        SosMultiObservationValues<SweDataArray> sosValues = new SosMultiObservationValues<SweDataArray>();
         sosValues.setValue(dataArrayValue);
         return sosValues;
     }
 
-    private SosSweDataRecord setRecordFrom(SosSweAbstractDataComponent resultStructure) throws OwsExceptionReport {
-        SosSweDataRecord record = null;
-        if (resultStructure instanceof SosSweDataArray
-                && ((SosSweDataArray) resultStructure).getElementType() instanceof SosSweDataRecord) {
-            SosSweDataArray array = (SosSweDataArray) resultStructure;
-            record = (SosSweDataRecord) array.getElementType();
-        } else if (resultStructure instanceof SosSweDataRecord) {
-            record = (SosSweDataRecord) resultStructure;
+    private SweDataRecord setRecordFrom(SweAbstractDataComponent resultStructure) throws OwsExceptionReport {
+        SweDataRecord record = null;
+        if (resultStructure instanceof SweDataArray
+                && ((SweDataArray) resultStructure).getElementType() instanceof SweDataRecord) {
+            SweDataArray array = (SweDataArray) resultStructure;
+            record = (SweDataRecord) array.getElementType();
+        } else if (resultStructure instanceof SweDataRecord) {
+            record = (SweDataRecord) resultStructure;
         } else {
             throw new NoApplicableCodeException().withMessage("Unsupported ResultStructure!");
         }
@@ -276,9 +276,9 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
     }
 
     // TODO move to helper class
-    private ITime getPhenomenonTime(String timeString) throws OwsExceptionReport {
+    private Time getPhenomenonTime(String timeString) throws OwsExceptionReport {
         try {
-            ITime phenomenonTime;
+            Time phenomenonTime;
             if (timeString.contains("/")) {
                 String[] times = timeString.split("/");
                 DateTime start = DateTimeHelper.parseIsoString2DateTime(times[0].trim());
@@ -294,17 +294,17 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
         }
     }
 
-    private String[] getSingleValues(String block, SosSweAbstractEncoding encoding) {
-        if (encoding instanceof SosSweTextEncoding) {
-            SosSweTextEncoding textEncoding = (SosSweTextEncoding) encoding;
+    private String[] getSingleValues(String block, SweAbstractEncoding encoding) {
+        if (encoding instanceof SweTextEncoding) {
+            SweTextEncoding textEncoding = (SweTextEncoding) encoding;
             return separateValues(block, textEncoding.getTokenSeparator());
         }
         return null;
     }
 
-    private String[] getBlockValues(String resultValues, SosSweAbstractEncoding encoding) {
-        if (encoding instanceof SosSweTextEncoding) {
-            SosSweTextEncoding textEncoding = (SosSweTextEncoding) encoding;
+    private String[] getBlockValues(String resultValues, SweAbstractEncoding encoding) {
+        if (encoding instanceof SweTextEncoding) {
+            SweTextEncoding textEncoding = (SweTextEncoding) encoding;
             String[] blockValues = separateValues(resultValues, textEncoding.getBlockSeparator());
             return checkForCountValue(blockValues, textEncoding.getTokenSeparator());
         }

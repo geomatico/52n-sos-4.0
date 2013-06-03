@@ -37,14 +37,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.n52.sos.ds.hibernate.HibernateTestCase;
 import org.n52.sos.ds.hibernate.entities.Observation;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public abstract class TemporalRestrictionTest extends HibernateTestCase {
-    private ITime filter;
+    private Time filter;
 
     @After
     public void cleanup() throws OwsExceptionReport {
@@ -81,14 +81,14 @@ public abstract class TemporalRestrictionTest extends HibernateTestCase {
         }
     }
 
-    protected abstract ITime createScenario(Session session) throws OwsExceptionReport;
+    protected abstract Time createScenario(Session session) throws OwsExceptionReport;
 
     protected HibernateObservationBuilder getBuilder(Session session) throws OwsExceptionReport {
         return new HibernateObservationBuilder(session);
     }
 
     @SuppressWarnings("unchecked")
-    private Set<Identifier> filter(TimePrimitiveFieldDescriptor d, TemporalRestriction r, ITime time, Session session)
+    private Set<Identifier> filter(TimePrimitiveFieldDescriptor d, TemporalRestriction r, Time time, Session session)
             throws OwsExceptionReport {
         List<String> list = session.createCriteria(Observation.class).add(r.get(d, time))
                 .setProjection(Projections.distinct(Projections.property(Observation.IDENTIFIER))).list();

@@ -34,8 +34,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
-import org.n52.sos.ogc.swe.simpleType.SosSweCategory;
+import org.n52.sos.ogc.swe.simpleType.SweBoolean;
+import org.n52.sos.ogc.swe.simpleType.SweCategory;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
@@ -68,9 +68,9 @@ public class SweCommonDecoderV20Test {
 		
 		Object decodedObject = decoder.decode(xbBoolean);
 		
-		assertThat(decodedObject.getClass().getName(), is(SosSweBoolean.class.getName()));
+		assertThat(decodedObject.getClass().getName(), is(SweBoolean.class.getName()));
 		
-		SosSweBoolean sosBoolean = (SosSweBoolean) decodedObject;
+		SweBoolean sosBoolean = (SweBoolean) decodedObject;
 		
 		assertThat(sosBoolean.getValue(), is(value));
 		assertThat(sosBoolean.getDefinition(), is(definition));
@@ -89,9 +89,9 @@ public class SweCommonDecoderV20Test {
 		
 		Object decodedObject = decoder.decode(xbCategory);
 		
-		assertThat(decodedObject.getClass().getName(), is(SosSweCategory.class.getName()));
+		assertThat(decodedObject.getClass().getName(), is(SweCategory.class.getName()));
 		
-		SosSweCategory sosCategory = (SosSweCategory) decodedObject;
+		SweCategory sosCategory = (SweCategory) decodedObject;
 		
 		assertThat(sosCategory.getValue(), is(value));
 		assertThat(sosCategory.getDefinition(), is(definition));

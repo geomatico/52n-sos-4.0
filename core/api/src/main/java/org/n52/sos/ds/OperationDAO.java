@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ds;
 
-import org.n52.sos.ogc.ows.OWSOperation;
+import org.n52.sos.ogc.ows.OwsOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SwesExtension;
 
@@ -60,7 +60,7 @@ public interface OperationDAO {
      *
      * @throws OwsExceptionReport If an error occurs.
      */
-    OWSOperation getOperationsMetadata(String service, String version) throws OwsExceptionReport;
+    OwsOperation getOperationsMetadata(String service, String version) throws OwsExceptionReport;
     
     /**
      * @return the operation specific extension information (&larr; should be available from cache or from code)

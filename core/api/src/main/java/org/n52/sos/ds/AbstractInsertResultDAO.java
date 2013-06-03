@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ds;
 
-import org.n52.sos.ogc.ows.OWSOperation;
+import org.n52.sos.ogc.ows.OwsOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.request.InsertResultRequest;
@@ -36,7 +36,7 @@ public abstract class AbstractInsertResultDAO extends AbstractOperationDAO {
 
     
     @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
+    protected void setOperationsMetadata(OwsOperation opsMeta, String service, String version) throws OwsExceptionReport {
         opsMeta.addPossibleValuesParameter(Sos2Constants.InsertResultParams.template, getCache().getResultTemplates());
         opsMeta.addAnyParameterValue(Sos2Constants.InsertResultParams.resultValues);
     }

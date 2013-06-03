@@ -52,15 +52,15 @@ import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.CapabilitiesExtension;
 import org.n52.sos.ogc.ows.MergableExtension;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OWSOperation;
-import org.n52.sos.ogc.ows.OWSOperationsMetadata;
-import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
+import org.n52.sos.ogc.ows.OwsOperation;
+import org.n52.sos.ogc.ows.OwsOperationsMetadata;
+import org.n52.sos.ogc.ows.OwsParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.ows.SosCapabilities;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosCapabilities;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.ogc.sos.SosObservationOffering;
@@ -258,23 +258,23 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
      * @throws OwsExceptionReport
      *             * If an error occurs
      */
-    private OWSOperationsMetadata getOperationsMetadataForOperations(final String service, final String version)
+    private OwsOperationsMetadata getOperationsMetadataForOperations(final String service, final String version)
             throws OwsExceptionReport {
 
-        final OWSOperationsMetadata operationsMetadata = new OWSOperationsMetadata();
+        final OwsOperationsMetadata operationsMetadata = new OwsOperationsMetadata();
         operationsMetadata.addCommonValue(OWSConstants.RequestParams.service.name(),
-                new OWSParameterValuePossibleValues(SosConstants.SOS));
+                new OwsParameterValuePossibleValues(SosConstants.SOS));
         operationsMetadata.addCommonValue(OWSConstants.RequestParams.version.name(),
-                new OWSParameterValuePossibleValues(ServiceOperatorRepository.getInstance()
+                new OwsParameterValuePossibleValues(ServiceOperatorRepository.getInstance()
                         .getSupportedVersions(service)));
 
         // FIXME: OpsMetadata for InsertSensor, InsertObservation SOS 2.0
         final Set<RequestOperatorKeyType> requestOperatorKeyTypes =
                 RequestOperatorRepository.getInstance().getActiveRequestOperatorKeyTypes();
-        final List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>(requestOperatorKeyTypes.size());
+        final List<OwsOperation> opsMetadata = new ArrayList<OwsOperation>(requestOperatorKeyTypes.size());
         for (final RequestOperatorKeyType requestOperatorKeyType : requestOperatorKeyTypes) {
             if (requestOperatorKeyType.getServiceOperatorKeyType().getVersion().equals(version)) {
-                final OWSOperation operationMetadata =
+                final OwsOperation operationMetadata =
                         RequestOperatorRepository.getInstance().getRequestOperator(requestOperatorKeyType)
                                 .getOperationMetadata(service, version);
                 if (operationMetadata != null) {

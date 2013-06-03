@@ -29,7 +29,7 @@ import org.joda.time.DateTime;
  * Class represents a GML conform timeInstant element
  * 
  */
-public class TimeInstant extends ITime {
+public class TimeInstant extends Time {
     private static final long serialVersionUID = -1426561343329882331L;
 
     /** date for this timeInstant */
@@ -121,7 +121,7 @@ public class TimeInstant extends ITime {
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     @Override
-    public int compareTo(ITime o) {
+    public int compareTo(Time o) {
         if (o instanceof TimeInstant) {
             TimeInstant ti = (TimeInstant) o;
             if (value.isBefore(ti.getValue())) {

@@ -43,13 +43,13 @@ import org.n52.sos.ds.hibernate.entities.TextObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosResultEncoding;
 import org.n52.sos.ogc.sos.SosResultStructure;
-import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
-import org.n52.sos.ogc.swe.SosSweDataArray;
-import org.n52.sos.ogc.swe.SosSweDataRecord;
-import org.n52.sos.ogc.swe.SosSweField;
-import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
-import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
-import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
+import org.n52.sos.ogc.swe.SweAbstractDataComponent;
+import org.n52.sos.ogc.swe.SweDataArray;
+import org.n52.sos.ogc.swe.SweDataRecord;
+import org.n52.sos.ogc.swe.SweField;
+import org.n52.sos.ogc.swe.encoding.SweAbstractEncoding;
+import org.n52.sos.ogc.swe.encoding.SweTextEncoding;
+import org.n52.sos.ogc.swe.simpleType.SweAbstractSimpleType;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.DateTimeHelper;
@@ -142,23 +142,23 @@ public class ResultHandlingHelper {
     }
 
     private static Map<Integer, String> getValueOrderMap(
-            final SosSweAbstractDataComponent sweDataElement) {
+            final SweAbstractDataComponent sweDataElement) {
         final Map<Integer, String> valueOrder = new HashMap<Integer, String>(0);
-        if (sweDataElement instanceof SosSweDataArray && ((SosSweDataArray) sweDataElement).getElementType() instanceof SosSweDataRecord) {
-            final SosSweDataArray dataArray = (SosSweDataArray) sweDataElement;
-            addOrderAndDefinitionToMap(((SosSweDataRecord) dataArray.getElementType()).getFields(), valueOrder);
-        } else if (sweDataElement instanceof SosSweDataRecord) {
-            final SosSweDataRecord dataRecord = (SosSweDataRecord) sweDataElement;
+        if (sweDataElement instanceof SweDataArray && ((SweDataArray) sweDataElement).getElementType() instanceof SweDataRecord) {
+            final SweDataArray dataArray = (SweDataArray) sweDataElement;
+            addOrderAndDefinitionToMap(((SweDataRecord) dataArray.getElementType()).getFields(), valueOrder);
+        } else if (sweDataElement instanceof SweDataRecord) {
+            final SweDataRecord dataRecord = (SweDataRecord) sweDataElement;
             addOrderAndDefinitionToMap(dataRecord.getFields(), valueOrder);
         }
         return new TreeMap<Integer, String>(valueOrder);
     }
 
-    private static void addOrderAndDefinitionToMap(final List<SosSweField> fields, final Map<Integer, String> valueOrder) {
+    private static void addOrderAndDefinitionToMap(final List<SweField> fields, final Map<Integer, String> valueOrder) {
         for (int i = 0; i < fields.size(); i++) {
-            final SosSweAbstractDataComponent element = fields.get(i).getElement();
-            if (element instanceof SosSweAbstractSimpleType) {
-                final SosSweAbstractSimpleType<?> simpleType = (SosSweAbstractSimpleType<?>) element;
+            final SweAbstractDataComponent element = fields.get(i).getElement();
+            if (element instanceof SweAbstractSimpleType) {
+                final SweAbstractSimpleType<?> simpleType = (SweAbstractSimpleType<?>) element;
                 if (simpleType.isSetDefinition()) {
                     addValueToValueOrderMap(valueOrder, i, simpleType.getDefinition());
                 }
@@ -227,48 +227,48 @@ public class ResultHandlingHelper {
         return Configurator.getInstance().getProfileHandler().getActiveProfile().getResponseNoDataPlaceholder();
     }
 
-    public static String getTokenSeparator(final SosSweAbstractEncoding encoding) {
-        if (encoding instanceof SosSweTextEncoding) {
-            return ((SosSweTextEncoding) encoding).getTokenSeparator();
+    public static String getTokenSeparator(final SweAbstractEncoding encoding) {
+        if (encoding instanceof SweTextEncoding) {
+            return ((SweTextEncoding) encoding).getTokenSeparator();
         }
         return null;
     }
     
-    public static String getBlockSeparator(final SosSweAbstractEncoding encoding) {
-        if (encoding instanceof SosSweTextEncoding) {
-            return ((SosSweTextEncoding) encoding).getBlockSeparator();
+    public static String getBlockSeparator(final SweAbstractEncoding encoding) {
+        if (encoding instanceof SweTextEncoding) {
+            return ((SweTextEncoding) encoding).getBlockSeparator();
         }
         return null;
     }
     
-    public static int hasResultTime(final SosSweAbstractDataComponent sweDataElement) {
-        if (sweDataElement instanceof SosSweDataArray && ((SosSweDataArray) sweDataElement).getElementType() instanceof SosSweDataRecord) {
-            final SosSweDataArray dataArray = (SosSweDataArray) sweDataElement;
-            return checkFields(((SosSweDataRecord) dataArray.getElementType()).getFields(), RESULT_TIME);
-        } else if (sweDataElement instanceof SosSweDataRecord) {
-            final SosSweDataRecord dataRecord = (SosSweDataRecord) sweDataElement;
+    public static int hasResultTime(final SweAbstractDataComponent sweDataElement) {
+        if (sweDataElement instanceof SweDataArray && ((SweDataArray) sweDataElement).getElementType() instanceof SweDataRecord) {
+            final SweDataArray dataArray = (SweDataArray) sweDataElement;
+            return checkFields(((SweDataRecord) dataArray.getElementType()).getFields(), RESULT_TIME);
+        } else if (sweDataElement instanceof SweDataRecord) {
+            final SweDataRecord dataRecord = (SweDataRecord) sweDataElement;
             return checkFields(dataRecord.getFields(), RESULT_TIME);
         }
         return -1;
     }
     
-    public static int hasPhenomenonTime(final SosSweAbstractDataComponent sweDataElement) {
-        if (sweDataElement instanceof SosSweDataArray && ((SosSweDataArray) sweDataElement).getElementType() instanceof SosSweDataRecord) {
-            final SosSweDataArray dataArray = (SosSweDataArray) sweDataElement;
-            return checkFields(((SosSweDataRecord) dataArray.getElementType()).getFields(), PHENOMENON_TIME);
-        } else if (sweDataElement instanceof SosSweDataRecord) {
-            final SosSweDataRecord dataRecord = (SosSweDataRecord) sweDataElement;
+    public static int hasPhenomenonTime(final SweAbstractDataComponent sweDataElement) {
+        if (sweDataElement instanceof SweDataArray && ((SweDataArray) sweDataElement).getElementType() instanceof SweDataRecord) {
+            final SweDataArray dataArray = (SweDataArray) sweDataElement;
+            return checkFields(((SweDataRecord) dataArray.getElementType()).getFields(), PHENOMENON_TIME);
+        } else if (sweDataElement instanceof SweDataRecord) {
+            final SweDataRecord dataRecord = (SweDataRecord) sweDataElement;
             return checkFields(dataRecord.getFields(), PHENOMENON_TIME);
         }
         return -1;
     }
 
-    public static int checkFields(final List<SosSweField> fields, final String definition) {
+    public static int checkFields(final List<SweField> fields, final String definition) {
 		int i = 0;
-		for (final SosSweField f : fields) {
-			final SosSweAbstractDataComponent element = f.getElement();
-            if (element instanceof SosSweAbstractSimpleType) {
-                final SosSweAbstractSimpleType<?> simpleType = (SosSweAbstractSimpleType<?>) element;
+		for (final SweField f : fields) {
+			final SweAbstractDataComponent element = f.getElement();
+            if (element instanceof SweAbstractSimpleType) {
+                final SweAbstractSimpleType<?> simpleType = (SweAbstractSimpleType<?>) element;
                 if (simpleType.isSetDefinition() && simpleType.getDefinition().equals(definition)) {
                     return i;
                 }

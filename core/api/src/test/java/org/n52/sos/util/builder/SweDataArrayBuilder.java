@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.n52.sos.ogc.swe.SosSweDataArray;
-import org.n52.sos.ogc.swe.SosSweDataRecord;
-import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
+import org.n52.sos.ogc.swe.SweDataArray;
+import org.n52.sos.ogc.swe.SweDataRecord;
+import org.n52.sos.ogc.swe.encoding.SweTextEncoding;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
@@ -37,7 +37,7 @@ import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
  */
 public class SweDataArrayBuilder {
 
-	private SosSweDataRecord elementType;
+	private SweDataRecord elementType;
 	private String[] encodingParameter;
 	private List<List<String>> blocks;
 	
@@ -46,7 +46,7 @@ public class SweDataArrayBuilder {
 		return new SweDataArrayBuilder();
 	}
 
-	public SweDataArrayBuilder setElementType(SosSweDataRecord elementType)
+	public SweDataArrayBuilder setElementType(SweDataRecord elementType)
 	{
 		this.elementType = elementType;
 		return this;
@@ -76,15 +76,15 @@ public class SweDataArrayBuilder {
 		return this;
 	}
 	
-	public SosSweDataArray build()
+	public SweDataArray build()
 	{
-		SosSweDataArray dataArray = new SosSweDataArray();
+		SweDataArray dataArray = new SweDataArray();
 		dataArray.setElementType(elementType);
 		if (encodingParameter != null && encodingParameter.length == 4)
 		{
 			if (encodingParameter[0].equals("text"))
 			{
-				SosSweTextEncoding encoding = new SosSweTextEncoding();
+				SweTextEncoding encoding = new SweTextEncoding();
 				encoding.setBlockSeparator(encodingParameter[1]);
 				encoding.setTokenSeparator(encodingParameter[2]);
 				encoding.setDecimalSeparator(encodingParameter[3]);

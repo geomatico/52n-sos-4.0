@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.TimeValuePair;
 
@@ -69,7 +69,7 @@ public class TVPValue implements IMultiValue<List<TimeValuePair>> {
     }
 
     @Override
-    public ITime getPhenomenonTime() {
+    public Time getPhenomenonTime() {
         TimePeriod timePeriod = new TimePeriod();
         if (value != null && !value.isEmpty()) {
             for (TimeValuePair timeValuePair : value) {

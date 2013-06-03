@@ -25,7 +25,7 @@ package org.n52.sos.util.builder;
 
 import org.n52.sos.ogc.om.SosMultiObservationValues;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
-import org.n52.sos.ogc.swe.SosSweDataArray;
+import org.n52.sos.ogc.swe.SweDataArray;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
@@ -33,22 +33,22 @@ import org.n52.sos.ogc.swe.SosSweDataArray;
  */
 public class SweDataArrayValueBuilder {
 
-	private SosSweDataArray dataArray;
+	private SweDataArray dataArray;
 	
 	public static SweDataArrayValueBuilder aSweDataArrayValue()
 	{
 		return new SweDataArrayValueBuilder();
 	}
 
-	public SweDataArrayValueBuilder setSweDataArray(SosSweDataArray dataArray)
+	public SweDataArrayValueBuilder setSweDataArray(SweDataArray dataArray)
 	{
 		this.dataArray = dataArray;
 		return this;
 	}
 
-	public SosMultiObservationValues<SosSweDataArray> build()
+	public SosMultiObservationValues<SweDataArray> build()
 	{
-		SosMultiObservationValues<SosSweDataArray> value = new SosMultiObservationValues<SosSweDataArray>();
+		SosMultiObservationValues<SweDataArray> value = new SosMultiObservationValues<SweDataArray>();
 		SweDataArrayValue dataArrayValue = new SweDataArrayValue();
 		dataArrayValue.setValue(dataArray);
 		value.setValue(dataArrayValue);

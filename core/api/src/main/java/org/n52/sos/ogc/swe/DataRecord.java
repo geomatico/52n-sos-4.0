@@ -30,13 +30,13 @@ public interface DataRecord {
     /**
      * @return the fields
      */
-    List<SosSweField> getFields();
+    List<SweField> getFields();
 
     /**
      * @param fields
      *            the fields to set
      */
-    DataRecord setFields(List<SosSweField> fields);
+    DataRecord setFields(List<SweField> fields);
 
     /**
      * Adds field to field list
@@ -44,7 +44,7 @@ public interface DataRecord {
      * @param field
      *            Field to add
      */
-    DataRecord addField(SosSweField field);
+    DataRecord addField(SweField field);
 
     /**
      * Check if there are field elements

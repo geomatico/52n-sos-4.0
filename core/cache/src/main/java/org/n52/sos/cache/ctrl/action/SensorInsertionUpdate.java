@@ -27,7 +27,7 @@ import java.util.Collection;
 
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ogc.om.SosOffering;
-import org.n52.sos.ogc.swe.SosFeatureRelationship;
+import org.n52.sos.ogc.swes.SwesFeatureRelationship;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.InsertSensorResponse;
 import org.n52.sos.util.Action;
@@ -93,9 +93,9 @@ public class SensorInsertionUpdate extends InMemoryCacheUpdate {
         }
 
         // related features
-        final Collection<SosFeatureRelationship> relatedFeatures = request.getRelatedFeatures();
+        final Collection<SwesFeatureRelationship> relatedFeatures = request.getRelatedFeatures();
         if (relatedFeatures != null && !relatedFeatures.isEmpty()) {
-            for (SosFeatureRelationship relatedFeature : relatedFeatures) {
+            for (SwesFeatureRelationship relatedFeature : relatedFeatures) {
                 final String identifier = relatedFeature.getFeature().getIdentifier().getValue();
                 for (SosOffering sosOffering : request.getProcedureDescription().getOfferings()) {                
                     cache.addRelatedFeatureForOffering(sosOffering.getOfferingIdentifier(), identifier);

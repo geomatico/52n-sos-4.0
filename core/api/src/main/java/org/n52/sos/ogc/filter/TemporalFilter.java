@@ -24,7 +24,7 @@
 package org.n52.sos.ogc.filter;
 
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 
 /**
  * Temporal filter class
@@ -40,7 +40,7 @@ public class TemporalFilter {
     /**
      * Temporal filter time value
      */
-    private ITime time;
+    private Time time;
 
     /**
      * Value reference
@@ -61,7 +61,7 @@ public class TemporalFilter {
      * @param valueReferencep
      *            value reference
      */
-    public TemporalFilter(TimeOperator operatorp, ITime timep, String valueReferencep) {
+    public TemporalFilter(TimeOperator operatorp, Time timep, String valueReferencep) {
         this.operator = operatorp;
         this.time = timep;
         this.valueReference = valueReferencep;
@@ -77,7 +77,7 @@ public class TemporalFilter {
      * @param valueReferencep
      *            value reference
      */
-    public TemporalFilter(String operatorNamep, ITime timep, String valueReferencep) {
+    public TemporalFilter(String operatorNamep, Time timep, String valueReferencep) {
         this.operator = TimeOperator.valueOf(operatorNamep);
         this.time = timep;
         this.valueReference = valueReferencep;
@@ -107,7 +107,7 @@ public class TemporalFilter {
      * 
      * @return filter time
      */
-    public ITime getTime() {
+    public Time getTime() {
         return time;
     }
 
@@ -117,7 +117,7 @@ public class TemporalFilter {
      * @param time
      *            filter time
      */
-    public void setTime(ITime time) {
+    public void setTime(Time time) {
         this.time = time;
     }
 

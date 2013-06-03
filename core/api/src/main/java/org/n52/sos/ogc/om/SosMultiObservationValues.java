@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.om;
 
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.om.values.IMultiValue;
 
 public class SosMultiObservationValues<T> implements ObservationValue<IMultiValue<T>> {
@@ -31,10 +31,10 @@ public class SosMultiObservationValues<T> implements ObservationValue<IMultiValu
 
     private IMultiValue<T> values;
 
-    private ITime phenomenonTime;
+    private Time phenomenonTime;
 
     @Override
-    public ITime getPhenomenonTime() {
+    public Time getPhenomenonTime() {
         if (phenomenonTime == null && values != null) {
             phenomenonTime = values.getPhenomenonTime();
         }
@@ -52,7 +52,7 @@ public class SosMultiObservationValues<T> implements ObservationValue<IMultiValu
     }
 
     @Override
-    public void setPhenomenonTime(ITime phenomenonTime) {
+    public void setPhenomenonTime(Time phenomenonTime) {
         this.phenomenonTime = phenomenonTime;
     }
 
