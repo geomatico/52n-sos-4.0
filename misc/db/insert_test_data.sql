@@ -91,7 +91,7 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION getSpatialSamplingFeatureType(text) RETURNS bigint AS
 $$
-	SELECT getFeatureOfInterestType('http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SFSampling'::text || $1);
+	SELECT getFeatureOfInterestType('http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_Sampling'::text || $1);
 $$
 LANGUAGE 'sql';
 
@@ -209,7 +209,7 @@ $$
 	xmlns:gml="http://www.opengis.net/gml/3.2" gml:id="ssf_'::text || $1 || '">
 	<gml:identifier codeSpace="">'::text || $1 || '</gml:identifier>
 	<gml:name>'::text || $4 || '</gml:name>
-	<sf:type xlink:href="http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SFSamplingPoint"/>
+	<sf:type xlink:href="http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint"/>
 	<sf:sampledFeature xlink:href="http://www.opengis.net/def/nil/OGC/0/unknown"/>
 	<sams:shape>
 		<gml:Point gml:id="pSsf_'::text || $1 || '">
@@ -469,9 +469,9 @@ SELECT insertObservationType('http://www.opengis.net/def/observationType/OGC-OM/
 SELECT insertObservationType('http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TextObservation');
 
 ---- FEATUREOFINTERESTTYPE
-SELECT insertFeatureOfInterestType('http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SFSamplingCurve');
-SELECT insertFeatureOfInterestType('http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SFSamplingSurface');
-SELECT insertFeatureOfInterestType('http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SFSamplingPoint');
+SELECT insertFeatureOfInterestType('http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingCurve');
+SELECT insertFeatureOfInterestType('http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingSurface');
+SELECT insertFeatureOfInterestType('http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint');
 SELECT insertFeatureOfInterestType('http://www.opengis.net/def/nil/OGC/0/unknown');
 
 ---- PROCEDUREDESCRIPTIONFORMAT
