@@ -273,6 +273,7 @@ public class HibernateCriteriaTransactionalUtilities {
         session.saveOrUpdate(hObservationConstellation);
         
         //update hidden child observation constellations
+        // TODO should hidden child observation constellations be restricted to the parent observation type?
         Set<String> offerings = new HashSet<String>(Configurator.getInstance().getCache().getOfferingsForProcedure(
                 hObservationConstellation.getProcedure().getIdentifier()));
         offerings.remove(hObservationConstellation.getOffering().getIdentifier());
