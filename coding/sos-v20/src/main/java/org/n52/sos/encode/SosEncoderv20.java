@@ -78,10 +78,10 @@ import org.n52.sos.ogc.filter.FilterConstants;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.SosFeatureCollection;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.OmObservation;
+import org.n52.sos.ogc.om.features.AbstractFeature;
+import org.n52.sos.ogc.om.features.FeatureCollection;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SwesExtension;
@@ -276,18 +276,18 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         final GetObservationResponseDocument xbGetObsRespDoc =
                 GetObservationResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         final GetObservationResponseType xbGetObsResp = xbGetObsRespDoc.addNewGetObservationResponse();
-        final Encoder<XmlObject, SosObservation> encoder =
-                CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
+        final Encoder<XmlObject, OmObservation> encoder =
+                CodingHelper.getEncoder(response.getResponseFormat(), new OmObservation());
         if (!(encoder instanceof ObservationEncoder)) {
             throw new NoApplicableCodeException()
                     .withMessage("Error while encoding GetObservation response, encoder is not of type ObservationEncoder!");
         }
-        final ObservationEncoder<XmlObject, SosObservation> iObservationEncoder =
-                (ObservationEncoder<XmlObject, SosObservation>) encoder;
+        final ObservationEncoder<XmlObject, OmObservation> iObservationEncoder =
+                (ObservationEncoder<XmlObject, OmObservation>) encoder;
         if (iObservationEncoder.shouldObservationsWithSameXBeMerged()) {
             response.mergeObservationsWithSameX();
         }
-        for (final SosObservation sosObservation : response.getObservationCollection()) {
+        for (final OmObservation sosObservation : response.getObservationCollection()) {
             xbGetObsResp.addNewObservationData().addNewOMObservation().set(encoder.encode(sosObservation, null));
         }
         // set schema location
@@ -306,16 +306,16 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
                         .getXmlOptions());
         final GetFeatureOfInterestResponseType xbGetFoiResponse =
                 xbGetFoiResponseDoc.addNewGetFeatureOfInterestResponse();
-        final SosAbstractFeature sosAbstractFeature = response.getAbstractFeature();
-        if (sosAbstractFeature instanceof SosFeatureCollection) {
-            final Map<String, SosAbstractFeature> sosFeatColMap =
-                    ((SosFeatureCollection) sosAbstractFeature).getMembers();
+        final AbstractFeature sosAbstractFeature = response.getAbstractFeature();
+        if (sosAbstractFeature instanceof FeatureCollection) {
+            final Map<String, AbstractFeature> sosFeatColMap =
+                    ((FeatureCollection) sosAbstractFeature).getMembers();
             for (final String sosFeatID : sosFeatColMap.keySet()) {
-                final SosAbstractFeature feature = sosFeatColMap.get(sosFeatID);
+                final AbstractFeature feature = sosFeatColMap.get(sosFeatID);
                 addFeatureOfInterestGetFeatureOfInterestResponse(feature, xbGetFoiResponse);
             }
         } else {
-            if (sosAbstractFeature instanceof SosSamplingFeature) {
+            if (sosAbstractFeature instanceof SamplingFeature) {
                 addFeatureOfInterestGetFeatureOfInterestResponse(sosAbstractFeature, xbGetFoiResponse);
             }
         }
@@ -327,7 +327,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         return xbGetFoiResponseDoc;
     }
 
-    private void addFeatureOfInterestGetFeatureOfInterestResponse(final SosAbstractFeature feature,
+    private void addFeatureOfInterestGetFeatureOfInterestResponse(final AbstractFeature feature,
             final GetFeatureOfInterestResponseType getFoiResponse) throws OwsExceptionReport {
         final Map<HelperValues, String> additionalValues =
                 new EnumMap<SosConstants.HelperValues, String>(HelperValues.class);
@@ -346,12 +346,12 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         final GetObservationByIdResponseDocument xbGetObsByIdRespDoc =
                 GetObservationByIdResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         final GetObservationByIdResponseType xbGetObsByIdResp = xbGetObsByIdRespDoc.addNewGetObservationByIdResponse();
-        final List<SosObservation> observationCollection = response.getObservationCollection();
-        final Encoder<XmlObject, SosObservation> encoder =
-                CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
+        final List<OmObservation> observationCollection = response.getObservationCollection();
+        final Encoder<XmlObject, OmObservation> encoder =
+                CodingHelper.getEncoder(response.getResponseFormat(), new OmObservation());
         final HashMap<String, String> gmlID4sfIdentifier = new HashMap<String, String>(observationCollection.size());
         final int sfIdCounter = 1;
-        for (final SosObservation sosObservation : observationCollection) {
+        for (final OmObservation sosObservation : observationCollection) {
             final Map<HelperValues, String> foiHelper =
                     new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
             String gmlId;

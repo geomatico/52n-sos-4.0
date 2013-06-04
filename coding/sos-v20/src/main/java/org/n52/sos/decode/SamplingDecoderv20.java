@@ -43,8 +43,8 @@ import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.SFConstants;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -62,7 +62,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class SamplingDecoderv20 implements Decoder<SosAbstractFeature, XmlObject> {
+public class SamplingDecoderv20 implements Decoder<AbstractFeature, XmlObject> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SamplingDecoderv20.class);
 
@@ -113,7 +113,7 @@ public class SamplingDecoderv20 implements Decoder<SosAbstractFeature, XmlObject
     }
 
     @Override
-    public SosAbstractFeature decode(XmlObject element) throws OwsExceptionReport {
+    public AbstractFeature decode(XmlObject element) throws OwsExceptionReport {
         // validate XmlObject
         XmlHelper.validateDocument(element);
         if (element instanceof SFSpatialSamplingFeatureDocument) {
@@ -126,9 +126,9 @@ public class SamplingDecoderv20 implements Decoder<SosAbstractFeature, XmlObject
         return null;
     }
 
-    private SosAbstractFeature parseSpatialSamplingFeature(SFSpatialSamplingFeatureType spatialSamplingFeature)
+    private AbstractFeature parseSpatialSamplingFeature(SFSpatialSamplingFeatureType spatialSamplingFeature)
             throws OwsExceptionReport {
-        SosSamplingFeature sosFeat = new SosSamplingFeature(null, spatialSamplingFeature.getId());
+        SamplingFeature sosFeat = new SamplingFeature(null, spatialSamplingFeature.getId());
         if (spatialSamplingFeature.getIdentifier() != null
                 && spatialSamplingFeature.getIdentifier().getStringValue() != null
                 && !spatialSamplingFeature.getIdentifier().getStringValue().isEmpty()) {
@@ -172,15 +172,15 @@ public class SamplingDecoderv20 implements Decoder<SosAbstractFeature, XmlObject
         return null;
     }
 
-    private List<SosAbstractFeature> getSampledFeatures(FeaturePropertyType sampledFeature) throws OwsExceptionReport {
-        List<SosAbstractFeature> sampledFeatures = new ArrayList<SosAbstractFeature>(1);
+    private List<AbstractFeature> getSampledFeatures(FeaturePropertyType sampledFeature) throws OwsExceptionReport {
+        List<AbstractFeature> sampledFeatures = new ArrayList<AbstractFeature>(1);
         if (sampledFeature != null && !sampledFeature.isNil()) {
             // if xlink:href is set
             if (sampledFeature.getHref() != null && !sampledFeature.getHref().isEmpty()) {
                 if (sampledFeature.getHref().startsWith("#")) {
-                    sampledFeatures.add(new SosSamplingFeature(null, sampledFeature.getHref().replace("#", "")));
+                    sampledFeatures.add(new SamplingFeature(null, sampledFeature.getHref().replace("#", "")));
                 } else {
-                    SosSamplingFeature sampFeat = new SosSamplingFeature(new CodeWithAuthority(sampledFeature.getHref()));
+                    SamplingFeature sampFeat = new SamplingFeature(new CodeWithAuthority(sampledFeature.getHref()));
                     if (sampledFeature.getTitle() != null && !sampledFeature.getTitle().isEmpty()) {
                         
                         sampFeat.addName(new CodeType(sampledFeature.getTitle()));
@@ -203,8 +203,8 @@ public class SamplingDecoderv20 implements Decoder<SosAbstractFeature, XmlObject
                 }
                 if (abstractFeature != null) {
                     Object decodedObject = CodingHelper.decodeXmlObject(abstractFeature);
-                    if (decodedObject instanceof SosAbstractFeature) {
-                        sampledFeatures.add((SosAbstractFeature) decodedObject);
+                    if (decodedObject instanceof AbstractFeature) {
+                        sampledFeatures.add((AbstractFeature) decodedObject);
                     }
                 }
                 throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
@@ -223,7 +223,7 @@ public class SamplingDecoderv20 implements Decoder<SosAbstractFeature, XmlObject
                 .withMessage("The requested geometry type of featureOfInterest is not supported by this service!");
     }
 
-    private void checkTypeAndGeometry(SosSamplingFeature sosFeat) throws OwsExceptionReport {
+    private void checkTypeAndGeometry(SamplingFeature sosFeat) throws OwsExceptionReport {
         String featTypeForGeometry = getFeatTypeForGeometry(sosFeat.getGeometry());
         if (sosFeat.getFeatureType() == null) {
             sosFeat.setFeatureType(featTypeForGeometry);

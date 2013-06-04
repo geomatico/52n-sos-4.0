@@ -65,8 +65,8 @@ import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.om.SosSingleObservationValue;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.SingleObservationValue;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -171,13 +171,13 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
     }
 
     private Object parseFeaturePropertyType(FeaturePropertyType featurePropertyType) throws OwsExceptionReport {
-        SosSamplingFeature feature = null;
+        SamplingFeature feature = null;
         // if xlink:href is set
         if (featurePropertyType.getHref() != null) {
                 if (featurePropertyType.getHref().startsWith("#")) {
-                    feature = new SosSamplingFeature(null, featurePropertyType.getHref().replace("#", ""));
+                    feature = new SamplingFeature(null, featurePropertyType.getHref().replace("#", ""));
                 } else {
-                    feature = new SosSamplingFeature(new CodeWithAuthority(featurePropertyType.getHref()));
+                    feature = new SamplingFeature(new CodeWithAuthority(featurePropertyType.getHref()));
                     if (featurePropertyType.getTitle() != null && !featurePropertyType.getTitle().isEmpty()) {
                         feature.addName(new org.n52.sos.ogc.gml.CodeType(featurePropertyType.getTitle()));
                     }
@@ -201,8 +201,8 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
             }
             if (abstractFeature != null) {
                 Object decodedObject = CodingHelper.decodeXmlObject(abstractFeature);
-                if (decodedObject instanceof SosSamplingFeature) {
-                    feature = (SosSamplingFeature) decodedObject;
+                if (decodedObject instanceof SamplingFeature) {
+                    feature = (SamplingFeature) decodedObject;
                 } else {
                     throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
                             .withMessage("The requested featurePropertyType type is not supported by this service!");
@@ -372,8 +372,8 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
         return timePeriod;
     }
 
-    private SosSingleObservationValue<String> parseReferenceType(ReferenceType referenceType) {
-        SosSingleObservationValue<String> value = new SosSingleObservationValue<String>();
+    private SingleObservationValue<String> parseReferenceType(ReferenceType referenceType) {
+        SingleObservationValue<String> value = new SingleObservationValue<String>();
         if (referenceType.getHref() != null && !referenceType.getHref().isEmpty()) {
             value.setValue(new CategoryValue(referenceType.getHref()));
         } else if (referenceType.getTitle() != null && !referenceType.getTitle().isEmpty()) {
@@ -382,10 +382,10 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
         return value;
     }
 
-    private SosSingleObservationValue<BigDecimal> parseMeasureType(MeasureType measureType) {
+    private SingleObservationValue<BigDecimal> parseMeasureType(MeasureType measureType) {
         QuantityValue quantityValue = new QuantityValue(new BigDecimal(measureType.getStringValue()));
         quantityValue.setUnit(measureType.getUom());
-        return new SosSingleObservationValue<BigDecimal>(quantityValue);
+        return new SingleObservationValue<BigDecimal>(quantityValue);
     }
 
     private Object parsePointType(PointType xbPointType) throws OwsExceptionReport {

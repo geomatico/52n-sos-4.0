@@ -23,19 +23,19 @@
  */
 package org.n52.sos.response;
 
-import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.om.OmObservation;
 
 
 public class InsertResultResponse extends AbstractServiceResponse {
 
-	private SosObservation observation;
+	private OmObservation observation;
 	
-	public SosObservation getObservation()
+	public OmObservation getObservation()
 	{
 		return observation;
 	}
 	
-	public void setObservation(SosObservation observation)
+	public void setObservation(OmObservation observation)
 	{
 		this.observation = observation;
 	}

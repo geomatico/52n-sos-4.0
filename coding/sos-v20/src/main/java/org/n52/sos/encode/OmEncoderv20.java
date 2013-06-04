@@ -41,9 +41,9 @@ import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.om.NamedValue;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.om.SosMultiObservationValues;
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.SosSingleObservationValue;
+import org.n52.sos.ogc.om.MultiObservationValues;
+import org.n52.sos.ogc.om.OmObservation;
+import org.n52.sos.ogc.om.SingleObservationValue;
 import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CategoryValue;
@@ -81,7 +81,7 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
     private static final Logger LOGGER = LoggerFactory.getLogger(OmEncoderv20.class);
 
     private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(OMConstants.NS_OM_2,
-            SosObservation.class, NamedValue.class);
+            OmObservation.class, NamedValue.class);
 
     // TODO: change to correct conformance class
     private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(ConformanceClasses.OM_V2_MEASUREMENT,
@@ -150,12 +150,12 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
     }
 
     @Override
-    protected XmlObject createResult(SosObservation sosObservation) throws OwsExceptionReport {
+    protected XmlObject createResult(OmObservation sosObservation) throws OwsExceptionReport {
         // TODO if OM_SWEArrayObservation and get ResultEncoding and
         // ResultStructure exists,
-        if (sosObservation.getValue() instanceof SosSingleObservationValue) {
+        if (sosObservation.getValue() instanceof SingleObservationValue) {
             return createSingleObservationToResult(sosObservation);
-        } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
+        } else if (sosObservation.getValue() instanceof MultiObservationValues) {
             return createMultiObservationValueToResult(sosObservation);
         }
         return null;
@@ -199,8 +199,8 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    private XmlObject createSingleObservationToResult(SosObservation sosObservation) throws OwsExceptionReport {
-        SosSingleObservationValue<?> observationValue = (SosSingleObservationValue) sosObservation.getValue();
+    private XmlObject createSingleObservationToResult(OmObservation sosObservation) throws OwsExceptionReport {
+        SingleObservationValue<?> observationValue = (SingleObservationValue) sosObservation.getValue();
         String observationType = "";
         if (sosObservation.getObservationConstellation().isSetObservationType()) {
             observationType = sosObservation.getObservationConstellation().getObservationType();
@@ -300,8 +300,8 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    private XmlObject createMultiObservationValueToResult(SosObservation sosObservation) throws OwsExceptionReport {
-        SosMultiObservationValues<?> observationValue = (SosMultiObservationValues) sosObservation.getValue();
+    private XmlObject createMultiObservationValueToResult(OmObservation sosObservation) throws OwsExceptionReport {
+        MultiObservationValues<?> observationValue = (MultiObservationValues) sosObservation.getValue();
         // TODO create SosSweDataArray
         SweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
         Map<HelperValues, String> additionalValues =

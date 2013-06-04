@@ -23,7 +23,7 @@
  */
 package org.n52.sos.util.builder;
 
-import org.n52.sos.ogc.om.SosObservableProperty;
+import org.n52.sos.ogc.om.OmObservableProperty;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
@@ -44,9 +44,9 @@ public class ObservablePropertyBuilder {
 		return this;
 	}
 
-	public SosObservableProperty build()
+	public OmObservableProperty build()
 	{
-		return new SosObservableProperty(identifier);
+		return new OmObservableProperty(identifier);
 	}
 
 }

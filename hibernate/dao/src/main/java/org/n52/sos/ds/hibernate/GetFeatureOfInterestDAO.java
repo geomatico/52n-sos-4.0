@@ -41,7 +41,7 @@ import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.util.TemporalRestrictions;
 import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.ogc.om.features.SosFeatureCollection;
+import org.n52.sos.ogc.om.features.FeatureCollection;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
@@ -74,8 +74,8 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
                     // good
                     Set<String> foiIDs = new HashSet<String>(queryFeatureIdentifiersForParameter(request, session));
                     // feature of interest
-                    SosFeatureCollection featureCollection =
-                            new SosFeatureCollection(getConfigurator().getFeatureQueryHandler().getFeatures(
+                    FeatureCollection featureCollection =
+                            new FeatureCollection(getConfigurator().getFeatureQueryHandler().getFeatures(
                                     new ArrayList<String>(foiIDs), request.getSpatialFilters(), session,
                                     request.getVersion(), -1));
                     GetFeatureOfInterestResponse response = new GetFeatureOfInterestResponse();
@@ -91,8 +91,8 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
             } else {
                 Set<String> foiIDs = new HashSet<String>(queryFeatureIdentifiersForParameter(request, session));
                 // feature of interest
-                SosFeatureCollection featureCollection =
-                        new SosFeatureCollection(getConfigurator().getFeatureQueryHandler().getFeatures(
+                FeatureCollection featureCollection =
+                        new FeatureCollection(getConfigurator().getFeatureQueryHandler().getFeatures(
                                 new ArrayList<String>(foiIDs), request.getSpatialFilters(), session,
                                 request.getVersion(), -1));
                 GetFeatureOfInterestResponse response = new GetFeatureOfInterestResponse();

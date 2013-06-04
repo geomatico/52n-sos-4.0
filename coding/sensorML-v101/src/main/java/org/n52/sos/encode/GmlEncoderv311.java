@@ -66,9 +66,9 @@ import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.features.SFConstants;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.SosFeatureCollection;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
+import org.n52.sos.ogc.om.features.FeatureCollection;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -104,7 +104,7 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
             org.n52.sos.ogc.gml.time.Time.class, com.vividsolutions.jts.geom.Geometry.class,
             org.n52.sos.ogc.om.values.CategoryValue.class, org.n52.sos.ogc.gml.ReferenceType.class,
             org.n52.sos.ogc.om.values.QuantityValue.class, org.n52.sos.ogc.gml.CodeWithAuthority.class,
-            org.n52.sos.ogc.gml.CodeType.class, SosAbstractFeature.class, SosEnvelope.class);
+            org.n52.sos.ogc.gml.CodeType.class, AbstractFeature.class, SosEnvelope.class);
 
     public GmlEncoderv311() {
         LOGGER.debug("Encoder for the following keys initialized successfully: {}!",
@@ -162,8 +162,8 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
             return createMeasureType((QuantityValue) element);
         } else if (element instanceof org.n52.sos.ogc.gml.CodeType) {
             return createCodeType((org.n52.sos.ogc.gml.CodeType) element);
-        } else if (element instanceof SosAbstractFeature) {
-            return createFeature((SosAbstractFeature) element);
+        } else if (element instanceof AbstractFeature) {
+            return createFeature((AbstractFeature) element);
         } else if (element instanceof SosEnvelope) {
             return createEnvelope((SosEnvelope)element);
         } else {
@@ -474,9 +474,9 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
         return measureType;
     }
 
-    private XmlObject createFeature(SosAbstractFeature sosAbstractFeature) throws OwsExceptionReport {
-        if (sosAbstractFeature instanceof SosSamplingFeature) {
-            SosSamplingFeature sampFeat = (SosSamplingFeature) sosAbstractFeature;
+    private XmlObject createFeature(AbstractFeature sosAbstractFeature) throws OwsExceptionReport {
+        if (sosAbstractFeature instanceof SamplingFeature) {
+            SamplingFeature sampFeat = (SamplingFeature) sosAbstractFeature;
             if (sosAbstractFeature.isSetGmlID()) {
                 FeaturePropertyType featureProperty =
                         FeaturePropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
@@ -496,7 +496,7 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
                 builder.append("sf_");
                 builder.append(JavaHelper.generateID(sosAbstractFeature.getIdentifier().getValue()));
                 sosAbstractFeature.setGmlId(builder.toString());
-                Encoder<XmlObject, SosSamplingFeature> encoder = CodingHelper.getEncoder(SFConstants.NS_SA, sampFeat);
+                Encoder<XmlObject, SamplingFeature> encoder = CodingHelper.getEncoder(SFConstants.NS_SA, sampFeat);
                 if (encoder != null) {
                     return encoder.encode(sampFeat);
                 } else {
@@ -509,20 +509,20 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
                     return featureProperty;
                 }
             }
-        } else if (sosAbstractFeature instanceof SosFeatureCollection) {
-            return createFeatureCollection((SosFeatureCollection) sosAbstractFeature);
+        } else if (sosAbstractFeature instanceof FeatureCollection) {
+            return createFeatureCollection((FeatureCollection) sosAbstractFeature);
         }
         throw new UnsupportedEncoderInputException(this, sosAbstractFeature);
     }
 
-    private XmlObject createFeatureCollection(SosFeatureCollection sosFeatureCollection) throws OwsExceptionReport {
-        Map<String, SosAbstractFeature> members = sosFeatureCollection.getMembers();
+    private XmlObject createFeatureCollection(FeatureCollection sosFeatureCollection) throws OwsExceptionReport {
+        Map<String, AbstractFeature> members = sosFeatureCollection.getMembers();
         XmlObject xmlObject = null;
         if (sosFeatureCollection.isSetMembers()) {
             if (members.size() == 1) {
                 for (String member : members.keySet()) {
-                    if (members.get(member) instanceof SosSamplingFeature) {
-                        return createFeature((SosSamplingFeature) members.get(member));
+                    if (members.get(member) instanceof SamplingFeature) {
+                        return createFeature((SamplingFeature) members.get(member));
                     } else {
                         throw new NoApplicableCodeException().withMessage("No encoder found for featuretype");
                     }
@@ -536,8 +536,8 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
                 builder.append(JavaHelper.generateID(Long.toString(System.currentTimeMillis())));
                 xbFeatCol.setId(builder.toString());
                 for (String member : members.keySet()) {
-                    if (members.get(member) instanceof SosSamplingFeature) {
-                        XmlObject xmlFeature = createFeature((SosSamplingFeature) members.get(member));
+                    if (members.get(member) instanceof SamplingFeature) {
+                        XmlObject xmlFeature = createFeature((SamplingFeature) members.get(member));
                         xbFeatCol.addNewFeatureMember().set(xmlFeature);
                     } else {
                         throw new NoApplicableCodeException().withMessage("No encoder found for featuretype");

@@ -24,7 +24,7 @@
 package org.n52.sos.request;
 
 import org.joda.time.DateTime;
-import org.n52.sos.ogc.om.SosObservationConstellation;
+import org.n52.sos.ogc.om.OmObservationConstellation;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosResultEncoding;
 import org.n52.sos.ogc.sos.SosResultStructure;
@@ -37,7 +37,7 @@ public class InsertResultTemplateRequest extends AbstractServiceRequest {
     
     private String identifier;
     
-    private SosObservationConstellation observationTemplate;
+    private OmObservationConstellation observationTemplate;
     
     private SosResultStructure resultStructure;
     
@@ -52,7 +52,7 @@ public class InsertResultTemplateRequest extends AbstractServiceRequest {
        this.identifier = identifier;
     }
 
-    public void setObservationTemplate(SosObservationConstellation observationConstellation) {
+    public void setObservationTemplate(OmObservationConstellation observationConstellation) {
         this.observationTemplate = observationConstellation;
     }
 
@@ -74,7 +74,7 @@ public class InsertResultTemplateRequest extends AbstractServiceRequest {
         return identifier;
     }
 
-    public SosObservationConstellation getObservationTemplate() {
+    public OmObservationConstellation getObservationTemplate() {
         return observationTemplate;
     }
     

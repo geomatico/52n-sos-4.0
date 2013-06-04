@@ -52,14 +52,14 @@ import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.ogc.om.SosObservableProperty;
-import org.n52.sos.ogc.om.SosOffering;
+import org.n52.sos.ogc.om.OmObservableProperty;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosInsertionCapabilities;
+import org.n52.sos.ogc.sos.SosOffering;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swes.SwesFeatureRelationship;
 import org.n52.sos.request.InsertSensorRequest;
@@ -161,9 +161,9 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
     }
 
     private List<ObservableProperty> getOrInsertNewObservableProperties(List<String> obsProps, Session session) {
-        List<SosObservableProperty> observableProperties = new ArrayList<SosObservableProperty>(obsProps.size());
+        List<OmObservableProperty> observableProperties = new ArrayList<OmObservableProperty>(obsProps.size());
         for (String observableProperty : obsProps) {
-            observableProperties.add(new SosObservableProperty(observableProperty));
+            observableProperties.add(new OmObservableProperty(observableProperty));
         }
         return new ObservablePropertyDAO().getOrInsertObservableProperty(observableProperties, session);
     }

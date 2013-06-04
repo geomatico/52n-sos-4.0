@@ -25,9 +25,9 @@ package org.n52.sos.util.builder;
 
 import java.util.ArrayList;
 
-import org.n52.sos.ogc.om.SosObservableProperty;
-import org.n52.sos.ogc.om.SosObservationConstellation;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.OmObservableProperty;
+import org.n52.sos.ogc.om.OmObservationConstellation;
+import org.n52.sos.ogc.om.features.AbstractFeature;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 
 /**
@@ -41,13 +41,13 @@ public class ObservationConstellationBuilder {
 		return new ObservationConstellationBuilder();
 	}
 
-	private SosAbstractFeature featureOfInterest;
+	private AbstractFeature featureOfInterest;
 	private SosProcedureDescription procedure;
 	private String observationType;
-	private SosObservableProperty observableProperty;
+	private OmObservableProperty observableProperty;
 	private ArrayList<String> offerings;
 
-	public ObservationConstellationBuilder setFeature(SosAbstractFeature featureOfInterest)
+	public ObservationConstellationBuilder setFeature(AbstractFeature featureOfInterest)
 	{
 		this.featureOfInterest = featureOfInterest;
 		return this;
@@ -65,7 +65,7 @@ public class ObservationConstellationBuilder {
 		return this;
 	}
 
-	public ObservationConstellationBuilder setObservableProperty(SosObservableProperty observableProperty)
+	public ObservationConstellationBuilder setObservableProperty(OmObservableProperty observableProperty)
 	{
 		this.observableProperty = observableProperty;
 		return this;
@@ -84,9 +84,9 @@ public class ObservationConstellationBuilder {
 		return this;
 	}
 	
-	public SosObservationConstellation build()
+	public OmObservationConstellation build()
 	{
-		SosObservationConstellation sosObservationConstellation = new SosObservationConstellation();
+		OmObservationConstellation sosObservationConstellation = new OmObservationConstellation();
 		sosObservationConstellation.setFeatureOfInterest(featureOfInterest);
 		sosObservationConstellation.setObservableProperty(observableProperty);
 		sosObservationConstellation.setObservationType(observationType);

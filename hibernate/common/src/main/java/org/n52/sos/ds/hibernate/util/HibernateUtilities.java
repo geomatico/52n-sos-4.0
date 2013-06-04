@@ -51,9 +51,9 @@ import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.om.SosObservationConstellation;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.OmObservationConstellation;
+import org.n52.sos.ogc.om.features.AbstractFeature;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.CountValue;
@@ -71,7 +71,7 @@ import org.n52.sos.util.StringHelper;
 public class HibernateUtilities {
     
     @Deprecated
-    public static ObservationConstellation checkObservationConstellation(SosObservationConstellation soc,
+    public static ObservationConstellation checkObservationConstellation(OmObservationConstellation soc,
                                                                          String offering, Session session,
                                                                          String parameterName) throws OwsExceptionReport {
         String observableProperty = soc.getObservableProperty().getIdentifier();
@@ -128,14 +128,14 @@ public class HibernateUtilities {
     }
 
     @Deprecated
-    public static FeatureOfInterest checkOrInsertFeatureOfInterest(SosAbstractFeature featureOfInterest, Session session)
+    public static FeatureOfInterest checkOrInsertFeatureOfInterest(AbstractFeature featureOfInterest, Session session)
             throws OwsExceptionReport {
-        if (featureOfInterest instanceof SosSamplingFeature) {
+        if (featureOfInterest instanceof SamplingFeature) {
             String featureIdentifier =
                    Configurator.getInstance().getFeatureQueryHandler()
-                    .insertFeature((SosSamplingFeature) featureOfInterest, session);
+                    .insertFeature((SamplingFeature) featureOfInterest, session);
             return HibernateCriteriaTransactionalUtilities.getOrInsertFeatureOfInterest(featureIdentifier,
-                                                                                        ((SosSamplingFeature) featureOfInterest)
+                                                                                        ((SamplingFeature) featureOfInterest)
                     .getUrl(), session);
         } else {
             // TODO: throw exception

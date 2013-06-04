@@ -61,8 +61,8 @@ import org.n52.sos.cache.ctrl.action.SensorDeletionUpdate;
 import org.n52.sos.cache.ctrl.action.SensorInsertionUpdate;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.OmObservation;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.ogc.swes.SwesFeatureRelationship;
@@ -105,7 +105,7 @@ public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
     private AbstractServiceRequest request;
     private ContentCacheControllerImpl controller;
     private AbstractServiceResponse response;
-    private SosObservation observation;
+    private OmObservation observation;
 
     @Before
     public void initController() {
@@ -1035,9 +1035,9 @@ public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
         return ((InsertObservationRequest) request).getAssignedSensorId();
     }
     
-    private SosEnvelope getSosEnvelopeFromObservation(SosObservation sosObservation) {
+    private SosEnvelope getSosEnvelopeFromObservation(OmObservation sosObservation) {
         return new SosEnvelope(
-                ((SosSamplingFeature) sosObservation.getObservationConstellation().getFeatureOfInterest()).getGeometry()
+                ((SamplingFeature) sosObservation.getObservationConstellation().getFeatureOfInterest()).getGeometry()
                 .getEnvelopeInternal(),
                 getCache().getDefaultEPSGCode());
     }

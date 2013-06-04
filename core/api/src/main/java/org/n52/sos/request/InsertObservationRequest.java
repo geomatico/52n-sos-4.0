@@ -26,7 +26,7 @@ package org.n52.sos.request;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.om.OmObservation;
 import org.n52.sos.ogc.sos.SosConstants;
 
 /**
@@ -50,7 +50,7 @@ public class InsertObservationRequest extends AbstractServiceRequest {
     /**
      * SOS observation collection with observations to insert
      */
-    private List<SosObservation> observations;
+    private List<OmObservation> observations;
 
     public InsertObservationRequest() {
 
@@ -80,7 +80,7 @@ public class InsertObservationRequest extends AbstractServiceRequest {
      * 
      * @return observations to insert
      */
-    public List<SosObservation> getObservations() {
+    public List<OmObservation> getObservations() {
         return observations;
     }
 
@@ -90,13 +90,13 @@ public class InsertObservationRequest extends AbstractServiceRequest {
      * @param observation
      *            observations to insert
      */
-    public void setObservation(List<SosObservation> observation) {
+    public void setObservation(List<OmObservation> observation) {
         this.observations = observation;
     }
 
-    public void addObservation(SosObservation observation) {
+    public void addObservation(OmObservation observation) {
        if (observations == null) {
-           observations = new LinkedList<SosObservation>();
+           observations = new LinkedList<OmObservation>();
        }
         observations.add(observation);
     }

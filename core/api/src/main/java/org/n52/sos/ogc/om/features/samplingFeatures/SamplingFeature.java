@@ -31,7 +31,7 @@ import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.NamedValue;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * 
  */
-public class SosSamplingFeature extends SosAbstractFeature {
+public class SamplingFeature extends AbstractFeature {
 
     private static final long serialVersionUID = 4660755526492323288L;
 
@@ -56,7 +56,7 @@ public class SosSamplingFeature extends SosAbstractFeature {
 
     private String url;
 
-    private List<SosAbstractFeature> sampledFeatures = new LinkedList<SosAbstractFeature>();
+    private List<AbstractFeature> sampledFeatures = new LinkedList<AbstractFeature>();
 
     private List<NamedValue<?>> parameters = new LinkedList<NamedValue<?>>();
 
@@ -68,11 +68,11 @@ public class SosSamplingFeature extends SosAbstractFeature {
      * @param featureIdentifier
      *            identifier of sampling feature
      */
-    public SosSamplingFeature(CodeWithAuthority featureIdentifier) {
+    public SamplingFeature(CodeWithAuthority featureIdentifier) {
         super(featureIdentifier);
     }
 
-    public SosSamplingFeature(CodeWithAuthority featureIdentifier, String gmlId) {
+    public SamplingFeature(CodeWithAuthority featureIdentifier, String gmlId) {
         super(featureIdentifier, gmlId);
     }
 
@@ -139,11 +139,11 @@ public class SosSamplingFeature extends SosAbstractFeature {
         this.url = url;
     }
 
-    public void setSampledFeatures(List<SosAbstractFeature> sampledFeatures) {
+    public void setSampledFeatures(List<AbstractFeature> sampledFeatures) {
         this.sampledFeatures.addAll(sampledFeatures);
     }
 
-    public List<SosAbstractFeature> getSampledFeatures() {
+    public List<AbstractFeature> getSampledFeatures() {
         if (isSetSampledFeatures()) {
             return Collections.unmodifiableList(sampledFeatures);
         }

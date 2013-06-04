@@ -54,8 +54,8 @@ import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.SosSingleObservationValue;
+import org.n52.sos.ogc.om.OmObservation;
+import org.n52.sos.ogc.om.SingleObservationValue;
 import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.CountValue;
@@ -331,7 +331,7 @@ public class ObservationDAO extends TimeCreator {
      *             If an error occurs.
      */
     public void insertObservationSingleValue(Set<ObservationConstellation> observationConstellations,
-            FeatureOfInterest feature, SosObservation observation, Session session) throws CodedException {
+            FeatureOfInterest feature, OmObservation observation, Session session) throws CodedException {
         insertObservationSingleValueWithSetId(observationConstellations, feature, observation, null, session);
     }
 
@@ -354,9 +354,9 @@ public class ObservationDAO extends TimeCreator {
      */
     @SuppressWarnings("rawtypes")
     private void insertObservationSingleValueWithSetId(Set<ObservationConstellation> observationConstellations,
-            FeatureOfInterest feature, SosObservation sosObservation, String setId, Session session)
+            FeatureOfInterest feature, OmObservation sosObservation, String setId, Session session)
             throws CodedException {
-        SosSingleObservationValue<?> value = (SosSingleObservationValue) sosObservation.getValue();
+        SingleObservationValue<?> value = (SingleObservationValue) sosObservation.getValue();
         Observation hObservation = createObservationFromValue(value.getValue(), session);
         hObservation.setDeleted(false);
         if (sosObservation.isSetIdentifier()) {
@@ -418,12 +418,12 @@ public class ObservationDAO extends TimeCreator {
      *             If an error occurs
      */
     public void insertObservationMutliValue(Set<ObservationConstellation> observationConstellations,
-            FeatureOfInterest feature, SosObservation containerObservation, Session session) throws OwsExceptionReport {
-        List<SosObservation> unfoldObservations =
+            FeatureOfInterest feature, OmObservation containerObservation, Session session) throws OwsExceptionReport {
+        List<OmObservation> unfoldObservations =
                 HibernateObservationUtilities.unfoldObservation(containerObservation);
         int subObservationIndex = 0;
         String setId = getSetId(containerObservation);
-        for (SosObservation sosObservation : unfoldObservations) {
+        for (OmObservation sosObservation : unfoldObservations) {
             String idExtension = subObservationIndex + "";
             setIdentifier(containerObservation, sosObservation, setId, idExtension);
             insertObservationSingleValueWithSetId(observationConstellations, feature, sosObservation, setId, session);
@@ -443,7 +443,7 @@ public class ObservationDAO extends TimeCreator {
      * @param idExtension
      *            Extension for observation identifier
      */
-    private void setIdentifier(SosObservation containerObservation, SosObservation sosObservation,
+    private void setIdentifier(OmObservation containerObservation, OmObservation sosObservation,
             String antiSubsettingId, String idExtension) {
         if (containerObservation.isSetIdentifier()) {
             String subObservationIdentifier = String.format("%s-%s", antiSubsettingId, idExtension);
@@ -460,7 +460,7 @@ public class ObservationDAO extends TimeCreator {
      *            Observation
      * @return Set id
      */
-    private String getSetId(SosObservation observation) {
+    private String getSetId(OmObservation observation) {
         String antiSubsettingId = null;
         if (observation.getIdentifier() != null) {
             antiSubsettingId = observation.getIdentifier().getValue();

@@ -26,7 +26,7 @@ package org.n52.sos.ogc.om;
 import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.om.values.IMultiValue;
 
-public class SosMultiObservationValues<T> implements ObservationValue<IMultiValue<T>> {
+public class MultiObservationValues<T> implements ObservationValue<IMultiValue<T>> {
     private static final long serialVersionUID = 4481588813229272799L;
 
     private IMultiValue<T> values;

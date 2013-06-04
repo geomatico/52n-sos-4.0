@@ -42,15 +42,15 @@ import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.om.AbstractSosPhenomenon;
+import org.n52.sos.ogc.om.AbstractPhenomenon;
 import org.n52.sos.ogc.om.ObservationValue;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.om.SosMultiObservationValues;
-import org.n52.sos.ogc.om.SosObservableProperty;
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.SosObservationConstellation;
-import org.n52.sos.ogc.om.SosSingleObservationValue;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.MultiObservationValues;
+import org.n52.sos.ogc.om.OmObservableProperty;
+import org.n52.sos.ogc.om.OmObservation;
+import org.n52.sos.ogc.om.OmObservationConstellation;
+import org.n52.sos.ogc.om.SingleObservationValue;
+import org.n52.sos.ogc.om.features.AbstractFeature;
 import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CountValue;
 import org.n52.sos.ogc.om.values.NilTemplateValue;
@@ -69,7 +69,7 @@ import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> {
+public class OmDecoderv20 implements Decoder<OmObservation, OMObservationType> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OmDecoderv20.class);
     
@@ -115,19 +115,19 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
     }
 
     @Override
-    public SosObservation decode(OMObservationType omObservation) throws OwsExceptionReport {
-        Map<String, SosAbstractFeature> featureMap = new HashMap<String, SosAbstractFeature>();
-        SosObservation sosObservation = new SosObservation();
+    public OmObservation decode(OMObservationType omObservation) throws OwsExceptionReport {
+        Map<String, AbstractFeature> featureMap = new HashMap<String, AbstractFeature>();
+        OmObservation sosObservation = new OmObservation();
         sosObservation.setIdentifier(getIdentifier(omObservation));
-        SosObservationConstellation observationConstallation = getObservationConstellation(omObservation);
+        OmObservationConstellation observationConstallation = getObservationConstellation(omObservation);
         sosObservation.setObservationConstellation(observationConstallation);
         sosObservation.setResultTime(getResultTime(omObservation));
         sosObservation.setValidTime(getValidTime(omObservation));
         sosObservation.setValue(getObservationValue(omObservation));
         try {
             Object decodeXmlElement = CodingHelper.decodeXmlElement(omObservation.getFeatureOfInterest());
-            if (decodeXmlElement instanceof SosAbstractFeature) {
-                SosAbstractFeature featureOfInterest = (SosAbstractFeature) decodeXmlElement;
+            if (decodeXmlElement instanceof AbstractFeature) {
+                AbstractFeature featureOfInterest = (AbstractFeature) decodeXmlElement;
                 observationConstallation.setFeatureOfInterest(checkFeatureWithMap(featureOfInterest, featureMap));
             }
         } catch (OwsExceptionReport e) {
@@ -162,9 +162,9 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
         return null;
     }
 
-    private SosObservationConstellation getObservationConstellation(OMObservationType omObservation)
+    private OmObservationConstellation getObservationConstellation(OMObservationType omObservation)
             throws OwsExceptionReport {
-        SosObservationConstellation observationConstellation = new SosObservationConstellation();
+        OmObservationConstellation observationConstellation = new OmObservationConstellation();
         observationConstellation.setObservationType(getObservationType(omObservation));
         observationConstellation.setProcedure(createProcedure(getProcedure(omObservation)));
         observationConstellation.setObservableProperty(getObservableProperty(omObservation));
@@ -185,9 +185,9 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
         return null;
     }
 
-    private AbstractSosPhenomenon getObservableProperty(OMObservationType omObservation) {
+    private AbstractPhenomenon getObservableProperty(OMObservationType omObservation) {
         if (omObservation.getObservedProperty() != null) {
-            return new SosObservableProperty(omObservation.getObservedProperty().getHref());
+            return new OmObservableProperty(omObservation.getObservedProperty().getHref());
         }
         return null;
     }
@@ -264,7 +264,7 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
         ObservationValue<?> observationValue;
         if (phenomenonTime.getIndeterminateValue() != null 
                 && phenomenonTime.getIndeterminateValue().equals("template")) {
-            observationValue = new SosSingleObservationValue<String>(new NilTemplateValue());
+            observationValue = new SingleObservationValue<String>(new NilTemplateValue());
         } else {
             observationValue = getResult(omObservation);
         }
@@ -277,19 +277,19 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
         if (omObservation.getResult().schemaType() == XmlBoolean.type) {
             XmlBoolean xbBoolean = (XmlBoolean) omObservation.getResult();
             BooleanValue booleanValue = new BooleanValue(xbBoolean.getBooleanValue());
-            return new SosSingleObservationValue<Boolean>(booleanValue);
+            return new SingleObservationValue<Boolean>(booleanValue);
         }
         // CountObservation
         else if (omObservation.getResult().schemaType() == XmlInteger.type) {
             XmlInteger xbInteger = (XmlInteger) omObservation.getResult();
             CountValue countValue = new CountValue(Integer.parseInt(xbInteger.getBigIntegerValue().toString()));
-            return new SosSingleObservationValue<Integer>(countValue);
+            return new SingleObservationValue<Integer>(countValue);
         }
         // TextObservation
         else if (omObservation.getResult().schemaType() == XmlString.type) {
             XmlString xbString = (XmlString) omObservation.getResult();
             TextValue stringValue = new TextValue(xbString.getStringValue());
-            return new SosSingleObservationValue<String>(stringValue);
+            return new SingleObservationValue<String>(stringValue);
         }
         // result elements with other encoding like SWE_ARRAY_OBSERVATION
         else {
@@ -297,7 +297,7 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
             if (decodedObject instanceof ObservationValue) {
                 return (ObservationValue) decodedObject;
             } else if (decodedObject instanceof SweDataArray) {
-                SosMultiObservationValues<SweDataArray> result = new SosMultiObservationValues<SweDataArray>();
+                MultiObservationValues<SweDataArray> result = new MultiObservationValues<SweDataArray>();
                 SweDataArrayValue value = new SweDataArrayValue();
                 value.setValue((SweDataArray) decodedObject);
                 result.setValue(value);
@@ -308,8 +308,8 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
         }
     }
 
-    private SosAbstractFeature checkFeatureWithMap(SosAbstractFeature featureOfInterest,
-            Map<String, SosAbstractFeature> featureMap) {
+    private AbstractFeature checkFeatureWithMap(AbstractFeature featureOfInterest,
+            Map<String, AbstractFeature> featureMap) {
         if (featureOfInterest.getGmlId() != null && !featureOfInterest.getGmlId().isEmpty()) {
             if (featureMap.containsKey(featureOfInterest.getGmlId())) {
                 return featureMap.get(featureOfInterest.getGmlId());

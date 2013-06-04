@@ -29,7 +29,7 @@ import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.om.quality.SosQuality;
 import org.n52.sos.ogc.om.values.Value;
 
-public class SosSingleObservationValue<T> implements ObservationValue<Value<T>> {
+public class SingleObservationValue<T> implements ObservationValue<Value<T>> {
     private static final long serialVersionUID = -8162038672393523937L;
 
     private Time phenomenonTime;
@@ -38,20 +38,20 @@ public class SosSingleObservationValue<T> implements ObservationValue<Value<T>> 
 
     private List<SosQuality> qualityList;
 
-    public SosSingleObservationValue() {
+    public SingleObservationValue() {
     }
 
-    public SosSingleObservationValue(Value<T> value) {
+    public SingleObservationValue(Value<T> value) {
         this.value = value;
     }
 
-    public SosSingleObservationValue(Time phenomenonTime, Value<T> value, List<SosQuality> qualityList) {
+    public SingleObservationValue(Time phenomenonTime, Value<T> value, List<SosQuality> qualityList) {
         this.phenomenonTime = phenomenonTime;
         this.value = value;
         this.qualityList = qualityList;
     }
 
-    public SosSingleObservationValue(Time phenomenonTime, Value<T> value) {
+    public SingleObservationValue(Time phenomenonTime, Value<T> value) {
         this.phenomenonTime = phenomenonTime;
         this.value = value;
     }

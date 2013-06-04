@@ -34,7 +34,7 @@ import org.n52.sos.ogc.gml.CodeWithAuthority;
  * schema.
  * 
  */
-public abstract class SosAbstractFeature implements Serializable {
+public abstract class AbstractFeature implements Serializable {
 
     /** identifier */
     private CodeWithAuthority identifier;
@@ -47,19 +47,19 @@ public abstract class SosAbstractFeature implements Serializable {
      * @param featureIdentifier
      *            Feature identifier
      */
-    public SosAbstractFeature(CodeWithAuthority featureIdentifier) {
+    public AbstractFeature(CodeWithAuthority featureIdentifier) {
         this.identifier = featureIdentifier;
     }
 
-    public SosAbstractFeature(CodeWithAuthority featureIdentifier, String gmlId) {
+    public AbstractFeature(CodeWithAuthority featureIdentifier, String gmlId) {
         this.identifier = featureIdentifier;
         this.gmlId = gmlId;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof SosAbstractFeature) {
-            SosAbstractFeature feature = (SosAbstractFeature) o;
+        if (o instanceof AbstractFeature) {
+            AbstractFeature feature = (AbstractFeature) o;
             if (feature.isSetIdentifier() && this.isSetIdentifier() && feature.isSetGmlID() && this.isSetGmlID()) {
                 if (feature.getIdentifier().equals(this.getIdentifier()) && feature.getGmlId().equals(this.getGmlId())) {
                     return true;

@@ -29,11 +29,11 @@ import java.util.List;
  * class represents a composite phenomenon
  * 
  */
-public class SosCompositePhenomenon extends AbstractSosPhenomenon {
+public class OmCompositePhenomenon extends AbstractPhenomenon {
     private static final long serialVersionUID = 364153143602078222L;
 
     /** the components of the composite phenomenon */
-    private List<SosObservableProperty> phenomenonComponents;
+    private List<OmObservableProperty> phenomenonComponents;
 
     /**
      * standard constructor
@@ -45,8 +45,8 @@ public class SosCompositePhenomenon extends AbstractSosPhenomenon {
      * @param phenomenonComponents
      *            components of the composite phenomenon
      */
-    public SosCompositePhenomenon(String compPhenId, String compPhenDesc,
-            List<SosObservableProperty> phenomenonComponents) {
+    public OmCompositePhenomenon(String compPhenId, String compPhenDesc,
+            List<OmObservableProperty> phenomenonComponents) {
         super(compPhenId, compPhenDesc);
         this.phenomenonComponents = phenomenonComponents;
     }
@@ -56,7 +56,7 @@ public class SosCompositePhenomenon extends AbstractSosPhenomenon {
      * 
      * @return Returns the phenomenonComponents.
      */
-    public List<SosObservableProperty> getPhenomenonComponents() {
+    public List<OmObservableProperty> getPhenomenonComponents() {
         return phenomenonComponents;
     }
 
@@ -66,7 +66,7 @@ public class SosCompositePhenomenon extends AbstractSosPhenomenon {
      * @param phenomenonComponents
      *            The phenomenonComponents to set.
      */
-    public void setPhenomenonComponents(List<SosObservableProperty> phenomenonComponents) {
+    public void setPhenomenonComponents(List<OmObservableProperty> phenomenonComponents) {
         this.phenomenonComponents = phenomenonComponents;
     }
 }

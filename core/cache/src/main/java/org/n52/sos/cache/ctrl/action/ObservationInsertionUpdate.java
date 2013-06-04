@@ -27,9 +27,9 @@ import java.util.List;
 
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ogc.gml.time.Time;
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.OmObservation;
+import org.n52.sos.ogc.om.features.AbstractFeature;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.util.Action;
 import org.slf4j.Logger;
@@ -81,7 +81,7 @@ public class ObservationInsertionUpdate extends InMemoryCacheUpdate {
         final WritableContentCache cache = getCache();
         // TODO Review required methods and update test accordingly (@see SensorInsertionInMemoryCacheUpdate)
         // Always update the javadoc when changing this method!
-        for (SosObservation observation : request.getObservations()) {
+        for (OmObservation observation : request.getObservations()) {
             final String observableProperty = observation.getObservationConstellation().getObservableProperty()
                     .getIdentifier();
             final String observationType = observation.getObservationConstellation().getObservationType();
@@ -100,19 +100,19 @@ public class ObservationInsertionUpdate extends InMemoryCacheUpdate {
             }
 
             // update features
-            List<SosSamplingFeature> observedFeatures = sosFeaturesToList(observation.getObservationConstellation()
+            List<SamplingFeature> observedFeatures = sosFeaturesToList(observation.getObservationConstellation()
                     .getFeatureOfInterest());
 
             final Envelope envelope = createEnvelopeFrom(observedFeatures);
             cache.updateGlobalEnvelope(envelope);
 
-            for (SosSamplingFeature sosSamplingFeature : observedFeatures) {
+            for (SamplingFeature sosSamplingFeature : observedFeatures) {
                 String featureOfInterest = sosSamplingFeature.getIdentifier().getValue();
 
                 cache.addFeatureOfInterest(featureOfInterest);
                 cache.addProcedureForFeatureOfInterest(featureOfInterest, procedure);
                 if (sosSamplingFeature.isSetSampledFeatures()) {
-                    for (SosAbstractFeature parentFeature : sosSamplingFeature.getSampledFeatures()) {
+                    for (AbstractFeature parentFeature : sosSamplingFeature.getSampledFeatures()) {
                         getCache().addParentFeature(sosSamplingFeature.getIdentifier().getValue(),
                                                     parentFeature.getIdentifier().getValue());
                     }

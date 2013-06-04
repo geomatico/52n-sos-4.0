@@ -51,10 +51,10 @@ import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.NamedValue;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.om.SosCompositePhenomenon;
-import org.n52.sos.ogc.om.SosObservableProperty;
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.OmCompositePhenomenon;
+import org.n52.sos.ogc.om.OmObservableProperty;
+import org.n52.sos.ogc.om.OmObservation;
+import org.n52.sos.ogc.om.features.AbstractFeature;
 import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.CountValue;
@@ -95,7 +95,7 @@ public abstract class AbstractOmEncoderv20 implements ObservationEncoder<XmlObje
      * @throws OwsExceptionReport
      *             if an error occurs
      */
-    protected abstract XmlObject createResult(SosObservation sosObservation)
+    protected abstract XmlObject createResult(OmObservation sosObservation)
             throws OwsExceptionReport;
 
     /**
@@ -139,8 +139,8 @@ public abstract class AbstractOmEncoderv20 implements ObservationEncoder<XmlObje
     @Override
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport,
             UnsupportedEncoderInputException {
-        if (element instanceof SosObservation) {
-            return createOmObservation((SosObservation) element, additionalValues);
+        if (element instanceof OmObservation) {
+            return createOmObservation((OmObservation) element, additionalValues);
         } else if (element instanceof NamedValue) {
             return createNamedValue((NamedValue) element);
         } else {
@@ -164,7 +164,7 @@ public abstract class AbstractOmEncoderv20 implements ObservationEncoder<XmlObje
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    protected XmlObject createOmObservation(SosObservation sosObservation, Map<HelperValues, String> additionalValues)
+    protected XmlObject createOmObservation(OmObservation sosObservation, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
         OMObservationType xbObservation =
                 OMObservationType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
@@ -208,16 +208,16 @@ public abstract class AbstractOmEncoderv20 implements ObservationEncoder<XmlObje
         addProcedure(xbObservation.addNewProcedure(), sosObservation.getObservationConstellation().getProcedure(),
                 observationID);
         // set observedProperty (phenomenon)
-        List<SosObservableProperty> phenComponents;
-        if (sosObservation.getObservationConstellation().getObservableProperty() instanceof SosObservableProperty) {
+        List<OmObservableProperty> phenComponents;
+        if (sosObservation.getObservationConstellation().getObservableProperty() instanceof OmObservableProperty) {
             xbObservation.addNewObservedProperty().setHref(
                     sosObservation.getObservationConstellation().getObservableProperty().getIdentifier());
-            phenComponents = new ArrayList<SosObservableProperty>(1);
-            phenComponents.add((SosObservableProperty) sosObservation.getObservationConstellation()
+            phenComponents = new ArrayList<OmObservableProperty>(1);
+            phenComponents.add((OmObservableProperty) sosObservation.getObservationConstellation()
                     .getObservableProperty());
-        } else if (sosObservation.getObservationConstellation().getObservableProperty() instanceof SosCompositePhenomenon) {
-            SosCompositePhenomenon compPhen =
-                    (SosCompositePhenomenon) sosObservation.getObservationConstellation().getObservableProperty();
+        } else if (sosObservation.getObservationConstellation().getObservableProperty() instanceof OmCompositePhenomenon) {
+            OmCompositePhenomenon compPhen =
+                    (OmCompositePhenomenon) sosObservation.getObservationConstellation().getObservableProperty();
             xbObservation.addNewObservedProperty().setHref(compPhen.getIdentifier());
             phenComponents = compPhen.getPhenomenonComponents();
         }
@@ -333,7 +333,7 @@ public abstract class AbstractOmEncoderv20 implements ObservationEncoder<XmlObje
      * @throws OwsExceptionReport
      *             If an error occurs.
      */
-    private void addResultTime(OMObservationType xbObs, SosObservation sosObservation) throws OwsExceptionReport {
+    private void addResultTime(OMObservationType xbObs, OmObservation sosObservation) throws OwsExceptionReport {
         TimeInstant resultTime = sosObservation.getResultTime();
         Time phenomenonTime = sosObservation.getPhenomenonTime();
         // get result time from SOS result time representation
@@ -384,7 +384,7 @@ public abstract class AbstractOmEncoderv20 implements ObservationEncoder<XmlObje
      * @throws OwsExceptionReport
      *             If an error occurs.
      */
-    private XmlObject addFeatureOfInterest(SosAbstractFeature feature) throws OwsExceptionReport {
+    private XmlObject addFeatureOfInterest(AbstractFeature feature) throws OwsExceptionReport {
         Map<HelperValues, String> additionalValues =
                 new EnumMap<SosConstants.HelperValues, String>(HelperValues.class);
         Profile activeProfile = Configurator.getInstance().getProfileHandler().getActiveProfile();

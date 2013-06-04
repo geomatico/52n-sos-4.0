@@ -65,11 +65,11 @@ import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
-import org.n52.sos.ogc.om.SosObservableProperty;
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.SosSingleObservationValue;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.OmObservableProperty;
+import org.n52.sos.ogc.om.OmObservation;
+import org.n52.sos.ogc.om.SingleObservationValue;
+import org.n52.sos.ogc.om.features.AbstractFeature;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosResultEncoding;
@@ -147,7 +147,7 @@ public class HibernateCriteriaTransactionalUtilities {
         return offering;
     }
     @Deprecated
-    public static List<RelatedFeature> getOrInsertRelatedFeature(SosAbstractFeature feature,
+    public static List<RelatedFeature> getOrInsertRelatedFeature(AbstractFeature feature,
             List<RelatedFeatureRole> roles, Session session) throws OwsExceptionReport {
         // TODO: create featureOfInterest and link to relatedFeature
         List<RelatedFeature> relFeats =
@@ -159,11 +159,11 @@ public class HibernateCriteriaTransactionalUtilities {
             RelatedFeature relFeat = new RelatedFeature();
             String identifier = feature.getIdentifier().getValue();
             String url = null;
-            if (feature instanceof SosSamplingFeature) {
+            if (feature instanceof SamplingFeature) {
                 identifier =
                         Configurator.getInstance().getFeatureQueryHandler()
-                                .insertFeature((SosSamplingFeature) feature, session);
-                url = ((SosSamplingFeature) feature).getUrl();
+                                .insertFeature((SamplingFeature) feature, session);
+                url = ((SamplingFeature) feature).getUrl();
             }
             relFeat.setFeatureOfInterest(getOrInsertFeatureOfInterest(identifier, url, session));
             relFeat.setRelatedFeatureRoles(new HashSet<RelatedFeatureRole>(roles));
@@ -190,14 +190,14 @@ public class HibernateCriteriaTransactionalUtilities {
     }
     @Deprecated
     public static List<ObservableProperty> getOrInsertObservableProperty(
-            List<SosObservableProperty> observableProperty, Session session) {
+            List<OmObservableProperty> observableProperty, Session session) {
         List<String> identifiers = new ArrayList<String>(observableProperty.size());
-        for (SosObservableProperty sosObservableProperty : observableProperty) {
+        for (OmObservableProperty sosObservableProperty : observableProperty) {
             identifiers.add(sosObservableProperty.getIdentifier());
         }
         List<ObservableProperty> obsProps =
                 new ObservablePropertyDAO().getObservableProperties(identifiers, session);
-        for (SosObservableProperty sosObsProp : observableProperty) {
+        for (OmObservableProperty sosObsProp : observableProperty) {
             boolean exists = false;
             for (ObservableProperty obsProp : obsProps) {
                 if (obsProp.getIdentifier().equals(sosObsProp.getIdentifier())) {
@@ -447,14 +447,14 @@ public class HibernateCriteriaTransactionalUtilities {
     }
     @Deprecated
     public static void insertObservationSingleValue(Set<ObservationConstellation> observationConstellations,
-            FeatureOfInterest feature, SosObservation observation, Session session) throws CodedException {
+            FeatureOfInterest feature, OmObservation observation, Session session) throws CodedException {
         insertObservationSingleValueWithSetId(observationConstellations, feature, observation, null, session);
     }
     @Deprecated
     @SuppressWarnings("rawtypes")
     private static void insertObservationSingleValueWithSetId(Set<ObservationConstellation> observationConstellations,
-            FeatureOfInterest feature, SosObservation sosObservation, String setId, Session session) throws CodedException {
-        SosSingleObservationValue<?> value = (SosSingleObservationValue) sosObservation.getValue();
+            FeatureOfInterest feature, OmObservation sosObservation, String setId, Session session) throws CodedException {
+        SingleObservationValue<?> value = (SingleObservationValue) sosObservation.getValue();
         Observation hObservation = HibernateUtilities.createObservationFromValue(value.getValue(), session);
         hObservation.setDeleted(false);
         if (sosObservation.isSetIdentifier()) {
@@ -503,12 +503,12 @@ public class HibernateCriteriaTransactionalUtilities {
     // working
     @Deprecated
     public static void insertObservationMutliValue(Set<ObservationConstellation> hObsConsts,
-            FeatureOfInterest feature, SosObservation containerObservation, Session session) throws OwsExceptionReport {
-        List<SosObservation> unfoldObservations =
+            FeatureOfInterest feature, OmObservation containerObservation, Session session) throws OwsExceptionReport {
+        List<OmObservation> unfoldObservations =
                 HibernateObservationUtilities.unfoldObservation(containerObservation);
         int subObservationIndex = 0;
         String setId = getSetId(containerObservation);
-        for (SosObservation sosObservation : unfoldObservations) {
+        for (OmObservation sosObservation : unfoldObservations) {
             String idExtension = subObservationIndex + "";
             setIdentifier(containerObservation, sosObservation, setId, idExtension);
             insertObservationSingleValueWithSetId(hObsConsts, feature, sosObservation, setId, session);
@@ -516,7 +516,7 @@ public class HibernateCriteriaTransactionalUtilities {
         }
     }
     @Deprecated
-    private static void setIdentifier(SosObservation containerObservation, SosObservation sosObservation,
+    private static void setIdentifier(OmObservation containerObservation, OmObservation sosObservation,
             String antiSubsettingId, String idExtension) {
         if (containerObservation.isSetIdentifier()) {
             String subObservationIdentifier = String.format("%s-%s", antiSubsettingId, idExtension);
@@ -526,7 +526,7 @@ public class HibernateCriteriaTransactionalUtilities {
         }
     }
     @Deprecated
-    private static String getSetId(SosObservation containerObservation) {
+    private static String getSetId(OmObservation containerObservation) {
         String antiSubsettingId = null;
         if (containerObservation.getIdentifier() != null) {
             antiSubsettingId = containerObservation.getIdentifier().getValue();

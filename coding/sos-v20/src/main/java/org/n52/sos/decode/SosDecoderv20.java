@@ -71,9 +71,9 @@ import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.SosObservationConstellation;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.OmObservation;
+import org.n52.sos.ogc.om.OmObservationConstellation;
+import org.n52.sos.ogc.om.features.AbstractFeature;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -325,12 +325,12 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
             int length = insertObservationType.getObservationArray().length;
             Map<String, Time> phenomenonTimes = new HashMap<String, Time>(length);
             Map<String, TimeInstant> resultTimes = new HashMap<String, TimeInstant>(length);
-            Map<String, SosAbstractFeature> features = new HashMap<String, SosAbstractFeature>(length);
+            Map<String, AbstractFeature> features = new HashMap<String, AbstractFeature>(length);
             CompositeOwsException exceptions = new CompositeOwsException();
             for (Observation observation : insertObservationType.getObservationArray()) {
                 Object decodedObject = CodingHelper.decodeXmlElement(observation.getOMObservation());
-                if (decodedObject instanceof SosObservation) {
-                    SosObservation sosObservation = (SosObservation) decodedObject;
+                if (decodedObject instanceof OmObservation) {
+                    OmObservation sosObservation = (OmObservation) decodedObject;
                     checkAndAddPhenomenonTime(sosObservation.getPhenomenonTime(), phenomenonTimes);
                     checkAndAddResultTime(sosObservation.getResultTime(), resultTimes);
                     checkAndAddFeatures(sosObservation.getObservationConstellation().getFeatureOfInterest(), features);
@@ -361,7 +361,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
         sosInsertResultTemplate.setVersion(insertResultTemplate.getVersion());
         ResultTemplateType resultTemplate = insertResultTemplate.getProposedTemplate().getResultTemplate();
         sosInsertResultTemplate.setIdentifier(resultTemplate.getIdentifier());
-        SosObservationConstellation sosObservationConstellation =
+        OmObservationConstellation sosObservationConstellation =
                 parseObservationTemplate(resultTemplate.getObservationTemplate());
         sosObservationConstellation.addOffering(resultTemplate.getOffering());
         sosInsertResultTemplate.setObservationTemplate(sosObservationConstellation);
@@ -525,11 +525,11 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
         return sosTemporalFilters;
     }
 
-    private SosObservationConstellation parseObservationTemplate(ObservationTemplate observationTemplate)
+    private OmObservationConstellation parseObservationTemplate(ObservationTemplate observationTemplate)
             throws OwsExceptionReport {
         Object decodedObject = CodingHelper.decodeXmlElement(observationTemplate.getOMObservation());
-        if (decodedObject instanceof SosObservation) {
-            SosObservation observation = (SosObservation) decodedObject;
+        if (decodedObject instanceof OmObservation) {
+            OmObservation observation = (OmObservation) decodedObject;
             return observation.getObservationConstellation();
         }
         return null;
@@ -595,16 +595,16 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
         }
     }
 
-    private void checkAndAddFeatures(SosAbstractFeature featureOfInterest, Map<String, SosAbstractFeature> features) {
+    private void checkAndAddFeatures(AbstractFeature featureOfInterest, Map<String, AbstractFeature> features) {
         if (!featureOfInterest.isReferenced()) {
             features.put(featureOfInterest.getGmlId(), featureOfInterest);
         }
     }
 
-    private void checkReferencedElements(List<SosObservation> observations, Map<String, Time> phenomenonTimes,
-                                         Map<String, TimeInstant> resultTimes, Map<String, SosAbstractFeature> features)
+    private void checkReferencedElements(List<OmObservation> observations, Map<String, Time> phenomenonTimes,
+                                         Map<String, TimeInstant> resultTimes, Map<String, AbstractFeature> features)
             throws OwsExceptionReport {
-        for (SosObservation observation : observations) {
+        for (OmObservation observation : observations) {
             // phenomenonTime
             Time phenomenonTime = observation.getPhenomenonTime();
             if (phenomenonTime.isReferenced()) {
@@ -630,7 +630,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
                 }
             }
             // featureOfInterest
-            SosAbstractFeature featureOfInterest = observation.getObservationConstellation().getFeatureOfInterest();
+            AbstractFeature featureOfInterest = observation.getObservationConstellation().getFeatureOfInterest();
             if (featureOfInterest.isReferenced()) {
                 observation.getObservationConstellation().setFeatureOfInterest(features.get(featureOfInterest.getGmlId()));
             }

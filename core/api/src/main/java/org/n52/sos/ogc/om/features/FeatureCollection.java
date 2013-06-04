@@ -32,14 +32,14 @@ import org.n52.sos.ogc.gml.CodeWithAuthority;
  * class represents a feature collection
  * 
  */
-public class SosFeatureCollection extends SosAbstractFeature {
+public class FeatureCollection extends AbstractFeature {
     private static final long serialVersionUID = -6527441724827160710L;
     /**
      * members of this feature collection
      */
-    private Map<String, SosAbstractFeature> members = new HashMap<String, SosAbstractFeature>(0);
+    private Map<String, AbstractFeature> members = new HashMap<String, AbstractFeature>(0);
     
-    public SosFeatureCollection() {
+    public FeatureCollection() {
         super(new CodeWithAuthority("gml:FeatureCollection"));
     }
     
@@ -49,7 +49,7 @@ public class SosFeatureCollection extends SosAbstractFeature {
      * @param members
      *            collection with feature members of this collection
      */
-    public SosFeatureCollection(Map<String, SosAbstractFeature> members) {
+    public FeatureCollection(Map<String, AbstractFeature> members) {
         super(new CodeWithAuthority("gml:FeatureCollection"));
         this.members = members;
     }
@@ -59,7 +59,7 @@ public class SosFeatureCollection extends SosAbstractFeature {
      * 
      * @return the members
      */
-    public Map<String, SosAbstractFeature> getMembers() {
+    public Map<String, AbstractFeature> getMembers() {
         return members;
     }
 
@@ -69,11 +69,11 @@ public class SosFeatureCollection extends SosAbstractFeature {
      * @param members
      *            the members to set
      */
-    public void setMembers(Map<String, SosAbstractFeature> members) {
+    public void setMembers(Map<String, AbstractFeature> members) {
         this.members.putAll(members);
     }
     
-    public void addMember(SosAbstractFeature member) {
+    public void addMember(AbstractFeature member) {
         members.put(member.getIdentifier().getValue(), member);
     }
     

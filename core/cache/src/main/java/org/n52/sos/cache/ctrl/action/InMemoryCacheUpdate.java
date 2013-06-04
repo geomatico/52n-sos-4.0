@@ -28,9 +28,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.n52.sos.cache.ContentCacheUpdate;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.SosFeatureCollection;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
+import org.n52.sos.ogc.om.features.FeatureCollection;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,11 +53,11 @@ public abstract class InMemoryCacheUpdate extends ContentCacheUpdate {
      *
      * @return a list of all sampling features
      */
-    protected List<SosSamplingFeature> sosFeaturesToList(SosAbstractFeature abstractFeature) {
-        if (abstractFeature instanceof SosFeatureCollection) {
-            return getAllFeaturesFrom((SosFeatureCollection) abstractFeature);
-        } else if (abstractFeature instanceof SosSamplingFeature) {
-            return Collections.singletonList((SosSamplingFeature) abstractFeature);
+    protected List<SamplingFeature> sosFeaturesToList(AbstractFeature abstractFeature) {
+        if (abstractFeature instanceof FeatureCollection) {
+            return getAllFeaturesFrom((FeatureCollection) abstractFeature);
+        } else if (abstractFeature instanceof SamplingFeature) {
+            return Collections.singletonList((SamplingFeature) abstractFeature);
         } else {
             String errorMessage = String.format("Feature Type \"%s\" not supported.", abstractFeature != null
                                                                                       ? abstractFeature.getClass()
@@ -67,14 +67,14 @@ public abstract class InMemoryCacheUpdate extends ContentCacheUpdate {
         }
     }
 
-    private List<SosSamplingFeature> getAllFeaturesFrom(SosFeatureCollection featureCollection) {
-        List<SosSamplingFeature> features = new ArrayList<SosSamplingFeature>(featureCollection.getMembers()
+    private List<SamplingFeature> getAllFeaturesFrom(FeatureCollection featureCollection) {
+        List<SamplingFeature> features = new ArrayList<SamplingFeature>(featureCollection.getMembers()
                 .size());
-        for (SosAbstractFeature abstractFeature : featureCollection.getMembers().values()) {
-            if (abstractFeature instanceof SosSamplingFeature) {
-                features.add((SosSamplingFeature) abstractFeature);
-            } else if (abstractFeature instanceof SosFeatureCollection) {
-                features.addAll(getAllFeaturesFrom((SosFeatureCollection) abstractFeature));
+        for (AbstractFeature abstractFeature : featureCollection.getMembers().values()) {
+            if (abstractFeature instanceof SamplingFeature) {
+                features.add((SamplingFeature) abstractFeature);
+            } else if (abstractFeature instanceof FeatureCollection) {
+                features.addAll(getAllFeaturesFrom((FeatureCollection) abstractFeature));
             }
         }
         return features;
@@ -87,9 +87,9 @@ public abstract class InMemoryCacheUpdate extends ContentCacheUpdate {
      *
      * @return the envelope for all features
      */
-    protected Envelope createEnvelopeFrom(List<SosSamplingFeature> samplingFeatures) {
+    protected Envelope createEnvelopeFrom(List<SamplingFeature> samplingFeatures) {
         Envelope featureEnvelope = new Envelope();
-        for (SosSamplingFeature samplingFeature : samplingFeatures) {
+        for (SamplingFeature samplingFeature : samplingFeatures) {
             featureEnvelope.expandToInclude(samplingFeature.getGeometry().getEnvelopeInternal());
         }
         return featureEnvelope;

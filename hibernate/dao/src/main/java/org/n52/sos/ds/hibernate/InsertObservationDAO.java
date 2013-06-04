@@ -49,10 +49,10 @@ import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.NoEncoderForKeyException;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.om.SosMultiObservationValues;
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.SosObservationConstellation;
-import org.n52.sos.ogc.om.SosSingleObservationValue;
+import org.n52.sos.ogc.om.MultiObservationValues;
+import org.n52.sos.ogc.om.OmObservation;
+import org.n52.sos.ogc.om.OmObservationConstellation;
+import org.n52.sos.ogc.om.SingleObservationValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -89,8 +89,8 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
             session = sessionHolder.getSession();
             transaction = session.beginTransaction();
             final CompositeOwsException exceptions = new CompositeOwsException();
-            for (final SosObservation sosObservation : request.getObservations()) {
-                final SosObservationConstellation sosObsConst = sosObservation.getObservationConstellation();
+            for (final OmObservation sosObservation : request.getObservations()) {
+                final OmObservationConstellation sosObsConst = sosObservation.getObservationConstellation();
                 final Set<ObservationConstellation> hObservationConstellations =
                         new HashSet<ObservationConstellation>(0);
                 FeatureOfInterest hFeature = null;
@@ -122,10 +122,10 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
 
                 if (!hObservationConstellations.isEmpty()) {
                     ObservationDAO observationDAO = new ObservationDAO();
-                    if (sosObservation.getValue() instanceof SosSingleObservationValue) {
+                    if (sosObservation.getValue() instanceof SingleObservationValue) {
                         observationDAO.insertObservationSingleValue(
                                 hObservationConstellations, hFeature, sosObservation, session);
-                    } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
+                    } else if (sosObservation.getValue() instanceof MultiObservationValues) {
                         observationDAO.insertObservationMutliValue(
                                 hObservationConstellations, hFeature, sosObservation, session);
                     }
@@ -176,7 +176,7 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
                 .equalsIgnoreCase(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
     }
 
-    private ResultTemplate createResultTemplate(final SosObservation observation,
+    private ResultTemplate createResultTemplate(final OmObservation observation,
             final ObservationConstellation hObsConst, final FeatureOfInterest feature, Session session) throws OwsExceptionReport {
         final ResultTemplate resultTemplate = new ResultTemplate();
         // TODO identifier handling: ignoring code space now

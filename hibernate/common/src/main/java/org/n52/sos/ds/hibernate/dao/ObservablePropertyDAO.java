@@ -34,7 +34,7 @@ import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
-import org.n52.sos.ogc.om.SosObservableProperty;
+import org.n52.sos.ogc.om.OmObservableProperty;
 
 /**
  * Hibernate data access class for observable properties
@@ -117,14 +117,14 @@ public class ObservablePropertyDAO {
      *            Hibernate session
      * @return Observable property objects
      */
-    public List<ObservableProperty> getOrInsertObservableProperty(List<SosObservableProperty> observableProperty,
+    public List<ObservableProperty> getOrInsertObservableProperty(List<OmObservableProperty> observableProperty,
             Session session) {
         List<String> identifiers = new ArrayList<String>(observableProperty.size());
-        for (SosObservableProperty sosObservableProperty : observableProperty) {
+        for (OmObservableProperty sosObservableProperty : observableProperty) {
             identifiers.add(sosObservableProperty.getIdentifier());
         }
         List<ObservableProperty> obsProps = new ObservablePropertyDAO().getObservableProperties(identifiers, session);
-        for (SosObservableProperty sosObsProp : observableProperty) {
+        for (OmObservableProperty sosObsProp : observableProperty) {
             boolean exists = false;
             for (ObservableProperty obsProp : obsProps) {
                 if (obsProp.getIdentifier().equals(sosObsProp.getIdentifier())) {

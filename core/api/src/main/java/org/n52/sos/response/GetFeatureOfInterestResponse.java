@@ -23,17 +23,17 @@
  */
 package org.n52.sos.response;
 
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
 
 public class GetFeatureOfInterestResponse extends AbstractServiceResponse {
 
-    private SosAbstractFeature abstractFeature;
+    private AbstractFeature abstractFeature;
 
-    public SosAbstractFeature getAbstractFeature() {
+    public AbstractFeature getAbstractFeature() {
         return abstractFeature;
     }
 
-    public void setAbstractFeature(SosAbstractFeature abstractFeature) {
+    public void setAbstractFeature(AbstractFeature abstractFeature) {
         this.abstractFeature = abstractFeature;
     }
 

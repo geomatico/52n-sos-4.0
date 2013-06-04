@@ -28,7 +28,7 @@ package org.n52.sos.ogc.om;
  * class represents a phenomenon of an observation
  * 
  */
-public class SosObservableProperty extends AbstractSosPhenomenon {
+public class OmObservableProperty extends AbstractPhenomenon {
     private static final long serialVersionUID = -1820718860701876580L;
 
     /** unit of the values of the phenomenons observations */
@@ -43,7 +43,7 @@ public class SosObservableProperty extends AbstractSosPhenomenon {
      * @param identifier
      *            observableProperty identifier
      */
-    public SosObservableProperty(String identifier) {
+    public OmObservableProperty(String identifier) {
         super(identifier);
     }
 
@@ -61,7 +61,7 @@ public class SosObservableProperty extends AbstractSosPhenomenon {
      *            database valType of the observation values according to this
      *            observableProperty
      */
-    public SosObservableProperty(String identifier, String description, String unit,
+    public OmObservableProperty(String identifier, String description, String unit,
             String valueType) {
         super(identifier, description);
         this.unit = unit;

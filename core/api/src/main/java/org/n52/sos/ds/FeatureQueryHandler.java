@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.n52.sos.ogc.filter.SpatialFilter;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
 
@@ -55,7 +55,7 @@ public interface FeatureQueryHandler {
      *
      * @throws OwsExceptionReport
      */
-    SosAbstractFeature getFeatureByID(String featureID, Object connection, String version, int responseSrid)
+    AbstractFeature getFeatureByID(String featureID, Object connection, String version, int responseSrid)
             throws OwsExceptionReport;
 
     /**
@@ -90,7 +90,7 @@ public interface FeatureQueryHandler {
      *
      * @throws OwsExceptionReport
      */
-    Map<String, SosAbstractFeature> getFeatures(Collection<String> foiIDs, List<SpatialFilter> list,
+    Map<String, AbstractFeature> getFeatures(Collection<String> foiIDs, List<SpatialFilter> list,
                                                        Object connection, String version, int responseSrid) throws
             OwsExceptionReport;
 
@@ -109,7 +109,7 @@ public interface FeatureQueryHandler {
     SosEnvelope getEnvelopeForFeatureIDs(Collection<String> featureIDs, Object connection) throws
             OwsExceptionReport;
     
-    String insertFeature(SosSamplingFeature samplingFeature, Object connection) throws OwsExceptionReport;
+    String insertFeature(SamplingFeature samplingFeature, Object connection) throws OwsExceptionReport;
 
     int getDefaultEPSG();
 }

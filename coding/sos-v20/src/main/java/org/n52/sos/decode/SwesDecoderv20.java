@@ -51,7 +51,7 @@ import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.Sos2Constants.UpdateSensorDescriptionParams;
@@ -303,7 +303,7 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
                 } else {
                     identifier = fpt.getHref();
                 }
-                SosSamplingFeature feature = new SosSamplingFeature(new CodeWithAuthority(identifier));
+                SamplingFeature feature = new SamplingFeature(new CodeWithAuthority(identifier));
                 if (checkForRequestUrl(fpt.getHref())) {
                     feature.setUrl(fpt.getHref());
                 }

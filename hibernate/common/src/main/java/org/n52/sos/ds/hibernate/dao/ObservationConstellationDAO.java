@@ -37,7 +37,7 @@ import org.n52.sos.ds.hibernate.entities.ObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.ogc.om.SosObservationConstellation;
+import org.n52.sos.ogc.om.OmObservationConstellation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.Configurator;
@@ -151,7 +151,7 @@ public class ObservationConstellationDAO {
      *             If the requested observation type is invalid
      */
     public ObservationConstellation checkObservationConstellation(
-            SosObservationConstellation sosObservationConstellation, String offering, Session session,
+            OmObservationConstellation sosObservationConstellation, String offering, Session session,
             String parameterName) throws OwsExceptionReport {
         String observableProperty = sosObservationConstellation.getObservableProperty().getIdentifier();
         String procedure = sosObservationConstellation.getProcedure().getIdentifier();

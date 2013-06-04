@@ -34,7 +34,7 @@ import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.InvalidObservationTypeException;
-import org.n52.sos.ogc.om.SosObservationConstellation;
+import org.n52.sos.ogc.om.OmObservationConstellation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -61,7 +61,7 @@ public class InsertResultTemplateDAO extends AbstractInsertResultTemplateDAO {
         try {
             session = sessionHolder.getSession();
             transaction = session.beginTransaction();
-            SosObservationConstellation sosObsConst = request.getObservationTemplate();
+            OmObservationConstellation sosObsConst = request.getObservationTemplate();
 //            if (request.getResultStructure().getResultStructure() instanceof SosSweDataArray
 //                    || request.getResultStructure().getResultStructure() instanceof SosSweDataRecord) {
 //                sosObsConst.setObservationType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);

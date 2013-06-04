@@ -23,7 +23,7 @@
  */
 package org.n52.sos.util.builder;
 
-import org.n52.sos.ogc.om.SosMultiObservationValues;
+import org.n52.sos.ogc.om.MultiObservationValues;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.swe.SweDataArray;
 
@@ -46,9 +46,9 @@ public class SweDataArrayValueBuilder {
 		return this;
 	}
 
-	public SosMultiObservationValues<SweDataArray> build()
+	public MultiObservationValues<SweDataArray> build()
 	{
-		SosMultiObservationValues<SweDataArray> value = new SosMultiObservationValues<SweDataArray>();
+		MultiObservationValues<SweDataArray> value = new MultiObservationValues<SweDataArray>();
 		SweDataArrayValue dataArrayValue = new SweDataArrayValue();
 		dataArrayValue.setValue(dataArray);
 		value.setValue(dataArrayValue);

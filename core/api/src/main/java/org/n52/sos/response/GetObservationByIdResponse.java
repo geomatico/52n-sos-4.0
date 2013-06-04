@@ -26,13 +26,13 @@ package org.n52.sos.response;
 import java.util.Collections;
 import java.util.List;
 
-import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.om.OmObservation;
 
 public class GetObservationByIdResponse extends AbstractServiceResponse {
 
     private String responseFormat;
     
-    private List<SosObservation> observationCollection;
+    private List<OmObservation> observationCollection;
     
     private String resultModel;
 
@@ -44,11 +44,11 @@ public class GetObservationByIdResponse extends AbstractServiceResponse {
         this.responseFormat = responseFormat;
     }
 
-    public List<SosObservation> getObservationCollection() {
+    public List<OmObservation> getObservationCollection() {
         return Collections.unmodifiableList(observationCollection);
     }
 
-    public void setObservationCollection(List<SosObservation> observationCollection) {
+    public void setObservationCollection(List<OmObservation> observationCollection) {
         this.observationCollection = observationCollection;
     }
     

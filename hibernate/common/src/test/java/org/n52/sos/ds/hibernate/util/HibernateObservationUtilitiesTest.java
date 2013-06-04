@@ -45,7 +45,7 @@ import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.om.OmObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.swe.SweDataArray;
@@ -76,7 +76,7 @@ public class HibernateObservationUtilitiesTest extends HibernateTestCase {
 
     @Test
     public void returnEmptyCollectionIfCalledWithoutAnyParameters() throws OwsExceptionReport {
-        List<SosObservation> resultList = HibernateObservationUtilities
+        List<OmObservation> resultList = HibernateObservationUtilities
                 .createSosObservationsFromObservations(null, null, null, null);
         assertThat("result is null", resultList, is(not(nullValue())));
         assertThat("elements in list", resultList.size(), is(0));
@@ -146,7 +146,7 @@ public class HibernateObservationUtilitiesTest extends HibernateTestCase {
             List<Observation> observationsFromDataBase = new ArrayList<Observation>();
             observationsFromDataBase.add(hObservation);
             // CALL
-            List<SosObservation> resultList = HibernateObservationUtilities
+            List<OmObservation> resultList = HibernateObservationUtilities
                     .createSosObservationsFromObservations(observationsFromDataBase, request.getVersion(), null, session);
             // TEST RESULTS
             assertThat(resultList, is(notNullValue()));

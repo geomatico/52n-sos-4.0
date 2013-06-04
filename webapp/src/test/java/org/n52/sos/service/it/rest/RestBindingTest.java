@@ -47,11 +47,11 @@ import org.n52.sos.encode.SensorMLEncoderv101;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.om.AbstractSosPhenomenon;
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.SosObservationConstellation;
-import org.n52.sos.ogc.om.SosSingleObservationValue;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.AbstractPhenomenon;
+import org.n52.sos.ogc.om.OmObservation;
+import org.n52.sos.ogc.om.OmObservationConstellation;
+import org.n52.sos.ogc.om.SingleObservationValue;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
@@ -141,18 +141,18 @@ public class RestBindingTest extends AbstractTransactionalTestv2{
 			final String featureId,
 			final String observableProperty) throws OwsExceptionReport
 	{
-		final SosObservation o = new SosObservation();
+		final OmObservation o = new OmObservation();
 		o.setValidTime(new TimePeriod(new DateTime(timestamp), new DateTime(timestamp)));
 		o.setObservationConstellation(
-				new SosObservationConstellation(
+				new OmObservationConstellation(
 						new SosProcedureDescriptionUnknowType(sensorId, null, null),
-						new AbstractSosPhenomenon(observableProperty), 
-						new SosSamplingFeature(new CodeWithAuthority(featureId))));
+						new AbstractPhenomenon(observableProperty), 
+						new SamplingFeature(new CodeWithAuthority(featureId))));
 		o.setResultTime(new TimeInstant(new DateTime(timestamp)));
 		final QuantityValue sosValue = new QuantityValue(new BigDecimal(value));
 		sosValue.setUnit("test-unit");
 		o.setValue(
-				new SosSingleObservationValue<BigDecimal>(
+				new SingleObservationValue<BigDecimal>(
 						new TimeInstant(new DateTime(timestamp)),
 						sosValue));
 		final OMObservationType xbObservation = (OMObservationType) new OmEncoderv20().encode(o);

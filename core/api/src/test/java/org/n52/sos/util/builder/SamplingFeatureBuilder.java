@@ -25,8 +25,8 @@ package org.n52.sos.util.builder;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.util.JTSHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,9 +79,9 @@ public class SamplingFeatureBuilder {
 		return this;
 	}
 
-	public SosAbstractFeature build()
+	public AbstractFeature build()
 	{
-		SosSamplingFeature feature = new SosSamplingFeature(new CodeWithAuthority(featureIdentifier));
+		SamplingFeature feature = new SamplingFeature(new CodeWithAuthority(featureIdentifier));
 		if (codespace != null && !codespace.isEmpty())
 		{
 			feature.getIdentifier().setCodeSpace(codespace);

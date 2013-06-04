@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
 import org.n52.sos.ogc.sos.SosResultTemplate;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 
@@ -36,20 +36,20 @@ import org.n52.sos.ogc.sos.SosProcedureDescription;
  * @author c_hollmann
  * 
  */
-public class SosObservationConstellation implements Serializable, Cloneable {
+public class OmObservationConstellation implements Serializable, Cloneable {
     private static final long serialVersionUID = 8758412729768944974L;
 
     /** Identifier of the procedure by which the observation is made */
     private SosProcedureDescription procedure;
 
     /** Identifier of the observableProperty to which the observation accords to */
-    private AbstractSosPhenomenon observableProperty;
+    private AbstractPhenomenon observableProperty;
 
     /** Identifiers of the offerings to which this observation belongs */
     private Set<String> offerings;
 
     /** Identifier of the featureOfInterest to which this observation belongs */
-    private SosAbstractFeature featureOfInterest;
+    private AbstractFeature featureOfInterest;
 
     /** type of the observation */
     private String observationType;
@@ -59,7 +59,7 @@ public class SosObservationConstellation implements Serializable, Cloneable {
     /**
      * default constructor
      */
-    public SosObservationConstellation() {
+    public OmObservationConstellation() {
         super();
     }
     
@@ -73,8 +73,8 @@ public class SosObservationConstellation implements Serializable, Cloneable {
      * @param featureOfInterest
      *            featureOfInterest to which this observation belongs
      */
-    public SosObservationConstellation(SosProcedureDescription procedure, AbstractSosPhenomenon observableProperty,
-            SosAbstractFeature featureOfInterest) {
+    public OmObservationConstellation(SosProcedureDescription procedure, AbstractPhenomenon observableProperty,
+            AbstractFeature featureOfInterest) {
         super();
         this.procedure = procedure;
         this.observableProperty = observableProperty;
@@ -95,8 +95,8 @@ public class SosObservationConstellation implements Serializable, Cloneable {
      * @param observationType
      *            Observation type
      */
-    public SosObservationConstellation(SosProcedureDescription procedure, AbstractSosPhenomenon observableProperty, Set<String> offerings,
-            SosAbstractFeature featureOfInterest, String observationType) {
+    public OmObservationConstellation(SosProcedureDescription procedure, AbstractPhenomenon observableProperty, Set<String> offerings,
+            AbstractFeature featureOfInterest, String observationType) {
         super();
         this.procedure = procedure;
         this.observableProperty = observableProperty;
@@ -129,7 +129,7 @@ public class SosObservationConstellation implements Serializable, Cloneable {
      * 
      * @return the observableProperty
      */
-    public AbstractSosPhenomenon getObservableProperty() {
+    public AbstractPhenomenon getObservableProperty() {
         return observableProperty;
     }
 
@@ -139,7 +139,7 @@ public class SosObservationConstellation implements Serializable, Cloneable {
      * @param observableProperty
      *            the observableProperty to set
      */
-    public void setObservableProperty(AbstractSosPhenomenon observableProperty) {
+    public void setObservableProperty(AbstractPhenomenon observableProperty) {
         this.observableProperty = observableProperty;
     }
 
@@ -181,7 +181,7 @@ public class SosObservationConstellation implements Serializable, Cloneable {
      * 
      * @return the featureOfInterest
      */
-    public SosAbstractFeature getFeatureOfInterest() {
+    public AbstractFeature getFeatureOfInterest() {
         return featureOfInterest;
     }
 
@@ -191,7 +191,7 @@ public class SosObservationConstellation implements Serializable, Cloneable {
      * @param featureOfInterest
      *            the featureOfInterest to set
      */
-    public void setFeatureOfInterest(SosAbstractFeature featureOfInterest) {
+    public void setFeatureOfInterest(AbstractFeature featureOfInterest) {
         this.featureOfInterest = featureOfInterest;
     }
 
@@ -221,7 +221,7 @@ public class SosObservationConstellation implements Serializable, Cloneable {
      */
     @Override
     public boolean equals(Object paramObject) {
-        if (paramObject instanceof SosObservationConstellation) {
+        if (paramObject instanceof OmObservationConstellation) {
             return this.hashCode() == paramObject.hashCode();
             /*
             SosObservationConstellation obsConst = (SosObservationConstellation) paramObject;
@@ -253,7 +253,7 @@ public class SosObservationConstellation implements Serializable, Cloneable {
      *            Observation constellation to chek
      * @return true if equals
      */
-    public boolean equalsExcludingObsProp(SosObservationConstellation toCheckObsConst) {
+    public boolean equalsExcludingObsProp(OmObservationConstellation toCheckObsConst) {
         return (procedure.equals(toCheckObsConst.getProcedure())
                 && featureOfInterest.equals(toCheckObsConst.getFeatureOfInterest())
                 && observationType.equals(toCheckObsConst.getObservationType()) && checkObservationTypeForMerging());
@@ -287,8 +287,8 @@ public class SosObservationConstellation implements Serializable, Cloneable {
     }
     
     @Override
-    public SosObservationConstellation clone() throws CloneNotSupportedException {
-        SosObservationConstellation clone = new SosObservationConstellation();
+    public OmObservationConstellation clone() throws CloneNotSupportedException {
+        OmObservationConstellation clone = new OmObservationConstellation();
         clone.setFeatureOfInterest(this.getFeatureOfInterest());
         clone.setObservableProperty(this.getObservableProperty());
         clone.setObservationType(this.getObservationType());

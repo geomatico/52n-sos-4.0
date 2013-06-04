@@ -26,7 +26,7 @@ package org.n52.sos.util.builder;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
 import org.n52.sos.ogc.sos.SosInsertionMetadata;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swes.SwesFeatureRelationship;
@@ -75,7 +75,7 @@ public class InsertSensorRequestBuilder {
 		return this;
 	}
 	
-	public InsertSensorRequestBuilder addRelatedFeature(SosAbstractFeature relatedFeature, String featureRole)
+	public InsertSensorRequestBuilder addRelatedFeature(AbstractFeature relatedFeature, String featureRole)
 	{
 		if (featureRelationships == null) 
 		{

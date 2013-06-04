@@ -26,7 +26,6 @@ package org.n52.sos.ogc.sos;
 import java.util.Collection;
 import java.util.Set;
 
-import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.util.CollectionHelper;
 
 public abstract class SosProcedureDescription {

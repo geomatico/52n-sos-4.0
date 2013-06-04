@@ -28,13 +28,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.om.OmObservation;
 
 public class GetObservationResponse extends AbstractServiceResponse {
 
     private String responseFormat;
 
-    private List<SosObservation> observationCollection;
+    private List<OmObservation> observationCollection;
 
     private String resultModel;
 
@@ -46,22 +46,22 @@ public class GetObservationResponse extends AbstractServiceResponse {
         this.responseFormat = responseFormat;
     }
 
-    public List<SosObservation> getObservationCollection() {
+    public List<OmObservation> getObservationCollection() {
         return observationCollection;
     }
 
-    public void setObservationCollection(List<SosObservation> observationCollection) {
+    public void setObservationCollection(List<OmObservation> observationCollection) {
         this.observationCollection = observationCollection;
     }
 
     public void mergeObservationsWithSameAntiSubsettingIdentifier() {
-        List<SosObservation> mergedObservations = new ArrayList<SosObservation>(0);
-        Map<String, SosObservation> antiSubsettingObservations = new HashMap<String, SosObservation>(0);
-        for (SosObservation sosObservation : observationCollection) {
+        List<OmObservation> mergedObservations = new ArrayList<OmObservation>(0);
+        Map<String, OmObservation> antiSubsettingObservations = new HashMap<String, OmObservation>(0);
+        for (OmObservation sosObservation : observationCollection) {
             // TODO merge observations with the same antiSubsetting identifier.
             if (sosObservation.isSetSetId()) {
                 if (antiSubsettingObservations.containsKey(sosObservation.getSetId())) {
-                    SosObservation antiSubsettingObservation =
+                    OmObservation antiSubsettingObservation =
                             antiSubsettingObservations.get(sosObservation.getSetId());
                     antiSubsettingObservation.mergeWithObservation(sosObservation);
                 } else {
@@ -79,15 +79,15 @@ public class GetObservationResponse extends AbstractServiceResponse {
         // TODO merge all observations with the same observationContellation
         // (proc, obsProp, foi)
         if (observationCollection != null) {
-            List<SosObservation> mergedObservations = new ArrayList<SosObservation>(0);
+            List<OmObservation> mergedObservations = new ArrayList<OmObservation>(0);
             int obsIdCounter = 1;
-                for (SosObservation sosObservation : observationCollection) {
+                for (OmObservation sosObservation : observationCollection) {
                     if (mergedObservations.isEmpty()) {
                         sosObservation.setObservationID(Integer.toString(obsIdCounter++));
                         mergedObservations.add(sosObservation);
                     } else {
                         boolean combined = false;
-                        for (SosObservation combinedSosObs : mergedObservations) {
+                        for (OmObservation combinedSosObs : mergedObservations) {
                             if (combinedSosObs.getObservationConstellation().equals(
                                     sosObservation.getObservationConstellation())) {
                                 combinedSosObs.setResultTime(null);
@@ -107,7 +107,7 @@ public class GetObservationResponse extends AbstractServiceResponse {
     }
 
     public boolean hasObservationsWithResultTemplate() {
-        for (SosObservation sosObservation : observationCollection) {
+        for (OmObservation sosObservation : observationCollection) {
             if (sosObservation.getObservationConstellation().isSetResultTemplate()) {
                 return true;
             }

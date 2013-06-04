@@ -25,8 +25,8 @@ package org.n52.sos.util.builder;
 
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.ObservationValue;
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.SosObservationConstellation;
+import org.n52.sos.ogc.om.OmObservation;
+import org.n52.sos.ogc.om.OmObservationConstellation;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
@@ -39,20 +39,20 @@ public class ObservationBuilder {
 		return new ObservationBuilder();
 	}
 
-	private SosObservationConstellation observationConstellation;
+	private OmObservationConstellation observationConstellation;
 	private ObservationValue<?> value;
 	private String identifer;
 	private String identiferCodespace;
 
-	public ObservationBuilder setObservationConstellation(SosObservationConstellation observationConstellation)
+	public ObservationBuilder setObservationConstellation(OmObservationConstellation observationConstellation)
 	{
 		this.observationConstellation = observationConstellation;
 		return this;
 	}
 
-	public SosObservation build()
+	public OmObservation build()
 	{
-		SosObservation sosObservation = new SosObservation();
+		OmObservation sosObservation = new OmObservation();
 		if (observationConstellation != null)
 		{
 			sosObservation.setObservationConstellation(observationConstellation);

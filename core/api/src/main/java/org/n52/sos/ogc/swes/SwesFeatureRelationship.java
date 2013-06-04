@@ -23,13 +23,13 @@
  */
 package org.n52.sos.ogc.swes;
 
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
 
 public class SwesFeatureRelationship {
 
     private String role;
 
-    private SosAbstractFeature feature;
+    private AbstractFeature feature;
 
     public String getRole() {
         return role;
@@ -39,11 +39,11 @@ public class SwesFeatureRelationship {
         this.role = role;
     }
 
-    public SosAbstractFeature getFeature() {
+    public AbstractFeature getFeature() {
         return feature;
     }
 
-    public void setFeature(SosAbstractFeature feature) {
+    public void setFeature(AbstractFeature feature) {
         this.feature = feature;
     }
 

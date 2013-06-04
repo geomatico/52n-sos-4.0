@@ -25,8 +25,8 @@ package org.n52.sos.request;
 
 import java.util.Collection;
 
-import org.n52.sos.ogc.om.AbstractSosPhenomenon;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.AbstractPhenomenon;
+import org.n52.sos.ogc.om.features.AbstractFeature;
 import org.n52.sos.ogc.sos.Sos1Constants;
 
 /**
@@ -48,12 +48,12 @@ public class SosRegisterSensorRequest extends AbstractServiceRequest {
     /**
      * observableProperties collection
      */
-    private Collection<AbstractSosPhenomenon> observableProperties;
+    private Collection<AbstractPhenomenon> observableProperties;
 
     /**
      * featureOfInterest collection
      */
-    private Collection<SosAbstractFeature> featuresOfInterest;
+    private Collection<AbstractFeature> featuresOfInterest;
 
     /**
      * Sensor description
@@ -72,8 +72,8 @@ public class SosRegisterSensorRequest extends AbstractServiceRequest {
      * @param featuresOfInterest
      *            featuresOfInterst
      */
-    public SosRegisterSensorRequest(Collection<AbstractSosPhenomenon> observableProperties, String sensorDescription,
-            Collection<SosAbstractFeature> featuresOfInterest) {
+    public SosRegisterSensorRequest(Collection<AbstractPhenomenon> observableProperties, String sensorDescription,
+            Collection<AbstractFeature> featuresOfInterest) {
         // this.system = system;
         this.observableProperties = observableProperties;
         this.sensorDescription = sensorDescription;
@@ -85,7 +85,7 @@ public class SosRegisterSensorRequest extends AbstractServiceRequest {
      * 
      * @return observableProperties
      */
-    public Collection<AbstractSosPhenomenon> getObservableProperties() {
+    public Collection<AbstractPhenomenon> getObservableProperties() {
         return observableProperties;
     }
 
@@ -95,7 +95,7 @@ public class SosRegisterSensorRequest extends AbstractServiceRequest {
      * @param observableProperties
      *            observableProperties
      */
-    public void setObservableProperties(Collection<AbstractSosPhenomenon> observableProperties) {
+    public void setObservableProperties(Collection<AbstractPhenomenon> observableProperties) {
         this.observableProperties = observableProperties;
     }
 
@@ -142,7 +142,7 @@ public class SosRegisterSensorRequest extends AbstractServiceRequest {
      * 
      * @return featuresOfInterst
      */
-    public Collection<SosAbstractFeature> getFeaturesOfInterest() {
+    public Collection<AbstractFeature> getFeaturesOfInterest() {
         return featuresOfInterest;
     }
 
@@ -152,7 +152,7 @@ public class SosRegisterSensorRequest extends AbstractServiceRequest {
      * @param featuresOfInterest
      *            featuresOfInterst
      */
-    public void setFeaturesOfInterest(Collection<SosAbstractFeature> featuresOfInterest) {
+    public void setFeaturesOfInterest(Collection<AbstractFeature> featuresOfInterest) {
         this.featuresOfInterest = featuresOfInterest;
     }
 

@@ -25,7 +25,7 @@ package org.n52.sos.util.builder;
 
 import java.util.ArrayList;
 
-import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.om.OmObservation;
 import org.n52.sos.request.InsertObservationRequest;
 
 
@@ -46,7 +46,7 @@ public class InsertObservationRequestBuilder
 
 	private String procedureId;
 	private ArrayList<String> offerings;
-	private ArrayList<SosObservation> observations;
+	private ArrayList<OmObservation> observations;
 
 	public InsertObservationRequestBuilder setProcedureId(String procedureId)
 	{
@@ -64,11 +64,11 @@ public class InsertObservationRequestBuilder
 		return this;
 	}
 
-	public InsertObservationRequestBuilder addObservation(SosObservation sosObservation)
+	public InsertObservationRequestBuilder addObservation(OmObservation sosObservation)
 	{
 		if (observations == null)
 		{
-			observations = new ArrayList<SosObservation>(1);
+			observations = new ArrayList<OmObservation>(1);
 		}
 		observations.add(sosObservation);
 		return this;

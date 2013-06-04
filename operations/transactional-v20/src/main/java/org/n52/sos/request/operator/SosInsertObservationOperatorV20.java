@@ -45,8 +45,8 @@ import org.n52.sos.exception.ows.concrete.InvalidOfferingParameterException;
 import org.n52.sos.exception.ows.concrete.MissingObservationParameterException;
 import org.n52.sos.exception.ows.concrete.MissingOfferingParameterException;
 import org.n52.sos.exception.ows.concrete.NoEncoderForResponseException;
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.SosObservationConstellation;
+import org.n52.sos.ogc.om.OmObservation;
+import org.n52.sos.ogc.om.OmObservationConstellation;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
@@ -145,7 +145,7 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<A
                 } else if (!Configurator.getInstance().getCache().getOfferings().contains(offering)) {
                     exceptions.add(new InvalidOfferingParameterException(offering));
                 } else {
-                    for (SosObservation observation : request.getObservations()) {
+                    for (OmObservation observation : request.getObservations()) {
                         observation.getObservationConstellation().addOffering(offering);
                     }
                 }
@@ -154,14 +154,14 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<A
         }
     }
 
-    private void checkObservations(List<SosObservation> observations) throws OwsExceptionReport {
+    private void checkObservations(List<OmObservation> observations) throws OwsExceptionReport {
         if (observations == null || observations.isEmpty()) {
             throw new MissingObservationParameterException();
         } else {
         	ContentCache cache = Configurator.getInstance().getCache();
             CompositeOwsException exceptions = new CompositeOwsException();
-            for (SosObservation observation : observations) {
-                SosObservationConstellation obsConstallation = observation.getObservationConstellation();
+            for (OmObservation observation : observations) {
+                OmObservationConstellation obsConstallation = observation.getObservationConstellation();
                 checkObservationConstellationParameter(obsConstallation);
                 // Requirement 67
                 checkOrSetObservationType(observation);
@@ -184,7 +184,7 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<A
         }
     }
 
-    private void checkObservationConstellationParameter(SosObservationConstellation obsConstallation) throws
+    private void checkObservationConstellationParameter(OmObservationConstellation obsConstallation) throws
             OwsExceptionReport {
         checkProcedureID(obsConstallation.getProcedure().getIdentifier(),
                          Sos2Constants.InsertObservationParams.procedure.name());
@@ -193,8 +193,8 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<A
     }
 
 
-    private void checkOrSetObservationType(SosObservation sosObservation) throws OwsExceptionReport {
-        SosObservationConstellation observationConstellation = sosObservation.getObservationConstellation();
+    private void checkOrSetObservationType(OmObservation sosObservation) throws OwsExceptionReport {
+        OmObservationConstellation observationConstellation = sosObservation.getObservationConstellation();
         String obsTypeFromValue = OMHelper.getObservationTypeFor(sosObservation.getValue().getValue());
         if (observationConstellation.isSetObservationType()) {
             checkObservationType(observationConstellation.getObservationType(),

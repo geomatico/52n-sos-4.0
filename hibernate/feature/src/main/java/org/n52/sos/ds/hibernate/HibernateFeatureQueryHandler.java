@@ -56,8 +56,8 @@ import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.NotYetSupportedException;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Range;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -86,7 +86,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     private boolean spatialDatasource;
 
     @Override
-    public SosAbstractFeature getFeatureByID(String featureID, Object connection, String version, int responeSrid)
+    public AbstractFeature getFeatureByID(String featureID, Object connection, String version, int responeSrid)
             throws OwsExceptionReport {
         Session session = HibernateSessionHolder.getSession(connection);
         try {
@@ -135,7 +135,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     }
 
     @Override
-    public Map<String, SosAbstractFeature> getFeatures(Collection<String> featureIDs,
+    public Map<String, AbstractFeature> getFeatures(Collection<String> featureIDs,
             List<SpatialFilter> spatialFilters, Object connection, String version, int responeSrid)
             throws OwsExceptionReport {
         Session session = HibernateSessionHolder.getSession(connection);
@@ -195,7 +195,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     }
 
     @Override
-    public String insertFeature(SosSamplingFeature samplingFeature, Object connection) throws OwsExceptionReport {
+    public String insertFeature(SamplingFeature samplingFeature, Object connection) throws OwsExceptionReport {
         if (samplingFeature.getUrl() != null && !samplingFeature.getUrl().isEmpty()) {
             // FIXME test if this still works
             return samplingFeature.getUrl();
@@ -224,11 +224,11 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
      * <p/>
      * @throws OwsExceptionReport * If feature type is not supported
      */
-    protected Map<String, SosAbstractFeature> createSosFeatures(List<FeatureOfInterest> features, String version)
+    protected Map<String, AbstractFeature> createSosFeatures(List<FeatureOfInterest> features, String version)
             throws OwsExceptionReport {
-        Map<String, SosAbstractFeature> sosAbstractFois = new HashMap<String, SosAbstractFeature>();
+        Map<String, AbstractFeature> sosAbstractFois = new HashMap<String, AbstractFeature>();
         for (FeatureOfInterest feature : features) {
-            SosAbstractFeature sosFeature = createSosAbstractFeature(feature, version);
+            AbstractFeature sosFeature = createSosAbstractFeature(feature, version);
             sosAbstractFois.put(feature.getIdentifier(), sosFeature);
         }
         // TODO if sampledFeatures are also in sosAbstractFois, reference them.
@@ -258,7 +258,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
      * <p/>
      * @throws OwsExceptionReport
      */
-    protected SosAbstractFeature createSosAbstractFeature(FeatureOfInterest feature, String version)
+    protected AbstractFeature createSosAbstractFeature(FeatureOfInterest feature, String version)
             throws OwsExceptionReport {
         if (feature == null) {
             return null;
@@ -271,7 +271,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
         if (feature.isSetCodespace()) {
             identifier.setCodeSpace(feature.getCodespace().getCodespace());
         }
-        SosSamplingFeature sampFeat = new SosSamplingFeature(identifier);
+        SamplingFeature sampFeat = new SamplingFeature(identifier);
         if (feature.isSetNames()) {
             sampFeat.setName(SosHelper.createCodeTypeListFromCSV(feature.getNames()));
         }
@@ -285,7 +285,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
         if (feature instanceof TFeatureOfInterest) {
             Set<FeatureOfInterest> parentFeatures = ((TFeatureOfInterest)feature).getParents();
             if (parentFeatures != null && !parentFeatures.isEmpty()) {
-                List<SosAbstractFeature> sampledFeatures = new ArrayList<SosAbstractFeature>(parentFeatures.size());
+                List<AbstractFeature> sampledFeatures = new ArrayList<AbstractFeature>(parentFeatures.size());
                 for (FeatureOfInterest parentFeature : parentFeatures) {
                     sampledFeatures.add(createSosAbstractFeature(parentFeature, version));
                 }
@@ -295,7 +295,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
         return sampFeat;
     }
 
-    protected String insertFeatureOfInterest(SosSamplingFeature samplingFeature, Session session) throws OwsExceptionReport {
+    protected String insertFeatureOfInterest(SamplingFeature samplingFeature, Session session) throws OwsExceptionReport {
         if (!isSpatialDatasource()) {
             throw new NotYetSupportedException("Insertion of full encoded features for non spatial datasources");
         }
@@ -335,7 +335,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
         }
     }
 
-    protected void processGeometryPreSave(SosSamplingFeature ssf, FeatureOfInterest f) throws OwsExceptionReport {
+    protected void processGeometryPreSave(SamplingFeature ssf, FeatureOfInterest f) throws OwsExceptionReport {
         f.setGeom(switchCoordinateAxisOrderIfNeeded(ssf.getGeometry()));
     }
 
@@ -467,11 +467,11 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
         this.spatialDatasource = spatialDatasource;
     }
 
-    protected Map<String, SosAbstractFeature> getFeaturesForNonSpatialDatasource(Collection<String> featureIDs,
+    protected Map<String, AbstractFeature> getFeaturesForNonSpatialDatasource(Collection<String> featureIDs,
                                                                                  List<SpatialFilter> spatialFilters,
                                                                                  Session session, String version)
             throws OwsExceptionReport {
-        Map<String, SosAbstractFeature> featureMap = new HashMap<String, SosAbstractFeature>(0);
+        Map<String, AbstractFeature> featureMap = new HashMap<String, AbstractFeature>(0);
         List<Geometry> envelopes = null;
         boolean hasSpatialFilter = false;
         if (spatialFilters != null && !spatialFilters.isEmpty()) {
@@ -484,7 +484,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
         List<FeatureOfInterest> featuresOfInterest = new FeatureOfInterestDAO()
                 .getFeatureOfInterestObject(featureIDs, session);
         for (FeatureOfInterest feature : featuresOfInterest) {
-            SosSamplingFeature sosAbstractFeature = (SosSamplingFeature) createSosAbstractFeature(feature, version);
+            SamplingFeature sosAbstractFeature = (SamplingFeature) createSosAbstractFeature(feature, version);
             if (!hasSpatialFilter) {
                 featureMap.put(sosAbstractFeature.getIdentifier().getValue(), sosAbstractFeature);
             } else {
@@ -497,7 +497,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     }
 
     @SuppressWarnings("unchecked")
-    protected Map<String, SosAbstractFeature> getFeaturesForSpatialDatasource(Collection<String> featureIDs,
+    protected Map<String, AbstractFeature> getFeaturesForSpatialDatasource(Collection<String> featureIDs,
                                                                               List<SpatialFilter> spatialFilters,
                                                                               Session session,
                                                                               String version) throws OwsExceptionReport {

@@ -38,8 +38,8 @@ import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.TFeatureOfInterest;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CollectionHelper;
@@ -219,13 +219,13 @@ public class FeatureOfInterestDAO {
      * @throws OwsExceptionReport
      *             If SOS feature type is not supported
      */
-    public FeatureOfInterest checkOrInsertFeatureOfInterest(SosAbstractFeature featureOfInterest, Session session)
+    public FeatureOfInterest checkOrInsertFeatureOfInterest(AbstractFeature featureOfInterest, Session session)
             throws OwsExceptionReport {
-        if (featureOfInterest instanceof SosSamplingFeature) {
+        if (featureOfInterest instanceof SamplingFeature) {
             String featureIdentifier =
                     Configurator.getInstance().getFeatureQueryHandler()
-                            .insertFeature((SosSamplingFeature) featureOfInterest, session);
-            return getOrInsertFeatureOfInterest(featureIdentifier, ((SosSamplingFeature) featureOfInterest).getUrl(),
+                            .insertFeature((SamplingFeature) featureOfInterest, session);
+            return getOrInsertFeatureOfInterest(featureIdentifier, ((SamplingFeature) featureOfInterest).getUrl(),
                     session);
         } else {
             // TODO: throw exception

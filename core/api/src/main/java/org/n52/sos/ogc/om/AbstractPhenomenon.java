@@ -29,7 +29,7 @@ import java.io.Serializable;
  * Abstract class for phenomena
  * 
  */
-public class AbstractSosPhenomenon implements Comparable<AbstractSosPhenomenon>, Serializable {
+public class AbstractPhenomenon implements Comparable<AbstractPhenomenon>, Serializable {
     private static final long serialVersionUID = 8730485367220080360L;
 
     /** phenomenon identifier */
@@ -44,7 +44,7 @@ public class AbstractSosPhenomenon implements Comparable<AbstractSosPhenomenon>,
      * @param identifier
      *            Phenomenon identifier
      */
-    public AbstractSosPhenomenon(String identifier) {
+    public AbstractPhenomenon(String identifier) {
         super();
         this.identifier = identifier;
     }
@@ -57,7 +57,7 @@ public class AbstractSosPhenomenon implements Comparable<AbstractSosPhenomenon>,
      * @param description
      *            Phenomenon description
      */
-    public AbstractSosPhenomenon(String identifier, String description) {
+    public AbstractPhenomenon(String identifier, String description) {
         super();
         this.identifier = identifier;
         this.description = description;
@@ -108,8 +108,8 @@ public class AbstractSosPhenomenon implements Comparable<AbstractSosPhenomenon>,
      */
     @Override
     public boolean equals(Object paramObject) {
-        if (paramObject instanceof AbstractSosPhenomenon) {
-            AbstractSosPhenomenon phen = (AbstractSosPhenomenon) paramObject;
+        if (paramObject instanceof AbstractPhenomenon) {
+            AbstractPhenomenon phen = (AbstractPhenomenon) paramObject;
             return identifier.equals(phen.getIdentifier());
         }
         return false;
@@ -131,7 +131,7 @@ public class AbstractSosPhenomenon implements Comparable<AbstractSosPhenomenon>,
      * @see java.lang.Comparable#compareTo(T) 
      */    
     @Override
-    public int compareTo(AbstractSosPhenomenon o) {
+    public int compareTo(AbstractPhenomenon o) {
         return identifier.compareTo( o.getIdentifier() );
     }    
 }

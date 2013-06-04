@@ -62,7 +62,7 @@ import org.n52.sos.ds.hibernate.entities.TextObservation;
 import org.n52.sos.ds.hibernate.entities.Unit;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.util.CollectionHelper;
 import org.slf4j.Logger;
@@ -644,7 +644,7 @@ public class HibernateCriteriaQueryUtilities {
     }
     @Deprecated
     public static List<ResultTemplate> getResultTemplateObjectsForObservationConstellationAndFeature(
-            ObservationConstellation observationConstellation, SosAbstractFeature sosAbstractFeature, Session session) {
+            ObservationConstellation observationConstellation, AbstractFeature sosAbstractFeature, Session session) {
         return getResultTemplateObject(observationConstellation.getOffering().getIdentifier(),
                 observationConstellation.getObservableProperty().getIdentifier(),
                 CollectionHelper.asList(sosAbstractFeature.getIdentifier().getValue()), session);

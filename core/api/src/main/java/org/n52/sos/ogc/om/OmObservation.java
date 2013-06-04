@@ -37,7 +37,7 @@ import org.n52.sos.util.StringHelper;
  * Class represents a SOS observation
  * 
  */
-public class SosObservation implements Serializable {
+public class OmObservation implements Serializable {
     private static final long serialVersionUID = 2703347670924921229L;
     
     /**
@@ -60,7 +60,7 @@ public class SosObservation implements Serializable {
     /**
      * constellation of procedure, obervedProperty, offering and observationType
      */
-    private SosObservationConstellation observationConstellation;
+    private OmObservationConstellation observationConstellation;
 
     /** type of the value or the result the value points to */
     private String resultType;
@@ -87,7 +87,7 @@ public class SosObservation implements Serializable {
     /**
      * constructor
      */
-    public SosObservation() {
+    public OmObservation() {
         super();
     }
 
@@ -96,7 +96,7 @@ public class SosObservation implements Serializable {
      * 
      * @return the observationConstellation
      */
-    public SosObservationConstellation getObservationConstellation() {
+    public OmObservationConstellation getObservationConstellation() {
         return observationConstellation;
     }
 
@@ -106,7 +106,7 @@ public class SosObservation implements Serializable {
      * @param observationConstellation
      *            the observationConstellation to set
      */
-    public void setObservationConstellation(SosObservationConstellation observationConstellation) {
+    public void setObservationConstellation(OmObservationConstellation observationConstellation) {
         this.observationConstellation = observationConstellation;
     }
 
@@ -339,19 +339,19 @@ public class SosObservation implements Serializable {
     }
     */
 
-    public void mergeWithObservation(SosObservation sosObservation) {
+    public void mergeWithObservation(OmObservation sosObservation) {
         TVPValue tvpValue;
-        if (this.value instanceof SosSingleObservationValue) { 
-            tvpValue = convertSingleValueToMultiValue((SosSingleObservationValue) this.value); 
+        if (this.value instanceof SingleObservationValue) { 
+            tvpValue = convertSingleValueToMultiValue((SingleObservationValue) this.value); 
         } else {
-            tvpValue = (TVPValue) ((SosMultiObservationValues) this.value).getValue();
+            tvpValue = (TVPValue) ((MultiObservationValues) this.value).getValue();
         }
-        if (sosObservation.getValue() instanceof SosSingleObservationValue) {
-            SosSingleObservationValue<?> singleValue = (SosSingleObservationValue)sosObservation.getValue();
+        if (sosObservation.getValue() instanceof SingleObservationValue) {
+            SingleObservationValue<?> singleValue = (SingleObservationValue)sosObservation.getValue();
             TimeValuePair timeValuePair = new TimeValuePair(singleValue.getPhenomenonTime(), singleValue.getValue());
             tvpValue.addValue(timeValuePair);
-        } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
-            SosMultiObservationValues<?> multiValue = (SosMultiObservationValues) sosObservation.getValue();
+        } else if (sosObservation.getValue() instanceof MultiObservationValues) {
+            MultiObservationValues<?> multiValue = (MultiObservationValues) sosObservation.getValue();
             tvpValue.addValues(((TVPValue) multiValue.getValue()).getValue());
         }
         if (isSetResultTime() && sosObservation.isSetResultTime()) {
@@ -363,8 +363,8 @@ public class SosObservation implements Serializable {
         }
     }
     
-    private TVPValue convertSingleValueToMultiValue(SosSingleObservationValue<?> singleValue) {
-        SosMultiObservationValues<List<TimeValuePair>> multiValue = new SosMultiObservationValues<List<TimeValuePair>>();
+    private TVPValue convertSingleValueToMultiValue(SingleObservationValue<?> singleValue) {
+        MultiObservationValues<List<TimeValuePair>> multiValue = new MultiObservationValues<List<TimeValuePair>>();
         TVPValue tvpValue = new TVPValue();
         tvpValue.setUnit(singleValue.getValue().getUnit());
         TimeValuePair timeValuePair = new TimeValuePair(singleValue.getPhenomenonTime(), singleValue.getValue());

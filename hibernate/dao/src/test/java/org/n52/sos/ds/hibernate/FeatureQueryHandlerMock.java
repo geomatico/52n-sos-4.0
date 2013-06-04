@@ -33,8 +33,8 @@ import java.util.UUID;
 import org.n52.sos.ds.FeatureQueryHandler;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
 
@@ -44,9 +44,9 @@ import org.n52.sos.ogc.sos.SosEnvelope;
 public class FeatureQueryHandlerMock implements FeatureQueryHandler {
 
     @Override
-    public SosAbstractFeature getFeatureByID(String featureID, Object connection, String version, int responseSrid)
+    public AbstractFeature getFeatureByID(String featureID, Object connection, String version, int responseSrid)
             throws OwsExceptionReport {
-        return new SosSamplingFeature(new CodeWithAuthority("feature"));
+        return new SamplingFeature(new CodeWithAuthority("feature"));
     }
 
     @Override
@@ -55,7 +55,7 @@ public class FeatureQueryHandlerMock implements FeatureQueryHandler {
     }
 
     @Override
-    public Map<String, SosAbstractFeature> getFeatures(Collection<String> foiIDs,
+    public Map<String, AbstractFeature> getFeatures(Collection<String> foiIDs,
                                                        List<SpatialFilter> list, Object connection, String version,
                                                        int responseSrid) throws OwsExceptionReport {
         return Collections.emptyMap();
@@ -68,7 +68,7 @@ public class FeatureQueryHandlerMock implements FeatureQueryHandler {
     }
 
     @Override
-    public String insertFeature(SosSamplingFeature samplingFeature, Object connection) throws OwsExceptionReport {
+    public String insertFeature(SamplingFeature samplingFeature, Object connection) throws OwsExceptionReport {
         return UUID.randomUUID().toString();
     }
 

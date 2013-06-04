@@ -63,9 +63,9 @@ import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.SosFeatureCollection;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
+import org.n52.sos.ogc.om.features.FeatureCollection;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -109,9 +109,9 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
             org.n52.sos.ogc.om.values.QuantityValue.class,
             org.n52.sos.ogc.gml.CodeWithAuthority.class,
             org.n52.sos.ogc.gml.CodeType.class,
-            SosSamplingFeature.class,
+            SamplingFeature.class,
             SosEnvelope.class,
-            SosFeatureCollection.class
+            FeatureCollection.class
             );
 
     public GmlEncoderv321() {
@@ -169,8 +169,8 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
             return createMeasureType((QuantityValue)element);
         } else if (element instanceof org.n52.sos.ogc.gml.CodeType) {
             return createCodeType((org.n52.sos.ogc.gml.CodeType) element);
-        } else if (element instanceof SosAbstractFeature) {
-            return createFeaturePropertyType((SosAbstractFeature)element, additionalValues);
+        } else if (element instanceof AbstractFeature) {
+            return createFeaturePropertyType((AbstractFeature)element, additionalValues);
         } else if (element instanceof SosEnvelope) {
             return createEnvelope((SosEnvelope)element);
         } else {
@@ -178,23 +178,23 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         }
     }
 
-    private XmlObject createFeaturePropertyType(SosAbstractFeature feature, Map<HelperValues, String> additionalValues)
+    private XmlObject createFeaturePropertyType(AbstractFeature feature, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
-        if (feature instanceof SosFeatureCollection) {
-             return createFeatureCollection((SosFeatureCollection)feature, additionalValues);
-        } else if (feature instanceof SosSamplingFeature) {
-             return createFeature((SosSamplingFeature)feature, additionalValues);
+        if (feature instanceof FeatureCollection) {
+             return createFeatureCollection((FeatureCollection)feature, additionalValues);
+        } else if (feature instanceof SamplingFeature) {
+             return createFeature((SamplingFeature)feature, additionalValues);
         } else {
             throw new UnsupportedEncoderInputException(this, feature);
         }
     }
 
-    private XmlObject createFeatureCollection(SosFeatureCollection element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+    private XmlObject createFeatureCollection(FeatureCollection element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         FeatureCollectionDocument featureCollectionDoc = FeatureCollectionDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         FeatureCollectionType featureCollection = featureCollectionDoc.addNewFeatureCollection();
         featureCollection.setId(element.getGmlId());
         if (element.isSetMembers()) {
-            for (SosAbstractFeature abstractFeature : element.getMembers().values()) {
+            for (AbstractFeature abstractFeature : element.getMembers().values()) {
                 featureCollection.addNewFeatureMember().set(createFeaturePropertyType(abstractFeature, new HashMap<HelperValues, String>(0)));
             }
         } 
@@ -207,20 +207,20 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
 //        return featureCollection;
     }
 
-    private XmlObject createFeature(SosAbstractFeature feature, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+    private XmlObject createFeature(AbstractFeature feature, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         FeaturePropertyType featurePropertyType = FeaturePropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        if (!(feature instanceof SosSamplingFeature)) {
+        if (!(feature instanceof SamplingFeature)) {
             featurePropertyType.setHref(feature.getIdentifier().getValue());
             return featurePropertyType;
         } else {
-            SosSamplingFeature samplingFeature = (SosSamplingFeature) feature;
+            SamplingFeature samplingFeature = (SamplingFeature) feature;
             if (samplingFeature.isSetGmlID()) {
                 featurePropertyType.setHref("#" + samplingFeature.getGmlId());
                 return featurePropertyType;
             } else {
                 if (additionalValues.containsKey(HelperValues.ENCODE) && additionalValues.get(HelperValues.ENCODE).equals("false") || !samplingFeature.isEncode()) {
                     featurePropertyType.setHref(feature.getIdentifier().getValue());
-                    if (feature instanceof SosSamplingFeature && samplingFeature.isSetNames()) {
+                    if (feature instanceof SamplingFeature && samplingFeature.isSetNames()) {
                         featurePropertyType.setTitle(samplingFeature.getFirstName().getValue());
                     } 
                 }

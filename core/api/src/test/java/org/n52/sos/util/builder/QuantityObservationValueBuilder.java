@@ -27,7 +27,7 @@ import java.math.BigDecimal;
 
 import org.joda.time.DateTime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
-import org.n52.sos.ogc.om.SosSingleObservationValue;
+import org.n52.sos.ogc.om.SingleObservationValue;
 import org.n52.sos.ogc.om.values.Value;
 import org.n52.sos.ogc.om.values.QuantityValue;
 
@@ -57,9 +57,9 @@ public class QuantityObservationValueBuilder {
 		return this;
 	}
 
-	public SosSingleObservationValue<BigDecimal> build()
+	public SingleObservationValue<BigDecimal> build()
 	{
-		SosSingleObservationValue<BigDecimal> value = new SosSingleObservationValue<BigDecimal>();
+		SingleObservationValue<BigDecimal> value = new SingleObservationValue<BigDecimal>();
 		value.setValue(quantity);
 		value.setPhenomenonTime(new TimeInstant(new DateTime(phenomenonTime)));
 		return value;

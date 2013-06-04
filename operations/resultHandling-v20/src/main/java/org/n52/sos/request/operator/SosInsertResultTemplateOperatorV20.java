@@ -41,7 +41,7 @@ import org.n52.sos.exception.ows.concrete.EncoderResponseUnsupportedException;
 import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
 import org.n52.sos.exception.ows.concrete.NoEncoderForResponseException;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.om.SosObservationConstellation;
+import org.n52.sos.ogc.om.OmObservationConstellation;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
@@ -207,7 +207,7 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
     }
 
     private void checkObservationType(InsertResultTemplateRequest request) throws OwsExceptionReport {
-        SosObservationConstellation observationConstellation = request.getObservationTemplate();
+        OmObservationConstellation observationConstellation = request.getObservationTemplate();
         if (!observationConstellation.isSetObservationType()) {
             observationConstellation.setObservationType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
         }

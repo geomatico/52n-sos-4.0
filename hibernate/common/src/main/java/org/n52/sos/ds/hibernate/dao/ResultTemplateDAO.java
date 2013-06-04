@@ -36,7 +36,7 @@ import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosResultEncoding;
@@ -116,7 +116,7 @@ public class ResultTemplateDAO {
      * @return Result template objects
      */
     public List<ResultTemplate> getResultTemplateObjectsForObservationConstellationAndFeature(
-            ObservationConstellation observationConstellation, SosAbstractFeature sosAbstractFeature, Session session) {
+            ObservationConstellation observationConstellation, AbstractFeature sosAbstractFeature, Session session) {
         return getResultTemplateObject(observationConstellation.getOffering().getIdentifier(),
                 observationConstellation.getObservableProperty().getIdentifier(),
                 CollectionHelper.asList(sosAbstractFeature.getIdentifier().getValue()), session);

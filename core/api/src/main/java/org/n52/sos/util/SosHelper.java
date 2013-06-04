@@ -45,7 +45,7 @@ import org.n52.sos.exception.ows.concrete.InvalidResponseFormatParameterExceptio
 import org.n52.sos.exception.ows.concrete.MissingProcedureDescriptionFormatException;
 import org.n52.sos.exception.sos.ResponseExceedsSizeLimitException;
 import org.n52.sos.ogc.gml.CodeType;
-import org.n52.sos.ogc.om.SosObservableProperty;
+import org.n52.sos.ogc.om.OmObservableProperty;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -445,7 +445,7 @@ public class SosHelper {
                 .setMinimum(envelope.getMinX() + " " + envelope.getMinY());
     }
 
-    public static SosObservableProperty createSosOberavablePropertyFromSosSMLIo(final SmlIo<?> output) {
+    public static OmObservableProperty createSosOberavablePropertyFromSosSMLIo(final SmlIo<?> output) {
         final SweAbstractSimpleType<?> ioValue = output.getIoValue();
         final String identifier = ioValue.getDefinition();
         final String description = ioValue.getDescription();
@@ -490,7 +490,7 @@ public class SosHelper {
         if ((unit == null) || unit.isEmpty()) {
             unit = SosConstants.NOT_DEFINED;
         }
-        return new SosObservableProperty(identifier, description, unit, valueType);
+        return new OmObservableProperty(identifier, description, unit, valueType);
     }
 
     public static void checkHref(final String href, final String parameterName) throws OwsExceptionReport {

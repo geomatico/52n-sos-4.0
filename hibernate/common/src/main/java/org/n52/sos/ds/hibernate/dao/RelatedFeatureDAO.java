@@ -33,8 +33,8 @@ import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 
@@ -101,7 +101,7 @@ public class RelatedFeatureDAO {
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    public List<RelatedFeature> getOrInsertRelatedFeature(SosAbstractFeature feature, List<RelatedFeatureRole> roles,
+    public List<RelatedFeature> getOrInsertRelatedFeature(AbstractFeature feature, List<RelatedFeatureRole> roles,
             Session session) throws OwsExceptionReport {
         // TODO: create featureOfInterest and link to relatedFeature
         List<RelatedFeature> relFeats = getRelatedFeatures(feature.getIdentifier().getValue(), session);
@@ -112,11 +112,11 @@ public class RelatedFeatureDAO {
             RelatedFeature relFeat = new RelatedFeature();
             String identifier = feature.getIdentifier().getValue();
             String url = null;
-            if (feature instanceof SosSamplingFeature) {
+            if (feature instanceof SamplingFeature) {
                 identifier =
                         Configurator.getInstance().getFeatureQueryHandler()
-                                .insertFeature((SosSamplingFeature) feature, session);
-                url = ((SosSamplingFeature) feature).getUrl();
+                                .insertFeature((SamplingFeature) feature, session);
+                url = ((SamplingFeature) feature).getUrl();
             }
             relFeat.setFeatureOfInterest(new FeatureOfInterestDAO().getOrInsertFeatureOfInterest(identifier, url,
                     session));

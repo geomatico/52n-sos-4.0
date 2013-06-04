@@ -26,7 +26,6 @@ package org.n52.sos.ogc.sos;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.n52.sos.ogc.om.SosOffering;
 
 public class SosProcedureDescriptionUnknowType extends SosProcedureDescription {    
     public SosProcedureDescriptionUnknowType(final String identifier, final String procedureDescriptionFormat, final String xmlDescription) {

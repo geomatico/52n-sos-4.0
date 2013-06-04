@@ -23,7 +23,7 @@
  */
 package org.n52.sos.util.builder;
 
-import org.n52.sos.ogc.om.SosOffering;
+import org.n52.sos.ogc.sos.SosOffering;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
 

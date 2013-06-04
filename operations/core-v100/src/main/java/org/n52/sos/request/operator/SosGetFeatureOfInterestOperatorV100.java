@@ -37,9 +37,9 @@ import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStream
 import org.n52.sos.exception.ows.concrete.NoEncoderForResponseException;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.om.features.SFConstants;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.SosFeatureCollection;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.features.AbstractFeature;
+import org.n52.sos.ogc.om.features.FeatureCollection;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
@@ -94,7 +94,7 @@ public class SosGetFeatureOfInterestOperatorV100 extends
         try {
             GetFeatureOfInterestResponse response = getDao().getFeatureOfInterest(sosRequest);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Encoder<XmlObject, SosAbstractFeature> encoder =
+            Encoder<XmlObject, AbstractFeature> encoder =
                     CodingHelper.getEncoder(GMLConstants.NS_GML, response.getAbstractFeature());
             if (encoder != null) {
                 String contentType = encoder.getContentType();

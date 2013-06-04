@@ -27,8 +27,8 @@ import java.util.List;
 
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ogc.gml.time.Time;
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.OmObservation;
+import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.util.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,13 +47,13 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class ResultInsertionUpdate extends InMemoryCacheUpdate {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResultInsertionUpdate.class);
-    private final SosObservation observation;
+    private final OmObservation observation;
     private final String templateIdentifier;
 
-    public ResultInsertionUpdate(String templateIdentifier, SosObservation observation) {
+    public ResultInsertionUpdate(String templateIdentifier, OmObservation observation) {
         if (observation == null || templateIdentifier == null || templateIdentifier.isEmpty()) {
             String msg = String.format("Missing argument: '%s': %s; template identifier: '%s'",
-                                       SosObservation.class.getName(),
+                                       OmObservation.class.getName(),
                                        observation,
                                        templateIdentifier);
             LOGGER.error(msg);
@@ -89,14 +89,14 @@ public class ResultInsertionUpdate extends InMemoryCacheUpdate {
             cache.addObservationIdentifierForProcedure(procedure, identifier);
         }
 
-        List<SosSamplingFeature> observedFeatures = sosFeaturesToList(observation.getObservationConstellation()
+        List<SamplingFeature> observedFeatures = sosFeaturesToList(observation.getObservationConstellation()
                 .getFeatureOfInterest());
 
         final Envelope envelope = createEnvelopeFrom(observedFeatures);
 
         cache.updateGlobalEnvelope(envelope);
 
-        for (SosSamplingFeature sosSamplingFeature : observedFeatures) {
+        for (SamplingFeature sosSamplingFeature : observedFeatures) {
             final String featureOfInterest = sosSamplingFeature.getIdentifier().getValue();
             cache.addFeatureOfInterest(featureOfInterest);
             cache.addFeatureOfInterestForResultTemplate(templateIdentifier, featureOfInterest);

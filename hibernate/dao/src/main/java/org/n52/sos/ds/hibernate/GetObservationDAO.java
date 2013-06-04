@@ -53,7 +53,7 @@ import org.n52.sos.ds.hibernate.util.TemporalRestrictions;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.MissingObservedPropertyParameterException;
 import org.n52.sos.ogc.filter.TemporalFilter;
-import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.om.OmObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -113,7 +113,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
     }
 
     @SuppressWarnings("unchecked")
-    protected List<SosObservation> queryObservation(final GetObservationRequest request, final Session session)
+    protected List<OmObservation> queryObservation(final GetObservationRequest request, final Session session)
             throws OwsExceptionReport {
         // TODO Threadable !?!
         // TODO How to ensure no duplicated observations ?!
@@ -162,7 +162,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
      *             * If an error occurs.
      */
     @SuppressWarnings("unchecked")
-    protected List<SosObservation> queryObservationHydro(final GetObservationRequest request, final Session session)
+    protected List<OmObservation> queryObservationHydro(final GetObservationRequest request, final Session session)
             throws OwsExceptionReport {
         // TODO Threadable !?!
         // TODO How to ensure no duplicated observations ?!
@@ -178,7 +178,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         final List<FirstLatest> flFilters = request.getFirstLatestTemporalFilter();
         final Criterion filterCriterion = getTemporalFilterCriterion(request);
 
-        final List<SosObservation> result = new LinkedList<SosObservation>();
+        final List<OmObservation> result = new LinkedList<OmObservation>();
         final Set<Observation> allObservations = new HashSet<Observation>(0);
         for (final ObservationConstellation oc : getObservationConstellations(session, request)) {
             final Set<Observation> observations = new HashSet<Observation>(0);
@@ -221,11 +221,11 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         }
     }
 
-    protected List<SosObservation> toSosObservation(final Collection<Observation> observations, final String version,
+    protected List<OmObservation> toSosObservation(final Collection<Observation> observations, final String version,
             String resultModel, final Session session) throws OwsExceptionReport {
         if (!observations.isEmpty()) {
             final long startProcess = System.currentTimeMillis();
-            final List<SosObservation> sosObservations =
+            final List<OmObservation> sosObservations =
                     HibernateObservationUtilities.createSosObservationsFromObservations(new HashSet<Observation>(
                             observations), version, resultModel, session);
             LOGGER.debug("Time to process observations needs {} ms!", (System.currentTimeMillis() - startProcess));
