@@ -722,6 +722,7 @@ DROP FUNCTION insertProcedure(text,timestamp with time zone,text,numeric,numeric
 DROP FUNCTION insertTextObservation(bigint, text);
 DROP FUNCTION insertUnit(text);
 DROP FUNCTION insertResultTemplate(bigint,bigint,bigint,bigint,text,text,text);
+DROP FUNCTION insertResultTemplate(text,text,text,text,text);
 DROP FUNCTION insertAllowedObservationTypesForOffering(text,text);
 DROP FUNCTION insertAllowedObservationTypesForOffering(bigint,bigint);
 DROP FUNCTION insertAllowedFeatureOfInterestTypesForOffering(text,text);
