@@ -81,6 +81,9 @@ public final class CollectionHelper {
         return list(elements);
     }
 
+    /**
+     * @return an <b>UNMODIFIABLE</b> List&lt;T&gt;
+     */
     public static <T> List<T> list(final T... elements) {
         return Collections.unmodifiableList(Arrays.asList(elements));
     }
@@ -125,18 +128,30 @@ public final class CollectionHelper {
                 };
     }
 
+    /**
+     * @return an <b>UNMODIFIABLE</b> Set&lt;T&gt;
+     */
     public static <T> Set<T> unmodifiableSet(final Set<? extends T> s) {
         return (s == null) ? Collections.<T> emptySet() : Collections.unmodifiableSet(s);
     }
 
+    /**
+     * @return an <b>UNMODIFIABLE</b> Map&lt;K, V&gt;
+     */
     public static <K, V> Map<K, V> unmodifiableMap(final Map<? extends K, ? extends V> m) {
         return (m == null) ? Collections.<K, V> emptyMap() : Collections.unmodifiableMap(m);
     }
 
+    /**
+     * @return an <b>UNMODIFIABLE</b> Collection&lt;T&gt;
+     */
     public static <T> Collection<T> unmodifiableCollection(final Collection<? extends T> c) {
         return (c == null) ? Collections.<T> emptyList() : Collections.unmodifiableCollection(c);
     }
 
+    /**
+     * @return an <b>UNMODIFIABLE</b> List&lt;T&gt;
+     */
     public static <T> List<T> unmodifiableList(final List<? extends T> l) {
         return (l == null) ? Collections.<T> emptyList() : Collections.unmodifiableList(l);
     }
@@ -282,9 +297,9 @@ public final class CollectionHelper {
      *
      * @return the reversed map
      */
-    public static <K, V> Map<V, K> reverse(Map<K, V> map) {
-        Map<V, K> reversed = new HashMap<V, K>(map.size());
-        for (Entry<K, V> e : map.entrySet()) {
+    public static <K, V> Map<V, K> reverse(final Map<K, V> map) {
+        final Map<V, K> reversed = new HashMap<V, K>(map.size());
+        for (final Entry<K, V> e : map.entrySet()) {
             reversed.put(e.getValue(), e.getKey());
         }
         return reversed;
