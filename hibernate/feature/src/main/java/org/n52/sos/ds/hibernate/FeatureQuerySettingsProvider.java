@@ -63,10 +63,14 @@ public class FeatureQuerySettingsProvider implements SettingDefinitionProvider {
             .setTitle("EPSG Codes with Switched Coordinates")
             .setDescription("A list of all EPSG codes for which the SOS has to switch coordinate order, " +
                             "for example from lat/lon to lon/lat, or from x/y to y/x.");
-
+    
     public static final IntegerSettingDefinition DEFAULT_EPSG_DEFINITION = new IntegerSettingDefinition()
-            .setGroup(ServiceSettings.GROUP).setOrder(1).setKey(DEFAULT_EPSG).setDefaultValue(4326)
-            .setTitle("Default EPSG Code").setDescription("The EPSG code in which the geometries are stored.");
+            .setGroup(ServiceSettings.GROUP)
+            .setOrder(1)
+            .setKey(DEFAULT_EPSG)
+            .setDefaultValue(4326)
+            .setTitle("Default EPSG Code")
+            .setDescription("The EPSG code in which the geometries are stored.");
 
     public static final BooleanSettingDefinition SPATIAL_DATASOURCE_DEFINITION =
             new BooleanSettingDefinition()
@@ -79,7 +83,9 @@ public class FeatureQuerySettingsProvider implements SettingDefinitionProvider {
                             "The underlying datasource supports spatial queries and geomety data types. If not, the SOS only supports Get... operations and only BBOX spatial filtering.");
 
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?, ?>> set(
-            EPSG_CODES_WITH_REVERSED_AXIS_ORDER_DEFINITION, DEFAULT_EPSG_DEFINITION, SPATIAL_DATASOURCE_DEFINITION);
+            EPSG_CODES_WITH_REVERSED_AXIS_ORDER_DEFINITION,
+            DEFAULT_EPSG_DEFINITION,
+            SPATIAL_DATASOURCE_DEFINITION);
 
     @Override
     public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
