@@ -40,18 +40,37 @@ import org.springframework.mock.web.MockHttpServletResponse;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class DescribeSensorTest extends AbstractSoapTest {
+public class DescribeSensorTest extends AbstractSosV2SoapTest {
 
+    @Override
+    @Test
+    public void missingServiceParameter() throws XmlException {
+        DescribeSensorDocument describeSensorDocument = getRequest("procedure", "procedureDescriptionFormat");
+        addVersionParameter(describeSensorDocument.getDescribeSensor());
+        missingServiceParameter(describeSensorDocument.getDescribeSensor(), describeSensorDocument);
+    }
+
+    @Override
+    @Test
+    public void emptyServiceParameter() throws XmlException {
+        DescribeSensorDocument describeSensorDocument = getRequest("procedure", "procedureDescriptionFormat");
+        addVersionParameter(describeSensorDocument.getDescribeSensor());
+        emptyServiceParameter(describeSensorDocument.getDescribeSensor(), describeSensorDocument);
+    }
+
+    @Override
     @Test
     public void invalidServiceParameter() throws XmlException {
+        DescribeSensorDocument describeSensorDocument = getRequest("procedure", "procedureDescriptionFormat");
+        addVersionParameter(describeSensorDocument.getDescribeSensor());
+        invalidServiceParameter(describeSensorDocument.getDescribeSensor(), describeSensorDocument);
+    }
+
+    protected DescribeSensorDocument getRequest(String procedure, String procedureDescriptionFormat) {
         DescribeSensorDocument describeSensorDocument = DescribeSensorDocument.Factory.newInstance();
         DescribeSensorType describeSensorType = describeSensorDocument.addNewDescribeSensor();
-        describeSensorType.setVersion(Sos2Constants.SERVICEVERSION);
-        describeSensorType.setService("INVALID");
         describeSensorType.setProcedure("procedure");
         describeSensorType.setProcedureDescriptionFormat("procedureDescriptionFormat");
-        MockHttpServletResponse res = execute(describeSensorDocument);
-        assertThat(res.getStatus(), is(400));
-        assertThat(getResponseAsNode(res), is(invalidServiceParameterValueExceptionFault("INVALID")));
+        return describeSensorDocument;
     }
 }

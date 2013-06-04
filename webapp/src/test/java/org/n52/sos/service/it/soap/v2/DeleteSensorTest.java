@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013
+AbstractSosV2KvpTest * Copyright (C) 2013
  * by 52 North Initiative for Geospatial Open Source Software GmbH
  *
  * Contact: Andreas Wytzisk
@@ -34,22 +34,41 @@ import net.opengis.swes.x20.DeleteSensorType;
 import org.apache.xmlbeans.XmlException;
 import org.junit.Test;
 import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.service.it.AbstractSoapTest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class DeleteSensorTest extends AbstractSoapTest {
+public class DeleteSensorTest extends AbstractSosV2SoapTest {
+
+    @Override
+    @Test
+    public void missingServiceParameter() throws XmlException {
+        DeleteSensorDocument deleteSensorDocument = getRequest("procedure");
+        addVersionParameter(deleteSensorDocument.getDeleteSensor());
+        missingServiceParameter(deleteSensorDocument.getDeleteSensor(), deleteSensorDocument);
+    }
+
+    @Override
+    @Test
+    public void emptyServiceParameter() throws XmlException {
+        DeleteSensorDocument deleteSensorDocument = getRequest("procedure");
+        addVersionParameter(deleteSensorDocument.getDeleteSensor());
+        emptyServiceParameter(deleteSensorDocument.getDeleteSensor(), deleteSensorDocument);
+    }
+
+    @Override
     @Test
     public void invalidServiceParameter() throws XmlException {
+        DeleteSensorDocument deleteSensorDocument = getRequest("procedure");
+        addVersionParameter(deleteSensorDocument.getDeleteSensor());
+        invalidServiceParameter(deleteSensorDocument.getDeleteSensor(), deleteSensorDocument);
+    }
+
+    protected DeleteSensorDocument getRequest(String procedure) {
         DeleteSensorDocument deleteSensorDocument = DeleteSensorDocument.Factory.newInstance();
         DeleteSensorType deleteSensorType = deleteSensorDocument.addNewDeleteSensor();
-        deleteSensorType.setVersion(Sos2Constants.SERVICEVERSION);
-        deleteSensorType.setService("INVALID");
-        deleteSensorType.setProcedure("procedure");
-        MockHttpServletResponse res = execute(deleteSensorDocument);
-        assertThat(res.getStatus(), is(400));
-        assertThat(getResponseAsNode(res), is(invalidServiceParameterValueExceptionFault("INVALID")));
+        deleteSensorType.setProcedure(procedure);
+        return deleteSensorDocument;
     }
 }

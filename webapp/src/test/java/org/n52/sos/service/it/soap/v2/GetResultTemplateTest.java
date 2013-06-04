@@ -24,11 +24,6 @@
 
 package org.n52.sos.service.it.soap.v2;
 
-import org.n52.sos.service.it.AbstractSoapTest;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.AbstractSoapTest.invalidServiceParameterValueExceptionFault;
-
 import net.opengis.sos.x20.GetResultTemplateDocument;
 import net.opengis.sos.x20.GetResultTemplateType;
 
@@ -41,21 +36,35 @@ import org.springframework.mock.web.MockHttpServletResponse;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class GetResultTemplateTest extends AbstractSoapTest {
+public class GetResultTemplateTest extends AbstractSosV2SoapTest {
+
+    @Override
+    @Test
+    public void missingServiceParameter() throws XmlException {
+        GetResultTemplateDocument getResultTemplateDocument = getRequest("offering", "observedProperty");
+        addVersionParameter(getResultTemplateDocument.getGetResultTemplate());
+        missingServiceParameter(getResultTemplateDocument.getGetResultTemplate(), getResultTemplateDocument);
+    }
+
+    @Override
+    @Test
+    public void emptyServiceParameter() throws XmlException {
+        GetResultTemplateDocument getResultTemplateDocument = getRequest("offering", "observedProperty");
+        addVersionParameter(getResultTemplateDocument.getGetResultTemplate());
+        emptyServiceParameter(getResultTemplateDocument.getGetResultTemplate(), getResultTemplateDocument);
+    }
+
+    @Override
     @Test
     public void invalidServiceParameter() throws XmlException {
         GetResultTemplateDocument getResultTemplateDocument = getRequest("offering", "observedProperty");
-        getResultTemplateDocument.getGetResultTemplate().setService("INVALID");
-        MockHttpServletResponse res = execute(getResultTemplateDocument);
-        assertThat(res.getStatus(), is(400));
-        assertThat(getResponseAsNode(res), is(invalidServiceParameterValueExceptionFault("INVALID")));
+        addVersionParameter(getResultTemplateDocument.getGetResultTemplate());
+        invalidServiceParameter(getResultTemplateDocument.getGetResultTemplate(), getResultTemplateDocument);
     }
 
     protected GetResultTemplateDocument getRequest(String offering, String observedProperty) {
         GetResultTemplateDocument getResultTemplateDocument = GetResultTemplateDocument.Factory.newInstance();
         GetResultTemplateType getResultTemplateType = getResultTemplateDocument.addNewGetResultTemplate();
-        getResultTemplateType.setVersion(Sos2Constants.SERVICEVERSION);
-        getResultTemplateType.setService(SosConstants.SOS);
         getResultTemplateType.setOffering(offering);
         getResultTemplateType.setObservedProperty(observedProperty);
         return getResultTemplateDocument;

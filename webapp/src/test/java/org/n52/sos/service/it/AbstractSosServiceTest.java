@@ -159,22 +159,31 @@ public abstract class AbstractSosServiceTest extends HibernateTestCase {
         }
     }
 
-    public static Matcher<Node> invalidServiceParameterValueException(final String value) {
-        return exception(OwsExceptionCode.InvalidParameterValue, OWSConstants.RequestParams.service,
-                         "The value of the mandatory parameter 'service' must be 'SOS'. Delivered value was: " + value);
-    }
-
     public static Matcher<Node> missingParameterValueException(final Enum<?> parameter) {
         return exception(OwsExceptionCode.MissingParameterValue, parameter,
-                         "The value for the parameter 'service' is missing in the request!");
+                         String.format("The value for the parameter '%s' is missing in the request!", parameter.name()));
     }
-
 
     public static Matcher<Node> missingServiceParameterValueException() {
         return exception(OwsExceptionCode.MissingParameterValue, OWSConstants.RequestParams.service,
                          "The value for the parameter 'service' is missing in the request!");
     }
 
+    public static Matcher<Node> invalidServiceParameterValueException(final String value) {
+        return exception(OwsExceptionCode.InvalidParameterValue, OWSConstants.RequestParams.service,
+                         "The value of the mandatory parameter 'service' must be 'SOS'. Delivered value was: " + value);
+    }
+
+    public static Matcher<Node> missingVersionParameterValueException() {
+        return exception(OwsExceptionCode.MissingParameterValue, OWSConstants.RequestParams.version,
+                         "The value for the parameter 'version' is missing in the request!");
+    }
+
+    public static Matcher<Node> invalidVersionParameterValueException(final String value) {
+        return exception(OwsExceptionCode.InvalidParameterValue, OWSConstants.RequestParams.version,
+                         "The requested version is not supported!");
+    }
+    
     public static Matcher<Node> exception(final Enum<?> code, final Enum<?> locator, final String text) {
         return allOf(hasXPath("//ows:ExceptionReport/ows:Exception/@exceptionCode", namespaceContext, is(code.name())),
                      hasXPath("//ows:ExceptionReport/ows:Exception/@locator", namespaceContext, is(locator.name())),

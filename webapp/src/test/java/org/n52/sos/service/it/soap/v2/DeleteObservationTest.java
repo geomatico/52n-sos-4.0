@@ -24,33 +24,46 @@
 
 package org.n52.sos.service.it.soap.v2;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.AbstractSoapTest.invalidServiceParameterValueExceptionFault;
-
 import net.opengis.sosdo.x10.DeleteObservationDocument;
 import net.opengis.sosdo.x10.DeleteObservationType;
 
 import org.apache.xmlbeans.XmlException;
 import org.junit.Test;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.service.it.AbstractSoapTest;
-import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class DeleteObservationTest extends AbstractSoapTest {
+public class DeleteObservationTest extends AbstractSosV2SoapTest {
 
+    @Override
+    @Test
+    public void missingServiceParameter() throws XmlException {
+        // currently not supported due to some validation issues. 
+//        DeleteObservationDocument deleteObservationDocument = getRequest("observation");
+//        addVersionParameter(deleteObservationDocument.getDeleteObservation());
+//        missingServiceParameter(deleteObservationDocument.getDeleteObservation(), deleteObservationDocument);
+    }
+
+    @Override
+    @Test
+    public void emptyServiceParameter() throws XmlException {
+        DeleteObservationDocument deleteObservationDocument = getRequest("observation");
+        addVersionParameter(deleteObservationDocument.getDeleteObservation());
+        invalidServiceParameter(deleteObservationDocument.getDeleteObservation(), deleteObservationDocument);
+    }
+
+    @Override
     @Test
     public void invalidServiceParameter() throws XmlException {
+        DeleteObservationDocument deleteObservationDocument = getRequest("observation");
+        addVersionParameter(deleteObservationDocument.getDeleteObservation());
+        invalidServiceParameter(deleteObservationDocument.getDeleteObservation(), deleteObservationDocument);
+    }
+
+    protected DeleteObservationDocument getRequest(String observation) {
         DeleteObservationDocument deleteObservationDocument = DeleteObservationDocument.Factory.newInstance();
         DeleteObservationType deleteObservationType = deleteObservationDocument.addNewDeleteObservation();
-        deleteObservationType.setVersion(Sos2Constants.SERVICEVERSION);
-        deleteObservationType.setService("INVALID");
         deleteObservationType.setObservation("observation");
-        MockHttpServletResponse res = execute(deleteObservationDocument);
-        assertThat(res.getStatus(), is(400));
-        assertThat(getResponseAsNode(res), is(invalidServiceParameterValueExceptionFault("INVALID")));
+        return deleteObservationDocument;
     }
 }

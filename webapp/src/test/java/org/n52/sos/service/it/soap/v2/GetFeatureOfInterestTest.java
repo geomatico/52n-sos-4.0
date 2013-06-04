@@ -24,11 +24,6 @@
 
 package org.n52.sos.service.it.soap.v2;
 
-import org.n52.sos.service.it.AbstractSoapTest;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.AbstractSoapTest.invalidServiceParameterValueExceptionFault;
-
 import net.opengis.sos.x20.GetFeatureOfInterestDocument;
 import net.opengis.sos.x20.GetFeatureOfInterestType;
 
@@ -40,16 +35,36 @@ import org.springframework.mock.web.MockHttpServletResponse;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class GetFeatureOfInterestTest extends AbstractSoapTest {
+public class GetFeatureOfInterestTest extends AbstractSosV2SoapTest {
 
+    @Override
+    @Test
+    public void missingServiceParameter() throws XmlException {
+        GetFeatureOfInterestDocument getFeatureOfInterestDocument = getRequest();
+        addVersionParameter(getFeatureOfInterestDocument.getGetFeatureOfInterest());
+        invalidServiceParameter(getFeatureOfInterestDocument.getGetFeatureOfInterest(), getFeatureOfInterestDocument);
+    }
+
+    @Override
+    @Test
+    public void emptyServiceParameter() throws XmlException {
+        GetFeatureOfInterestDocument getFeatureOfInterestDocument = getRequest();
+        addVersionParameter(getFeatureOfInterestDocument.getGetFeatureOfInterest());
+        emptyServiceParameter(getFeatureOfInterestDocument.getGetFeatureOfInterest(), getFeatureOfInterestDocument);
+    }
+
+    @Override
     @Test
     public void invalidServiceParameter() throws XmlException {
+        GetFeatureOfInterestDocument getFeatureOfInterestDocument = getRequest();
+        addVersionParameter(getFeatureOfInterestDocument.getGetFeatureOfInterest());
+        invalidServiceParameter(getFeatureOfInterestDocument.getGetFeatureOfInterest(), getFeatureOfInterestDocument);
+    }
+
+    protected GetFeatureOfInterestDocument getRequest() {
         GetFeatureOfInterestDocument getFeatureOfInterestDocument = GetFeatureOfInterestDocument.Factory.newInstance();
         GetFeatureOfInterestType getFeatureOfInterestType = getFeatureOfInterestDocument.addNewGetFeatureOfInterest();
-        getFeatureOfInterestType.setVersion(Sos2Constants.SERVICEVERSION);
-        getFeatureOfInterestType.setService("INVALID");
-        MockHttpServletResponse res = execute(getFeatureOfInterestDocument);
-        assertThat(res.getStatus(), is(400));
-        assertThat(getResponseAsNode(res), is(invalidServiceParameterValueExceptionFault("INVALID")));
+        return getFeatureOfInterestDocument;
     }
+
 }

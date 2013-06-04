@@ -51,7 +51,7 @@ import org.n52.sos.ogc.sos.SosConstants;
  * @since 4.0.0
  *
  */
-public abstract class AbstractTransactionalTestv2 extends AbstractSosServiceTest {
+public class AbstractTransactionalTestv2 extends AbstractSosServiceTest implements SosServiceV2Test {
 	
     @After
     public void cleanUpDB() {
@@ -62,8 +62,6 @@ public abstract class AbstractTransactionalTestv2 extends AbstractSosServiceTest
 	{
 	    final InsertSensorDocument insertSensorDocument = InsertSensorDocument.Factory.newInstance();
 	    final InsertSensorType insertSensorType = insertSensorDocument.addNewInsertSensor();
-	    insertSensorType.setVersion(Sos2Constants.SERVICEVERSION);
-	    insertSensorType.setService(SosConstants.SOS);
 	    insertSensorType.setProcedureDescriptionFormat(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
 	    final SensorMLDocument sensorMLDocument = SensorMLDocument.Factory.newInstance();
 	    final SensorML sensorML = sensorMLDocument.addNewSensorML();
@@ -80,8 +78,6 @@ public abstract class AbstractTransactionalTestv2 extends AbstractSosServiceTest
 	{
 	    final InsertObservationDocument insertObservationDocument = InsertObservationDocument.Factory.newInstance();
 	    final InsertObservationType insertObservationType = insertObservationDocument.addNewInsertObservation();
-	    insertObservationType.setVersion(Sos2Constants.SERVICEVERSION);
-	    insertObservationType.setService(SosConstants.SOS);
 	    insertObservationType.addOffering("offering");
 	    final OMObservationType observation = insertObservationType.addNewObservation().addNewOMObservation();
 	    observation.setId("id");

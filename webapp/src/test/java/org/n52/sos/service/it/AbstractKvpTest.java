@@ -24,15 +24,52 @@
 
 package org.n52.sos.service.it;
 
+import org.junit.Test;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.service.it.AbstractSosServiceTest;
-import org.n52.sos.service.it.RequestBuilder;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class AbstractKvpTest extends AbstractSosServiceTest {
+public abstract class AbstractKvpTest extends AbstractSosServiceTest {
+    
     protected RequestBuilder builder() {
         return RequestBuilder.get("/kvp").accept(SosConstants.CONTENT_TYPE_XML);
     }
+
+    /**
+     * Definition for missing service parameter
+     */
+    @Test
+    public abstract void missingServiceParameter();
+
+    /**
+     * Definition for empty service parameter value
+     */
+    @Test
+    public abstract void emptyServiceParameter();
+
+    /**
+     * Definition for invalid service parameter value
+     */
+    @Test
+    public abstract void invalidServiceParameter();
+
+    /**
+     * Definition for missing version parameter
+     */
+    @Test
+    public abstract void missingVersionParameter();
+
+    /**
+     * Definition for empty version parameter value
+     */
+    @Test
+    public abstract void emptyVersionParameter();
+
+    /**
+     * Definition for invalid version parameter value
+     */
+    @Test
+    public abstract void invalidVersionParameter();
+
 }

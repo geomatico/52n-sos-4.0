@@ -24,10 +24,6 @@
 
 package org.n52.sos.service.it.soap.v2;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.AbstractSoapTest.invalidServiceParameterValueExceptionFault;
-
 import net.opengis.sensorML.x101.SensorMLDocument;
 import net.opengis.sensorML.x101.SensorMLDocument.SensorML;
 import net.opengis.sensorML.x101.SystemDocument;
@@ -40,27 +36,40 @@ import org.junit.Test;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.service.it.AbstractSoapTest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class UpdateSensorDescriptionTest extends AbstractSoapTest {
+public class UpdateSensorDescriptionTest extends AbstractSosV2SoapTest {
+    @Override
+    @Test
+    public void missingServiceParameter() throws XmlException {
+        UpdateSensorDescriptionDocument updateSensorDescriptionDocument = getMinimalRequest();
+        addVersionParameter(updateSensorDescriptionDocument.getUpdateSensorDescription());
+        missingServiceParameter(updateSensorDescriptionDocument.getUpdateSensorDescription(),
+                updateSensorDescriptionDocument);
+    }
+
+    @Override
+    @Test
+    public void emptyServiceParameter() throws XmlException {
+        UpdateSensorDescriptionDocument updateSensorDescriptionDocument = getMinimalRequest();
+        addVersionParameter(updateSensorDescriptionDocument.getUpdateSensorDescription());
+        emptyServiceParameter(updateSensorDescriptionDocument.getUpdateSensorDescription(),
+                updateSensorDescriptionDocument);
+    }
+
     @Test
     public void invalidServiceParameter() throws XmlException {
         UpdateSensorDescriptionDocument updateSensorDescriptionDocument = getMinimalRequest();
-        updateSensorDescriptionDocument.getUpdateSensorDescription().setService("INVALID");
-        MockHttpServletResponse res = execute(updateSensorDescriptionDocument);
-        assertThat(res.getStatus(), is(400));
-        assertThat(getResponseAsNode(res), is(invalidServiceParameterValueExceptionFault("INVALID")));
+        addVersionParameter(updateSensorDescriptionDocument.getUpdateSensorDescription());
+        invalidServiceParameter(updateSensorDescriptionDocument.getUpdateSensorDescription(), updateSensorDescriptionDocument);
     }
 
     protected UpdateSensorDescriptionDocument getMinimalRequest() {
         UpdateSensorDescriptionDocument insertSensorDocument = UpdateSensorDescriptionDocument.Factory.newInstance();
         UpdateSensorDescriptionType updateSensorDescriptionType = insertSensorDocument.addNewUpdateSensorDescription();
-        updateSensorDescriptionType.setVersion(Sos2Constants.SERVICEVERSION);
-        updateSensorDescriptionType.setService(SosConstants.SOS);
         updateSensorDescriptionType.setProcedure("procedure");
         updateSensorDescriptionType.setProcedureDescriptionFormat(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
         SensorMLDocument sensorMLDocument = SensorMLDocument.Factory.newInstance();

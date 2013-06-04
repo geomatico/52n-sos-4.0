@@ -24,11 +24,6 @@
 
 package org.n52.sos.service.it.soap.v2;
 
-import org.n52.sos.service.it.AbstractSoapTest;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.AbstractSoapTest.invalidServiceParameterValueExceptionFault;
-
 import net.opengis.sos.x20.GetObservationDocument;
 import net.opengis.sos.x20.GetObservationType;
 
@@ -40,15 +35,34 @@ import org.springframework.mock.web.MockHttpServletResponse;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class GetObservationTest extends AbstractSoapTest {
+public class GetObservationTest extends AbstractSosV2SoapTest {
+    @Override
+    @Test
+    public void missingServiceParameter() throws XmlException {
+        GetObservationDocument getObservationDocument = getRequest();
+        addVersionParameter(getObservationDocument.getGetObservation());
+        missingServiceParameter(getObservationDocument.getGetObservation(), getObservationDocument);
+    }
+
+    @Override
+    @Test
+    public void emptyServiceParameter() throws XmlException {
+        GetObservationDocument getObservationDocument = getRequest();
+        addVersionParameter(getObservationDocument.getGetObservation());
+        emptyServiceParameter(getObservationDocument.getGetObservation(), getObservationDocument);
+    }
+
+    @Override
     @Test
     public void invalidServiceParameter() throws XmlException {
+        GetObservationDocument getObservationDocument = getRequest();
+        addVersionParameter(getObservationDocument.getGetObservation());
+        invalidServiceParameter(getObservationDocument.getGetObservation(), getObservationDocument);
+    }
+
+    protected GetObservationDocument getRequest() {
         GetObservationDocument getObservationDocument = GetObservationDocument.Factory.newInstance();
         GetObservationType getObservationType = getObservationDocument.addNewGetObservation();
-        getObservationType.setVersion(Sos2Constants.SERVICEVERSION);
-        getObservationType.setService("INVALID");
-        MockHttpServletResponse res = execute(getObservationDocument);
-        assertThat(res.getStatus(), is(400));
-        assertThat(getResponseAsNode(res), is(invalidServiceParameterValueExceptionFault("INVALID")));
+        return getObservationDocument;
     }
 }

@@ -24,11 +24,6 @@
 
 package org.n52.sos.service.it.soap.v2;
 
-import org.n52.sos.service.it.AbstractSoapTest;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.AbstractSoapTest.invalidServiceParameterValueExceptionFault;
-
 import net.opengis.sos.x20.InsertResultDocument;
 import net.opengis.sos.x20.InsertResultType;
 
@@ -41,18 +36,38 @@ import org.springframework.mock.web.MockHttpServletResponse;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class InsertResultTest extends AbstractSoapTest {
+public class InsertResultTest extends AbstractSosV2SoapTest {
+
+    @Override
+    @Test
+    public void missingServiceParameter() throws XmlException {
+        InsertResultDocument insertResultDocument = getRequest("template");
+        addVersionParameter(insertResultDocument.getInsertResult());
+        missingServiceParameter(insertResultDocument.getInsertResult(), insertResultDocument);
+    }
+
+    @Override
+    @Test
+    public void emptyServiceParameter() throws XmlException {
+        InsertResultDocument insertResultDocument = getRequest("template");
+        addVersionParameter(insertResultDocument.getInsertResult());
+        emptyServiceParameter(insertResultDocument.getInsertResult(), insertResultDocument);
+    }
+
     @Test
     public void invalidServiceParameter() throws XmlException {
+        InsertResultDocument insertResultDocument = getRequest("template");
+        addVersionParameter(insertResultDocument.getInsertResult());
+        invalidServiceParameter(insertResultDocument.getInsertResult(), insertResultDocument);
+
+    }
+
+    public InsertResultDocument getRequest(String template) {
         InsertResultDocument insertResultDocument = InsertResultDocument.Factory.newInstance();
         InsertResultType insertResultType = insertResultDocument.addNewInsertResult();
-        insertResultType.setVersion(Sos2Constants.SERVICEVERSION);
-        insertResultType.setService("INVALID");
-        insertResultType.setTemplate("template");
+        insertResultType.setTemplate(template);
         insertResultType.addNewResultValues().set(XmlString.Factory.newValue("values"));
-        MockHttpServletResponse res = execute(insertResultDocument);
-        assertThat(res.getStatus(), is(400));
-        assertThat(getResponseAsNode(res), is(invalidServiceParameterValueExceptionFault("INVALID")));
+        return insertResultDocument;
     }
 
 }

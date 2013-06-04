@@ -24,10 +24,6 @@
 
 package org.n52.sos.service.it.soap.v2;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.AbstractSoapTest.invalidServiceParameterValueExceptionFault;
-
 import net.opengis.om.x20.OMObservationType;
 import net.opengis.sos.x20.InsertResultTemplateDocument;
 import net.opengis.sos.x20.InsertResultTemplateType;
@@ -41,23 +37,35 @@ import org.apache.xmlbeans.XmlException;
 import org.junit.Test;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.service.it.AbstractSoapTest;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class InsertResultTemplateTest extends AbstractSoapTest {
+public class InsertResultTemplateTest extends AbstractSosV2SoapTest {
+
+    @Override
+    @Test
+    public void missingServiceParameter() throws XmlException {
+        InsertResultTemplateDocument insertResultTemplateDocument = getMinimalRequest();
+        addVersionParameter(insertResultTemplateDocument.getInsertResultTemplate());
+        missingServiceParameter(insertResultTemplateDocument.getInsertResultTemplate(), insertResultTemplateDocument);
+    }
+
+    @Override
+    @Test
+    public void emptyServiceParameter() throws XmlException {
+        InsertResultTemplateDocument insertResultTemplateDocument = getMinimalRequest();
+        addVersionParameter(insertResultTemplateDocument.getInsertResultTemplate());
+        emptyServiceParameter(insertResultTemplateDocument.getInsertResultTemplate(), insertResultTemplateDocument);
+    }
 
     @Test
     public void invalidServiceParameter() throws XmlException {
         InsertResultTemplateDocument insertResultTemplateDocument = getMinimalRequest();
-        insertResultTemplateDocument.getInsertResultTemplate().setService("INVALID");
-        System.out.println(insertResultTemplateDocument.xmlText(XmlOptionsHelper.getInstance().getXmlOptions()));
-        MockHttpServletResponse res = execute(insertResultTemplateDocument);
-        assertThat(res.getStatus(), is(400));
-        assertThat(getResponseAsNode(res), is(invalidServiceParameterValueExceptionFault("INVALID")));
+        addVersionParameter(insertResultTemplateDocument.getInsertResultTemplate());
+        invalidServiceParameter(insertResultTemplateDocument.getInsertResultTemplate(), insertResultTemplateDocument);
     }
 
     protected TextEncodingDocument createTextEncoding() {
@@ -71,8 +79,6 @@ public class InsertResultTemplateTest extends AbstractSoapTest {
     protected InsertResultTemplateDocument getMinimalRequest() {
         InsertResultTemplateDocument insertResultTemplateDocument = InsertResultTemplateDocument.Factory.newInstance();
         InsertResultTemplateType insertResultTemplateType = insertResultTemplateDocument.addNewInsertResultTemplate();
-        insertResultTemplateType.setVersion(Sos2Constants.SERVICEVERSION);
-        insertResultTemplateType.setService(SosConstants.SOS);
         ProposedTemplate proposedTemplate = insertResultTemplateType.addNewProposedTemplate();
         ResultTemplateType resultTemplate = proposedTemplate.addNewResultTemplate();
         resultTemplate.setOffering("offering");

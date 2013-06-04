@@ -24,36 +24,19 @@
 
 package org.n52.sos.service.it.kvp.v2;
 
-import org.n52.sos.service.it.AbstractKvpTest;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.AbstractSosServiceTest.invalidServiceParameterValueException;
-
-import org.junit.Test;
+import org.junit.Before;
 import org.n52.sos.ext.deleteobservation.DeleteObservationConstants;
-import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.w3c.dom.Node;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author Carsten Hollmann <c.hollmann@52north.org>
+ * @since 4.0.0
  */
-public class DeleteObservationTest extends AbstractKvpTest {
-    @Test
-    public void invalidServiceParameter() {
-        Node node = getResponseAsNode(execute(builder()
-                .query(OWSConstants.RequestParams.request, DeleteObservationConstants.Operations.DeleteObservation)
-                .query(OWSConstants.RequestParams.service, "INVALID")
-                .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)));
-        assertThat(node, is(invalidServiceParameterValueException("INVALID")));
-    }
+public class DeleteObservationTest extends AbstractSosV2KvpTest {
 
-    @Test
-    public void emptyServiceParameter() {
-        Node node = getResponseAsNode(execute(builder()
-                .query(OWSConstants.RequestParams.request, DeleteObservationConstants.Operations.DeleteObservation)
-                .query(OWSConstants.RequestParams.service, "")
-                .query(OWSConstants.RequestParams.version, Sos2Constants.SERVICEVERSION)));
-        assertThat(node, is(missingServiceParameterValueException()));
+    @Override
+    @Before
+    public void setRequest() {
+        this.request = DeleteObservationConstants.Operations.DeleteObservation.name();
     }
 }

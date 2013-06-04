@@ -24,26 +24,46 @@
 
 package org.n52.sos.service.it.soap.v2;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.AbstractSoapTest.invalidServiceParameterValueExceptionFault;
-
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.junit.Test;
-import org.n52.sos.service.it.AbstractSoapTest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class GetDataAvailabilityTest extends AbstractSoapTest {
+public class GetDataAvailabilityTest extends AbstractSosV2SoapTest {
 
+    @Override
+    @Test
+    public void missingServiceParameter() throws XmlException {
+        // currently not supported due to missing XML schema
+//        XmlObject getDataAvailabilityDocument =
+//                XmlObject.Factory
+//                        .parse("<sos:GetDataAvailability xmlns:sos=\"http://www.opengis.net/sos/2.0\" version=\"2.0.0\"/>");
+//        MockHttpServletResponse res = execute(getDataAvailabilityDocument);
+//        assertThat(res.getStatus(), is(400));
+//        assertThat(getResponseAsNode(res), is(missingServiceParameterValueExceptionFault()));
+    }
+
+    @Override
+    @Test
+    public void emptyServiceParameter() throws XmlException {
+        XmlObject getDataAvailabilityDocument =
+                XmlObject.Factory
+                        .parse("<sos:GetDataAvailability xmlns:sos=\"http://www.opengis.net/sos/2.0\" service=\"\" version=\"2.0.0\"/>");
+        MockHttpServletResponse res = execute(getDataAvailabilityDocument);
+        assertThat(res.getStatus(), is(400));
+        assertThat(getResponseAsNode(res), is(missingServiceParameterValueExceptionFault()));
+    }
+
+    @Override
     @Test
     public void invalidServiceParameter() throws XmlException {
 
-        XmlObject getDataAvailabilityDocument = XmlObject.Factory
-                .parse("<sos:GetDataAvailability xmlns:sos=\"http://www.opengis.net/sos/2.0\" service=\"INVALID\" version=\"2.0.0\"/>");
+        XmlObject getDataAvailabilityDocument =
+                XmlObject.Factory
+                        .parse("<sos:GetDataAvailability xmlns:sos=\"http://www.opengis.net/sos/2.0\" service=\"INVALID\" version=\"2.0.0\"/>");
         MockHttpServletResponse res = execute(getDataAvailabilityDocument);
         assertThat(res.getStatus(), is(400));
         assertThat(getResponseAsNode(res), is(invalidServiceParameterValueExceptionFault("INVALID")));

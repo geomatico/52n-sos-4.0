@@ -24,11 +24,6 @@
 
 package org.n52.sos.service.it.soap.v2;
 
-import org.n52.sos.service.it.AbstractSoapTest;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.AbstractSoapTest.invalidServiceParameterValueExceptionFault;
-
 import net.opengis.sos.x20.GetResultDocument;
 import net.opengis.sos.x20.GetResultType;
 
@@ -40,18 +35,37 @@ import org.springframework.mock.web.MockHttpServletResponse;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class GetResultTest extends AbstractSoapTest {
+public class GetResultTest extends AbstractSosV2SoapTest {
+
+    @Override
+    @Test
+    public void missingServiceParameter() throws XmlException {
+        GetResultDocument getResultDocument = getRequest("offering", "observedProperty");
+        addVersionParameter(getResultDocument.getGetResult());
+        missingServiceParameter(getResultDocument.getGetResult(), getResultDocument);
+    }
+
+    @Override
+    @Test
+    public void emptyServiceParameter() throws XmlException {
+        GetResultDocument getResultDocument = getRequest("offering", "observedProperty");
+        addVersionParameter(getResultDocument.getGetResult());
+        emptyServiceParameter(getResultDocument.getGetResult(), getResultDocument);
+    }
 
     @Test
     public void invalidServiceParameter() throws XmlException {
+        GetResultDocument getResultDocument = getRequest("offering", "observedProperty");
+        addVersionParameter(getResultDocument.getGetResult());
+        invalidServiceParameter(getResultDocument.getGetResult(), getResultDocument);
+    }
+
+    protected GetResultDocument getRequest(String offering, String observedProperty) {
         GetResultDocument getResultDocument = GetResultDocument.Factory.newInstance();
         GetResultType getResultType = getResultDocument.addNewGetResult();
-        getResultType.setVersion(Sos2Constants.SERVICEVERSION);
-        getResultType.setService("INVALID");
         getResultType.setOffering("offering");
         getResultType.setObservedProperty("observedProperty");
-        MockHttpServletResponse res = execute(getResultDocument);
-        assertThat(res.getStatus(), is(400));
-        assertThat(getResponseAsNode(res), is(invalidServiceParameterValueExceptionFault("INVALID")));
+        return getResultDocument;
     }
+
 }

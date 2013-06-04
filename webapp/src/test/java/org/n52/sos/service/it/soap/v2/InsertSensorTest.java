@@ -24,29 +24,41 @@
 
 package org.n52.sos.service.it.soap.v2;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import net.opengis.swes.x20.InsertSensorDocument;
 
 import org.apache.xmlbeans.XmlException;
 import org.junit.Test;
-import org.n52.sos.service.it.AbstractSoapTest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
- * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk
+ *         J&uuml;rrens</a>
  * 
  * @since 4.0.0
  */
-public class InsertSensorTest extends AbstractSoapTest {
+public class InsertSensorTest extends AbstractSosV2SoapTest {
+    @Override
+    @Test
+    public void missingServiceParameter() throws XmlException {
+        final InsertSensorDocument insertSensorDocument = getInsertSensorMinimalDocument();
+        addVersionParameter(insertSensorDocument.getInsertSensor());
+        missingServiceParameter(insertSensorDocument.getInsertSensor(), insertSensorDocument);
+    }
+
+    @Override
+    @Test
+    public void emptyServiceParameter() throws XmlException {
+        final InsertSensorDocument insertSensorDocument = getInsertSensorMinimalDocument();
+        addVersionParameter(insertSensorDocument.getInsertSensor());
+        emptyServiceParameter(insertSensorDocument.getInsertSensor(), insertSensorDocument);
+    }
+
     @Test
     public void invalidServiceParameter() throws XmlException {
         final InsertSensorDocument insertSensorDocument = getInsertSensorMinimalDocument();
-        insertSensorDocument.getInsertSensor().setService("INVALID");
-        final MockHttpServletResponse res = execute(insertSensorDocument);
-        assertThat(res.getStatus(), is(400));
-        assertThat(getResponseAsNode(res), is(invalidServiceParameterValueExceptionFault("INVALID")));
+        addVersionParameter(insertSensorDocument.getInsertSensor());
+        invalidServiceParameter(insertSensorDocument.getInsertSensor(), insertSensorDocument);
     }
 
 }

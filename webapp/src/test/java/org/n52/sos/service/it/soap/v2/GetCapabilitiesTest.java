@@ -24,10 +24,6 @@
 
 package org.n52.sos.service.it.soap.v2;
 
-import org.n52.sos.service.it.AbstractSoapTest;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-
 import net.opengis.sos.x20.GetCapabilitiesDocument;
 import net.opengis.sos.x20.GetCapabilitiesType;
 
@@ -39,7 +35,31 @@ import org.springframework.mock.web.MockHttpServletResponse;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class GetCapabilitiesTest extends AbstractSoapTest {
+public class GetCapabilitiesTest extends AbstractSosV2SoapTest {
+
+    @Override
+    @Test
+    public void missingServiceParameter() throws XmlException {
+        GetCapabilitiesDocument getCapabilitiesDocument = GetCapabilitiesDocument.Factory.newInstance();
+        GetCapabilitiesType getCapabilitiesType = getCapabilitiesDocument.addNewGetCapabilities2();
+        getCapabilitiesType.addNewAcceptVersions().addNewVersion().setStringValue(Sos2Constants.SERVICEVERSION);
+        MockHttpServletResponse res = execute(getCapabilitiesDocument);
+        assertThat(res.getStatus(), is(200));
+        // TODO check if response is a sos:Capabilities document
+//        assertThat(getResponseAsNode(res), is(missingServiceParameterValueExceptionFault()));
+    }
+
+    @Override
+    @Test
+    public void emptyServiceParameter() throws XmlException {
+        GetCapabilitiesDocument getCapabilitiesDocument = GetCapabilitiesDocument.Factory.newInstance();
+        GetCapabilitiesType getCapabilitiesType = getCapabilitiesDocument.addNewGetCapabilities2();
+        getCapabilitiesType.addNewAcceptVersions().addNewVersion().setStringValue(Sos2Constants.SERVICEVERSION);
+        getCapabilitiesType.setService("");
+        MockHttpServletResponse res = execute(getCapabilitiesDocument);
+        assertThat(res.getStatus(), is(400));
+        assertThat(getResponseAsNode(res), is(missingServiceParameterValueExceptionFault()));
+    }
 
     @Test
     public void invalidServiceParameter() throws XmlException {

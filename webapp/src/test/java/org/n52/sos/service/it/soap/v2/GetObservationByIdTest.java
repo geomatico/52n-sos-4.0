@@ -24,11 +24,6 @@
 
 package org.n52.sos.service.it.soap.v2;
 
-import org.n52.sos.service.it.AbstractSoapTest;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.n52.sos.service.it.AbstractSoapTest.invalidServiceParameterValueExceptionFault;
-
 import net.opengis.sos.x20.GetObservationByIdDocument;
 import net.opengis.sos.x20.GetObservationByIdType;
 
@@ -40,16 +35,36 @@ import org.springframework.mock.web.MockHttpServletResponse;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class GetObservationByIdTest extends AbstractSoapTest {
+public class GetObservationByIdTest extends AbstractSosV2SoapTest {
+
+    @Override
+    @Test
+    public void missingServiceParameter() throws XmlException {
+        GetObservationByIdDocument getObservationByIdDocument = getRequest("observation");
+        addVersionParameter(getObservationByIdDocument.getGetObservationById());
+        missingServiceParameter(getObservationByIdDocument.getGetObservationById(), getObservationByIdDocument);
+    }
+
+    @Override
+    @Test
+    public void emptyServiceParameter() throws XmlException {
+        GetObservationByIdDocument getObservationByIdDocument = getRequest("observation");
+        addVersionParameter(getObservationByIdDocument.getGetObservationById());
+        emptyServiceParameter(getObservationByIdDocument.getGetObservationById(), getObservationByIdDocument);
+    }
+
+    @Override
     @Test
     public void invalidServiceParameter() throws XmlException {
+        GetObservationByIdDocument getObservationByIdDocument = getRequest("observation");
+        addVersionParameter(getObservationByIdDocument.getGetObservationById());
+        invalidServiceParameter(getObservationByIdDocument.getGetObservationById(), getObservationByIdDocument);
+    }
+
+    protected GetObservationByIdDocument getRequest(String observation) {
         GetObservationByIdDocument getObservationByIdDocument = GetObservationByIdDocument.Factory.newInstance();
         GetObservationByIdType getObservationByIdType = getObservationByIdDocument.addNewGetObservationById();
-        getObservationByIdType.setVersion(Sos2Constants.SERVICEVERSION);
-        getObservationByIdType.setService("INVALID");
         getObservationByIdType.addObservation("observation");
-        MockHttpServletResponse res = execute(getObservationByIdDocument);
-        assertThat(res.getStatus(), is(400));
-        assertThat(getResponseAsNode(res), is(invalidServiceParameterValueExceptionFault("INVALID")));
+        return getObservationByIdDocument;
     }
 }
