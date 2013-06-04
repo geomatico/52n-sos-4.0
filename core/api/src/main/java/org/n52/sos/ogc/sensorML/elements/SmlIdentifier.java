@@ -102,4 +102,19 @@ public class SmlIdentifier {
 	{
 		return String.format("SosSMLIdentifier [name=%s, definition=%s, value=%s]", name, definition, value);
 	}
+	
+	public boolean isSetName()
+	{
+		return name != null && !name.isEmpty();
+	}
+	
+	public boolean isSetValue()
+	{
+		return value != null && !value.isEmpty();
+	}
+	
+	public boolean isSetDefinition()
+	{
+		return definition != null && !definition.isEmpty();
+	}
 }
