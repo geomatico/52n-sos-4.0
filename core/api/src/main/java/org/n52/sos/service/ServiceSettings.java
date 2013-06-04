@@ -48,7 +48,6 @@ public class ServiceSettings implements SettingDefinitionProvider {
     public static final String ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR = "service.encodeFullChildrenInDescribeSensor";
     public static final String GENERATE_OFFERING_WHEN_NOT_SPECIFIED = "service.generateOfferingWhenNotSpecified";
     public static final String MAX_GET_OBSERVATION_RESULTS = "service.maxGetObservationResults";
-    public static final String DEFAULT_COORDINATE_UOM = "service.defaultCoordUOM";
     
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
             .setTitle("Service").setOrder(2);
@@ -61,14 +60,6 @@ public class ServiceSettings implements SettingDefinitionProvider {
             .setDescription("The endpoint URL of this sos which will be shown in the GetCapabilities response "
                             + "(e.g. <code>http://localhost:8080/52nSOS/sos</code>). The path to a specific "
                             + "binding (like <code>/soap</code>) will appended to this URL.");
-    
-    public static final StringSettingDefinition DEFAULT_COORDINATE_UOM_DEFINITION = new StringSettingDefinition()
-    .setGroup(ServiceSettings.GROUP)
-    .setOrder(1.5f)
-    .setKey(DEFAULT_COORDINATE_UOM)
-    .setDefaultValue("deg")
-    .setTitle("Default <abbr title=\"Unit of Measurement\">UOM</abbr> for coordinates")
-    .setDescription("The Unit Of Measurement used for coordinates");
     
     public static final IntegerSettingDefinition MINIMUM_GZIP_SIZE_DEFINITION = new IntegerSettingDefinition()
             .setMinimum(0)
@@ -132,7 +123,6 @@ public class ServiceSettings implements SettingDefinitionProvider {
     
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
             SERVICE_URL_DEFINITION,
-            DEFAULT_COORDINATE_UOM_DEFINITION,
             MINIMUM_GZIP_SIZE_DEFINITION,
             MAX_GET_OBSERVATION_RESULTS_DEFINITION,
             SUPPORTS_QUALITY_DEFINITION,

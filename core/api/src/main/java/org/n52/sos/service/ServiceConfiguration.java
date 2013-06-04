@@ -54,7 +54,6 @@ public class ServiceConfiguration {
     private String defaultProcedurePrefix;
     private String defaultObservablePropertyPrefix;
     private String defaultFeaturePrefix;
-    private String defaultCoordinateUOM;
     private boolean useDefaultPrefixes;
     private boolean encodeFullChildrenInDescribeSensor;
     private boolean useHttpStatusCodesInKvpAndPoxBinding;
@@ -319,16 +318,4 @@ public class ServiceConfiguration {
         srsNamePrefixSosV2 = prefix;
     }
     
-    public String getDefaultCoordinateUOM()
-    {
-    	return defaultCoordinateUOM;
-    }
-    
-	@Setting(ServiceSettings.DEFAULT_COORDINATE_UOM)
-	public void setDefaultCoordinateUOM(final String defaultCoordinateUOM)
-	{
-		Validation.notNullOrEmpty(ServiceSettings.DEFAULT_COORDINATE_UOM, defaultCoordinateUOM);
-		this.defaultCoordinateUOM = defaultCoordinateUOM;
-	}
-
 }
