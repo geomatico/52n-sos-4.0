@@ -33,7 +33,11 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
+ * Test for SOAP SOS 2.0 GetCapabilities request.
+ * 
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author Carsten Hollmann <c.hollmann@52north.org>
+ * @since 4.0.0
  */
 public class GetCapabilitiesTest extends AbstractSosV2SoapTest {
 
@@ -46,7 +50,8 @@ public class GetCapabilitiesTest extends AbstractSosV2SoapTest {
         MockHttpServletResponse res = execute(getCapabilitiesDocument);
         assertThat(res.getStatus(), is(200));
         // TODO check if response is a sos:Capabilities document
-//        assertThat(getResponseAsNode(res), is(missingServiceParameterValueExceptionFault()));
+        // assertThat(getResponseAsNode(res),
+        // is(missingServiceParameterValueExceptionFault()));
     }
 
     @Override

@@ -31,17 +31,23 @@ import org.apache.xmlbeans.XmlException;
 import org.junit.Test;
 
 /**
+ * Test for SOAP SOS 2.0 DeleteObservation request.
+ * 
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author Carsten Hollmann <c.hollmann@52north.org>
+ * @since 4.0.0
  */
 public class DeleteObservationTest extends AbstractSosV2SoapTest {
 
     @Override
     @Test
     public void missingServiceParameter() throws XmlException {
-        // currently not supported due to some validation issues. 
-//        DeleteObservationDocument deleteObservationDocument = getRequest("observation");
-//        addVersionParameter(deleteObservationDocument.getDeleteObservation());
-//        missingServiceParameter(deleteObservationDocument.getDeleteObservation(), deleteObservationDocument);
+        // currently not supported due to some validation issues.
+        // DeleteObservationDocument deleteObservationDocument =
+        // getRequest("observation");
+        // addVersionParameter(deleteObservationDocument.getDeleteObservation());
+        // missingServiceParameter(deleteObservationDocument.getDeleteObservation(),
+        // deleteObservationDocument);
     }
 
     @Override

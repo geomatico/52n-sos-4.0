@@ -28,6 +28,8 @@ import org.junit.Before;
 import org.n52.sos.gda.GetDataAvailabilityConstants;
 
 /**
+ * Test for KVP SOS 2.0 GetDataAvailability request.
+ * 
  * @author Christian Autermann <c.autermann@52north.org>
  * @author Carsten Hollmann <c.hollmann@52north.org>
  * @since 4.0.0

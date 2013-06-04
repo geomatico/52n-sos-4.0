@@ -42,58 +42,55 @@ import org.junit.After;
 import org.n52.sos.ds.hibernate.H2Configuration;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
 
 /**
- * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk
+ *         J&uuml;rrens</a>
  * 
  * @since 4.0.0
- *
+ * 
  */
 public class AbstractTransactionalTestv2 extends AbstractSosServiceTest implements SosServiceV2Test {
-	
+
     @After
     public void cleanUpDB() {
-    	H2Configuration.recreate();
+        H2Configuration.recreate();
     }
 
-	protected InsertSensorDocument getInsertSensorMinimalDocument()
-	{
-	    final InsertSensorDocument insertSensorDocument = InsertSensorDocument.Factory.newInstance();
-	    final InsertSensorType insertSensorType = insertSensorDocument.addNewInsertSensor();
-	    insertSensorType.setProcedureDescriptionFormat(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
-	    final SensorMLDocument sensorMLDocument = SensorMLDocument.Factory.newInstance();
-	    final SensorML sensorML = sensorMLDocument.addNewSensorML();
-	    sensorML.setVersion(SensorMLConstants.VERSION_V101);
-	    final SystemDocument systemDocument = SystemDocument.Factory.newInstance();
-	    systemDocument.addNewSystem();
-	    sensorML.addNewMember().set(systemDocument);
-	    insertSensorType.addNewProcedureDescription().set(sensorMLDocument);
-	    insertSensorType.addNewObservableProperty();
-	    return insertSensorDocument;
-	}
+    protected InsertSensorDocument getInsertSensorMinimalDocument() {
+        final InsertSensorDocument insertSensorDocument = InsertSensorDocument.Factory.newInstance();
+        final InsertSensorType insertSensorType = insertSensorDocument.addNewInsertSensor();
+        insertSensorType.setProcedureDescriptionFormat(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
+        final SensorMLDocument sensorMLDocument = SensorMLDocument.Factory.newInstance();
+        final SensorML sensorML = sensorMLDocument.addNewSensorML();
+        sensorML.setVersion(SensorMLConstants.VERSION_V101);
+        final SystemDocument systemDocument = SystemDocument.Factory.newInstance();
+        systemDocument.addNewSystem();
+        sensorML.addNewMember().set(systemDocument);
+        insertSensorType.addNewProcedureDescription().set(sensorMLDocument);
+        insertSensorType.addNewObservableProperty();
+        return insertSensorDocument;
+    }
 
-	protected InsertObservationDocument getInsertObservationMinimalDocument()
-	{
-	    final InsertObservationDocument insertObservationDocument = InsertObservationDocument.Factory.newInstance();
-	    final InsertObservationType insertObservationType = insertObservationDocument.addNewInsertObservation();
-	    insertObservationType.addOffering("offering");
-	    final OMObservationType observation = insertObservationType.addNewObservation().addNewOMObservation();
-	    observation.setId("id");
-	    final TimeInstantDocument timeInstantDocument = TimeInstantDocument.Factory.newInstance();
-	    final TimeInstantType timeInstantType = timeInstantDocument.addNewTimeInstant();
-	    timeInstantType.setId("phenomenonTime");
-	    timeInstantType.addNewTimePosition().setObjectValue("2000-01-01T00:00:00Z");
-	    observation.addNewPhenomenonTime().set(timeInstantDocument);
-	    observation.addNewResultTime().setHref("#phenomenonTime");
-	    observation.addNewProcedure();
-	    observation.addNewObservedProperty();
-	    observation.addNewFeatureOfInterest().setHref("featureOfInterest");
-	    XmlObject result = observation.addNewResult();
-	    result = result.substitute(new QName(OMConstants.NS_OM_2, OMConstants.EN_RESULT), XmlString.type);
-	    result.set(XmlString.Factory.newValue("value"));
-	    return insertObservationDocument;
-	}
+    protected InsertObservationDocument getInsertObservationMinimalDocument() {
+        final InsertObservationDocument insertObservationDocument = InsertObservationDocument.Factory.newInstance();
+        final InsertObservationType insertObservationType = insertObservationDocument.addNewInsertObservation();
+        insertObservationType.addOffering("offering");
+        final OMObservationType observation = insertObservationType.addNewObservation().addNewOMObservation();
+        observation.setId("id");
+        final TimeInstantDocument timeInstantDocument = TimeInstantDocument.Factory.newInstance();
+        final TimeInstantType timeInstantType = timeInstantDocument.addNewTimeInstant();
+        timeInstantType.setId("phenomenonTime");
+        timeInstantType.addNewTimePosition().setObjectValue("2000-01-01T00:00:00Z");
+        observation.addNewPhenomenonTime().set(timeInstantDocument);
+        observation.addNewResultTime().setHref("#phenomenonTime");
+        observation.addNewProcedure();
+        observation.addNewObservedProperty();
+        observation.addNewFeatureOfInterest().setHref("featureOfInterest");
+        XmlObject result = observation.addNewResult();
+        result = result.substitute(new QName(OMConstants.NS_OM_2, OMConstants.EN_RESULT), XmlString.type);
+        result.set(XmlString.Factory.newValue("value"));
+        return insertObservationDocument;
+    }
 
 }

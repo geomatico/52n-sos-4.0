@@ -28,6 +28,8 @@ import org.junit.Before;
 import org.n52.sos.ext.deleteobservation.DeleteObservationConstants;
 
 /**
+ * Test for KVP SOS 2.0 DeleteObservation request.
+ * 
  * @author Christian Autermann <c.autermann@52north.org>
  * @author Carsten Hollmann <c.hollmann@52north.org>
  * @since 4.0.0

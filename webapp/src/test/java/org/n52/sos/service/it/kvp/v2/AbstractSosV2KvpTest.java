@@ -7,15 +7,16 @@ import org.n52.sos.service.it.AbstractKvpTest;
 import org.n52.sos.service.it.SosServiceV2Test;
 import org.w3c.dom.Node;
 
-/**.
- * Abstract class for SOS 2.0 KVP tests. Contains tests for service and version parameter
+/**
+ * . Abstract class for SOS 2.0 KVP tests. Contains tests for service and
+ * version parameter
+ * 
  * @author Carsten Hollmann <c.hollmann@52north.org>
  * @since 4.0.0
- *
+ * 
  */
 public abstract class AbstractSosV2KvpTest extends AbstractKvpTest implements SosServiceV2Test {
 
-    
     /**
      * Request parameter value
      */

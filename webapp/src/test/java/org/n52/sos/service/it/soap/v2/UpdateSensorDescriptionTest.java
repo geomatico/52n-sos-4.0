@@ -39,7 +39,11 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
+ * Test for SOAP SOS 2.0 UpdateSensorDescription request.
+ * 
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author Carsten Hollmann <c.hollmann@52north.org>
+ * @since 4.0.0
  */
 public class UpdateSensorDescriptionTest extends AbstractSosV2SoapTest {
     @Override
@@ -64,7 +68,8 @@ public class UpdateSensorDescriptionTest extends AbstractSosV2SoapTest {
     public void invalidServiceParameter() throws XmlException {
         UpdateSensorDescriptionDocument updateSensorDescriptionDocument = getMinimalRequest();
         addVersionParameter(updateSensorDescriptionDocument.getUpdateSensorDescription());
-        invalidServiceParameter(updateSensorDescriptionDocument.getUpdateSensorDescription(), updateSensorDescriptionDocument);
+        invalidServiceParameter(updateSensorDescriptionDocument.getUpdateSensorDescription(),
+                updateSensorDescriptionDocument);
     }
 
     protected UpdateSensorDescriptionDocument getMinimalRequest() {

@@ -56,12 +56,15 @@ import org.xml.sax.SAXException;
 /**
  * Integration tests for the 52n-sos
  * 
- * Normally these tests are run against the local development code as part of the Maven lifecycle via the
- * maven-failsafe-plugin and maven-jetty-plugin during the verify phase in the test profile (see pom).
+ * Normally these tests are run against the local development code as part of
+ * the Maven lifecycle via the maven-failsafe-plugin and maven-jetty-plugin
+ * during the verify phase in the test profile (see pom).
  * 
- * In addition, the tests can be run against an external SOS server by specifying host and port system
- * properties (e.g. in Eclipse, open the debug configuration and add -Dhost=your.sos.server -Dport=80 to the
- * VM arguments). Note that the external server MUST CONTAIN THE NORMAL TEST DATA (see db/test.sql).
+ * In addition, the tests can be run against an external SOS server by
+ * specifying host and port system properties (e.g. in Eclipse, open the debug
+ * configuration and add -Dhost=your.sos.server -Dport=80 to the VM arguments).
+ * Note that the external server MUST CONTAIN THE NORMAL TEST DATA (see
+ * db/test.sql).
  * 
  * @author Shane StClair
  * 
@@ -69,10 +72,12 @@ import org.xml.sax.SAXException;
 
 public class SosITBase {
     private String defaultHost = "localhost";
+
     // host to run tests against
     private String host = assignHost();
 
     private int defaultPort = 9090;
+
     // port to run tests against
     private int port = assignPort();
 
@@ -98,22 +103,23 @@ public class SosITBase {
     }
 
     /**
-     * Assign test port (use "jetty.port" or "port" system properties or default to 8080)
+     * Assign test port (use "jetty.port" or "port" system properties or default
+     * to 8080)
      * 
      * @return test port
      */
     private int assignPort() {
         if (System.getProperty("jetty.port") != null) {
             return Integer.valueOf(System.getProperty("jetty.port").trim());
-        }
-        else if (System.getProperty("port") != null) {
+        } else if (System.getProperty("port") != null) {
             return Integer.valueOf(System.getProperty("port").trim());
         }
         return defaultPort;
     }
 
     /**
-     * Assign test base path context (use "basepath" system property or default to null)
+     * Assign test base path context (use "basepath" system property or default
+     * to null)
      * 
      * @return test base path
      */
@@ -129,7 +135,8 @@ public class SosITBase {
     }
 
     /**
-     * Combine path argument with basepath (just returns path if basepath is null)
+     * Combine path argument with basepath (just returns path if basepath is
+     * null)
      * 
      * @param path
      * @return Combined path
@@ -145,12 +152,13 @@ public class SosITBase {
     }
 
     /**
-     * Get URI for the relative sos path and query using test host, port, and basepath
+     * Get URI for the relative sos path and query using test host, port, and
+     * basepath
      * 
      * @param path
-     *        The relative test endpoint
+     *            The relative test endpoint
      * @param query
-     *        Query parameters to add to the request
+     *            Query parameters to add to the request
      * @return Constructed URI
      * @throws URISyntaxException
      */
@@ -162,7 +170,7 @@ public class SosITBase {
         b.setPath(getPath(path));
         b.setQuery(query);
         b.setFragment(null);
-        
+
         return b.build();
     }
 
@@ -190,7 +198,7 @@ public class SosITBase {
      * Simple test to assert that a path exists
      * 
      * @param path
-     *        Path to test
+     *            Path to test
      * @throws IOException
      * @throws URISyntaxException
      */
@@ -217,18 +225,19 @@ public class SosITBase {
     /**
      * Validates and XmlObject using xmlbeans validation
      * 
-     * Note: this can't be used when an XmlObject uses schemas generated in two different jars, like most of
-     * the 52n-sos-xml classes. See https://issues.apache.org/jira/browse/XMLBEANS-299
+     * Note: this can't be used when an XmlObject uses schemas generated in two
+     * different jars, like most of the 52n-sos-xml classes. See
+     * https://issues.apache.org/jira/browse/XMLBEANS-299
      * 
      * @param xb_xml
-     *        XmlObject to validate
+     *            XmlObject to validate
      */
     protected void validateXmlBean(XmlObject xb_xml) {
         XmlOptions validateOptions = new XmlOptions();
         List<XmlError> errorList = new ArrayList<XmlError>();
         validateOptions.setErrorListener(errorList);
         boolean valid = xb_xml.validate(validateOptions);
-        if ( !valid) {
+        if (!valid) {
             System.out.println(xb_xml.getDomNode().getNodeName() + " is invalid.");
             for (XmlError error : errorList) {
                 System.out.println(error.getErrorCode() + " - " + error.getMessage() + " at: ");
@@ -239,8 +248,9 @@ public class SosITBase {
     }
 
     /**
-     * Returns a javax.xml.validation Validator that validates xml documents against their internally defined
-     * schemas. Constructs the validator if necessary.
+     * Returns a javax.xml.validation Validator that validates xml documents
+     * against their internally defined schemas. Constructs the validator if
+     * necessary.
      * 
      * @return xmlValidator
      * @throws SAXException

@@ -36,73 +36,79 @@ import org.w3.x2003.x05.soapEnvelope.EnvelopeDocument;
 import org.w3c.dom.Node;
 
 /**
+ * Abstract class for SOS SOAP requests tests
+ * 
  * @author Christian Autermann <c.autermann@52north.org>
- * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk
+ *         J&uuml;rrens</a>
+ * @author Carsten Hollmann <c.hollmann@52north.org>
  * 
  * @since 4.0.0
  */
 public class AbstractSoapTest extends AbstractTransactionalTestv2 {
     protected static final NamespaceContext CTX = new SosNamespaceContext();
-    
+
     private static final String INVALID_PARAMETER_VALUE = "The request contained an invalid parameter value.";
-    
-    private static final String MISSING_PARAMETER_VALUE = "The request did not include a value for a required parameter and this server does not declare a default value for it.";
-    
+
+    private static final String MISSING_PARAMETER_VALUE =
+            "The request did not include a value for a required parameter and this server does not declare a default value for it.";
+
     private static final String MISSING_PARAMETER = "[XmlBeans validation error:] Expected attribute: ";
-    
+
     private static final String INVALID_REQUEST = "The request did not conform to its XML Schema definition.";
-    
 
     public static Matcher<Node> invalidServiceParameterValueExceptionFault(final String parameter) {
-        return soapFault(OwsExceptionCode.InvalidParameterValue, INVALID_PARAMETER_VALUE, OWSConstants.RequestParams.service,
-                         "The value of the mandatory parameter 'service' must be 'SOS'. Delivered value was: " +
-                         parameter);
+        return soapFault(OwsExceptionCode.InvalidParameterValue, INVALID_PARAMETER_VALUE,
+                OWSConstants.RequestParams.service,
+                "The value of the mandatory parameter 'service' must be 'SOS'. Delivered value was: " + parameter);
     }
-    
+
     public static Matcher<Node> invalidRequestMissingParameterExceptionFault(final String parameter) {
         return soapFault(SwesExceptionCode.InvalidRequest, INVALID_REQUEST, "Expected attribute: " + parameter,
                 MISSING_PARAMETER + parameter);
     }
-    
+
     public static Matcher<Node> missingServiceParameterValueExceptionFault() {
-        return soapFault(OwsExceptionCode.MissingParameterValue, MISSING_PARAMETER_VALUE, OWSConstants.RequestParams.service,
-                            "The value for the parameter 'service' is missing in the request!");
-    }
-    
-    public static Matcher<Node> invalidVersionParameterValueExceptionFault(final String parameter) {
-        return soapFault(OwsExceptionCode.InvalidParameterValue, INVALID_PARAMETER_VALUE, OWSConstants.RequestParams.version,
-                "The requested version is not supported!");
-    }
-    
-    public static Matcher<Node> missingVersionParameterValueExceptionFault() {
-        return soapFault(OwsExceptionCode.MissingParameterValue, MISSING_PARAMETER_VALUE, OWSConstants.RequestParams.version,
-                            "The value for the parameter 'version' is missing in the request!");
+        return soapFault(OwsExceptionCode.MissingParameterValue, MISSING_PARAMETER_VALUE,
+                OWSConstants.RequestParams.service, "The value for the parameter 'service' is missing in the request!");
     }
 
-    public static Matcher<Node> soapFault(final Enum<?> code, final String text, final Enum<?> locator, final String exceptionText) {
-        return allOf(hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Code/soap:Subcode/soap:Value",
-                              CTX, endsWith(":" + code.name())),
-                     hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Reason/soap:Text[@xml:lang='en']",
-                              CTX, is(text)),
-                     hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Detail/ows:Exception/@exceptionCode",
-                              CTX, is(code.name())),
-                     hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Detail/ows:Exception/@locator",
-                              CTX, is(locator.name())),
-                     hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Detail/ows:Exception/ows:ExceptionText",
-                              CTX, is(exceptionText)));
+    public static Matcher<Node> invalidVersionParameterValueExceptionFault(final String parameter) {
+        return soapFault(OwsExceptionCode.InvalidParameterValue, INVALID_PARAMETER_VALUE,
+                OWSConstants.RequestParams.version, "The requested version is not supported!");
     }
-    
-    public static Matcher<Node> soapFault(final Enum<?> code, final String text, final String locator, final String exceptionText) {
-        return allOf(hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Code/soap:Subcode/soap:Value",
-                              CTX, endsWith(":" + code.name())),
-                     hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Reason/soap:Text[@xml:lang='en']",
-                              CTX, is(text)),
-                     hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Detail/ows:Exception/@exceptionCode",
-                              CTX, is(code.name())),
-                     hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Detail/ows:Exception/@locator",
-                              CTX, startsWith(locator)),
-                     hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Detail/ows:Exception/ows:ExceptionText",
-                              CTX, startsWith(exceptionText)));
+
+    public static Matcher<Node> missingVersionParameterValueExceptionFault() {
+        return soapFault(OwsExceptionCode.MissingParameterValue, MISSING_PARAMETER_VALUE,
+                OWSConstants.RequestParams.version, "The value for the parameter 'version' is missing in the request!");
+    }
+
+    public static Matcher<Node> soapFault(final Enum<?> code, final String text, final Enum<?> locator,
+            final String exceptionText) {
+        return allOf(
+                hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Code/soap:Subcode/soap:Value", CTX, endsWith(":"
+                        + code.name())),
+                hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Reason/soap:Text[@xml:lang='en']", CTX, is(text)),
+                hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Detail/ows:Exception/@exceptionCode", CTX,
+                        is(code.name())),
+                hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Detail/ows:Exception/@locator", CTX,
+                        is(locator.name())),
+                hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Detail/ows:Exception/ows:ExceptionText", CTX,
+                        is(exceptionText)));
+    }
+
+    public static Matcher<Node> soapFault(final Enum<?> code, final String text, final String locator,
+            final String exceptionText) {
+        return allOf(
+                hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Code/soap:Subcode/soap:Value", CTX, endsWith(":"
+                        + code.name())),
+                hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Reason/soap:Text[@xml:lang='en']", CTX, is(text)),
+                hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Detail/ows:Exception/@exceptionCode", CTX,
+                        is(code.name())),
+                hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Detail/ows:Exception/@locator", CTX,
+                        startsWith(locator)),
+                hasXPath("//soap:Envelope/soap:Body/soap:Fault/soap:Detail/ows:Exception/ows:ExceptionText", CTX,
+                        startsWith(exceptionText)));
     }
 
     protected XmlObject envelope(final XmlObject r) {
@@ -111,11 +117,8 @@ public class AbstractSoapTest extends AbstractTransactionalTestv2 {
         return envDoc;
     }
 
-
     protected MockHttpServletResponse execute(final XmlObject doc) {
-        return execute(RequestBuilder.post("/soap")
-                .accept("application/soap+xml")
-                .contentType("application/soap+xml")
+        return execute(RequestBuilder.post("/soap").accept("application/soap+xml").contentType("application/soap+xml")
                 .entity(envelope(doc).xmlText()));
     }
 }

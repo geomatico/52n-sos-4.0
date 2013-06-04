@@ -57,41 +57,47 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-
-
 /**
  * @author Christian Autermann <c.autermann@52north.org>
- * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk
+ *         J&uuml;rrens</a>
+ * @author Carsten Hollmann <c.hollmann@52north.org>
  * 
  * @since 4.0.0
  * 
- * TODO Review @After and @Before calling between sub and super classes
+ *        TODO Review @After and @Before calling between sub and super classes
  * 
  */
 public abstract class AbstractSosServiceTest extends HibernateTestCase {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractSosServiceTest.class);
+
     private static SosService service;
+
     private static final ServletContext servletContext = new MockServletContext();
+
     private static final ServletConfig servletConfig = new MockServletConfig(servletContext);
+
     private static final NamespaceContext namespaceContext = new SosNamespaceContext();
-    
+
     /**
-     * "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CountObservation",
-    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_SWEArrayObservation",
-    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation",
-    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation",
-    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TextObservation"
+     * "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CountObservation"
+     * , "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+     * "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_SWEArrayObservation"
+     * ,
+     * "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation"
+     * ,
+     * "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation"
+     * ,
+     * "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TextObservation"
      */
     private final String[] defaultObservationTypes = {
-    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CountObservation",
-    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_SWEArrayObservation",
-    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation",
-    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation",
-    		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TextObservation"
-    		};
-    
+            "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CountObservation",
+            "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+            "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_SWEArrayObservation",
+            "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation",
+            "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation",
+            "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TextObservation" };
+
     public static final String ENCODING = "UTF-8";
 
     @BeforeClass
@@ -100,9 +106,10 @@ public abstract class AbstractSosServiceTest extends HibernateTestCase {
         service = new SosService();
         service.init(servletConfig);
     }
-    
+
     /**
      * Removes all entries of entity {@link ObservationType} from the database.
+     * 
      * @throws OwsExceptionReport
      */
     protected void removeObservationTypes() throws OwsExceptionReport {
@@ -111,8 +118,8 @@ public abstract class AbstractSosServiceTest extends HibernateTestCase {
         try {
             session = getSession();
             transaction = session.beginTransaction();
-            final ScrollableIterable<ObservationType> i = ScrollableIterable.fromCriteria(session
-                    .createCriteria(ObservationType.class));
+            final ScrollableIterable<ObservationType> i =
+                    ScrollableIterable.fromCriteria(session.createCriteria(ObservationType.class));
             for (final ObservationType o : i) {
                 session.delete(o);
             }
@@ -130,25 +137,26 @@ public abstract class AbstractSosServiceTest extends HibernateTestCase {
     }
 
     /**
-     * Add some default entries of entity {@link ObservationType} to the test database.
+     * Add some default entries of entity {@link ObservationType} to the test
+     * database.
+     * 
      * @throws OwsExceptionReport
      * @see {@link #defaultObservationTypes}
      */
     protected void addObservationTypes() throws OwsExceptionReport {
         Session session = null;
         Transaction transaction = null;
-		try {
-        	session = getSession();
-        	transaction = session.beginTransaction();
-        	for (int i = 0; i < defaultObservationTypes.length; i++) 
-        	{
-        		final ObservationType ot = new ObservationType();
-        		ot.setObservationTypeId(i);
-        		ot.setObservationType(defaultObservationTypes[i]);
-        		session.save(ot);
-			}
-        	session.flush();
-        	transaction.commit();
+        try {
+            session = getSession();
+            transaction = session.beginTransaction();
+            for (int i = 0; i < defaultObservationTypes.length; i++) {
+                final ObservationType ot = new ObservationType();
+                ot.setObservationTypeId(i);
+                ot.setObservationType(defaultObservationTypes[i]);
+                session.save(ot);
+            }
+            session.flush();
+            transaction.commit();
         } catch (final HibernateException he) {
             if (transaction != null) {
                 transaction.rollback();
@@ -161,33 +169,34 @@ public abstract class AbstractSosServiceTest extends HibernateTestCase {
 
     public static Matcher<Node> missingParameterValueException(final Enum<?> parameter) {
         return exception(OwsExceptionCode.MissingParameterValue, parameter,
-                         String.format("The value for the parameter '%s' is missing in the request!", parameter.name()));
+                String.format("The value for the parameter '%s' is missing in the request!", parameter.name()));
     }
 
     public static Matcher<Node> missingServiceParameterValueException() {
         return exception(OwsExceptionCode.MissingParameterValue, OWSConstants.RequestParams.service,
-                         "The value for the parameter 'service' is missing in the request!");
+                "The value for the parameter 'service' is missing in the request!");
     }
 
     public static Matcher<Node> invalidServiceParameterValueException(final String value) {
         return exception(OwsExceptionCode.InvalidParameterValue, OWSConstants.RequestParams.service,
-                         "The value of the mandatory parameter 'service' must be 'SOS'. Delivered value was: " + value);
+                "The value of the mandatory parameter 'service' must be 'SOS'. Delivered value was: " + value);
     }
 
     public static Matcher<Node> missingVersionParameterValueException() {
         return exception(OwsExceptionCode.MissingParameterValue, OWSConstants.RequestParams.version,
-                         "The value for the parameter 'version' is missing in the request!");
+                "The value for the parameter 'version' is missing in the request!");
     }
 
     public static Matcher<Node> invalidVersionParameterValueException(final String value) {
         return exception(OwsExceptionCode.InvalidParameterValue, OWSConstants.RequestParams.version,
-                         "The requested version is not supported!");
+                "The requested version is not supported!");
     }
-    
+
     public static Matcher<Node> exception(final Enum<?> code, final Enum<?> locator, final String text) {
-        return allOf(hasXPath("//ows:ExceptionReport/ows:Exception/@exceptionCode", namespaceContext, is(code.name())),
-                     hasXPath("//ows:ExceptionReport/ows:Exception/@locator", namespaceContext, is(locator.name())),
-                     hasXPath("//ows:ExceptionReport/ows:Exception/ows:ExceptionText", namespaceContext, is(text)));
+        return allOf(
+                hasXPath("//ows:ExceptionReport/ows:Exception/@exceptionCode", namespaceContext, is(code.name())),
+                hasXPath("//ows:ExceptionReport/ows:Exception/@locator", namespaceContext, is(locator.name())),
+                hasXPath("//ows:ExceptionReport/ows:Exception/ows:ExceptionText", namespaceContext, is(text)));
     }
 
     protected MockHttpServletResponse execute(final RequestBuilder b) {
@@ -211,8 +220,9 @@ public abstract class AbstractSosServiceTest extends HibernateTestCase {
             final byte[] response = res.getContentAsByteArray();
             assertThat(response, is(not(nullValue())));
             assertThat(response.length, is(not(0)));
-            final Element node = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-                    .parse(new ByteArrayInputStream(response)).getDocumentElement();
+            final Element node =
+                    DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                            .parse(new ByteArrayInputStream(response)).getDocumentElement();
             return node;
         } catch (final ParserConfigurationException ex) {
             LOG.error("Error parsing response", ex);

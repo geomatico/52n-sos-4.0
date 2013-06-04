@@ -41,7 +41,11 @@ import org.n52.sos.util.XmlOptionsHelper;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
+ * Test for SOAP SOS 2.0 InsertResultTemplate request.
+ * 
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author Carsten Hollmann <c.hollmann@52north.org>
+ * @since 4.0.0
  */
 public class InsertResultTemplateTest extends AbstractSosV2SoapTest {
 

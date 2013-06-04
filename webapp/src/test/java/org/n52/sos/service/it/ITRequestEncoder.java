@@ -76,34 +76,29 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 
 /**
- * class encapsulates operations for creating request documents for SOS operations
+ * class encapsulates operations for creating request documents for SOS
+ * operations
  * 
  */
 public class ITRequestEncoder {
     // QNames for use in xmlbeans substitutions
-    public static final QName QN_TIME_INSTANT = new QName(GMLConstants.NS_GML,
-                                                          GMLConstants.EN_TIME_INSTANT,
-                                                          GMLConstants.NS_GML_PREFIX);
+    public static final QName QN_TIME_INSTANT = new QName(GMLConstants.NS_GML, GMLConstants.EN_TIME_INSTANT,
+            GMLConstants.NS_GML_PREFIX);
 
-    public static final QName QN_TIME_PERIOD = new QName(GMLConstants.NS_GML,
-                                                         GMLConstants.EN_TIME_PERIOD,
-                                                         GMLConstants.NS_GML_PREFIX);
+    public static final QName QN_TIME_PERIOD = new QName(GMLConstants.NS_GML, GMLConstants.EN_TIME_PERIOD,
+            GMLConstants.NS_GML_PREFIX);
 
     public static final QName QN_TM_EQUALS = new QName(OGCConstants.NS_OGC,
-                                                       FilterConstants.TimeOperator.TM_Equals.name(),
-                                                       OGCConstants.NS_OGC_PREFIX);
+            FilterConstants.TimeOperator.TM_Equals.name(), OGCConstants.NS_OGC_PREFIX);
 
     public static final QName QN_TM_BEFORE = new QName(OGCConstants.NS_OGC,
-                                                       FilterConstants.TimeOperator.TM_Before.name(),
-                                                       OGCConstants.NS_OGC_PREFIX);
+            FilterConstants.TimeOperator.TM_Before.name(), OGCConstants.NS_OGC_PREFIX);
 
     public static final QName QN_TM_AFTER = new QName(OGCConstants.NS_OGC,
-                                                      FilterConstants.TimeOperator.TM_Before.name(),
-                                                      OGCConstants.NS_OGC_PREFIX);
+            FilterConstants.TimeOperator.TM_Before.name(), OGCConstants.NS_OGC_PREFIX);
 
     public static final QName QN_TM_DURING = new QName(OGCConstants.NS_OGC,
-                                                       FilterConstants.TimeOperator.TM_During.name(),
-                                                       OGCConstants.NS_OGC_PREFIX);
+            FilterConstants.TimeOperator.TM_During.name(), OGCConstants.NS_OGC_PREFIX);
 
     public static final Map<FilterConstants.TimeOperator, QName> timeOpQNameMap;
 
@@ -125,13 +120,14 @@ public class ITRequestEncoder {
      * creates GetObservationDocument from SosGetObservationRequest
      * 
      * @param assignedSensorID
-     *        id of new registered sensor
+     *            id of new registered sensor
      * @return Returns XMLBeans representation of RegisterSensorResponse
-
-     *
+     * 
+     * 
      * @throws OwsExceptionReport
      */
-    public GetObservationDocument createGetObservationRequest(AbstractServiceRequest request) throws OwsExceptionReport {
+    public GetObservationDocument createGetObservationRequest(AbstractServiceRequest request)
+            throws OwsExceptionReport {
         if (request instanceof GetObservationRequest) {
             GetObservationRequest req = (GetObservationRequest) request;
 
@@ -148,8 +144,7 @@ public class ITRequestEncoder {
 
             if (req.getSrid() == -1) {
                 xb_getObs.setSrsName(SosConstants.PARAMETER_NOT_SET);
-            }
-            else {
+            } else {
                 xb_getObs.setSrsName(ServiceConfiguration.getInstance().getSrsNamePrefix() + req.getSrid());
             }
 
@@ -181,8 +176,7 @@ public class ITRequestEncoder {
                     FeatureOfInterest xb_foi = xb_getObs.addNewFeatureOfInterest();
                     xb_foi.addNewObjectID().setStringValue(featureOfInterest);
                 }
-            }
-            else if (req.getSpatialFilter() != null) {
+            } else if (req.getSpatialFilter() != null) {
                 SpatialFilter sf = req.getSpatialFilter();
                 FeatureOfInterest xb_foi = xb_getObs.addNewFeatureOfInterest();
 
@@ -218,19 +212,20 @@ public class ITRequestEncoder {
      * Encodes a ComparisonFilter to a ComparisonOpsType XML bean
      * 
      * @param filter
-     *        The filter to be encoded
+     *            The filter to be encoded
      * @param xb_compOpsType
-     *        The pre-created ComparisonOpsType XML bean to populate
+     *            The pre-created ComparisonOpsType XML bean to populate
      * @return Populated ComparisonOpsType XML bean (for convenience)
-
-     *
+     * 
+     * 
      * @throws OwsExceptionReport
      */
     public static ComparisonOpsType encodeComparisonFilter(ComparisonFilter filter, ComparisonOpsType xb_compOpsType)
             throws OwsExceptionReport {
         switch (filter.getOperator()) {
         case PropertyIsBetween:
-            PropertyIsBetweenType xb_propBetween = (PropertyIsBetweenType) xb_compOpsType.changeType(PropertyIsBetweenType.type);
+            PropertyIsBetweenType xb_propBetween =
+                    (PropertyIsBetweenType) xb_compOpsType.changeType(PropertyIsBetweenType.type);
             xb_propBetween.addNewExpression().newCursor().setTextValue(filter.getPropertyName());
             xb_propBetween.addNewLowerBoundary().addNewExpression().newCursor().setTextValue(filter.getValue());
             xb_propBetween.addNewUpperBoundary().addNewExpression().newCursor().setTextValue(filter.getValueUpper());
@@ -248,56 +243,63 @@ public class ITRequestEncoder {
             xb_propNull.addNewPropertyName().newCursor().setTextValue(filter.getPropertyName());
             break;
         case PropertyIsEqualTo:
-            BinaryComparisonOpType xb_propEqual = (BinaryComparisonOpType) xb_compOpsType.changeType(BinaryComparisonOpType.type);
+            BinaryComparisonOpType xb_propEqual =
+                    (BinaryComparisonOpType) xb_compOpsType.changeType(BinaryComparisonOpType.type);
             xb_propEqual.getDomNode().setPrefix("ogc");
             xb_propEqual.getDomNode().setNodeValue(ComparisonOperator.PropertyIsEqualTo.toString());
             xb_propEqual.setExpressionArray(createExpressionArray(filter.getPropertyName(), filter.getValue()));
             break;
         case PropertyIsGreaterThan:
-            BinaryComparisonOpType xb_propGreater = (BinaryComparisonOpType) xb_compOpsType.changeType(BinaryComparisonOpType.type);
+            BinaryComparisonOpType xb_propGreater =
+                    (BinaryComparisonOpType) xb_compOpsType.changeType(BinaryComparisonOpType.type);
             xb_propGreater.getDomNode().setPrefix("ogc");
             xb_propGreater.getDomNode().setNodeValue(ComparisonOperator.PropertyIsGreaterThan.toString());
             xb_propGreater.setExpressionArray(createExpressionArray(filter.getPropertyName(), filter.getValue()));
             break;
         case PropertyIsGreaterThanOrEqualTo:
-            BinaryComparisonOpType xb_propGTE = (BinaryComparisonOpType) xb_compOpsType.changeType(BinaryComparisonOpType.type);
+            BinaryComparisonOpType xb_propGTE =
+                    (BinaryComparisonOpType) xb_compOpsType.changeType(BinaryComparisonOpType.type);
             xb_propGTE.getDomNode().setPrefix("ogc");
             xb_propGTE.getDomNode().setNodeValue(ComparisonOperator.PropertyIsGreaterThanOrEqualTo.toString());
             xb_propGTE.setExpressionArray(createExpressionArray(filter.getPropertyName(), filter.getValue()));
             break;
         case PropertyIsLessThan:
-            BinaryComparisonOpType xb_propLess = (BinaryComparisonOpType) xb_compOpsType.changeType(BinaryComparisonOpType.type);
+            BinaryComparisonOpType xb_propLess =
+                    (BinaryComparisonOpType) xb_compOpsType.changeType(BinaryComparisonOpType.type);
             xb_propLess.getDomNode().setPrefix("ogc");
             xb_propLess.getDomNode().setNodeValue(ComparisonOperator.PropertyIsLessThan.toString());
             xb_propLess.setExpressionArray(createExpressionArray(filter.getPropertyName(), filter.getValue()));
             break;
         case PropertyIsLessThanOrEqualTo:
-            BinaryComparisonOpType xb_propLTE = (BinaryComparisonOpType) xb_compOpsType.changeType(BinaryComparisonOpType.type);
+            BinaryComparisonOpType xb_propLTE =
+                    (BinaryComparisonOpType) xb_compOpsType.changeType(BinaryComparisonOpType.type);
             xb_propLTE.getDomNode().setPrefix("ogc");
             xb_propLTE.getDomNode().setNodeValue(ComparisonOperator.PropertyIsLessThanOrEqualTo.toString());
             xb_propLTE.setExpressionArray(createExpressionArray(filter.getPropertyName(), filter.getValue()));
             break;
         case PropertyIsNotEqualTo:
-            BinaryComparisonOpType xb_propNE = (BinaryComparisonOpType) xb_compOpsType.changeType(BinaryComparisonOpType.type);
+            BinaryComparisonOpType xb_propNE =
+                    (BinaryComparisonOpType) xb_compOpsType.changeType(BinaryComparisonOpType.type);
             xb_propNE.getDomNode().setPrefix("ogc");
             xb_propNE.getDomNode().setNodeValue(ComparisonOperator.PropertyIsNotEqualTo.toString());
             xb_propNE.setExpressionArray(createExpressionArray(filter.getPropertyName(), filter.getValue()));
             break;
         default:
-                throw new InvalidParameterValueException().at(SosConstants.GetObservationParams.result)
-                        .withMessage("Could not encode unknown comparison operator %s", filter.getOperator().toString());
+            throw new InvalidParameterValueException().at(SosConstants.GetObservationParams.result).withMessage(
+                    "Could not encode unknown comparison operator %s", filter.getOperator().toString());
         }
 
         return xb_compOpsType;
     }
 
     /**
-     * Creates an ExpressionArray from a property name and value for use in a BinaryComparisonOpType
+     * Creates an ExpressionArray from a property name and value for use in a
+     * BinaryComparisonOpType
      * 
      * @param propertyName
-     *        The name of the filtered property
+     *            The name of the filtered property
      * @param value
-     *        The filter value
+     *            The filter value
      * @return The ExpressionArray
      */
     public static ExpressionType[] createExpressionArray(String propertyName, String value) {
@@ -315,17 +317,19 @@ public class ITRequestEncoder {
     }
 
     /**
-     * Gets a ResponseModeType.Enum given a responseMode string, or throws exception if not found
+     * Gets a ResponseModeType.Enum given a responseMode string, or throws
+     * exception if not found
      * 
      * @param responseMode
-     *        The responseMode string to look up
+     *            The responseMode string to look up
      * @return The matching ResponseModeType.Enum
-
-     *
+     * 
+     * 
      * @throws OwsExceptionReport
      */
     public static ResponseModeType.Enum getResponseModeEnum(String responseMode) throws OwsExceptionReport {
-        ResponseModeType.Enum responseModeEnum = (ResponseModeType.Enum) ResponseModeType.Enum.table.forString(responseMode);
+        ResponseModeType.Enum responseModeEnum =
+                (ResponseModeType.Enum) ResponseModeType.Enum.table.forString(responseMode);
         if (responseModeEnum == null) {
             throw new InvalidResponseModeParameterException(responseMode);
         }
@@ -334,15 +338,16 @@ public class ITRequestEncoder {
     }
 
     /**
-     * Encodes a TemporalFilter and adds it to an EventTime xmlbean, using correct substitution groups
+     * Encodes a TemporalFilter and adds it to an EventTime xmlbean, using
+     * correct substitution groups
      * 
      * @param tf
-     *        TemporalFilter to encode
+     *            TemporalFilter to encode
      * @param xb_eventTime
-     *        EventTime xmlbean to add encoded temporal filter to
+     *            EventTime xmlbean to add encoded temporal filter to
      * @return EventTime arguments (for convenience)
-
-     *
+     * 
+     * 
      * @throws OwsExceptionReport
      */
     public static EventTime encodeTemporalFilter(TemporalFilter tf, EventTime xb_eventTime) throws OwsExceptionReport {
@@ -356,28 +361,30 @@ public class ITRequestEncoder {
                 throw new InvalidParameterValueException().at(Sos1Constants.GetObservationParams.eventTime)
                         .withMessage("No QName found for temporal operator %s", tf.getOperator().name());
             }
-            BinaryTemporalOpType xb_binaryTempOp = (BinaryTemporalOpType) xb_eventTime.addNewTemporalOps().substitute(timeOpQName,
-                                                                                                                      BinaryTemporalOpType.type);
+            BinaryTemporalOpType xb_binaryTempOp =
+                    (BinaryTemporalOpType) xb_eventTime.addNewTemporalOps().substitute(timeOpQName,
+                            BinaryTemporalOpType.type);
             xb_binaryTempOp.addNewPropertyName().newCursor().setTextValue(OM_SAMPLING_TIME);
             addTimeObject(tf.getTime(), xb_binaryTempOp);
             break;
         default:
-                // operator not implemented, throw error
-                throw new InvalidParameterValueException().at(Sos1Constants.GetObservationParams.eventTime)
-                        .withMessage("Temporal filter %s not implemented in SosRequestEncoder", tf.getOperator());
+            // operator not implemented, throw error
+            throw new InvalidParameterValueException().at(Sos1Constants.GetObservationParams.eventTime).withMessage(
+                    "Temporal filter %s not implemented in SosRequestEncoder", tf.getOperator());
         }
         return xb_eventTime;
     }
 
     /**
-     * Converts an ISosTime to a TimeInstant or TimePeriod on an BinaryTemporalOpType
+     * Converts an ISosTime to a TimeInstant or TimePeriod on an
+     * BinaryTemporalOpType
      * 
      * @param sosTime
-     *        ISosTime to convert (TimeInstant or TimePeriod)
+     *            ISosTime to convert (TimeInstant or TimePeriod)
      * @param xb_binaryTempOps
-     *        BinaryTemporalOpType to add TimeInstant or TimePeriod to
-
-     *
+     *            BinaryTemporalOpType to add TimeInstant or TimePeriod to
+     * 
+     * 
      * @throws OwsExceptionReport
      */
     public static void addTimeObject(Time sosTime, BinaryTemporalOpType xb_binaryTempOps) throws OwsExceptionReport {
@@ -385,9 +392,9 @@ public class ITRequestEncoder {
             return;
         } else if (sosTime instanceof TimeInstant) {
             TimeInstant ti = (TimeInstant) sosTime;
-            TimeInstantType xb_timeInstant = (TimeInstantType) xb_binaryTempOps.addNewTimeObject()
-                    .substitute(QN_TIME_INSTANT,
-                                TimeInstantType.type);
+            TimeInstantType xb_timeInstant =
+                    (TimeInstantType) xb_binaryTempOps.addNewTimeObject().substitute(QN_TIME_INSTANT,
+                            TimeInstantType.type);
             String timeStr;
             if (ti.getIndeterminateValue() != null) {
                 timeStr = ti.getIndeterminateValue();
@@ -397,9 +404,9 @@ public class ITRequestEncoder {
             xb_timeInstant.addNewTimePosition().setStringValue(timeStr);
         } else if (sosTime instanceof TimePeriod) {
             TimePeriod tp = (TimePeriod) sosTime;
-            TimePeriodType xb_timePeriod = (TimePeriodType) xb_binaryTempOps.addNewTimeObject()
-                    .substitute(QN_TIME_PERIOD,
-                                TimePeriodType.type);
+            TimePeriodType xb_timePeriod =
+                    (TimePeriodType) xb_binaryTempOps.addNewTimeObject().substitute(QN_TIME_PERIOD,
+                            TimePeriodType.type);
             String beginTimeStr;
             if (tp.getStartIndet() != null) {
                 beginTimeStr = tp.getStartIndet();
@@ -427,8 +434,7 @@ public class ITRequestEncoder {
         MultiPoint mp = null;
         try {
             mp = (MultiPoint) geom;
-        }
-        catch (ClassCastException e) {
+        } catch (ClassCastException e) {
             throw new InvalidParameterValueException().at(SosConstants.GetObservationParams.featureOfInterest)
                     .causedBy(e).withMessage("BBOX geometry argument not a MultiPoint");
         }

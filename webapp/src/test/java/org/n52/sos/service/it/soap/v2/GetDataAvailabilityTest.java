@@ -30,7 +30,11 @@ import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
+ * Test for SOAP SOS 2.0 GetDataAvailability request.
+ * 
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author Carsten Hollmann <c.hollmann@52north.org>
+ * @since 4.0.0
  */
 public class GetDataAvailabilityTest extends AbstractSosV2SoapTest {
 
@@ -38,12 +42,13 @@ public class GetDataAvailabilityTest extends AbstractSosV2SoapTest {
     @Test
     public void missingServiceParameter() throws XmlException {
         // currently not supported due to missing XML schema
-//        XmlObject getDataAvailabilityDocument =
-//                XmlObject.Factory
-//                        .parse("<sos:GetDataAvailability xmlns:sos=\"http://www.opengis.net/sos/2.0\" version=\"2.0.0\"/>");
-//        MockHttpServletResponse res = execute(getDataAvailabilityDocument);
-//        assertThat(res.getStatus(), is(400));
-//        assertThat(getResponseAsNode(res), is(missingServiceParameterValueExceptionFault()));
+        // XmlObject getDataAvailabilityDocument =
+        // XmlObject.Factory
+        // .parse("<sos:GetDataAvailability xmlns:sos=\"http://www.opengis.net/sos/2.0\" version=\"2.0.0\"/>");
+        // MockHttpServletResponse res = execute(getDataAvailabilityDocument);
+        // assertThat(res.getStatus(), is(400));
+        // assertThat(getResponseAsNode(res),
+        // is(missingServiceParameterValueExceptionFault()));
     }
 
     @Override

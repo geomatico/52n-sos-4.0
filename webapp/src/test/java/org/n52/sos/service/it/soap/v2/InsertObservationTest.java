@@ -31,10 +31,12 @@ import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
+ * Test for SOAP SOS 2.0 InsertObservation request.
+ * 
  * @author Christian Autermann <c.autermann@52north.org>
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk
  *         J&uuml;rrens</a>
- * 
+ * @author Carsten Hollmann <c.hollmann@52north.org>
  * @since 4.0.0
  */
 public class InsertObservationTest extends AbstractSosV2SoapTest {

@@ -62,11 +62,17 @@ public class RequestBuilder {
     public static RequestBuilder head(final String path) {
         return new RequestBuilder("HEAD", path);
     }
+
     private ServletContext context = null;
+
     private final SetMultiMap<String, String> headers = MultiMaps.newSetMultiMap();
+
     private final SetMultiMap<String, String> query = MultiMaps.newSetMultiMap();
+
     private String method = null;
+
     private String path = null;
+
     private String content = null;
 
     private RequestBuilder(final String method, final String path) {
@@ -125,24 +131,23 @@ public class RequestBuilder {
             }
 
             final StringBuilder queryString = new StringBuilder();
-            if (query != null && !query.isEmpty())
-            {
-            	boolean first = true;
-            	for (final String key : query.keySet()) {
-            		final Set<String> values = query.get(key);
-            		req.addParameter(key, values.toArray(new String[values.size()]));
-            		if (first) {
-            			queryString.append("?");
-            			first = false;
-            		} else {
-            			queryString.append("&");
-            		}
-            		queryString.append(key).append("=").append(StringHelper.join(",", values));
-            	}
-            	req.setQueryString(queryString.toString());
+            if (query != null && !query.isEmpty()) {
+                boolean first = true;
+                for (final String key : query.keySet()) {
+                    final Set<String> values = query.get(key);
+                    req.addParameter(key, values.toArray(new String[values.size()]));
+                    if (first) {
+                        queryString.append("?");
+                        first = false;
+                    } else {
+                        queryString.append("&");
+                    }
+                    queryString.append(key).append("=").append(StringHelper.join(",", values));
+                }
+                req.setQueryString(queryString.toString());
             }
             req.setRequestURI(path + queryString.toString());
-            
+
             if (path == null) {
                 path = "/";
             }

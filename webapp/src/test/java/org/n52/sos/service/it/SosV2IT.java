@@ -30,9 +30,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class SosV2IT extends SosITBase {
-    
+
     /*
-     * TODO Accommodate tests to this SOS 
+     * TODO Accommodate tests to this SOS
      */
 
     /**

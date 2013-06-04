@@ -44,12 +44,12 @@ import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.W3CConstants;
 
-
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class SosNamespaceContext implements NamespaceContext {
     private final Map<String, String> prefixForNamespace;
+
     private final Map<String, String> namespaceForPrefix;
 
     public SosNamespaceContext() {

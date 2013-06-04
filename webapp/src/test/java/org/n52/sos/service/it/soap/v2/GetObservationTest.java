@@ -33,7 +33,11 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
+ * Test for SOAP SOS 2.0 GetObservation request.
+ * 
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author Carsten Hollmann <c.hollmann@52north.org>
+ * @since 4.0.0
  */
 public class GetObservationTest extends AbstractSosV2SoapTest {
     @Override

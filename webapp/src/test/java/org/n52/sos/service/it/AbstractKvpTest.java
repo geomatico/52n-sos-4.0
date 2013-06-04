@@ -28,10 +28,14 @@ import org.junit.Test;
 import org.n52.sos.ogc.sos.SosConstants;
 
 /**
+ * Abstract class for SOS KVP tests
+ * 
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author Carsten Hollmann <c.hollmann@52north.org>
+ * @since 4.0.0
  */
 public abstract class AbstractKvpTest extends AbstractSosServiceTest {
-    
+
     protected RequestBuilder builder() {
         return RequestBuilder.get("/kvp").accept(SosConstants.CONTENT_TYPE_XML);
     }

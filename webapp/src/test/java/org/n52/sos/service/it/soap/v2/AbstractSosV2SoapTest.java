@@ -11,6 +11,13 @@ import org.n52.sos.service.it.AbstractSoapTest;
 import org.n52.sos.service.it.SosServiceV2Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+/**
+ * Abstract class for SOS 2.0 SOAP request tests
+ * 
+ * @author Carsten Hollmann <c.hollmann@52north.org>
+ * @since 4.0.0
+ * 
+ */
 public abstract class AbstractSosV2SoapTest extends AbstractSoapTest implements SosServiceV2Test {
 
     protected void addServiceParameter(ExtensibleRequestType extensibleRequestType) {
@@ -24,7 +31,8 @@ public abstract class AbstractSosV2SoapTest extends AbstractSoapTest implements 
     public void missingServiceParameter(ExtensibleRequestType extensibleRequestType, XmlObject xmlDocument) {
         MockHttpServletResponse res = execute(xmlDocument);
         assertThat(res.getStatus(), is(400));
-        assertThat(getResponseAsNode(res), is(invalidRequestMissingParameterExceptionFault(OWSConstants.RequestParams.service.name())));
+        assertThat(getResponseAsNode(res),
+                is(invalidRequestMissingParameterExceptionFault(OWSConstants.RequestParams.service.name())));
     }
 
     @Test
