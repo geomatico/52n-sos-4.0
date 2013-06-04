@@ -23,21 +23,8 @@
  */
 package org.n52.sos.service;
 
-import static org.n52.sos.service.MiscSettings.CHARACTER_ENCODING;
-import static org.n52.sos.service.MiscSettings.DEFAULT_FEATURE_PREFIX;
-import static org.n52.sos.service.MiscSettings.DEFAULT_OBSERVABLEPROPERTY_PREFIX;
-import static org.n52.sos.service.MiscSettings.DEFAULT_OFFERING_PREFIX;
-import static org.n52.sos.service.MiscSettings.DEFAULT_PROCEDURE_PREFIX;
-import static org.n52.sos.service.MiscSettings.GML_DATE_FORMAT;
-import static org.n52.sos.service.MiscSettings.HTTP_STATUS_CODE_USE_IN_KVP_POX_BINDING;
-import static org.n52.sos.service.MiscSettings.SRS_NAME_PREFIX_SOS_V1;
-import static org.n52.sos.service.MiscSettings.SRS_NAME_PREFIX_SOS_V2;
-import static org.n52.sos.service.ServiceSettings.ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR;
-import static org.n52.sos.service.ServiceSettings.MINIMUM_GZIP_SIZE;
-import static org.n52.sos.service.ServiceSettings.SENSOR_DIRECTORY;
-import static org.n52.sos.service.ServiceSettings.SERVICE_URL;
-import static org.n52.sos.service.ServiceSettings.SUPPORTS_QUALITY;
-import static org.n52.sos.service.ServiceSettings.USE_DEFAULT_PREFIXES;
+import static org.n52.sos.service.MiscSettings.*;
+import static org.n52.sos.service.ServiceSettings.*;
 
 import java.net.URI;
 
@@ -67,6 +54,7 @@ public class ServiceConfiguration {
     private String defaultProcedurePrefix;
     private String defaultObservablePropertyPrefix;
     private String defaultFeaturePrefix;
+    private String defaultCoordinateUOM;
     private boolean useDefaultPrefixes;
     private boolean encodeFullChildrenInDescribeSensor;
     private boolean useHttpStatusCodesInKvpAndPoxBinding;
@@ -330,5 +318,17 @@ public class ServiceConfiguration {
         }
         srsNamePrefixSosV2 = prefix;
     }
+    
+    public String getDefaultCoordinateUOM()
+    {
+    	return defaultCoordinateUOM;
+    }
+    
+	@Setting(ServiceSettings.DEFAULT_COORDINATE_UOM)
+	public void setDefaultCoordinateUOM(final String defaultCoordinateUOM)
+	{
+		Validation.notNullOrEmpty(ServiceSettings.DEFAULT_COORDINATE_UOM, defaultCoordinateUOM);
+		this.defaultCoordinateUOM = defaultCoordinateUOM;
+	}
 
 }
