@@ -47,7 +47,7 @@ public class AbstractSensorML extends SosProcedureDescription {
 
     private List<SmlCharacteristics> characteristics = new ArrayList<SmlCharacteristics>(0);
 
-    private List<SmlCapabilities> capabilities = new ArrayList<SmlCapabilities>(0);
+    private final List<SmlCapabilities> capabilities = new ArrayList<SmlCapabilities>(0);
 
     private List<SmlContact> contacts = new ArrayList<SmlContact>(0);
 
@@ -66,7 +66,11 @@ public class AbstractSensorML extends SosProcedureDescription {
     }
 
     public AbstractSensorML setKeywords(final List<String> keywords) {
-        this.keywords = keywords;
+    	if (isSetKeywords()) {
+    		this.keywords.addAll(keywords);
+    	} else {
+    		this.keywords = keywords;
+    	}
         return this;
     }
 
