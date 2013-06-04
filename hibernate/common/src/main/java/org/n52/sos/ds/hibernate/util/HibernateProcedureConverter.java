@@ -30,6 +30,7 @@ import static org.n52.sos.util.HTTPConstants.StatusCode.*;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -37,7 +38,9 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.n52.sos.cache.ContentCache;
 import org.n52.sos.ds.hibernate.HibernateSessionHolder;
+import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
 import org.n52.sos.ds.hibernate.entities.BlobObservation;
 import org.n52.sos.ds.hibernate.entities.BooleanObservation;
 import org.n52.sos.ds.hibernate.entities.CategoryObservation;
@@ -67,13 +70,20 @@ import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.SmlContact;
 import org.n52.sos.ogc.sensorML.SmlResponsibleParty;
 import org.n52.sos.ogc.sensorML.System;
+import org.n52.sos.ogc.sensorML.elements.SmlCapabilities;
 import org.n52.sos.ogc.sensorML.elements.SmlClassifier;
 import org.n52.sos.ogc.sensorML.elements.SmlIdentifier;
 import org.n52.sos.ogc.sensorML.elements.SmlIo;
 import org.n52.sos.ogc.sensorML.elements.SmlPosition;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.sos.SosEnvelope;
+import org.n52.sos.ogc.sos.SosOffering;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
+import org.n52.sos.ogc.swe.DataRecord;
 import org.n52.sos.ogc.swe.SweCoordinate;
+import org.n52.sos.ogc.swe.SweDataRecord;
+import org.n52.sos.ogc.swe.SweEnvelope;
+import org.n52.sos.ogc.swe.SweField;
 import org.n52.sos.ogc.swe.simpleType.SweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SweBoolean;
 import org.n52.sos.ogc.swe.simpleType.SweCategory;
@@ -94,11 +104,27 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+/**
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * @author <a href="mailto:c.hollmann@52north.org">Carsten Hollmann</a>
+ * @author <a href="mailto:c.autermann@52north.org">Christian Autermann</a>
+ * @author ShaneStClair
+ * 
+ * @since 4.0.0
+ * 
+ * TODO
+ * - apply description enrichment to all types of procedures (creates, file, or database)
+ * - use setting switches for code flow
+ */
 public class HibernateProcedureConverter {
     private final Logger LOGGER = LoggerFactory.getLogger(HibernateProcedureConverter.class);
 
-    public SosProcedureDescription createSosProcedureDescription(final Procedure procedure,
-            final String procedureIdentifier, final String outputFormat) throws OwsExceptionReport {
+    public SosProcedureDescription createSosProcedureDescription(
+    		final Procedure procedure,
+            final String procedureId,
+            final String requestedDescriptionFormat,
+            final String requestedServiceVersion,
+            final Session session) throws OwsExceptionReport {
         if (procedure == null) {
             throw new NoApplicableCodeException().causedBy(
                     new IllegalArgumentException("Parameter 'procedure' should not be null!")).setStatus(
@@ -108,9 +134,10 @@ public class HibernateProcedureConverter {
         String xmlDoc = null;
         SosProcedureDescription sosProcedureDescription = null;
 
-        // TODO: check and query for validTime parameter
+        // TODO: check and query for validTime parameter <-- according to request? This todo is unclear to me! (eike)
         if (procedure instanceof TProcedure) {
             final Set<ValidProcedureTime> validProcedureTimes = ((TProcedure)procedure).getValidProcedureTimes();
+            // get the content of the latest validProcedureTime entry 
             for (final ValidProcedureTime validProcedureTime : validProcedureTimes) {
                 if (validProcedureTime.getEndTime() == null) {
                     xmlDoc = validProcedureTime.getDescriptionXml();
@@ -121,49 +148,294 @@ public class HibernateProcedureConverter {
         }
 
         final String descriptionFormat = procedure.getProcedureDescriptionFormat().getProcedureDescriptionFormat();
-        checkOutputFormatWithDescriptionFormat(outputFormat, procedure.getProcedureDescriptionFormat().getProcedureDescriptionFormat(), procedureIdentifier);
-        // check whether SMLFile or Url is set
-        if (filename == null && xmlDoc == null) {
-            final SensorML sml = new SensorML();
-
-            // 2 try to get position from entity
-            if (procedure.isSpatial()) {
-                // 2.1 if position is available -> system -> own class <- should
-                // be compliant with SWE lightweight profile
-                sml.addMember(createSmlSystem(procedure));
-            } else {
-                // 2.2 if no position is available -> processModel -> own class
-                sml.addMember(createSmlProcessModel(procedure));
-            }
-            sosProcedureDescription = sml;
+        checkOutputFormatWithDescriptionFormat(requestedDescriptionFormat, descriptionFormat, procedureId);
+        
+        if (!isDescriptionAvailable(filename, xmlDoc)) {
+            sosProcedureDescription = generateProcedureDescription(procedure);
         } else {
-//            try {
-                if (filename != null && descriptionFormat != null && xmlDoc == null) {
-                    if (filename.startsWith("<")) {
-                        sosProcedureDescription =
-                                createProcedureDescriptionFromXml(procedureIdentifier, filename);
-                    } else {
-                        sosProcedureDescription =
-                                createProcedureDescriptionFromFile(procedureIdentifier, filename);
-                    }
-                } else {
-                    sosProcedureDescription =
-                            createProcedureDescriptionFromXml(procedureIdentifier, xmlDoc);
-                }
-//            } catch (final IOException ioe) {
-//                throw new NoApplicableCodeException().causedBy(ioe)
-//                        .withMessage("An error occured while parsing the sensor description document!")
-//                        .setStatus(INTERNAL_SERVER_ERROR);
-//            } catch (final XmlException xmle) {
-//                throw new XmlDecodingException("sensor description document", xmle)
-//                        .setStatus(INTERNAL_SERVER_ERROR);
-//            }
+        	if (filename != null && descriptionFormat != null && xmlDoc == null) {
+        		if (filename.startsWith("<")) {
+        			sosProcedureDescription =
+        					createProcedureDescriptionFromXml(procedureId, filename);
+        		} else {
+        			sosProcedureDescription =
+        					createProcedureDescriptionFromFile(procedureId, filename);
+        		}
+        	} else {
+        		sosProcedureDescription =
+        				createProcedureDescriptionFromXml(procedureId, xmlDoc);
+        	}
         }
         if (sosProcedureDescription != null) {
+            if (sosProcedureDescription instanceof SensorML && ((SensorML)sosProcedureDescription).isWrapper()) {
+                for (final AbstractProcess abstractProcess :  ((SensorML)sosProcedureDescription).getMembers()) {
+                    addValuesToSensorDescription(abstractProcess, requestedServiceVersion, descriptionFormat, session);
+                }
+            } else {
+                addValuesToSensorDescription(sosProcedureDescription, requestedServiceVersion, descriptionFormat, session);
+            }
             sosProcedureDescription.setDescriptionFormat(descriptionFormat);
         }
         return sosProcedureDescription;
     }
+    
+    private void addValuesToSensorDescription(
+    		final SosProcedureDescription procedureDescription,
+    		final String version,
+    		final String procedureDescriptionFormat,
+            final Session session)
+            		throws OwsExceptionReport {
+    	// enrich with features
+    	if (procedureSettings().isEnrichWithFeatures())
+    	{
+    		final Collection<String> features = getFeatureOfInterestIDsForProcedure(procedureDescription.getIdentifier(), version);
+    		if (features != null && !features.isEmpty()) {
+    			procedureDescription.addFeaturesOfInterest(new HashSet<String>(features));
+    		}
+    	}
+
+        // parent procs
+        final Collection<String> parentProcedures = getParentProcedures(procedureDescription.getIdentifier(), version);
+        if (parentProcedures != null && !parentProcedures.isEmpty()) {
+            procedureDescription.addParentProcedures(new HashSet<String>(parentProcedures));
+        }
+
+        // child procs
+        final Set<SosProcedureDescription> childProcedures =
+                getChildProcedures(procedureDescription.getIdentifier(), procedureDescriptionFormat,
+                       version, session);
+       procedureDescription.addChildProcedures(childProcedures);
+       
+       // enrich with offerings
+       if (procedureSettings().isEnrichWithOfferings())
+       {
+    	   final Collection<SosOffering> offerings = getSosOfferingsForProcedure(procedureDescription.getIdentifier());
+    	   if (offerings != null && !offerings.isEmpty())
+    	   {
+    		   procedureDescription.addOfferings(offerings);
+    	   }
+       }
+       
+       // enrich according to OGC#09-033 Profile for sensor discovery
+       if (procedureSettings().isEnrichWithDiscoveryInformation() && procedureDescription instanceof AbstractSensorML)
+       {
+    	   // TODO Eike: implement enrichment according OGC#09-033 and move already implemented stuff from ProcedureConverter to this class
+    	   if (procedureDescription instanceof AbstractSensorML)
+    	   {
+    		   final AbstractSensorML abstractSensorML = (AbstractSensorML)procedureDescription;
+    		   
+    		   // add observed BBox
+    		   final SmlCapabilities observedBBox = createObservedBBOXCapability(abstractSensorML,
+    				   procedureSettings().getLatLongUom());
+    		   if (observedBBox != null)
+    		   {
+    			   abstractSensorML.addCapabilities(observedBBox);
+    		   }
+
+    		   final String[] observableProperties = getObservablePropertiesForProcedure(procedureDescription.getIdentifier());
+
+
+    		   // add classification
+    		   if (procedureSettings().isGenerateClassification()) {
+    			   final List<SmlClassifier> classifier = createClassifier(abstractSensorML);
+    			   if (classifier != null && !classifier.isEmpty()) {
+    				   abstractSensorML.setClassifications(classifier);
+    			   }
+    		   }
+
+    		   // add longName
+    		   if (!isIdentifierLongNameSet(abstractSensorML))
+    		   {
+    			   abstractSensorML.addIdentifier(createLongName(procedureDescription.getIdentifier()));
+    		   }
+
+    		   // add shortName
+    		   if (!isIdentifierShortNameSet(abstractSensorML))
+    		   {
+    			   abstractSensorML.addIdentifier(createShortName(procedureDescription.getIdentifier()));
+    		   }
+    		   
+    		   // set contacts --> take from service information
+    	        if (procedureSettings().isUseServiceContactAsProcedureContact()) {
+    	            final List<SmlContact> contacts = createContactFromServiceContact();
+    	            if (contacts != null && !contacts.isEmpty()) {
+    	                abstractSensorML.setContact(contacts);
+    	            }
+    	        }
+    	        
+    	        // add keywords TODO use values like longName and shortName and others
+    	        final List<String> keywordsList = createKeywordsList(procedureDescription.getIdentifier(), observableProperties);
+    	        if (keywordsList != null && !keywordsList.isEmpty())
+    	        {
+    	        	abstractSensorML.setKeywords(keywordsList);
+    	        }
+    	   }
+       }
+    }
+
+	private boolean isIdentifierShortNameSet(final AbstractSensorML abstractSensorML)
+	{
+		if (abstractSensorML.isSetIdentifications())
+		{
+			for (final SmlIdentifier smlIdentifier : abstractSensorML.getIdentifications()) {
+				if ((smlIdentifier.isSetName() && smlIdentifier.getName().equalsIgnoreCase(SensorMLConstants.ELEMENT_NAME_SHORT_NAME))
+						|| (smlIdentifier.isSetDefinition() && smlIdentifier.getDefinition().equalsIgnoreCase(procedureSettings().getIdentifierShortNameDefinition())))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean isIdentifierLongNameSet(final AbstractSensorML abstractSensorML)
+	{
+		if (abstractSensorML.isSetIdentifications())
+		{
+			for (final SmlIdentifier smlIdentifier : abstractSensorML.getIdentifications()) {
+				if ((smlIdentifier.isSetName() && smlIdentifier.getName().equalsIgnoreCase(SensorMLConstants.ELEMENT_NAME_LONG_NAME))
+						|| (smlIdentifier.isSetDefinition() && smlIdentifier.getDefinition().equalsIgnoreCase(procedureSettings().getIdentifierLongNameDefinition())))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+    private SmlCapabilities createObservedBBOXCapability(
+    		final AbstractSensorML procedureDescription,
+    		final String uomForCoordinates)
+	{
+		// get all offerings for this procedure
+		final Collection<SosOffering> offeringsForProcedure = getSosOfferingsForProcedure(procedureDescription.getIdentifier());
+		
+		if (offeringsForProcedure == null)
+		{
+			return null;
+		}
+		
+		// get bbox for each offering and merge to one bbox
+		final SosEnvelope mergedBBox = getMergedBBox(offeringsForProcedure);
+		
+		if (mergedBBox == null) 
+		{
+			return null;
+		}
+		// add merged bbox to capabilities as swe:envelope
+		final SweEnvelope envelope = new SweEnvelope(mergedBBox,uomForCoordinates);
+		
+		final SweField field = new SweField(SensorMLConstants.ELEMENT_NAME_OBSERVED_BBOX, envelope);
+
+		final DataRecord datarecord = new SweDataRecord();
+		datarecord.addField(field);
+		
+		final SmlCapabilities capability = new SmlCapabilities();
+		capability.setName(SensorMLConstants.ELEMENT_NAME_OBSERVED_BBOX);
+		capability.setDataRecord(datarecord);
+		
+		return capability;
+	}
+
+	protected SosEnvelope getMergedBBox(final Collection<SosOffering> offeringsForProcedure)
+	{
+		SosEnvelope mergedEnvelope = null;
+		for (final SosOffering sosOffering : offeringsForProcedure)
+		{
+			final SosEnvelope offeringEnvelope = getCache().getEnvelopeForOffering(sosOffering.getOfferingIdentifier());
+			if (offeringEnvelope != null && offeringEnvelope.isSetEnvelope())
+			{
+				if (mergedEnvelope == null) 
+				{
+					mergedEnvelope = offeringEnvelope;
+				}
+				else 
+				{
+					mergedEnvelope.expandToInclude(offeringEnvelope.getEnvelope());
+				}
+			}
+		}
+		return mergedEnvelope;
+	}
+
+    private Collection<String> getFeatureOfInterestIDsForProcedure(
+    		final String procedure,
+    		final String version) throws OwsExceptionReport {
+    	final Set<String> featureIds = CollectionHelper.set();
+    	for (final String offeringId : getCache().getOfferingsForProcedure(procedure)) 
+    	{	
+			featureIds.addAll(getCache().getFeaturesOfInterestForOffering(offeringId));
+		}
+    	return SosHelper.getFeatureIDs(featureIds, version);
+    }
+
+    /**
+     * Add parent procedures to a procedure
+     * 
+     * @param procID
+     *            procedure identifier to add parent procedures to
+     * @param parentProcedureIds
+     *            The parent procedures to add
+
+     *
+     * @throws OwsExceptionReport
+     */
+    private Set<String> getParentProcedures(final String procID, final String version) throws OwsExceptionReport {
+        return getCache().getParentProcedures(procID, false, false);
+    }
+
+    /**
+     * Add a collection of child procedures to a procedure 
+     * 
+     * @param procID
+     *            procedure identifier  to add child procedures to
+     * @param childProcedures
+     *            The child procedures to add
+     *
+     * @throws OwsExceptionReport
+     */
+	private Set<SosProcedureDescription> getChildProcedures(
+			final String procID,
+			final String outputFormat,
+			final String version,
+			final Session session)
+					throws OwsExceptionReport {
+        final Set<SosProcedureDescription> childProcedures = new HashSet<SosProcedureDescription>(0);
+        final Collection<String> childProcedureIds = getCache().getChildProcedures(procID, false, false);
+        if (childProcedureIds != null && !childProcedureIds.isEmpty()) {
+            for (final String childProcID : childProcedureIds) {
+                final Procedure childProcedure = new ProcedureDAO().getProcedureForIdentifier(childProcID, session);
+                final SosProcedureDescription childProcedureDescription = createSosProcedureDescription(childProcedure, childProcID, outputFormat,version,session);
+                addValuesToSensorDescription(childProcedureDescription, version, outputFormat, session);
+				childProcedures.add(childProcedureDescription);
+            }
+        }
+        return childProcedures;
+    }
+    
+    private boolean isDescriptionAvailable(final String filename,
+			final String xmlDoc)
+	{
+		return filename != null || xmlDoc != null;
+	}
+
+	private SosProcedureDescription generateProcedureDescription(final Procedure procedure) throws OwsExceptionReport
+	{
+		SosProcedureDescription sosProcedureDescription;
+		final SensorML sml = new SensorML();
+
+		// 2 try to get position from entity
+		if (procedure.isSpatial()) {
+		    // 2.1 if position is available -> system -> own class <- should
+		    // be compliant with SWE lightweight profile
+		    sml.addMember(createSmlSystem(procedure));
+		} else {
+		    // 2.2 if no position is available -> processModel -> own class
+		    sml.addMember(createSmlProcessModel(procedure));
+		}
+		sosProcedureDescription = sml;
+		return sosProcedureDescription;
+	}
 
     private void checkOutputFormatWithDescriptionFormat(final String outputFormat, final String procedureDescriptionFormat,
             final String procedureIdentifier) throws OwsExceptionReport {
@@ -231,22 +503,6 @@ public class HibernateProcedureConverter {
 
         // 3 set identification
         abstractSensorML.setIdentifications(createIdentifications(procedure.getIdentifier()));
-
-        // 4 set keywords
-        abstractSensorML.setKeywords(createKeywordsList(procedure, observableProperties));
-
-        // 5 set classification
-        if (procedureSettings().isGenerateClassification()) {
-            createClassifier(abstractSensorML);
-        }
-
-        // 6 set contacts --> take from service information?
-        if (procedureSettings().isUseServiceContactAsSensorContact()) {
-            final List<SmlContact> contacts = createContactFromServiceContact();
-            if (contacts != null && !contacts.isEmpty()) {
-                abstractSensorML.setContact(contacts);
-            }
-        }
 
         // 7 set outputs --> observableProperties
         abstractSensorML.setOutputs(createOutputs(procedure, observableProperties));
@@ -406,17 +662,19 @@ public class HibernateProcedureConverter {
         return serviceProvider;
     }
 
-    private void createClassifier(final AbstractSensorML abstractSensorML) {
+    private List<SmlClassifier> createClassifier(final AbstractSensorML abstractSensorML) {
+    	final List<SmlClassifier> classifications = CollectionHelper.list();
         if (!procedureSettings().getClassifierIntendedApplicationValue().isEmpty()) {
-            abstractSensorML.addClassification(new SmlClassifier(INTENDED_APPLICATION, 
+            classifications.add(new SmlClassifier(INTENDED_APPLICATION, 
             		procedureSettings().getClassifierIntendedApplicationDefinition(),
             		procedureSettings().getClassifierIntendedApplicationValue()));
         }
         if (!procedureSettings().getClassifierProcedureTypeValue().isEmpty()) {
-            abstractSensorML.addClassification(new SmlClassifier(PROCEDURE_TYPE,
+            classifications.add(new SmlClassifier(PROCEDURE_TYPE,
             		procedureSettings().getClassifierSensorTypeDefinition(),
             		procedureSettings().getClassifierProcedureTypeValue()));
         }
+        return classifications;
     }
 
     private List<String> createDescriptions(final Procedure procedure, final String[] observableProperties) {
@@ -426,29 +684,42 @@ public class HibernateProcedureConverter {
     }
 
     private List<SmlIdentifier> createIdentifications(final String identifier) {
-        // get long and short name definition from misc settings
-        final SmlIdentifier idUniqueId =
-                new SmlIdentifier(OGCConstants.URN_UNIQUE_IDENTIFIER_END, OGCConstants.URN_UNIQUE_IDENTIFIER,
-                        identifier);
-        final SmlIdentifier idShortName =
-                new SmlIdentifier(SensorMLConstants.ELEMENT_NAME_SHORT_NAME, procedureSettings().getIdentifierShortNameDefinition(), identifier);
-        final SmlIdentifier idLongName =
-                new SmlIdentifier(SensorMLConstants.ELEMENT_NAME_LONG_NAME, procedureSettings().getIdentifierLongNameDefinition(), identifier);
-        return CollectionHelper.list(idUniqueId, idLongName, idShortName);
+        final List<SmlIdentifier> list = CollectionHelper.list();
+        list.add(createIdentifier(identifier));
+        return list;
     }
+
+	private SmlIdentifier createIdentifier(final String identifier)
+	{
+		return new SmlIdentifier(OGCConstants.URN_UNIQUE_IDENTIFIER_END, OGCConstants.URN_UNIQUE_IDENTIFIER,
+		        identifier);
+	}
+
+	private SmlIdentifier createLongName(final String identifier)
+	{
+		return new SmlIdentifier(SensorMLConstants.ELEMENT_NAME_LONG_NAME, procedureSettings().getIdentifierLongNameDefinition(), identifier);
+	}
+
+	private SmlIdentifier createShortName(final String identifier)
+	{
+		return new SmlIdentifier(SensorMLConstants.ELEMENT_NAME_SHORT_NAME, procedureSettings().getIdentifierShortNameDefinition(), identifier);
+	}
 
     protected ServiceConfiguration getServiceConfig() {
         return ServiceConfiguration.getInstance();
     }
 
-    private ProcedureDescriptionSettings procedureSettings() {
+	private ProcedureDescriptionSettings procedureSettings() {
         return ProcedureDescriptionSettings.getInstance();
     }
 
-    private List<String> createKeywordsList(final Procedure procedure, final String[] observableProperties) {
+	// TODO use more values like longName and shortName from procedureDescription
+    private List<String> createKeywordsList(
+    		final String procedureIdentifier,
+    		final String[] observableProperties) {
         final List<String> keywords = CollectionHelper.list();
         keywords.addAll(CollectionHelper.list(observableProperties));
-        keywords.add(procedure.getIdentifier());
+        keywords.add(procedureIdentifier);
         if (procedureSettings().isGenerateClassification()
                 && !procedureSettings().getClassifierIntendedApplicationValue().isEmpty()) {
             keywords.add(procedureSettings().getClassifierIntendedApplicationValue());
@@ -459,19 +730,34 @@ public class HibernateProcedureConverter {
         } 
         // TODO test this and add offering names, too
         if (procedureSettings().isEnrichWithOfferings()) {
-        	keywords.addAll(getOfferingsForProcedure(procedure.getIdentifier()));
+        	keywords.addAll(getOfferingIdentifiersForProcedure(procedureIdentifier));
         }
         return keywords;
     }
 
     protected String[] getObservablePropertiesForProcedure(final String procedureIdentifier) {
-        return Configurator.getInstance().getCache().getObservablePropertiesForProcedure(procedureIdentifier)
+        return getCache().getObservablePropertiesForProcedure(procedureIdentifier)
                 .toArray(new String[0]);
     }
     
-    protected Collection<String> getOfferingsForProcedure(final String procedureIdentifier) {
-    	return Configurator.getInstance().getCache().getOfferingsForProcedure(procedureIdentifier);
+    protected Collection<SosOffering> getSosOfferingsForProcedure(final String procedureIdentifier) {
+		final Collection<String> offeringIds = getCache().getOfferingsForProcedure(procedureIdentifier);
+		final Collection<SosOffering> offerings = CollectionHelper.list();
+		for (final String offeringIdentifier : offeringIds) {
+			final String offeringName = getCache().getNameForOffering(offeringIdentifier);
+			offerings.add(new SosOffering(offeringIdentifier, offeringName));
+		}
+		return offerings;
+	}
+
+	protected Collection<String> getOfferingIdentifiersForProcedure(final String procedureIdentifier) {
+    	return getCache().getOfferingsForProcedure(procedureIdentifier);
     }
+
+	protected ContentCache getCache()
+	{
+		return Configurator.getInstance().getCache();
+	}
 
     private SosProcedureDescription createProcedureDescriptionFromXml(final String procedureIdentifier,
             final String xmlDoc) throws CodedException, OwsExceptionReport {

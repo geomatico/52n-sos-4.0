@@ -26,7 +26,7 @@ package org.n52.sos.ds.hibernate.util;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.number.OrderingComparison.*;
+import static org.hamcrest.number.OrderingComparison.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -35,8 +35,11 @@ import static org.n52.sos.ogc.sensorML.SensorMLConstants.*;
 import static org.n52.sos.ogc.sensorML.elements.SmlClassifier.*;
 import static org.n52.sos.util.StringHelper.join;
 
+import org.hibernate.Session;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.n52.sos.cache.ContentCache;
+import org.n52.sos.cache.WritableCache;
 import org.n52.sos.ds.hibernate.entities.NumericObservation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat;
@@ -52,6 +55,7 @@ import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.System;
 import org.n52.sos.ogc.sensorML.elements.SmlClassifier;
 import org.n52.sos.ogc.sensorML.elements.SmlIdentifier;
+import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.service.ProcedureDescriptionSettings;
 import org.n52.sos.service.ServiceConfiguration;
@@ -73,13 +77,19 @@ public class HibernateProcedureConverterTest {
 	
 	private static final String[] OBSERVABLE_PROPERTIES = {"test-obserable-property-1","test-obserable-property-2"};
 
+	private static final String SERVICE_VERSION = Sos2Constants.SERVICEVERSION;
+
+	private static ContentCache CONTENT_CACHE = null;
+
+	private static Session SESSION = null;
+
 	private static HibernateProcedureConverter converter;
 	
 	private static Procedure spatialProcedure;
 	
 	private static Procedure nonSpatialProc;
 
-	private static String PROCEDURE_DESCRIPTION_SPATIAL;
+	private static String METHOD_DESCRIPTION;
 	
 	@BeforeClass
 	public static void initFixtures()
@@ -105,16 +115,20 @@ public class HibernateProcedureConverterTest {
 				PROCEDURE_IDENTIFIER,
 				join(",", (Object[])OBSERVABLE_PROPERTIES));
 		
-		PROCEDURE_DESCRIPTION_SPATIAL = format(
-				ProcedureDescriptionSettings.getInstance().getDescriptionTemplate(),
-				"sensor system",
+		METHOD_DESCRIPTION = format(
+				ProcedureDescriptionSettings.getInstance().getProcessMethodRulesDefinitionDescriptionTemplate(),
 				PROCEDURE_IDENTIFIER,
-				join(",", (Object[])OBSERVABLE_PROPERTIES));
+				join(",", (Object[])OBSERVABLE_PROPERTIES)
+				);
+		
+		CONTENT_CACHE = new WritableCache();
 	}
 	
 	@BeforeClass
 	public static void initConverterMockup() throws OwsExceptionReport
 	{
+		SESSION = mock(Session.class);
+		
 		converter = mock(HibernateProcedureConverter.class);
 		when(converter.getObservablePropertiesForProcedure(anyString())).thenReturn(OBSERVABLE_PROPERTIES);
 		
@@ -124,13 +138,16 @@ public class HibernateProcedureConverterTest {
 		
 		when(converter.getServiceConfig()).thenReturn(mock(ServiceConfiguration.class));
 		
-		when(converter.createSosProcedureDescription(any(Procedure.class), anyString(), anyString())).thenCallRealMethod();
+		when(converter.createSosProcedureDescription(any(Procedure.class), anyString(), anyString(), anyString(), any(Session.class))).thenCallRealMethod();
+		
+		when(converter.getCache()).thenReturn(CONTENT_CACHE);
+		
 	}
 	
 	@Test(expected=NoApplicableCodeException.class) public void 
 	should_throw_exception_with_null_parameters()
 			throws OwsExceptionReport {
-		converter.createSosProcedureDescription(null, null, null);
+		converter.createSosProcedureDescription(null, null, null, null, null);
 	}
 	
 	@Test public void 
@@ -139,7 +156,9 @@ public class HibernateProcedureConverterTest {
 		final SosProcedureDescription description = converter.createSosProcedureDescription(
 				spatialProcedure, 
 				PROCEDURE_IDENTIFIER,
-				NS_SML);
+				NS_SML,
+				SERVICE_VERSION,
+				SESSION);
 		assertThat(description, is(instanceOf(SensorML.class)));
 		final SensorML smlDesc = (SensorML)description; 
 		assertThat(smlDesc.getMembers().get(0), instanceOf(System.class));
@@ -151,7 +170,9 @@ public class HibernateProcedureConverterTest {
 		final SosProcedureDescription description = converter.createSosProcedureDescription(
 				nonSpatialProc,
 				PROCEDURE_IDENTIFIER,
-				NS_SML);
+				NS_SML,
+				SERVICE_VERSION,
+				SESSION);
 		assertThat(description, is(instanceOf(SensorML.class)));
 		final SensorML smlDesc = (SensorML)description; 
 		assertThat(smlDesc.getMembers().get(0), instanceOf(ProcessModel.class));
@@ -211,8 +232,9 @@ public class HibernateProcedureConverterTest {
 	throws OwsExceptionReport {
 		final ProcessModel pModel = setupProcessModel();
 		assertThat(pModel.getMethod().getRulesDefinition(), instanceOf(RulesDefinition.class));
-		assertThat(pModel.getMethod().getRulesDefinition().getDescription(), instanceOf(String.class)); // FIXME how to use assertThat with boolean values
-		assertThat(pModel.getMethod().getRulesDefinition().getDescription().length(), is(greaterThan(0)));
+		assertThat(pModel.getMethod().getRulesDefinition().isSetDescription(), is(Boolean.TRUE));
+		assertThat(pModel.getMethod().getRulesDefinition().getDescription().isEmpty(), is(Boolean.FALSE));
+		assertThat(pModel.getMethod().getRulesDefinition().getDescription(), is(METHOD_DESCRIPTION));
 	}
 	
 	@Test public void 
@@ -293,10 +315,21 @@ public class HibernateProcedureConverterTest {
 	
 	protected AbstractProcess setupAbstractProcess() throws OwsExceptionReport
 	{
-		final SensorML description = (SensorML) converter.createSosProcedureDescription(nonSpatialProc, PROCEDURE_IDENTIFIER, NS_SML);
+		final SensorML description = (SensorML) converter.createSosProcedureDescription(
+				nonSpatialProc,
+				PROCEDURE_IDENTIFIER,
+				NS_SML,
+				SERVICE_VERSION,
+				SESSION);
 		assertThat(description.getMembers().size(), is(1));
 		final AbstractProcess process = description.getMembers().get(0);
 		return process;
+	}
+
+	@Test
+	public void testCreateIdentifications()
+	 throws Exception {
+	
 	}
 	
 }

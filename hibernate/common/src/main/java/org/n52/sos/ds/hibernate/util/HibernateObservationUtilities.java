@@ -61,9 +61,9 @@ import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.AbstractPhenomenon;
-import org.n52.sos.ogc.om.ObservationValue;
-import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.MultiObservationValues;
+import org.n52.sos.ogc.om.OMConstants;
+import org.n52.sos.ogc.om.ObservationValue;
 import org.n52.sos.ogc.om.OmObservableProperty;
 import org.n52.sos.ogc.om.OmObservation;
 import org.n52.sos.ogc.om.OmObservationConstellation;
@@ -73,12 +73,12 @@ import org.n52.sos.ogc.om.quality.SosQuality;
 import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.CountValue;
-import org.n52.sos.ogc.om.values.Value;
 import org.n52.sos.ogc.om.values.NilTemplateValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.om.values.UnknownValue;
+import org.n52.sos.ogc.om.values.Value;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -165,7 +165,7 @@ public class HibernateObservationUtilities {
      *             * If an error occurs
      */
     public static List<OmObservation> createSosObservationsFromObservations(
-            final Collection<Observation> observations, final String version, String resultModel, final Session session)
+            final Collection<Observation> observations, final String version, final String resultModel, final Session session)
             throws OwsExceptionReport {
         final List<OmObservation> observationCollection = new ArrayList<OmObservation>(0);
 
@@ -192,9 +192,12 @@ public class HibernateObservationUtilities {
                 } else {
                     if (getConfiguration().getActiveProfile().isEncodeProcedureInObservation()) {
                         procedure =
-                                new HibernateProcedureConverter().createSosProcedureDescription(hProcedure,
-                                        procedureIdentifier, hProcedure.getProcedureDescriptionFormat()
-                                                .getProcedureDescriptionFormat());
+                                new HibernateProcedureConverter().createSosProcedureDescription(
+                                		hProcedure,
+                                        procedureIdentifier,
+                                        hProcedure.getProcedureDescriptionFormat().getProcedureDescriptionFormat(),
+                                        version,
+                                        session);
                     } else {
                         procedure =
                                 new SosProcedureDescriptionUnknowType(procedureIdentifier, hProcedure
@@ -248,7 +251,7 @@ public class HibernateObservationUtilities {
                             getObservationConstellation(hProcedure, hObservableProperty, hObservation.getOfferings(),
                                     session);
                     if (hObservationConstellation != null) {
-                        String observationType = hObservationConstellation.getObservationType().getObservationType();
+                        final String observationType = hObservationConstellation.getObservationType().getObservationType();
                         obsConst.setObservationType(observationType);
                         if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)
                                 || observationType.equals(OMConstants.OBS_TYPE_OBSERVATION)) {
