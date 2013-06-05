@@ -109,6 +109,8 @@ public interface SWEConstants {
     String EN_OFFERING = "offering";
 
     String EN_QUANTITY = "Quantity";
+    
+    String EN_QUANTITY_RANGE = "QuantityRange";
 
     String EN_SIMPLEDATARECORD = "SimpleDataRecord";
 
@@ -166,6 +168,8 @@ public interface SWEConstants {
     QName QN_QUANTITY_SWE_101 = new QName(NS_SWE_101, EN_QUANTITY, NS_SWE_PREFIX);
 
     QName QN_QUANTITY_SWE_200 = new QName(NS_SWE_20, EN_QUANTITY, NS_SWE_PREFIX);
+    
+    QName QN_QUANTITY_RANGE_SWE_200 = new QName(NS_SWE_20, EN_QUANTITY_RANGE, NS_SWE_PREFIX);
 
     QName QN_SIMPLEDATARECORD_SWE_101 = new QName(NS_SWE_101, EN_SIMPLEDATARECORD, NS_SWE_PREFIX);
     QName QN_DATA_RECORD_SWE_101 = new QName(NS_SWE_101, EN_DATA_RECORD, NS_SWE_PREFIX);
