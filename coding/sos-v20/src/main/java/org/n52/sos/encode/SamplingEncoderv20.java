@@ -38,6 +38,7 @@ import net.opengis.samplingSpatial.x20.ShapeType;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.apache.xmlbeans.XmlOptions;
 import org.joda.time.DateTime;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
@@ -149,17 +150,16 @@ public class SamplingEncoderv20 implements Encoder<XmlObject, AbstractFeature> {
                             .getXmlOptions());
             if (sampFeat.getXmlDescription() != null) {
                 try {
-                    XmlObject feature = XmlObject.Factory.parse(sampFeat.getXmlDescription());
+                    XmlObject feature = XmlObject.Factory.parse(sampFeat.getXmlDescription(), XmlOptionsHelper.getInstance().getXmlOptions());
+                    XmlHelper.updateGmlIDs(feature.getDomNode().getFirstChild(), absFeature.getGmlId(), null);
                     if (XmlHelper.getNamespace(feature).equals(SFConstants.NS_SAMS)) {
-                        if (feature instanceof SFSpatialSamplingFeatureDocument) {
-                            xbSampFeatDoc = (SFSpatialSamplingFeatureDocument) feature;
-                        } else if (feature instanceof SFSpatialSamplingFeatureType) {
+                        if (feature instanceof SFSpatialSamplingFeatureType) {
+                           
                             xbSampFeatDoc.setSFSpatialSamplingFeature((SFSpatialSamplingFeatureType) feature);
+                            return xbSampFeatDoc;
                         }
-                        XmlHelper
-                                .updateGmlIDs(xbSampFeatDoc.getDomNode().getFirstChild(), absFeature.getGmlId(), null);
-                        return xbSampFeatDoc;
-                    }
+                    } 
+                    return feature;
                 } catch (XmlException xmle) {
                     throw new NoApplicableCodeException()
                             .causedBy(xmle)
