@@ -84,6 +84,8 @@ public interface SWEConstants {
 
     String EN_DATA_ARRAY = "DataArray";
 
+    String EN_DATA_ARRAY_PROPERTY_TYPE = "DataArrayPropertyType";
+
     String EN_DATA_CHOICE = "DataChoice";
     
     String EN_DATA_RECORD = "DataRecord";
@@ -146,6 +148,8 @@ public interface SWEConstants {
     QName QN_DATA_ARRAY_SWE_200 = new QName(NS_SWE_20, EN_DATA_ARRAY, NS_SWE_PREFIX);
 
     QName QN_DATA_RECORD_SWE_200 = new QName(NS_SWE_20, EN_DATA_RECORD, NS_SWE_PREFIX);
+
+    QName QN_DATA_ARRAY_PROPERTY_TYPE_SWE_200 = new QName(NS_SWE_20, EN_DATA_ARRAY_PROPERTY_TYPE, NS_SWE_PREFIX);
 
     QName QN_DELETE_SENSOR = new QName(NS_SWES_20, EN_DELETE_SENSOR, NS_SWES_PREFIX);
 

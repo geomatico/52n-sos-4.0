@@ -30,15 +30,23 @@ import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
+import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.soap.SoapFault;
 import org.n52.sos.soap.SoapHelper;
 import org.n52.sos.soap.SoapRequest;
 import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3.x2003.x05.soapEnvelope.Body;
+import org.w3.x2003.x05.soapEnvelope.EnvelopeDocument;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * class encapsulates decoding methods for SOAP elements.
@@ -51,40 +59,43 @@ public class Soap12Decoder extends AbstractSoapDecoder {
     public Soap12Decoder() {
         super(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE);
         LOGGER.debug("Decoder for the following keys initialized successfully: {}!",
-                     StringHelper.join(", ", getDecoderKeyTypes()));
+                StringHelper.join(", ", getDecoderKeyTypes()));
     }
 
     /**
      * Parses SOAP 1.2 Envelope to a SOS internal SOAP request.
-     *
-     * @param doc request as xml representation
-     *
+     * 
+     * @param doc
+     *            request as xml representation
+     * 
      * @return SOS internal SOAP request
-     *
-     * @throws OwsExceptionReport if an error occurs.
+     * 
+     * @throws OwsExceptionReport
+     *             if an error occurs.
      */
     @Override
     protected SoapRequest createEnvelope(XmlObject doc) throws OwsExceptionReport {
-        SoapRequest soapRequest = new SoapRequest(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE,
-                                                  SOAPConstants.SOAP_1_2_PROTOCOL);
+        SoapRequest soapRequest =
+                new SoapRequest(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE, SOAPConstants.SOAP_1_2_PROTOCOL);
+
         String soapAction = "";
         try {
             SOAPMessage message;
             try {
                 message = SoapHelper.getSoapMessageForProtocol(SOAPConstants.SOAP_1_2_PROTOCOL, doc.newInputStream());
             } catch (IOException ioe) {
-                throw new NoApplicableCodeException().causedBy(ioe)
-                        .withMessage("Error while parsing SOAPMessage from request string!");
+                throw new NoApplicableCodeException().causedBy(ioe).withMessage(
+                        "Error while parsing SOAPMessage from request string!");
             } catch (SOAPException soape) {
-                throw new NoApplicableCodeException().causedBy(soape)
-                        .withMessage("Error while parsing SOAPMessage from request string!");
+                throw new NoApplicableCodeException().causedBy(soape).withMessage(
+                        "Error while parsing SOAPMessage from request string!");
             }
             try {
                 if (message.getSOAPHeader() != null) {
                     soapRequest.setSoapHeader(getSoapHeader(message.getSOAPHeader()));
                 }
                 soapRequest.setAction(checkSoapAction(soapAction, soapRequest.getSoapHeader()));
-                soapRequest.setSoapBodyContent(getSOAPBodyContent(message));
+                soapRequest.setSoapBodyContent(getBodyContent((EnvelopeDocument) doc));
             } catch (SOAPException soape) {
                 throw new NoApplicableCodeException().causedBy(soape).withMessage("Error while parsing SOAPMessage!");
             }
@@ -105,5 +116,25 @@ public class Soap12Decoder extends AbstractSoapDecoder {
         return r;
     }
 
-    
+    private XmlObject getBodyContent(EnvelopeDocument doc) throws CodedException {
+        Body body = doc.getEnvelope().getBody();
+        try {
+            Node domNode = body.getDomNode();
+            if (domNode.hasChildNodes()) {
+                NodeList childNodes = domNode.getChildNodes();
+                for (int i = 0; i < childNodes.getLength(); i++) {
+                    Node node = childNodes.item(i);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        XmlObject content = XmlObject.Factory.parse(node);
+                        // fix problem with invalid prefix in xsi:type value for om:result and OM_SWEArrayObservation type.
+                        XmlHelper.fixNamespaceForXsiType(content, SWEConstants.QN_DATA_ARRAY_PROPERTY_TYPE_SWE_200);
+                        return content;
+                    }
+                }
+            }
+            return body;
+        } catch (XmlException xmle) {
+            throw new NoApplicableCodeException().causedBy(xmle).withMessage("Error while parsing SOAP body element!");
+        }
+    }
 }

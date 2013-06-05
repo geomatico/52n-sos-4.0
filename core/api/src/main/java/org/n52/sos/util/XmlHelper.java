@@ -412,34 +412,36 @@ public final class XmlHelper {
 
     public static void updateGmlIDs(Node node, String gmlID, String oldGmlID) {
         // check this node's attributes
-        String nodeNamespace = node.getNamespaceURI();
-        NamedNodeMap attributes = node.getAttributes();
-        if (attributes != null) {
-            for (int i = 0, len = attributes.getLength(); i < len; i++) {
-                Attr attr = (Attr) attributes.item(i);
-                if (attr.getLocalName().equals(GMLConstants.AN_ID)) {
-                    String attrNamespace = attr.getNamespaceURI();
-                    if ((attrNamespace != null && GMLConstants.NS_GML.equals(attrNamespace) || GMLConstants.NS_GML_32
-                            .equals(attrNamespace))
-                            || (attrNamespace == null && nodeNamespace != null
-                                    && GMLConstants.NS_GML.equals(nodeNamespace) || GMLConstants.NS_GML_32
-                                        .equals(nodeNamespace)) || (attr.getName().equals("gml:id"))) {
-                        if (oldGmlID == null) {
-                            oldGmlID = attr.getValue();
-                            attr.setValue((gmlID));
-                        } else {
-                            String helperString = attr.getValue();
-                            helperString = helperString.replace(oldGmlID, gmlID);
-                            attr.setValue(helperString);
+        if (node != null) {
+            String nodeNamespace = node.getNamespaceURI();
+            NamedNodeMap attributes = node.getAttributes();
+            if (attributes != null) {
+                for (int i = 0, len = attributes.getLength(); i < len; i++) {
+                    Attr attr = (Attr) attributes.item(i);
+                    if (attr.getLocalName().equals(GMLConstants.AN_ID)) {
+                        String attrNamespace = attr.getNamespaceURI();
+                        if ((attrNamespace != null && GMLConstants.NS_GML.equals(attrNamespace) || GMLConstants.NS_GML_32
+                                .equals(attrNamespace))
+                                || (attrNamespace == null && nodeNamespace != null
+                                        && GMLConstants.NS_GML.equals(nodeNamespace) || GMLConstants.NS_GML_32
+                                            .equals(nodeNamespace)) || (attr.getName().equals("gml:id"))) {
+                            if (oldGmlID == null) {
+                                oldGmlID = attr.getValue();
+                                attr.setValue((gmlID));
+                            } else {
+                                String helperString = attr.getValue();
+                                helperString = helperString.replace(oldGmlID, gmlID);
+                                attr.setValue(helperString);
+                            }
                         }
                     }
                 }
-            }
-            // recurse this node's children
-            NodeList children = node.getChildNodes();
-            if (children != null) {
-                for (int i = 0, len = children.getLength(); i < len; i++) {
-                    updateGmlIDs(children.item(i), gmlID, oldGmlID);
+                // recurse this node's children
+                NodeList children = node.getChildNodes();
+                if (children != null) {
+                    for (int i = 0, len = children.getLength(); i < len; i++) {
+                        updateGmlIDs(children.item(i), gmlID, oldGmlID);
+                    }
                 }
             }
         }
@@ -574,5 +576,31 @@ public final class XmlHelper {
             }
         }
         c.dispose();
+    }
+    
+    public static void fixNamespaceForXsiType(final XmlObject object, QName value) {
+        XmlCursor cursor = object.newCursor();
+        while (cursor.hasNextToken()) {
+            if (cursor.toNextToken().isStart()) {
+                final String xsiType = cursor.getAttributeText(W3CConstants.QN_XSI_TYPE);
+                if (xsiType != null) {
+
+                    final String[] toks = xsiType.split(":");
+                    String localName;
+                    if (toks.length > 1) {
+                        localName = toks[1];
+                    } else {
+                        localName = toks[0];
+                    }
+                    if (localName.equals(value.getLocalPart())) {
+                        cursor.setAttributeText(W3CConstants.QN_XSI_TYPE,
+                                XmlHelper.getPrefixForNamespace(object, value.getNamespaceURI()) + ":"
+                                        + value.getLocalPart());
+                    }
+                }
+            }
+        }
+        cursor.dispose();
+
     }
 }

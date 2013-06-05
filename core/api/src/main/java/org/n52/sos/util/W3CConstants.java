@@ -33,6 +33,7 @@ public interface W3CConstants {
     // attribute names
     String AN_HREF = "href";
     String AN_TITLE = "title";
+    String AN_TYPE = "type";
     String AN_SCHEMA_LOCATION = "schemaLocation";
     // namespaces and schema locations
     String NS_XLINK = "http://www.w3.org/1999/xlink";
@@ -44,4 +45,5 @@ public interface W3CConstants {
     String NS_XS_PREFIX = "xs";
     QName QN_SCHEMA_LOCATION = new QName(NS_XSI, AN_SCHEMA_LOCATION);
     QName QN_SCHEMA_LOCATION_PREFIXED = new QName(NS_XSI, AN_SCHEMA_LOCATION, NS_XSI_PREFIX);
+    QName QN_XSI_TYPE = new QName(NS_XSI, AN_TYPE, NS_XSI_PREFIX);
 }
