@@ -41,6 +41,7 @@ import org.n52.sos.ogc.om.OmObservationConstellation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.CollectionHelper;
 
 /**
  * Hibernate data access class for observation constellation
@@ -213,6 +214,7 @@ public class ObservationConstellationDAO {
      *            Hibernate session
      * @return Observation constellation object
      */
+    @SuppressWarnings("unchecked")
     public ObservationConstellation updateObservationConstellation(ObservationConstellation observationConstellation,
             String observationType, Session session) {
         ObservationType obsType = new ObservationTypeDAO().getObservationTypeObject(observationType, session);
@@ -227,23 +229,23 @@ public class ObservationConstellationDAO {
                         .getOfferingsForProcedure(observationConstellation.getProcedure().getIdentifier()));
         offerings.remove(observationConstellation.getOffering().getIdentifier());
 
-        @SuppressWarnings("unchecked")
-        List<ObservationConstellation> hiddenChildObsConsts =
-                session.createCriteria(ObservationConstellation.class)
-                        .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
-                        .add(Restrictions.eq(ObservationConstellation.OBSERVABLE_PROPERTY,
-                                observationConstellation.getObservableProperty()))
-                        .add(Restrictions.eq(ObservationConstellation.PROCEDURE,
-                                observationConstellation.getProcedure()))
-                        .add(Restrictions.eq(ObservationConstellation.HIDDEN_CHILD, true))
-                        .createCriteria(ObservationConstellation.OFFERING)
-                        .add(Restrictions.in(Offering.IDENTIFIER, offerings)).list();
-        for (ObservationConstellation hiddenChildObsConst : hiddenChildObsConsts) {
-            hiddenChildObsConst.setObservationType(obsType);
-            session.saveOrUpdate(hiddenChildObsConst);
+        if (CollectionHelper.isNotEmpty(offerings)) {
+            Criteria c =
+                    session.createCriteria(ObservationConstellation.class)
+                            .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                            .add(Restrictions.eq(ObservationConstellation.OBSERVABLE_PROPERTY,
+                                    observationConstellation.getObservableProperty()))
+                            .add(Restrictions.eq(ObservationConstellation.PROCEDURE,
+                                    observationConstellation.getProcedure()))
+                            .add(Restrictions.eq(ObservationConstellation.HIDDEN_CHILD, true));
+            c.createCriteria(ObservationConstellation.OFFERING).add(Restrictions.in(Offering.IDENTIFIER, offerings));
+            List<ObservationConstellation> hiddenChildObsConsts = c.list();
+            for (ObservationConstellation hiddenChildObsConst : hiddenChildObsConsts) {
+                hiddenChildObsConst.setObservationType(obsType);
+                session.saveOrUpdate(hiddenChildObsConst);
+            }
         }
 
         return observationConstellation;
     }
-
 }
