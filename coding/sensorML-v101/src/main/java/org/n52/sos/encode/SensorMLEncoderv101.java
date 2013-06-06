@@ -112,8 +112,8 @@ import org.n52.sos.ogc.sensorML.elements.SmlPosition;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.sos.SosOffering;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
+import org.n52.sos.ogc.sos.SosOffering;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
 import org.n52.sos.ogc.swe.SWEConstants;
@@ -816,7 +816,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         int counter = 1;
         final Set<String> outputNames = CollectionHelper.set();
         for (final SmlIo<?> sosSMLIo : sosOutputs) {
-            if (!definitions.contains(sosSMLIo.getIoValue().getDefinition())) {
+            if (sosSMLIo.isSetValue() && !definitions.contains(sosSMLIo.getIoValue().getDefinition())) {
                 if (!sosSMLIo.isSetName() || outputNames.contains(sosSMLIo.getIoName())) {
                     sosSMLIo.setIoName(getValidOutputName(counter++, outputNames));
                 }
