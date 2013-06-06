@@ -133,4 +133,10 @@ public class SosOffering implements Comparable<SosOffering> {
 		return getOfferingIdentifier().compareTo(o.getOfferingIdentifier());
 	}
 
+    @Override
+    public String toString() {
+        return "SosOffering [offeringIdentifier=" + offeringIdentifier
+                + ", offeringName=" + offeringName + ", parentOfferingFlag="
+                + parentOfferingFlag + "]";
+    }
 }
