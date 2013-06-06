@@ -23,10 +23,14 @@
             <column name="descriptionFile" />
         </property>
         <!-- optional properties, used for automatic sensor description creation if available -->
-        <!-- <property name="geom" type="org.hibernate.spatial.GeometryType">
+        <!-- remove the comments around the property "geom" if the procedures have a geometry column -->
+        <!--
+        <property name="geom" type="org.hibernate.spatial.GeometryType">
             <column name="geom" unique="true" />
-        </property> -->
+        </property>
+        -->
         <!-- supports types bigDecimal and string -->
+        <!-- remove the comments around the next properties as need (leave altitude if only 2d coordinates are required) -->
         <!--  
         <property name="longitude" type="bigDecimal">
            <column name="longitude" unique="true" />
@@ -34,12 +38,14 @@
         <property name="latitude" type="bigDecimal">
         	<column name="latitude" unique="true" />
         </property>
-        <property name="altitude" type="bigDecimal">
-        	<column name="altitude" unique="true" />
-        </property>
         <property name="srid" type="integer">
         	<column name="srid" unique="true" />
         </property> 
+        -->
+        <!--
+        <property name="altitude" type="bigDecimal">
+        	<column name="altitude" unique="true" />
+        </property>
         -->
     </class>
 </hibernate-mapping>
