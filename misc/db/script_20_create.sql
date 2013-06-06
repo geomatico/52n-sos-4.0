@@ -61,10 +61,8 @@ alter table countValue add constraint observationCountValueFk foreign key (obser
 create index featureOfInterestIdentifierIdx on featureOfInterest (identifier);
 alter table featureOfInterest add constraint featureFeatureTypeFk foreign key (featureOfInterestTypeId) references featureOfInterestType;
 alter table featureOfInterest add constraint featureCodespaceFk foreign key (codespaceId) references codespace;
-alter table featureRelation add constraint featureOfInterest_parentFk foreign key (parentFeatureId) references observableProperty;
-alter table featureRelation add constraint FKFD198312780C440 foreign key (parentFeatureId) references featureOfInterest;
-alter table featureRelation add constraint FKFD198312DA85B80E foreign key (childFeatureId) references featureOfInterest;
-alter table featureRelation add constraint featureOfInterestChildFk foreign key (childFeatureId) references observableProperty;
+alter table featureRelation add constraint featureOfInterestParentFk foreign key (parentFeatureId) references featureOfInterest;
+alter table featureRelation add constraint featureOfInterestChildFk foreign key (childFeatureId) references featureOfInterest;
 alter table geometryValue add constraint observationGeometryValueFk foreign key (observationId) references observation;
 alter table numericValue add constraint observationNumericValueFk foreign key (observationId) references observation;
 create index obsResultTimeIdx on observation (resultTime);
