@@ -26,6 +26,7 @@ package org.n52.sos.ds.hibernate.dao;
 import java.sql.Timestamp;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 
 /**
@@ -43,10 +44,10 @@ public abstract class TimeCreator {
      * @return Time period object
      */
     public TimePeriod createTimePeriod(Timestamp minStart, Timestamp maxStart, Timestamp maxEnd) {
-        DateTime start = new DateTime(minStart);
-        DateTime end = new DateTime(maxStart);
+        DateTime start = new DateTime(minStart, DateTimeZone.UTC);
+        DateTime end = new DateTime(maxStart, DateTimeZone.UTC);
         if (maxEnd != null) {
-            DateTime endTmp = new DateTime(maxEnd);
+            DateTime endTmp = new DateTime(maxEnd, DateTimeZone.UTC);
             if (endTmp.isAfter(end)) {
                 end = endTmp;
             }
