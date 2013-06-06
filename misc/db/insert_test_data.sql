@@ -138,7 +138,7 @@ LANGUAGE 'sql';
 CREATE OR REPLACE FUNCTION insertOffering(text) RETURNS bigint AS
 $$
 	INSERT INTO offering(offeringId,hibernateDiscriminator, identifier, name) 
-		SELECT nextval('offeringId_seq'),'T',$1, $1 || 'Name'::text
+		SELECT nextval('offeringId_seq'),'T',$1, $1 || ' name'::text
 		WHERE $1 NOT IN (
 			SELECT identifier FROM offering);
 	SELECT offeringId FROM offering WHERE identifier = $1;
