@@ -39,6 +39,7 @@ import org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider;
 import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.DataConnectionProvider;
+import org.n52.sos.ds.hibernate.type.UtcTimestampType;
 import org.n52.sos.exception.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,7 +156,11 @@ public class SessionFactoryProvider implements DataConnectionProvider {
               configuration.addDirectory(new File(this.getClass().getResource("/mapping/transactional").toURI()));
             }
             configuration.mergeProperties(properties);
+            
+            //set timestamp mapping to a special type to ensure time is always queried in UTC
 
+            configuration.registerTypeOverride(new UtcTimestampType());
+            
             ServiceRegistry serviceRegistry =
                     new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
             this.sessionFactory = configuration.buildSessionFactory(serviceRegistry);

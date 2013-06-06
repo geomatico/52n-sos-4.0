@@ -38,6 +38,7 @@ import java.util.Set;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.n52.sos.cache.ContentCache;
 import org.n52.sos.ds.FeatureQueryHandler;
 import org.n52.sos.ds.hibernate.dao.ResultTemplateDAO;
@@ -362,17 +363,17 @@ public class HibernateObservationUtilities {
         sosObservation.setTokenSeparator(getTokenSeparator());
         sosObservation.setTupleSeparator(getTupleSeparator());
         sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
-        sosObservation.setResultTime(new TimeInstant(new DateTime(hObservation.getResultTime())));
+        sosObservation.setResultTime(new TimeInstant(new DateTime(hObservation.getResultTime(), DateTimeZone.UTC)));
         sosObservation.setValue(new SingleObservationValue(getPhenomenonTime(hObservation), value));
         return sosObservation;
     }
 
     private static Time getPhenomenonTime(final Observation hObservation) {
         // create time element
-        final DateTime phenStartTime = new DateTime(hObservation.getPhenomenonTimeStart());
+        final DateTime phenStartTime = new DateTime(hObservation.getPhenomenonTimeStart(), DateTimeZone.UTC);
         DateTime phenEndTime;
         if (hObservation.getPhenomenonTimeEnd() != null) {
-            phenEndTime = new DateTime(hObservation.getPhenomenonTimeEnd());
+            phenEndTime = new DateTime(hObservation.getPhenomenonTimeEnd(), DateTimeZone.UTC);
         } else {
             phenEndTime = phenStartTime;
         }

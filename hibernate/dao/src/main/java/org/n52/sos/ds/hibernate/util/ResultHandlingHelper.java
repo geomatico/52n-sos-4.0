@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.n52.sos.ds.hibernate.entities.BlobObservation;
 import org.n52.sos.ds.hibernate.entities.BooleanObservation;
 import org.n52.sos.ds.hibernate.entities.CategoryObservation;
@@ -115,7 +116,7 @@ public class ResultHandlingHelper {
 
 	private static Object getTimeStringForResultTime(final Date resultTime) {
         if (resultTime != null) {
-            return DateTimeHelper.formatDateTime2IsoString(new DateTime(resultTime));
+            return DateTimeHelper.formatDateTime2IsoString(new DateTime(resultTime, DateTimeZone.UTC));
         }
         return Configurator.getInstance().getProfileHandler().getActiveProfile().getResponseNoDataPlaceholder();
     }
@@ -130,13 +131,13 @@ public class ResultHandlingHelper {
     	final StringBuilder builder = new StringBuilder();
     	if (phenomenonTimeStart.equals(phenomenonTimeEnd))
     	{
-    		builder.append(formatDateTime2IsoString(new DateTime(phenomenonTimeStart)));
+    		builder.append(formatDateTime2IsoString(new DateTime(phenomenonTimeStart, DateTimeZone.UTC)));
     	}
     	else
     	{
-    		builder.append(formatDateTime2IsoString(new DateTime(phenomenonTimeStart)));
+    		builder.append(formatDateTime2IsoString(new DateTime(phenomenonTimeStart, DateTimeZone.UTC)));
     		builder.append('/');
-    		builder.append(formatDateTime2IsoString(new DateTime(phenomenonTimeStart)));
+    		builder.append(formatDateTime2IsoString(new DateTime(phenomenonTimeEnd, DateTimeZone.UTC)));
     	}
     	return builder.toString();
     }
