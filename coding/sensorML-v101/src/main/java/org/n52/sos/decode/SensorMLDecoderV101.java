@@ -436,15 +436,15 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
         for (final Capabilities xbCapabilities : capabilitiesArray) {
             final Object decodedObject = CodingHelper.decodeXmlElement(xbCapabilities.getAbstractDataRecord());
             if (decodedObject instanceof DataRecord) {
-            	DataRecord dataRecord = (DataRecord) decodedObject;
+            	final DataRecord dataRecord = (DataRecord) decodedObject;
             	//check if this capabilities is insertion metadata and should be parsed and removed
             	if (REMOVABLE_CAPABILITIES_NAMES.contains(xbCapabilities.getName())) {
-            		Map<String,String> metadata = parseCapabilitiesMetadata(dataRecord, xbCapabilities);
+            		final Map<String,String> metadata = parseCapabilitiesMetadata(dataRecord, xbCapabilities);
             		if (SensorMLConstants.ELEMENT_NAME_FEATURES_OF_INTEREST.equals(xbCapabilities.getName())) {
             			abstractProcess.addFeaturesOfInterest(metadata.keySet());
             		} else if (SensorMLConstants.ELEMENT_NAME_OFFERINGS.equals(xbCapabilities.getName())) {
-            			Set<SosOffering> offerings = new HashSet<SosOffering>();
-            			for (Entry<String,String> offeringEntry : metadata.entrySet()) {
+            			final Set<SosOffering> offerings = new HashSet<SosOffering>();
+            			for (final Entry<String,String> offeringEntry : metadata.entrySet()) {
             				offerings.add(new SosOffering(offeringEntry.getKey(), offeringEntry.getValue()));
             			}
             			abstractProcess.addOfferings(offerings);
@@ -456,7 +456,7 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
             		}
             	} else {
             		//normal capabilities element, just parse
-                	SmlCapabilities sosSmlCapabilities = new SmlCapabilities();
+                	final SmlCapabilities sosSmlCapabilities = new SmlCapabilities();
                 	sosSmlCapabilities.setDataRecord(dataRecord);
                 	abstractProcess.addCapabilities(sosSmlCapabilities);            		
             	}
@@ -476,15 +476,15 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
      * @return Map of insertion metadata (key=identifier, value=name)
      * @throws CodedException thrown if the DataRecord fields are in an incorrect format
      */
-    private Map<String,String> parseCapabilitiesMetadata(final DataRecord dataRecord, Capabilities xbCapabilities)
+    private Map<String,String> parseCapabilitiesMetadata(final DataRecord dataRecord, final Capabilities xbCapabilities)
     		throws CodedException {
-    	Map<String,String> metadataMap = new HashMap<String,String>();
-    	for (SweField sosSweField : dataRecord.getFields()) {
+    	final Map<String,String> metadataMap = new HashMap<String,String>();
+    	for (final SweField sosSweField : dataRecord.getFields()) {
     		if (!(sosSweField.getElement() instanceof SweText)) {
     			throw new UnsupportedDecoderInputException(this, xbCapabilities).withMessage(
     					"Removable capabilities element %s contains a non-Text field", xbCapabilities.getName());    			    		
     		}
-    		SweText sosSweText = (SweText) sosSweField.getElement();
+    		final SweText sosSweText = (SweText) sosSweField.getElement();
     		if (!sosSweText.isSetValue()) {
     			throw new UnsupportedDecoderInputException(this, xbCapabilities).withMessage(
     					"Removable capabilities element %s contains a field with no value", xbCapabilities.getName());    			    		    			
@@ -664,13 +664,22 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
         } else if (xbIoCompPropType.isSetAbstractDataRecord()) {
             toDecode = xbIoCompPropType.getAbstractDataRecord();
         } else {
-            throw new InvalidParameterValueException().at(XmlHelper.getLocalName(xbIoCompPropType)).withMessage(
-                    "An \"IoComponentProperty\" is not supported");
+            throw new InvalidParameterValueException()
+            .at(XmlHelper.getLocalName(xbIoCompPropType))
+            .withMessage("An 'IoComponentProperty' is not supported");
         }
 
         final Object decodedObject = CodingHelper.decodeXmlElement(toDecode);
         if (decodedObject instanceof SweAbstractSimpleType) {
             sosIo.setIoValue((SweAbstractSimpleType) decodedObject);
+        } 
+        else
+        {
+        	throw new InvalidParameterValueException()
+        	.at(XmlHelper.getLocalName(xbIoCompPropType))
+        	.withMessage("The 'IoComponentProperty' with type '%s' as value for '%s' is not supported.",
+        			XmlHelper.getLocalName(toDecode),
+        			XmlHelper.getLocalName(xbIoCompPropType));
         }
         return sosIo;
     }
