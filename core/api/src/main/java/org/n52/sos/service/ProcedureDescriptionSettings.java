@@ -125,7 +125,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	.setTitle("Description template")
 	.setDescription("The template used to generate a description using the sensor identifier and the observed properties " +
 			"related. The template MUST contain '%s' three times. The first one will be replaced with 'sensor system' or " +
-			"'procedure' depending if it's spatial or non-spatial. The seconde one will be replaced with the sensor id and" +
+			"'procedure' depending if it's spatial or non-spatial. The second one will be replaced with the sensor id and" +
 			" the third with a comma separated list of properties: e.g. <i>The %s with the id '%s' observes the following " +
 			"properties: '%s'.</i>.");
 
