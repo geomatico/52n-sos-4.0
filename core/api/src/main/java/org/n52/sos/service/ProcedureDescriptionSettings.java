@@ -107,7 +107,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	.setKey(IDENTIFIER_LONG_NAME_DEFINITION)
 	.setDefaultValue("urn:ogc:def:identifier:OGC:1.0:longname")
 	.setTitle("Identifier 'longname' definition")
-	.setDescription("The definition for the sml:identification holding the 'longname'. Used only if the sensor description is <b>generated</b>.");
+	.setDescription("The definition for the sml:identification holding the 'longname'. Used only if the procedure description is enriched according to OGC#09-033.");
 
 	public static final StringSettingDefinition IDENTIFIER_SHORT_NAME_DEFINITION_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
@@ -115,7 +115,7 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
 	.setKey(IDENTIFIER_SHORT_NAME_DEFINITION)
 	.setDefaultValue("urn:ogc:def:identifier:OGC:1.0:shortname")
 	.setTitle("Identifier 'shortname' definition")
-	.setDescription("The definition for the sml:identification holding the 'shortname'. Used only if the sensor description is <b>generated</b>.");
+	.setDescription("The definition for the sml:identification holding the 'shortname'. Used only if the sensor description is enriched according to OGC#09-033.");
 
 	public static final StringSettingDefinition DESCRIPTION_TEMPLATE_DEFINITION = new StringSettingDefinition()
 	.setGroup(GROUP)
@@ -354,17 +354,17 @@ public class ProcedureDescriptionSettings implements SettingDefinitionProvider {
         Validation.notNullOrEmpty(IDENTIFIER_SHORT_NAME_DEFINITION, identifierShortNameDefinition);
         this.identifierShortNameDefinition = identifierShortNameDefinition;
     }
+    
+    public String getIdentifierShortNameDefinition()
+    {
+    	return identifierShortNameDefinition;
+    }
 
     @Setting(IDENTIFIER_LONG_NAME_DEFINITION)
     public void setIdentifierLongNameDefinition(final String identifierLongNameDefinition)
     {
         Validation.notNullOrEmpty(IDENTIFIER_LONG_NAME_DEFINITION, identifierLongNameDefinition);
         this.identifierLongNameDefinition = identifierLongNameDefinition;
-    }
-
-    public String getIdentifierShortNameDefinition()
-    {
-        return identifierShortNameDefinition;
     }
 
     public String getIdentifierLongNameDefinition()
