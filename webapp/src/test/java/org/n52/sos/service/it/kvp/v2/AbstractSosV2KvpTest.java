@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.service.it.AbstractKvpTest;
+import org.n52.sos.service.it.RequestBuilder;
 import org.n52.sos.service.it.SosServiceV2Test;
 import org.w3c.dom.Node;
 
@@ -84,5 +85,11 @@ public abstract class AbstractSosV2KvpTest extends AbstractKvpTest implements So
                         .query(OWSConstants.RequestParams.service, SERVICE)
                         .query(OWSConstants.RequestParams.version, "1.2.3")));
         assertThat(node, is(invalidVersionParameterValueException("1.2.3")));
+    }
+
+    @Override
+    public RequestBuilder getBuilderWithRequestServiceVersion() {
+        return builder().query(OWSConstants.RequestParams.request, request)
+                .query(OWSConstants.RequestParams.service, SERVICE).query(OWSConstants.RequestParams.version, VERSION);
     }
 }

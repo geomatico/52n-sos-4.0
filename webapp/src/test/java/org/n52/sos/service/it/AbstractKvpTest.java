@@ -75,5 +75,13 @@ public abstract class AbstractKvpTest extends AbstractSosServiceTest {
      */
     @Test
     public abstract void invalidVersionParameter();
+    
+    /**
+     * Get RequestBuilder with valid parameters request, service and version.
+     * This should be used to test further mandatory parameters.
+     * 
+     * @return RequestBuilder with valid parameters request, service and version
+     */
+    public abstract RequestBuilder getBuilderWithRequestServiceVersion();
 
 }
