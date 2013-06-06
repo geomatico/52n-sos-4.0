@@ -48,7 +48,6 @@ import org.n52.sos.ds.hibernate.dao.FeatureOfInterestDAO;
 import org.n52.sos.ds.hibernate.dao.FeatureOfInterestTypeDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.TFeatureOfInterest;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.SpatialRestrictions;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
