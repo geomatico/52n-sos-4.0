@@ -96,5 +96,10 @@ public class SmlIo<T> {
 	{
 		return String.format("SosSMLIo [ioName=%s, ioValue=%s]", ioName, ioValue);
 	}
+
+	public Boolean isSetValue()
+	{
+		return ioValue != null;
+	}
     
 }
