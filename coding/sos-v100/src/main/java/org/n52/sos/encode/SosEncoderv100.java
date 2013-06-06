@@ -261,7 +261,7 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
      * @throws OwsExceptionReport
      *             * if an error occurs.
      */
-    private void setContents(Contents xbContents, Collection<SosObservationOffering> offerings, String version)
+    protected void setContents(Contents xbContents, Collection<SosObservationOffering> offerings, String version)
             throws OwsExceptionReport {
         // Contents xbContType = xbContents.addNewContents();
         ObservationOfferingList xbObservationOfferings = xbContents.addNewObservationOfferingList();

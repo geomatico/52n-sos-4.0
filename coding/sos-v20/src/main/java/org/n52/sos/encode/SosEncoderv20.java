@@ -509,7 +509,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
      * @throws OwsExceptionReport
      *             * if an error occurs.
      */
-    private void setContents(final Contents xbContents, final Collection<SosObservationOffering> offerings,
+    protected void setContents(final Contents xbContents, final Collection<SosObservationOffering> offerings,
             final String version) throws OwsExceptionReport {
         final ContentsType xbContType = xbContents.addNewContents();
 
