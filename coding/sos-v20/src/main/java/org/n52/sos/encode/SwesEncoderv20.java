@@ -62,9 +62,10 @@ public class SwesEncoderv20 implements Encoder<XmlObject, AbstractServiceRespons
     private static final Logger LOGGER = LoggerFactory.getLogger(SwesEncoderv20.class);
     private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper
             .encoderKeysForElements(SWEConstants.NS_SWES_20,
-        DescribeSensorResponse.class, InsertSensorResponse.class,
-        UpdateSensorResponse.class, DeleteSensorResponse.class
-    );
+        DescribeSensorResponse.class,
+        InsertSensorResponse.class,
+        UpdateSensorResponse.class,
+        DeleteSensorResponse.class);
 
     public SwesEncoderv20() {
         LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
@@ -86,8 +87,10 @@ public class SwesEncoderv20 implements Encoder<XmlObject, AbstractServiceRespons
     }
 
     @Override
-    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
-        nameSpacePrefixMap.put(SWEConstants.NS_SWES_20, SWEConstants.NS_SWES_PREFIX);
+    public void addNamespacePrefixToMap(final Map<String, String> nameSpacePrefixMap) {
+    	if (nameSpacePrefixMap != null) {
+    		nameSpacePrefixMap.put(SWEConstants.NS_SWES_20, SWEConstants.NS_SWES_PREFIX);
+    	}
     }
 
     @Override
@@ -101,12 +104,12 @@ public class SwesEncoderv20 implements Encoder<XmlObject, AbstractServiceRespons
     }
 
     @Override
-    public XmlObject encode(AbstractServiceResponse response) throws OwsExceptionReport {
+    public XmlObject encode(final AbstractServiceResponse response) throws OwsExceptionReport {
         return encode(response, null);
     }
 
     @Override
-    public XmlObject encode(AbstractServiceResponse response, Map<HelperValues, String> additionalValues)
+    public XmlObject encode(final AbstractServiceResponse response, final Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
         if (response instanceof DescribeSensorResponse) {
             return createDescribeSensorResponse((DescribeSensorResponse) response);
@@ -120,56 +123,56 @@ public class SwesEncoderv20 implements Encoder<XmlObject, AbstractServiceRespons
         throw new UnsupportedEncoderInputException(this, response);
     }
 
-    private XmlObject createDescribeSensorResponse(DescribeSensorResponse response) throws OwsExceptionReport {
-        DescribeSensorResponseDocument xbDescSensorRespDoc =
+    private XmlObject createDescribeSensorResponse(final DescribeSensorResponse response) throws OwsExceptionReport {
+        final DescribeSensorResponseDocument xbDescSensorRespDoc =
                 DescribeSensorResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        DescribeSensorResponseType describeSensorResponse = xbDescSensorRespDoc.addNewDescribeSensorResponse();
+        final DescribeSensorResponseType describeSensorResponse = xbDescSensorRespDoc.addNewDescribeSensorResponse();
         describeSensorResponse.setProcedureDescriptionFormat(response.getOutputFormat());
-        XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getOutputFormat(), response.getSensorDescription());
+        final XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getOutputFormat(), response.getSensorDescription());
         describeSensorResponse.addNewDescription().addNewSensorDescription().addNewData().set(xmlObject);
         // set schema location
-        Set<SchemaLocation> schemaLocations = CollectionHelper.set();
+        final Set<SchemaLocation> schemaLocations = CollectionHelper.set();
         schemaLocations.add(SWEConstants.SWES_20_DESCRIBE_SENSOR_SCHEMA_LOCATION);
         N52XmlHelper.addSchemaLocationsForTo(xbDescSensorRespDoc, schemaLocations);
         N52XmlHelper.setSchemaLocationsToDocument(xbDescSensorRespDoc, schemaLocations);
         return xbDescSensorRespDoc;
     }
 
-    private XmlObject createInsertSensorResponse(InsertSensorResponse response) {
-        InsertSensorResponseDocument xbInsSenRespDoc =
+    private XmlObject createInsertSensorResponse(final InsertSensorResponse response) {
+        final InsertSensorResponseDocument xbInsSenRespDoc =
                 InsertSensorResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        InsertSensorResponseType xbInsSenResp = xbInsSenRespDoc.addNewInsertSensorResponse();
+        final InsertSensorResponseType xbInsSenResp = xbInsSenRespDoc.addNewInsertSensorResponse();
         xbInsSenResp.setAssignedProcedure(response.getAssignedProcedure());
         xbInsSenResp.setAssignedOffering(response.getAssignedOffering());
         // set schema location
-        Set<SchemaLocation> schemaLocations = CollectionHelper.set();
+        final Set<SchemaLocation> schemaLocations = CollectionHelper.set();
         schemaLocations.add(SWEConstants.SWES_20_INSERT_SENSOR_SCHEMA_LOCATION);
         N52XmlHelper.addSchemaLocationsForTo(xbInsSenRespDoc, schemaLocations);
         N52XmlHelper.setSchemaLocationsToDocument(xbInsSenRespDoc, schemaLocations);
         return xbInsSenRespDoc;
     }
 
-    private XmlObject createUpdateSensorResponse(UpdateSensorResponse response) {
-        UpdateSensorDescriptionResponseDocument xbUpSenRespDoc =
+    private XmlObject createUpdateSensorResponse(final UpdateSensorResponse response) {
+        final UpdateSensorDescriptionResponseDocument xbUpSenRespDoc =
                 UpdateSensorDescriptionResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance()
                         .getXmlOptions());
-        UpdateSensorDescriptionResponseType xbUpSenResp = xbUpSenRespDoc.addNewUpdateSensorDescriptionResponse();
+        final UpdateSensorDescriptionResponseType xbUpSenResp = xbUpSenRespDoc.addNewUpdateSensorDescriptionResponse();
         xbUpSenResp.setUpdatedProcedure(response.getUpdatedProcedure());
         // set schema location
-        Set<SchemaLocation> schemaLocations = CollectionHelper.set();
+        final Set<SchemaLocation> schemaLocations = CollectionHelper.set();
         schemaLocations.add(SWEConstants.SWES_20_UPDATE_SENSOR_DESCRIPTION_SCHEMA_LOCATION);
         N52XmlHelper.addSchemaLocationsForTo(xbUpSenRespDoc, schemaLocations);
         N52XmlHelper.setSchemaLocationsToDocument(xbUpSenRespDoc, schemaLocations);
         return xbUpSenRespDoc;
     }
 
-    private XmlObject createDeleteSensorResponse(DeleteSensorResponse response) {
-        DeleteSensorResponseDocument xbDelSenRespDoc =
+    private XmlObject createDeleteSensorResponse(final DeleteSensorResponse response) {
+        final DeleteSensorResponseDocument xbDelSenRespDoc =
                 DeleteSensorResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        DeleteSensorResponseType xbDelSenResp = xbDelSenRespDoc.addNewDeleteSensorResponse();
+        final DeleteSensorResponseType xbDelSenResp = xbDelSenRespDoc.addNewDeleteSensorResponse();
         xbDelSenResp.setDeletedProcedure(response.getDeletedProcedure());
         // set schema location
-        Set<SchemaLocation> schemaLocations = CollectionHelper.set();
+        final Set<SchemaLocation> schemaLocations = CollectionHelper.set();
         schemaLocations.add(SWEConstants.SWES_20_DELETE_SENSOR_SCHEMA_LOCATION);
         N52XmlHelper.addSchemaLocationsForTo(xbDelSenRespDoc, schemaLocations);
         N52XmlHelper.setSchemaLocationsToDocument(xbDelSenRespDoc, schemaLocations);
