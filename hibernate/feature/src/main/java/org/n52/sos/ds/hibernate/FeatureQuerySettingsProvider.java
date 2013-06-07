@@ -80,7 +80,7 @@ public class FeatureQuerySettingsProvider implements SettingDefinitionProvider {
                     .setDefaultValue(true)
                     .setTitle("Is datasource spatial enabled")
                     .setDescription(
-                            "The underlying datasource supports spatial queries and geomety data types. If not, the SOS only supports Get... operations and only BBOX spatial filtering.");
+                            "The underlying datasource supports spatial queries and geometry data types. If not, the SOS only supports Get... operations and only BBOX spatial filtering.");
 
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?, ?>> set(
             EPSG_CODES_WITH_REVERSED_AXIS_ORDER_DEFINITION,
