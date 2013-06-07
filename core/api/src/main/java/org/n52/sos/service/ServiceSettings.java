@@ -110,17 +110,9 @@ public class ServiceSettings implements SettingDefinitionProvider {
     		.setOrder(12)
     		.setKey(ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR)
     		.setDefaultValue(true)
-    		.setTitle("Whether to encode full SensorML for child procedures in DescribeSensor responses")
-    		.setDescription("Whether to encode full SensorML for child procedures in DescribeSensor responses.");    
+    		.setTitle("Encode full for child procedure SensorMl in parent DescribeSensor responses")
+    		.setDescription("Whether to encode full SensorML for each child procedures in a DescribeSensor response for a parent procedure.");    
 
-    public static final BooleanSettingDefinition GENERATE_OFFERING_WHEN_NOT_SPECIFIED_DEFINITION = new BooleanSettingDefinition()
-			.setGroup(GROUP)
-			.setOrder(13)
-			.setKey(GENERATE_OFFERING_WHEN_NOT_SPECIFIED)
-			.setDefaultValue(true)
-			.setTitle("Whether to generate an offering during InsertSensor if none are specified.")
-			.setDescription("Whether to generate an offering during InsertSensor if none are specified.");    
-    
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
             SERVICE_URL_DEFINITION,
             MINIMUM_GZIP_SIZE_DEFINITION,
@@ -128,8 +120,7 @@ public class ServiceSettings implements SettingDefinitionProvider {
             SUPPORTS_QUALITY_DEFINITION,
             SENSOR_DIRECTORY_DEFINITION,
             USE_DEFAULT_PREFIXES_DEFINITION,
-            ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR_DEFINITION,
-            GENERATE_OFFERING_WHEN_NOT_SPECIFIED_DEFINITION);
+            ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR_DEFINITION);
 
     @Override
     public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
