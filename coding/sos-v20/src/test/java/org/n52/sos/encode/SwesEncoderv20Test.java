@@ -33,9 +33,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import net.opengis.swes.x20.DeleteSensorResponseDocument;
 import net.opengis.swes.x20.InsertSensorResponseDocument;
+import net.opengis.swes.x20.UpdateSensorDescriptionResponseDocument;
 
 import org.apache.xmlbeans.XmlObject;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -45,6 +48,7 @@ import org.n52.sos.response.DeleteSensorResponse;
 import org.n52.sos.response.DescribeSensorResponse;
 import org.n52.sos.response.InsertSensorResponse;
 import org.n52.sos.response.UpdateSensorResponse;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.SchemaLocation;
@@ -55,6 +59,12 @@ import org.n52.sos.util.SchemaLocation;
  *
  */
 public class SwesEncoderv20Test {
+	
+	@BeforeClass
+	public final static void initDecoders() {
+		CodingRepository.getInstance();
+	}
+	
 	@Test public final void 
 	should_return_correct_encoder_keys()
 	{
@@ -124,7 +134,7 @@ public class SwesEncoderv20Test {
 	}
 	
 	@Test public final void
-	should_encode_InsertSensorResponse()
+	should_encode_InsertSensor_response()
 			throws OwsExceptionReport {
 		final String assignedOffering = "assignedOffering";
 		final String assignedProcedure = "assignedProcedure";
@@ -141,4 +151,37 @@ public class SwesEncoderv20Test {
 		assertThat(doc.getInsertSensorResponse().getAssignedProcedure(), is(assignedProcedure));
 		assertThat(doc.validate(), is(TRUE));
 	}
+	
+	@Test public final void
+	should_encode_UpdateSensor_response()
+			throws OwsExceptionReport {
+		final UpdateSensorResponse response = new UpdateSensorResponse();
+		final String updatedProcedure = "updatedProcedure";
+		response.setUpdatedProcedure(updatedProcedure);
+		
+		final XmlObject encodedResponse = new SwesEncoderv20().encode(response);
+		
+		assertThat(encodedResponse, is(instanceOf(UpdateSensorDescriptionResponseDocument.class)));
+		final UpdateSensorDescriptionResponseDocument doc = (UpdateSensorDescriptionResponseDocument) encodedResponse;
+		assertThat(doc.isNil(), is(FALSE));
+		assertThat(doc.getUpdateSensorDescriptionResponse().getUpdatedProcedure(), is(updatedProcedure));
+		assertThat(doc.validate(), is(TRUE));
+	}
+	
+	@Test public final void
+	should_encode_DeleteSensor_response()
+			throws OwsExceptionReport {
+		final DeleteSensorResponse response = new DeleteSensorResponse();
+		final String deletedProcedure = "deletedProcedure";
+		response.setDeletedProcedure(deletedProcedure);
+		
+		final XmlObject encodedResponse = new SwesEncoderv20().encode(response);
+		
+		assertThat(encodedResponse, is(instanceOf(DeleteSensorResponseDocument.class)));
+		final DeleteSensorResponseDocument doc = (DeleteSensorResponseDocument) encodedResponse;
+		assertThat(doc.isNil(), is(FALSE));
+		assertThat(doc.getDeleteSensorResponse().getDeletedProcedure(), is(deletedProcedure));
+		assertThat(doc.validate(), is(TRUE));
+	}
+
 }
