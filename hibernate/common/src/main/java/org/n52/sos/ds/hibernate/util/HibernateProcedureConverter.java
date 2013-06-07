@@ -169,10 +169,10 @@ public class HibernateProcedureConverter {
 		if (sosProcedureDescription != null) {
 			if (sosProcedureDescription instanceof SensorML && ((SensorML)sosProcedureDescription).isWrapper()) {
 				for (final AbstractProcess abstractProcess :  ((SensorML)sosProcedureDescription).getMembers()) {
-					addValuesToSensorDescription(abstractProcess, requestedServiceVersion, descriptionFormat, session);
+					addValuesToSensorDescription(procedureId, abstractProcess, requestedServiceVersion, descriptionFormat, session);
 				}
 			} else {
-				addValuesToSensorDescription(sosProcedureDescription, requestedServiceVersion, descriptionFormat, session);
+				addValuesToSensorDescription(procedureId, sosProcedureDescription, requestedServiceVersion, descriptionFormat, session);
 			}
 			sosProcedureDescription.setDescriptionFormat(descriptionFormat);
 		}
@@ -180,6 +180,7 @@ public class HibernateProcedureConverter {
 	}
 
 	private void addValuesToSensorDescription(
+			final String procedureId,
 			final SosProcedureDescription procedureDescription,
 			final String version,
 			final String procedureDescriptionFormat,
@@ -188,28 +189,30 @@ public class HibernateProcedureConverter {
 		// enrich with features
 		if (procedureSettings().isEnrichWithFeatures())
 		{
-			final Collection<String> features = getFeatureOfInterestIDsForProcedure(procedureDescription.getIdentifier(), version);
+			final Collection<String> features = getFeatureOfInterestIDsForProcedure(procedureId, version);
 			if (features != null && !features.isEmpty()) {
 				procedureDescription.addFeaturesOfInterest(new HashSet<String>(features));
 			}
 		}
 
 		// parent procs
-		final Collection<String> parentProcedures = getParentProcedures(procedureDescription.getIdentifier(), version);
+		final Collection<String> parentProcedures = getParentProcedures(procedureId, version);
 		if (parentProcedures != null && !parentProcedures.isEmpty()) {
 			procedureDescription.addParentProcedures(new HashSet<String>(parentProcedures));
 		}
 
 		// child procs
 		final Set<SosProcedureDescription> childProcedures =
-				getChildProcedures(procedureDescription.getIdentifier(), procedureDescriptionFormat,
+				getChildProcedures(procedureId, procedureDescriptionFormat,
 						version, session);
-		procedureDescription.addChildProcedures(childProcedures);
+		if (childProcedures != null && !childProcedures.isEmpty()) {
+			procedureDescription.addChildProcedures(childProcedures);
+		}
 
 		// enrich with offerings
 		if (procedureSettings().isEnrichWithOfferings())
 		{
-			final Collection<SosOffering> offerings = getSosOfferingsForProcedure(procedureDescription.getIdentifier());
+			final Collection<SosOffering> offerings = getSosOfferingsForProcedure(procedureId);
 			if (offerings != null && !offerings.isEmpty())
 			{
 				procedureDescription.addOfferings(offerings);
@@ -232,7 +235,7 @@ public class HibernateProcedureConverter {
 					abstractSensorML.addCapabilities(observedBBox);
 				}
 
-				final String[] observableProperties = getObservablePropertiesForProcedure(procedureDescription.getIdentifier());
+				final String[] observableProperties = getObservablePropertiesForProcedure(procedureId);
 
 
 				// add classification
@@ -246,13 +249,13 @@ public class HibernateProcedureConverter {
 				// add longName
 				if (!isIdentifierLongNameSet(abstractSensorML))
 				{
-					abstractSensorML.addIdentifier(createLongName(procedureDescription.getIdentifier()));
+					abstractSensorML.addIdentifier(createLongName(procedureId));
 				}
 
 				// add shortName
 				if (!isIdentifierShortNameSet(abstractSensorML))
 				{
-					abstractSensorML.addIdentifier(createShortName(procedureDescription.getIdentifier()));
+					abstractSensorML.addIdentifier(createShortName(procedureId));
 				}
 
 				// set contacts --> take from service information
@@ -263,11 +266,12 @@ public class HibernateProcedureConverter {
 					}
 				}
 
-				// add keywords TODO use values like longName and shortName and others
+				// add keywords
 				final List<String> keywordsList = createKeywordsList(
+						procedureId,
 						abstractSensorML,
 						observableProperties,
-						getOfferingIdentifiersForProcedure(procedureDescription.getIdentifier()));
+						getOfferingIdentifiersForProcedure(procedureId));
 				if (keywordsList != null && !keywordsList.isEmpty())
 				{
 					abstractSensorML.setKeywords(keywordsList);
@@ -419,7 +423,7 @@ public class HibernateProcedureConverter {
 			for (final String childProcID : childProcedureIds) {
 				final Procedure childProcedure = new ProcedureDAO().getProcedureForIdentifier(childProcID, session);
 				final SosProcedureDescription childProcedureDescription = createSosProcedureDescription(childProcedure, childProcID, outputFormat,version,session);
-				addValuesToSensorDescription(childProcedureDescription, version, outputFormat, session);
+				addValuesToSensorDescription(procID,childProcedureDescription, version, outputFormat, session);
 				childProcedures.add(childProcedureDescription);
 			}
 		}
@@ -728,16 +732,18 @@ public class HibernateProcedureConverter {
 
 	// TODO use more values like longName and shortName from procedureDescription
 	private List<String> createKeywordsList(
+			final String procedureId,
 			final AbstractSensorML procedureDescription,
 			final String[] observableProperties,
-			final Collection<String> offerings) {
+			final Collection<String> offerings) 
+	{
 		final Set<String> keywords = CollectionHelper.set();
 		if (procedureDescription.isSetKeywords()) {
 			keywords.addAll(procedureDescription.getKeywords());
 		}
 		// add observable properties
 		keywords.addAll(CollectionHelper.list(observableProperties));
-		keywords.add(procedureDescription.getIdentifier());
+		keywords.add(procedureId);
 		// add intended application
 		if (procedureSettings().isGenerateClassification()
 				&& !procedureSettings().getClassifierIntendedApplicationValue().isEmpty()) {
@@ -756,12 +762,11 @@ public class HibernateProcedureConverter {
 		if (isIdentifierLongNameSet(procedureDescription)) {
 			keywords.add(getLongName(procedureDescription.getIdentifications()));
 		}
-		
 		// add shortName
 		if (isIdentifierShortNameSet(procedureDescription)) {
 			keywords.add(getShortName(procedureDescription.getIdentifications()));
 		}
-		// TODO What about adding feature identifiers, too?
+		// add features 
 		if (procedureSettings().isEnrichWithFeatures() && procedureDescription.isSetFeaturesOfInterest()) {
 			keywords.addAll(procedureDescription.getFeaturesOfInterest());
 		}
