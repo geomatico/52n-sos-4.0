@@ -380,8 +380,11 @@ public class HibernateProcedureConverter {
 			final String version) throws OwsExceptionReport {
 		final Set<String> featureIds = CollectionHelper.set();
 		for (final String offeringId : getCache().getOfferingsForProcedure(procedure)) 
-		{	
-			featureIds.addAll(getCache().getFeaturesOfInterestForOffering(offeringId));
+		{
+		    //don't include features for offerings which this procedure is a hidden child of
+		    if (!getCache().getHiddenChildProceduresForOffering(offeringId).contains(procedure)) {
+		        featureIds.addAll(getCache().getFeaturesOfInterestForOffering(offeringId));
+		    }
 		}
 		return SosHelper.getFeatureIDs(featureIds, version);
 	}
@@ -656,16 +659,36 @@ public class HibernateProcedureConverter {
 		if (serviceProvider == null) {
 			return null;
 		}
-		smlRespParty.setIndividualName(serviceProvider.getIndividualName());
-		smlRespParty.setOrganizationName(serviceProvider.getName());
-		smlRespParty.addOnlineResource(serviceProvider.getSite());
-		smlRespParty.setPositionName(serviceProvider.getPositionName());
-		smlRespParty.addDeliveryPoint(serviceProvider.getDeliveryPoint());
-		smlRespParty.addPhoneVoice(serviceProvider.getPhone());
-		smlRespParty.setCity(serviceProvider.getCity());
-		smlRespParty.setCountry(serviceProvider.getCountry());
-		smlRespParty.setPostalCode(serviceProvider.getPostalCode());
-		smlRespParty.setEmail(serviceProvider.getMailAddress());
+		if (serviceProvider.getIndividualName() != null) {
+		    smlRespParty.setIndividualName(serviceProvider.getIndividualName());
+		}
+		if (serviceProvider.getName() != null) {
+		    smlRespParty.setOrganizationName(serviceProvider.getName());
+		}
+		if (serviceProvider.getSite() != null) {
+		    smlRespParty.addOnlineResource(serviceProvider.getSite());
+		}
+		if (serviceProvider.getPositionName() != null) {
+		    smlRespParty.setPositionName(serviceProvider.getPositionName());
+		}
+		if (serviceProvider.getDeliveryPoint() != null) {
+		    smlRespParty.addDeliveryPoint(serviceProvider.getDeliveryPoint());
+		}
+		if (serviceProvider.getPhone() != null) {
+		    smlRespParty.addPhoneVoice(serviceProvider.getPhone());
+		}
+		if (serviceProvider.getCity() != null) {
+		    smlRespParty.setCity(serviceProvider.getCity());
+		}
+		if (serviceProvider.getCountry() != null) {
+		    smlRespParty.setCountry(serviceProvider.getCountry());
+		}
+		if (serviceProvider.getPostalCode() != null) {
+		    smlRespParty.setPostalCode(serviceProvider.getPostalCode());
+		}
+		if (serviceProvider.getMailAddress() != null) {
+		    smlRespParty.setEmail(serviceProvider.getMailAddress());
+		}
 		return CollectionHelper.list((SmlContact) smlRespParty);
 	}
 

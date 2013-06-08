@@ -26,6 +26,7 @@ package org.n52.sos.util;
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -133,4 +134,24 @@ public final class JavaHelper {
 
     private JavaHelper() {
     }
+    
+    /**
+     * Examine a collection and determines if it is null, empty, or contains only null values
+     * 
+     * @param collection Collection to examine
+     * @return whether the collection is null, empty, or contains only nulls
+     */
+    public static boolean nullEmptyOrContainsOnlyNulls(Collection<? extends Object> collection) {
+        if (collection == null || collection.isEmpty()) {
+            return true;
+        }
+        
+        for (Object obj : collection) {
+            if (obj != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
 }
