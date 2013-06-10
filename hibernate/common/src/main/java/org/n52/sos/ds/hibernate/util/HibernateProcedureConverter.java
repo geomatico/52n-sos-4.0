@@ -426,7 +426,8 @@ public class HibernateProcedureConverter {
 			for (final String childProcID : childProcedureIds) {
 				final Procedure childProcedure = new ProcedureDAO().getProcedureForIdentifier(childProcID, session);
 				final SosProcedureDescription childProcedureDescription = createSosProcedureDescription(childProcedure, childProcID, outputFormat,version,session);
-				addValuesToSensorDescription(procID,childProcedureDescription, version, outputFormat, session);
+				// TODO check if call is necessary because it is also called in createSosProcedureDescription()
+//				addValuesToSensorDescription(childProcID,childProcedureDescription, version, outputFormat, session);
 				childProcedures.add(childProcedureDescription);
 			}
 		}
