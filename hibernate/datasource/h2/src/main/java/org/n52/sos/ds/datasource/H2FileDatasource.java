@@ -104,8 +104,7 @@ public class H2FileDatasource extends AbstractH2Datasource {
                 .getProperty(HibernateConstants.CONNECTION_URL));
         matcher.find();
         settings.put(h2Database.getKey(), matcher.group(1));
-        settings.put(getTransactionalDefiniton().getKey(),
-                     isTransactional(current));
+        settings.put(TRANSACTIONAL_KEY, isTransactional(current));
         return settings;
     }
 

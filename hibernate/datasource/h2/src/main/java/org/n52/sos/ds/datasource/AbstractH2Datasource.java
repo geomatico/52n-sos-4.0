@@ -61,7 +61,8 @@ public abstract class AbstractH2Datasource extends AbstractHibernateDatasource {
     }
 
     @Override
-    public Set<SettingDefinition<?, ?>> getChangableSettingDefinitions() {
+    public Set<SettingDefinition<?, ?>> getChangableSettingDefinitions(
+            Properties p) {
         return Collections.emptySet();
     }
 

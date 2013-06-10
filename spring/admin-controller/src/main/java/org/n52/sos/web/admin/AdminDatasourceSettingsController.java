@@ -82,7 +82,7 @@ public class AdminDatasourceSettingsController extends AbstractDatasourceControl
         // parse them
         Map<String, Object> newSettings =
                 parseDatasourceSettings(getDatasource()
-                .getChangableSettingDefinitions(), req);
+                .getChangableSettingDefinitions(getSettings()), req);
         Properties settings = getSettings();
 
         // test them
@@ -155,10 +155,7 @@ public class AdminDatasourceSettingsController extends AbstractDatasourceControl
     private JSONObject encodeSettings(Properties p) throws JSONException {
         SettingDefinitionEncoder enc = new SettingDefinitionEncoder();
         Set<SettingDefinition<?, ?>> defs = getDatasource()
-                .getChangableSettingDefinitions();
-        for (SettingDefinition<?, ?> def : defs) {
-            setDefaultValue(def, p.getProperty(def.getKey(), null));
-        }
+                .getChangableSettingDefinitions(p);
         JSONObject settings = enc.encode(enc.sortByGroup(defs));
         return new JSONObject().put(SETTINGS, settings);
     }
@@ -167,7 +164,8 @@ public class AdminDatasourceSettingsController extends AbstractDatasourceControl
             JSONException {
         SettingDefinitionEncoder enc = new SettingDefinitionEncoder();
         Set<SettingDefinition<?, ?>> defs = getDatasource()
-                .getChangableSettingDefinitions();
+                .getChangableSettingDefinitions(getDatasource()
+                .getDatasourceProperties(getSettings(), p));
         for (SettingDefinition<?, ?> def : defs) {
             setDefaultValue(def, p.get(def.getKey()));
         }

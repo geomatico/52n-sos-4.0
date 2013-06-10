@@ -23,6 +23,9 @@
  */
 package org.n52.sos.ds.datasource;
 
+import static org.n52.sos.ds.datasource.AbstractHibernateDatasource.DATABASE_DEFAULT_VALUE;
+import static org.n52.sos.ds.datasource.AbstractHibernateDatasource.HOST_DEFAULT_VALUE;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -64,25 +67,18 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
     private static final String POSTGRES_DRIVER_CLASS = "org.postgresql.Driver";
     private static final Pattern JDBC_URL_PATTERN =
             Pattern.compile("^jdbc:postgresql://([^:]+):([0-9]+)/(.*)$");
-    protected final StringSettingDefinition pgUsername =
-            createUsernameDefinition()
-            .setDescription("Your database server user name. The default value for PostgreSQL is \"postgres\".")
-            .setDefaultValue("postgres");
-    protected final StringSettingDefinition pgPassword =
-            createPasswordDefinition()
-            .setDescription("Your database server password. The default value is \"postgres\".")
-            .setDefaultValue("postgres");
-    protected final StringSettingDefinition pgDatabase =
-            createDatabaseDefinition();
-    protected final StringSettingDefinition pgHost = createHostDefinition()
-            .setDescription("Set this to the IP/net location of PostgreSQL database server. The default value for PostgreSQL is \"localhost\".");
-    protected final IntegerSettingDefinition pgPort = createPortDefinition()
-            .setTitle("Database Port")
-            .setDescription("Set this to the port number of your PostgreSQL server. The default value for PostgreSQL is 5432.")
-            .setDefaultValue(5432);
-    protected final StringSettingDefinition pgCatalog =
-            createCatalogDefinition()
-            .setDefaultValue("public");
+    public static final String USERNAME_DESCRIPTION =
+            "Your database server user name. The default value for PostgreSQL is \"postgres\".";
+    public static final String USERNAME_DEFAULT_VALUE = "postgres";
+    public static final String PASSWORD_DESCRIPTION =
+            "Your database server password. The default value is \"postgres\".";
+    public static final String PASSWORD_DEFAULT_VALUE = "postgres";
+    public static final String HOST_DESCRIPTION =
+            "Set this to the IP/net location of PostgreSQL database server. The default value for PostgreSQL is \"localhost\".";
+    public static final String PORT_DESCRIPTION =
+            "Set this to the port number of your PostgreSQL server. The default value for PostgreSQL is 5432.";
+    public static final int PORT_DEFAULT_VALUE = 5432;
+    public static final String CATALOG_DEFAULT_VALUE = "public";
 
     @Override
     public String getDialectName() {
@@ -112,25 +108,43 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
 
     @Override
     public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
-        return CollectionHelper.<SettingDefinition<?, ?>>set(pgUsername,
-                                                             pgPassword,
-                                                             pgDatabase,
-                                                             pgHost,
-                                                             pgPort,
-                                                             pgCatalog,
-                                                             getTransactionalDefiniton());
+        return CollectionHelper.<SettingDefinition<?, ?>>set(
+                createUsernameDefinition(USERNAME_DEFAULT_VALUE),
+                createPasswordDefinition(PASSWORD_DEFAULT_VALUE),
+                createDatabaseDefinition(DATABASE_DEFAULT_VALUE),
+                createHostDefinition(HOST_DEFAULT_VALUE),
+                createPortDefinition(PORT_DEFAULT_VALUE),
+                createCatalogDefinition(CATALOG_DEFAULT_VALUE),
+                getTransactionalDefiniton());
     }
 
-    @Override
-    public Set<SettingDefinition<?, ?>> getChangableSettingDefinitions() {
-        return CollectionHelper.<SettingDefinition<?, ?>>set(pgUsername,
-                                                             pgPassword,
-                                                             pgDatabase,
-                                                             pgHost,
-                                                             pgPort,
-                                                             pgCatalog);
+    protected StringSettingDefinition createUsernameDefinition(String defaultValue) {
+        return createUsernameDefinition().setDescription(USERNAME_DESCRIPTION)
+                .setDefaultValue(defaultValue);
     }
 
+    protected StringSettingDefinition createPasswordDefinition(String defaultValue) {
+        return createPasswordDefinition().setDescription(PASSWORD_DESCRIPTION)
+                .setDefaultValue(defaultValue);
+    }
+
+    protected StringSettingDefinition createDatabaseDefinition(String defaultValue) {
+        return createDatabaseDefinition().setDefaultValue(defaultValue);
+    }
+
+    protected StringSettingDefinition createHostDefinition(String defaultValue) {
+        return createHostDefinition().setDescription(HOST_DESCRIPTION)
+                .setDefaultValue(defaultValue);
+    }
+
+    protected IntegerSettingDefinition createPortDefinition(int defaultValue) {
+        return createPortDefinition().setDescription(PORT_DESCRIPTION)
+                .setDefaultValue(defaultValue);
+    }
+
+    protected StringSettingDefinition createCatalogDefinition(String defaultValue) {
+        return createCatalogDefinition().setDefaultValue(defaultValue);
+    }
 
     @Override
     public boolean supportsTestData() {
@@ -145,7 +159,8 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
         try {
             conn = openConnection(settings);
             stmt = conn.createStatement();
-            String schema = (String) settings.get(pgCatalog.getKey());
+            String schema = (String) settings.get(createCatalogDefinition()
+                    .getKey());
             schema = schema == null ? "" : "." + schema;
             final String command = String.format(
                     "BEGIN; " +
@@ -202,11 +217,16 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
     public Properties getDatasourceProperties(
             Map<String, Object> settings) {
         Properties p = new Properties();
-        p.put(HibernateConstants.DEFAULT_CATALOG, settings.get(pgCatalog.getKey()));
-        p.put(HibernateConstants.CONNECTION_USERNAME, settings.get(pgUsername.getKey()));
-        p.put(HibernateConstants.CONNECTION_PASSWORD, settings.get(pgPassword.getKey()));
-        p.put(HibernateConstants.CONNECTION_URL, toURL(settings));
-        p.put(HibernateConstants.CONNECTION_PROVIDER_CLASS, C3P0_CONNCETION_PROVIDER_CLASS);
+        p.put(HibernateConstants.DEFAULT_CATALOG,
+              settings.get(CATALOG_KEY));
+        p.put(HibernateConstants.CONNECTION_USERNAME,
+              settings.get(USERNAME_KEY));
+        p.put(HibernateConstants.CONNECTION_PASSWORD,
+              settings.get(PASSWORD_KEY));
+        p.put(HibernateConstants.CONNECTION_URL,
+              toURL(settings));
+        p.put(HibernateConstants.CONNECTION_PROVIDER_CLASS,
+              C3P0_CONNCETION_PROVIDER_CLASS);
         p.put(HibernateConstants.DIALECT, POSTGIS_DIALECT_CLASS);
         p.put(HibernateConstants.DRIVER_CLASS, POSTGRES_DRIVER_CLASS);
         p.put(HibernateConstants.C3P0_MIN_SIZE, "10");
@@ -225,9 +245,9 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
     protected String toURL(
             Map<String, Object> settings) {
         String url = String.format("jdbc:postgresql://%s:%d/%s",
-                                   settings.get(pgHost.getKey()),
-                                   settings.get(pgPort.getKey()),
-                                   settings.get(pgDatabase.getKey()));
+                                   settings.get(HOST_KEY),
+                                   settings.get(PORT_KEY),
+                                   settings.get(DATABASE_KEY));
         return url;
     }
 
@@ -235,13 +255,13 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
     protected Map<String, Object> parseDatasourceProperties(Properties current) {
         Map<String, Object> settings = new HashMap<String, Object>(current
                 .size());
-        settings.put(pgCatalog.getKey(),
+        settings.put(CATALOG_KEY,
                      current.getProperty(HibernateConstants.DEFAULT_CATALOG));
-        settings.put(pgUsername.getKey(),
+        settings.put(USERNAME_KEY,
                      current.getProperty(HibernateConstants.CONNECTION_USERNAME));
-        settings.put(pgPassword.getKey(),
+        settings.put(PASSWORD_KEY,
                      current.getProperty(HibernateConstants.CONNECTION_PASSWORD));
-        settings.put(getTransactionalDefiniton().getKey(),
+        settings.put(TRANSACTIONAL_KEY,
                      isTransactional(current));
         String url = current.getProperty(HibernateConstants.CONNECTION_URL);
         Matcher matcher = JDBC_URL_PATTERN.matcher(url);
@@ -249,11 +269,24 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
         String host = matcher.group(1);
         String port = matcher.group(2);
         String db = matcher.group(3);
-        settings.put(pgHost.getKey(), host);
-        settings.put(pgPort.getKey(),
+        settings.put(createHostDefinition().getKey(), host);
+        settings.put(createPortDefinition().getKey(),
                      port == null ? null : Integer.valueOf(port));
-        settings.put(pgDatabase.getKey(), db);
+        settings.put(createDatabaseDefinition().getKey(), db);
         return settings;
+    }
+
+    @Override
+    public Set<SettingDefinition<?, ?>> getChangableSettingDefinitions(
+            Properties current) {
+        Map<String, Object> settings = parseDatasourceProperties(current);
+        return CollectionHelper.<SettingDefinition<?, ?>>set(
+                createUsernameDefinition((String) settings.get(USERNAME_KEY)),
+                createPasswordDefinition((String) settings.get(PASSWORD_KEY)),
+                createDatabaseDefinition((String) settings.get(DATABASE_KEY)),
+                createHostDefinition((String) settings.get(HOST_KEY)),
+                createPortDefinition((Integer) settings.get(PORT_KEY)),
+                createCatalogDefinition((String) settings.get(CATALOG_KEY)));
     }
 
     @Override

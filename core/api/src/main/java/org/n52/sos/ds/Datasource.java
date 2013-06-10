@@ -50,10 +50,13 @@ public interface Datasource {
     Set<SettingDefinition<?, ?>> getSettingDefinitions();
 
     /**
+     * @param current the current settings
+     *
      * @return the settings that can be newSettings without schema without
      *         reinstallation
      */
-    Set<SettingDefinition<?, ?>> getChangableSettingDefinitions();
+    Set<SettingDefinition<?, ?>> getChangableSettingDefinitions(
+            Properties current);
 
     /**
      * Check if a connection is possible.

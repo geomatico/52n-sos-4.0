@@ -57,10 +57,37 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractHibernateDatasource implements Datasource {
     private static final Logger LOG = LoggerFactory
             .getLogger(AbstractHibernateDatasource.class);
-    public static final String CORE_MAPPINGS_PATH =
-            "/mapping/core";
+    public static final String CORE_MAPPINGS_PATH = "/mapping/core";
     public static final String TRANSACTIONAL_MAPPINGS_PATH =
             "/mapping/transactional";
+    public static final String USERNAME_TITLE = "User Name";
+    public static final String PASSWORD_TITLE = "Password";
+    public static final String DATABASE_KEY = "jdbc.database";
+    public static final String DATABASE_TITLE = "Database";
+    public static final String DATABASE_DESCRIPTION =
+            "Set this to the name of the database you want to use for SOS.";
+    public static final String DATABASE_DEFAULT_VALUE = "sos";
+    public static final String HOST_KEY = "jdbc.host";
+    public static final String HOST_TITLE = "Host";
+    public static final String HOST_DESCRIPTION =
+            "Set this to the IP/net location of the database server. The default value for is \"localhost\".";
+    public static final String HOST_DEFAULT_VALUE = "localhost";
+    public static final String PORT_KEY = "jdbc.port";
+    public static final String PORT_TITLE = "Database Port";
+    public static final String CATALOG_TITLE = "Schema";
+    public static final String CATALOG_DESCRIPTION =
+            "Qualifies unqualified table names with the given schema in generated SQL.";
+    public static final String CATALOG_DEFAULT_VALUE = "public";
+    public static final String TRANSACTIONAL_TITLE = "Transactional Profile";
+    public static final String TRANSACTIONAL_DESCRIPTION =
+            "Should the database support the transactional profile?";
+    public static final String TRANSACTIONAL_KEY = "sos.transactional";
+    public static final boolean TRANSACTIONAL_DEFAULT_VALUE = true;
+    public static final String USERNAME_KEY =
+            HibernateConstants.CONNECTION_USERNAME;
+    public static final String PASSWORD_KEY =
+            HibernateConstants.CONNECTION_PASSWORD;
+    public static final String CATALOG_KEY = HibernateConstants.DEFAULT_CATALOG;
     private Dialect dialect;
     private final BooleanSettingDefinition transactionalDefiniton =
             createTransactionalDefinition();
@@ -69,64 +96,63 @@ public abstract class AbstractHibernateDatasource implements Datasource {
         return new StringSettingDefinition()
                 .setGroup(BASE_GROUP)
                 .setOrder(1)
-                .setKey(HibernateConstants.CONNECTION_USERNAME)
-                .setTitle("User Name");
+                .setKey(USERNAME_KEY)
+                .setTitle(USERNAME_TITLE);
     }
 
     protected StringSettingDefinition createPasswordDefinition() {
         return new StringSettingDefinition()
                 .setGroup(BASE_GROUP)
                 .setOrder(2)
-                .setKey(HibernateConstants.CONNECTION_PASSWORD)
-                .setTitle("Password");
+                .setKey(PASSWORD_KEY)
+                .setTitle(PASSWORD_TITLE);
     }
 
     protected StringSettingDefinition createDatabaseDefinition() {
         return new StringSettingDefinition()
                 .setGroup(BASE_GROUP)
                 .setOrder(3)
-                .setKey("jdbc.database")
-                .setTitle("Database")
-                .setDescription("Set this to the name of the database you want to use for SOS.")
-                .setDefaultValue("sos");
+                .setKey(DATABASE_KEY)
+                .setTitle(DATABASE_TITLE)
+                .setDescription(DATABASE_DESCRIPTION)
+                .setDefaultValue(DATABASE_DEFAULT_VALUE);
     }
 
     protected StringSettingDefinition createHostDefinition() {
         return new StringSettingDefinition()
                 .setGroup(BASE_GROUP)
                 .setOrder(4)
-                .setKey("jdbc.host")
-                .setTitle("Host")
-                .setDescription("Set this to the IP/net location of the database server. The default value for is \"localhost\".")
-                .setDefaultValue("localhost");
+                .setKey(HOST_KEY)
+                .setTitle(HOST_TITLE)
+                .setDescription(HOST_DESCRIPTION)
+                .setDefaultValue(HOST_DEFAULT_VALUE);
     }
 
     protected IntegerSettingDefinition createPortDefinition() {
         return new IntegerSettingDefinition()
                 .setGroup(BASE_GROUP)
                 .setOrder(5)
-                .setKey("jdbc.port")
-                .setTitle("Port");
+                .setKey(PORT_KEY)
+                .setTitle(PORT_TITLE);
     }
     protected StringSettingDefinition createCatalogDefinition() {
         return new StringSettingDefinition()
                 .setGroup(ADVANCED_GROUP)
                 .setOrder(1)
-                .setKey(HibernateConstants.DEFAULT_CATALOG)
-                .setTitle("Schema")
-                .setDescription("Qualifies unqualified table names with the given schema in generated SQL.")
-                .setDefaultValue("public");
+                .setKey(CATALOG_KEY)
+                .setTitle(CATALOG_TITLE)
+                .setDescription(CATALOG_DESCRIPTION)
+                .setDefaultValue(CATALOG_DEFAULT_VALUE);
     }
 
     protected BooleanSettingDefinition createTransactionalDefinition() {
         return new BooleanSettingDefinition()
-                .setDefaultValue(true)
-                .setTitle("Transactional Profile")
-                .setDescription("Should the database support the transactional profile?")
+                .setDefaultValue(TRANSACTIONAL_DEFAULT_VALUE)
+                .setTitle(TRANSACTIONAL_TITLE)
+                .setDescription(TRANSACTIONAL_DESCRIPTION)
                 .setGroup(ADVANCED_GROUP)
                 .setOrder(2)
-                .setOptional(false)
-                .setKey("sos.transactional");
+                .setKey(TRANSACTIONAL_KEY);
     }
 
     public CustomConfiguration getConfig(Map<String, Object> settings) {
