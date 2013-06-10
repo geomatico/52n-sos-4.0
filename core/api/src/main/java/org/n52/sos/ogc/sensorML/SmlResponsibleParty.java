@@ -26,6 +26,7 @@ package org.n52.sos.ogc.sensorML;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.JavaHelper;
 
 /**
@@ -131,7 +132,7 @@ public class SmlResponsibleParty implements SmlContact{
 	}
 	
 	public boolean isSetPhoneVoice() {
-		return !JavaHelper.nullEmptyOrContainsOnlyNulls(phoneVoice);
+		return !CollectionHelper.nullEmptyOrContainsOnlyNulls(phoneVoice);
 	}
 
 	public List<String> getPhoneVoice()
@@ -163,7 +164,7 @@ public class SmlResponsibleParty implements SmlContact{
 	}
 	
 	public boolean isSetPhoneFax() {
-		return !JavaHelper.nullEmptyOrContainsOnlyNulls(phoneFax);
+		return !CollectionHelper.nullEmptyOrContainsOnlyNulls(phoneFax);
 	}
 
 	public List<String> getPhoneFax()
@@ -195,7 +196,7 @@ public class SmlResponsibleParty implements SmlContact{
 	}
 	
 	public boolean isSetDeliveryPoint() {
-		return !JavaHelper.nullEmptyOrContainsOnlyNulls(deliveryPoints);
+		return !CollectionHelper.nullEmptyOrContainsOnlyNulls(deliveryPoints);
 	}
 
 	public List<String> getDeliveryPoint()
@@ -302,7 +303,7 @@ public class SmlResponsibleParty implements SmlContact{
 	}
 	
 	public boolean isSetOnlineResources() {
-		return !JavaHelper.nullEmptyOrContainsOnlyNulls(onlineResources);
+		return !CollectionHelper.nullEmptyOrContainsOnlyNulls(onlineResources);
 	}
 
 	public List<String> getOnlineResources()

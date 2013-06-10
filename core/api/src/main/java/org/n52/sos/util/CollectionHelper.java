@@ -304,4 +304,21 @@ public final class CollectionHelper {
         }
         return reversed;
     }
+    
+    /**
+     * Examine a collection and determines if it is null, empty, or contains only null values
+     * 
+     * @param collection Collection to examine
+     * @return whether the collection is null, empty, or contains only nulls
+     */
+    public static boolean nullEmptyOrContainsOnlyNulls(Collection<? extends Object> collection) {
+        if (isNotEmpty(collection)) {
+            for (Object obj : collection) {
+                if (obj != null) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
