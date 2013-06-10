@@ -44,6 +44,7 @@ import net.opengis.swe.x20.DataArrayType.ElementType;
 import net.opengis.swe.x20.DataRecordPropertyType;
 import net.opengis.swe.x20.DataRecordType;
 import net.opengis.swe.x20.DataRecordType.Field;
+import net.opengis.swe.x20.QuantityRangeType;
 import net.opengis.swe.x20.QuantityType;
 import net.opengis.swe.x20.Reference;
 import net.opengis.swe.x20.TextEncodingType;
@@ -78,6 +79,7 @@ import org.n52.sos.ogc.swe.simpleType.SweCategory;
 import org.n52.sos.ogc.swe.simpleType.SweCount;
 import org.n52.sos.ogc.swe.simpleType.SweObservableProperty;
 import org.n52.sos.ogc.swe.simpleType.SweQuantity;
+import org.n52.sos.ogc.swe.simpleType.SweQuantityRange;
 import org.n52.sos.ogc.swe.simpleType.SweText;
 import org.n52.sos.ogc.swe.simpleType.SweTime;
 import org.n52.sos.ogc.swe.simpleType.SweTimeRange;
@@ -392,6 +394,8 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
             return createObservableProperty((SweObservableProperty) sosSimpleType);
         } else if (sosSimpleType instanceof SweQuantity) {
             return createQuantity((SweQuantity) sosSimpleType);
+        } else if (sosSimpleType instanceof SweQuantityRange) {
+            return createQuantityRange((SweQuantityRange) sosSimpleType);            
         } else if (sosSimpleType instanceof SweText) {
             return createText((SweText) sosSimpleType);
         } else if (sosSimpleType instanceof SweTimeRange) {
@@ -433,7 +437,7 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
         throw new RuntimeException("NOT YET IMPLEMENTED: encoding of swe:ObservableProperty");
     }
 
-    private QuantityType createQuantity(final SweQuantity quantity) {
+    protected QuantityType createQuantity(final SweQuantity quantity) {
         final QuantityType xbQuantity = QuantityType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (quantity.isSetAxisID()) {
             xbQuantity.setAxisID(quantity.getDescription());
@@ -449,6 +453,25 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
             LOGGER.warn("Quality encoding is not supported for {}", xbQuantity.schemaType());
         }
         return xbQuantity;
+    }
+
+    protected QuantityRangeType createQuantityRange(final SweQuantityRange quantityRange) {
+        final QuantityRangeType xbQuantityRange =
+                QuantityRangeType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        if (quantityRange.isSetAxisID()) {
+            xbQuantityRange.setAxisID(quantityRange.getDescription());
+        }
+        if (quantityRange.isSetValue()) {
+            xbQuantityRange.setValue(quantityRange.getValue().getRangeAsList());
+        }
+        if (quantityRange.isSetUom()) {
+            xbQuantityRange.addNewUom().setCode(quantityRange.getUom());
+        }
+        if (quantityRange.isSetQuality()) {
+            // TODO implement
+            LOGGER.warn("Quality encoding is not supported for {}", xbQuantityRange.schemaType());
+        }
+        return xbQuantityRange;
     }
 
     private TextType createText(final SweText text) {
