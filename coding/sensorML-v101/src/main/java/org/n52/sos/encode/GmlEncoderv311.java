@@ -459,7 +459,7 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
         return codeType;
     }
 
-    private XmlObject createMeasureType(QuantityValue quantityValue) {
+    protected XmlObject createMeasureType(QuantityValue quantityValue) {
         MeasureType measureType = MeasureType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (quantityValue.getUnit() != null) {
             measureType.setUom(quantityValue.getUnit());
