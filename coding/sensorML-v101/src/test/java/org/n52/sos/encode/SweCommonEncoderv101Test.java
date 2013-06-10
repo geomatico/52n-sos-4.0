@@ -262,6 +262,41 @@ public class SweCommonEncoderv101Test {
 		assertThat(field1.isSetTime(), is(TRUE));
 		assertThat(field1.getTime().getValue().toString(), is(value.toString()));
 	}
+
+    @Test
+    public void should_encode_simpleDatarecord_with_quantities() throws OwsExceptionReport
+    {
+        final String name = "field-1";
+        final String unit = "m";
+        final Double value = 1.1;        
+        final String name2 = "field-2";
+        final String unit2 = "urn:ogc:def:uom:UCUM::m";        
+        final Double value2 = 1.2;
+
+        
+        final XmlObject encode = new SweCommonEncoderv101().encode(new SweSimpleDataRecord()
+                .addField(new SweField(name, new SweQuantity().setUom(unit).setValue(value)))
+                .addField(new SweField(name2, new SweQuantity().setUom(unit2).setValue(value2))));
+        
+        assertThat(encode,instanceOf(SimpleDataRecordType.class));        
+        final SimpleDataRecordType xbSimpleDataRecord = (SimpleDataRecordType) encode;
+        assertThat(xbSimpleDataRecord.getFieldArray().length, is(2));
+        
+        final AnyScalarPropertyType field1 = xbSimpleDataRecord.getFieldArray(0);
+        final AnyScalarPropertyType field2 = xbSimpleDataRecord.getFieldArray(1);
+       
+        //unit in code
+        assertThat(field1.getName(), is(name));
+        assertThat(field1.isSetQuantity(), is(TRUE));
+        assertThat(field1.getQuantity().getValue(), is(value));
+        assertThat(field1.getQuantity().getUom().getCode(), is(unit));
+        
+        //unit in href
+        assertThat(field2.getName(), is(name2));
+        assertThat(field2.isSetQuantity(), is(TRUE));
+        assertThat(field2.getQuantity().getValue(), is(value2));
+        assertThat(field2.getQuantity().getUom().getHref(), is(unit2));        
+    }
 	
 	@Test(expected=NoApplicableCodeException.class)
 	public void should_throw_exception_if_received_simpleDataRecord_with_field_with_null_element()

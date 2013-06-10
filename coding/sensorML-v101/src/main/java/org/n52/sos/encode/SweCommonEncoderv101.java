@@ -56,6 +56,7 @@ import net.opengis.swe.x101.TextDocument.Text;
 import net.opengis.swe.x101.TimeDocument.Time;
 import net.opengis.swe.x101.TimeGeometricPrimitivePropertyType;
 import net.opengis.swe.x101.TimeRangeDocument.TimeRange;
+import net.opengis.swe.x101.UomPropertyType;
 import net.opengis.swe.x101.VectorPropertyType;
 import net.opengis.swe.x101.VectorType;
 import net.opengis.swe.x101.VectorType.Coordinate;
@@ -366,7 +367,7 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             xbQuantity.setValue(Double.valueOf(quantity.getValue()));
         }
         if (quantity.isSetUom()) {
-            xbQuantity.addNewUom().setCode(quantity.getUom());
+            xbQuantity.addNewUom().set(createUom(quantity.getUom()));
         }
         if (quantity.isSetQuality()) {
             // TODO implement
@@ -386,7 +387,7 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             xbQuantityRange.setValue(quantityRange.getValue().getRangeAsList());
         }
         if (quantityRange.isSetUom()) {
-            xbQuantityRange.addNewUom().setCode(quantityRange.getUom());
+            xbQuantityRange.addNewUom().set(createUom(quantityRange.getUom()));
         }
         if (quantityRange.isSetQuality()) {
             // TODO implement
@@ -684,4 +685,14 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
         timeCursor.dispose();
         return xbTimeGeometricPrimitiveProperty;
     }
+    
+    private UomPropertyType createUom(String uom) {
+        UomPropertyType xbUom = UomPropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        if (uom.startsWith("urn:") || uom.startsWith("http://")) {
+            xbUom.setHref(uom);
+        } else {
+            xbUom.setCode(uom);
+        }
+        return xbUom;
+    }    
 }
