@@ -465,7 +465,7 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
             xbQuantityRange.setValue(quantityRange.getValue().getRangeAsList());
         }
         if (quantityRange.isSetUom()) {
-            xbQuantityRange.addNewUom().setCode(quantityRange.getUom());
+            xbQuantityRange.setUom(createUnitReference(quantityRange.getUom()));
         }
         if (quantityRange.isSetQuality()) {
             // TODO implement
