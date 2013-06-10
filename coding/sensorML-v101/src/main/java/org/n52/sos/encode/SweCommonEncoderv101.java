@@ -356,7 +356,7 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
      * @param quantity
      *            SOS internal representation
      */
-    private Quantity createQuantity(final SweQuantity quantity) {
+    protected Quantity createQuantity(final SweQuantity quantity) {
         final Quantity xbQuantity = Quantity.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         addAbstractDataComponentValues(xbQuantity, quantity);
         if (quantity.isSetAxisID()) {
@@ -375,7 +375,7 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
         return xbQuantity;
     }
 
-    private QuantityRange createQuantityRange(final SweQuantityRange quantityRange) {
+    protected QuantityRange createQuantityRange(final SweQuantityRange quantityRange) {
         final QuantityRange xbQuantityRange =
                 QuantityRange.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         addAbstractDataComponentValues(xbQuantityRange, quantityRange);
