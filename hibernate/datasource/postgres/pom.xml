@@ -20,6 +20,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-dialect</artifactId>
+        </dependency>
         <!-- Hibernate Core Dependencies -->
         <dependency>
             <groupId>org.hibernate</groupId>

@@ -40,6 +40,7 @@ import java.util.regex.Pattern;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.mapping.Table;
 import org.hibernate.spatial.dialect.postgis.PostgisDialect;
+import org.hibernate.spatial.dialect.postgis.PostgisDialect52N;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
@@ -59,7 +60,7 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
     private static final String C3P0_CONNCETION_PROVIDER_CLASS =
             "org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider";
     private static final String POSTGIS_DIALECT_CLASS =
-            PostgisDialect.class.getName();
+            PostgisDialect52N.class.getName();
     private static final String POSTGRES_DRIVER_CLASS = "org.postgresql.Driver";
     private static final Pattern JDBC_URL_PATTERN =
             Pattern.compile("^jdbc:postgresql://([^:]+):([0-9]+)/(.*)$");

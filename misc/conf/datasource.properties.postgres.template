@@ -22,7 +22,7 @@ hibernate.connection.autoReconnectForPools=true
 hibernate.connection.driver_class=org.postgresql.Driver
 hibernate.connection.provider_class=org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider
 hibernate.connection.testOnBorrow=true
-hibernate.dialect=org.hibernate.spatial.dialect.postgis.PostgisDialect
+hibernate.dialect=org.hibernate.spatial.dialect.postgis.PostgisDialect52N
 hibernate.default_catalog=public
 
 
