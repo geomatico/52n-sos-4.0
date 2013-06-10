@@ -40,7 +40,6 @@ import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
 import org.n52.sos.config.settings.StringSettingDefinition;
-import org.n52.sos.ds.datasource.AbstractHibernateDatasource;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.util.CollectionHelper;
@@ -249,6 +248,11 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
                      port == null ? null : Integer.valueOf(port));
         settings.put(pgDatabase.getKey(), db);
         return settings;
+    }
+
+    @Override
+    public boolean supportsClear() {
+        return false;
     }
 
     @Override

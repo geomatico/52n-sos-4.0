@@ -42,7 +42,6 @@ import org.hibernate.spatial.dialect.h2geodb.GeoDBDialect;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.settings.StringSettingDefinition;
-import org.n52.sos.ds.datasource.AbstractHibernateDatasource;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.util.CollectionHelper;
@@ -57,7 +56,9 @@ public class H2FileDatasource extends AbstractHibernateDatasource {
     private static final String DEFAULT_USERNAME = "sa";
     private static final String DEFAULT_PASSWORD = "";
     private static final Pattern JDBC_URL_PATTERN =
-            Pattern.compile("^jdbc:h2:(.+)$");
+            Pattern.compile("^jdbc:h2:(.+); INIT=create domain if not exists geometry as blob$");
+    private static final String JDBC_URL_FORMAT =
+            "jdbc:h2:%s; INIT=create domain if not exists geometry as blob";
     private final StringSettingDefinition h2Database =
             createDatabaseDefinition()
             .setDescription("Set this to the name/path of the database you want to use for SOS.")
@@ -126,8 +127,7 @@ public class H2FileDatasource extends AbstractHibernateDatasource {
     }
 
     private String toURL(Map<String, Object> settings) {
-        return String.format("jdbc:h2:%s",
-                             settings.get(h2Database.getKey()));
+        return String.format(JDBC_URL_FORMAT, settings.get(h2Database.getKey()));
     }
 
     @Override
@@ -199,7 +199,7 @@ public class H2FileDatasource extends AbstractHibernateDatasource {
     }
 
     @Override
-    protected String[] getPreSchemaScript() {
-        return new String[] { "create domain if not exists geometry as blob" };
+    public boolean supportsClear() {
+        return false;
     }
 }

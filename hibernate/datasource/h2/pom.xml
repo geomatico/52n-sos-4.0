@@ -7,9 +7,9 @@
         <version>4.0.0-Beta3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>hibernate-datasource-h2file</artifactId>
+    <artifactId>hibernate-datasource-h2</artifactId>
     <packaging>jar</packaging>
-    <name>52North SOS Hibernate H2 File Datasource</name>
+    <name>52North SOS Hibernate H2 Datasource</name>
 	<description>52North Sensor Observation Service Hibernate common module</description>
     <dependencies>
         <dependency>

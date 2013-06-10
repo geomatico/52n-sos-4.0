@@ -43,8 +43,8 @@
 
 <div class="pull-right">
     <ul class="inline">
-        <li><a href="#confirmDialogClear" data-toggle="modal" role="button" title="Clear Datasource" class="btn btn-danger">Clear Datasource</a></li>
-        <li><a href="#confirmDialogDelete" data-toggle="modal" role="button" title="Delete deleted Observations" class="btn btn-danger">Delete deleted Observations</a></li>
+        <li><button data-target="#confirmDialogClear" data-toggle="modal" title="Clear Datasource" class="btn btn-danger">Clear Datasource</button></li>
+        <li><button data-target="#confirmDialogDelete" data-toggle="modal" title="Delete deleted Observations" class="btn btn-danger">Delete deleted Observations</button></li>
         <li><button id="testdata" type="button" class="btn btn-danger"></button></li>
     </ul>
 </div>
@@ -100,9 +100,13 @@
 <script type="text/javascript">
     $(function() {
         var $button = $("#testdata");
+        var $clearDialog = $("#confirmDialogClear");
+        var $deleteDeletedDialog = $("#confirmDialogDelete");
+        var testDataInstalled = ${testDataInstalled};
+        var supportsTestData = ${supportsTestData};
+        var supportsClear = ${supportsClear};
+        var supportsDeleteDeleted = ${supportsDeleteDeleted};
 
-        var testDataInstalled = ${IS_TEST_DATA_SET_INSTALLED};
-        var supportsTestData = ${SUPPORTS_TEST_DATA_SET};
         function setButtonLabel() {
             if (testDataInstalled) {
                 $button.text("Remove test data");
@@ -154,49 +158,56 @@
                 }
             });
         }
-        
-        $("#clear").click(function() {
-            $("#confirmDialogClear").find("button").add($button).attr("disabled", true);
-            $.ajax({
-                "url": "<c:url value="/admin/datasource/clear" />",
-                "type": "POST"
-            }).fail(function(error) {
-                showError("Request failed: " + error.status + " " + error.statusText);
-                $("#confirmDialogClear").find("button").removeAttr("disabled");
-                $("#confirmDialogClear").modal("hide");
-                if (supportsTestData) { $button.removeAttr("disabled"); }
-            }).done(function() {
-                showSuccess("The datasource was cleared");
-                testDataInstalled = false;
-                setButtonLabel();
-                $("#confirmDialogClear").find("button").removeAttr("disabled");
-                $("#confirmDialogClear").modal("hide");
-                if (supportsTestData) { $button.removeAttr("disabled"); }
-            });
-        });
-
-        $("#delete").click(function() {
-            $("#confirmDialogDelete").find("button").add($button).attr("disabled", true);
-            $.ajax({
-                "url": "<c:url value="/admin/datasource/deleteDeletedObservations" />",
-                "type": "POST"
-            }).fail(function(error) {
-                if (error.responseText) {
-                    showError(error.responseText);
-                } else {
+        if (supportsClear) {
+            $("#clear").click(function() {
+                $clearDialog.find("button").add($button).attr("disabled", true);
+                $.ajax({
+                    "url": "<c:url value="/admin/datasource/clear" />",
+                    "type": "POST"
+                }).fail(function(error) {
                     showError("Request failed: " + error.status + " " + error.statusText);
-                }
-
-                $("#confirmDialogDelete").find("button").removeAttr("disabled");
-                $("#confirmDialogDelete").modal("hide");
-                if (supportsTestData) { $button.removeAttr("disabled"); }
-            }).done(function() {
-                showSuccess("The deleted observation were deleted.");
-                $("#confirmDialogDelete").find("button").removeAttr("disabled");
-                $("#confirmDialogDelete").modal("hide");
-                if (supportsTestData) { $button.removeAttr("disabled"); }
+                    $clearDialog.find("button").removeAttr("disabled");
+                    $clearDialog.modal("hide");
+                    if (supportsTestData) { $button.removeAttr("disabled"); }
+                }).done(function() {
+                    showSuccess("The datasource was cleared");
+                    testDataInstalled = false;
+                    setButtonLabel();
+                    $clearDialog.find("button").removeAttr("disabled");
+                    $clearDialog.modal("hide");
+                    if (supportsTestData) { $button.removeAttr("disabled"); }
+                });
             });
-        });
+        } else {
+            $("button[data-target=#confirmDialogClear]").attr("disabled", true);
+        }
+
+        if (supportsDeleteDeleted) {
+            $("#delete").click(function() {
+                $deleteDeletedDialog.find("button").add($button).attr("disabled", true);
+                $.ajax({
+                    "url": "<c:url value="/admin/datasource/deleteDeletedObservations" />",
+                    "type": "POST"
+                }).fail(function(error) {
+                    if (error.responseText) {
+                        showError(error.responseText);
+                    } else {
+                        showError("Request failed: " + error.status + " " + error.statusText);
+                    }
+
+                    $deleteDeletedDialog.find("button").removeAttr("disabled");
+                    $deleteDeletedDialog.modal("hide");
+                    if (supportsTestData) { $button.removeAttr("disabled"); }
+                }).done(function() {
+                    showSuccess("The deleted observation were deleted.");
+                    $deleteDeletedDialog.find("button").removeAttr("disabled");
+                    $deleteDeletedDialog.modal("hide");
+                    if (supportsTestData) { $button.removeAttr("disabled"); }
+                });
+            });
+        } else {
+            $("button[data-target=#confirmDialogDelete]").attr("disabled", true);
+        }
     });
 </script>
 

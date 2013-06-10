@@ -227,11 +227,18 @@ public interface Datasource {
     void removeTestData(Properties settings);
 
     /**
-     * Clear the contents of the datasource (if applicable).
+     * Clear the contents of the datasource. Only called if
+     * {@link #isClearSupported() isClearSupported()} returns {@code true}.
      *
      * @param settings the settings to connect
      */
     void clear(Properties settings);
+
+    /**
+     *
+     * @return
+     */
+    boolean supportsClear();
 
     /**
      * Create the datasource properties used by the {@link ConnectionProvider}

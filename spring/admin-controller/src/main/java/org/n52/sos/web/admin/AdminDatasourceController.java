@@ -55,9 +55,11 @@ public class AdminDatasourceController extends AbstractDatasourceController {
     private static final String TEST_OFFERING_PREFIX = "test_offering";
     private static final String ROWS = "rows";
     private static final String NAMES = "names";
-    private static final String IS_TEST_DATA_SET_INSTALLED =
-            "IS_TEST_DATA_SET_INSTALLED";
-    private static final String SUPPORTS_TEST_DATA = "SUPPORTS_TEST_DATA_SET";
+    private static final String IS_TEST_DATA_SET_INSTALLED = "testDataInstalled";
+    private static final String SUPPORTS_TEST_DATA = "supportsTestData";
+    private static final String SUPPORTS_CLEAR = "supportsClear";
+    private static final String SUPPORTS_DELETE_DELETED =
+            "supportsDeleteDeleted";
     private ServiceLoader<GeneralQueryDAO> daoServiceLoader = ServiceLoader.load(GeneralQueryDAO.class);
 
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE)
@@ -65,6 +67,9 @@ public class AdminDatasourceController extends AbstractDatasourceController {
         Map<String, Object> model = CollectionHelper.map();
         boolean supportsTestData = getDatasource().supportsTestData();
         model.put(SUPPORTS_TEST_DATA, supportsTestData);
+        model.put(SUPPORTS_CLEAR, getDatasource().supportsClear());
+        model.put(SUPPORTS_DELETE_DELETED,
+                  daoServiceLoader.iterator().hasNext());
         model.put(IS_TEST_DATA_SET_INSTALLED,
                   supportsTestData ? getDatasource().isTestDataPresent(getSettings()) : false);
         return new ModelAndView(ControllerConstants.Views.ADMIN_DATASOURCE, model);
@@ -119,18 +124,24 @@ public class AdminDatasourceController extends AbstractDatasourceController {
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE_REMOVE_TEST_DATA, method = RequestMethod.POST)
     public void deleteTestData() throws OwsExceptionReport,
                                         ConnectionProviderException {
-        LOG.info("Removing test data set.");
-        getDatasource().removeTestData(getSettings());
-        updateCache();
+        if (getDatasource().supportsTestData()) {
+            LOG.info("Removing test data set.");
+            getDatasource().removeTestData(getSettings());
+            updateCache();
+        }
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE_CREATE_TEST_DATA, method = RequestMethod.POST)
     public void createTestData() throws OwsExceptionReport,
                                         ConnectionProviderException {
-        LOG.info("Inserting test data set.");
-        getDatasource().insertTestData(getSettings());
-        updateCache();
+        
+        if (getDatasource().supportsTestData()) {
+            LOG.info("Inserting test data set.");
+            getDatasource().insertTestData(getSettings());
+            updateCache();
+        }
+        
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -138,8 +149,10 @@ public class AdminDatasourceController extends AbstractDatasourceController {
                     method = RequestMethod.POST)
     public void clearDatasource() throws OwsExceptionReport,
                                          ConnectionProviderException {
-        LOG.info("Clearing database contents.");
-        getDatasource().clear(getSettings());
-        updateCache();
+        if (getDatasource().supportsClear()) {
+            LOG.info("Clearing database contents.");
+            getDatasource().clear(getSettings());
+            updateCache();
+        }
     }
 }

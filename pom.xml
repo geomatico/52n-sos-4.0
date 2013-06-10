@@ -180,7 +180,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>hibernate-datasource-h2file</artifactId>
+                <artifactId>hibernate-datasource-h2</artifactId>
                 <version>${sos.version}</version>
             </dependency>
             <dependency>
