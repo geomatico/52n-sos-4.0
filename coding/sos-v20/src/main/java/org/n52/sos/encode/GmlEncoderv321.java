@@ -586,7 +586,7 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         return codeType;
     }
 
-    private MeasureType createMeasureType(QuantityValue quantityValue) throws OwsExceptionReport {
+    protected MeasureType createMeasureType(QuantityValue quantityValue) throws OwsExceptionReport {
         if (!quantityValue.isSetValue()) {
             throw new NoApplicableCodeException()
                     .withMessage("The required 'value' parameter is empty for encoding %s!", MeasureType.class.getName());
