@@ -46,7 +46,7 @@ abstract class AbstractSettingDefinition<S extends AbstractSettingDefinition<S, 
     private String title;
     private String description;
     private SettingDefinitionGroup group;
-    private final SettingType type;
+    private SettingType type;
     private T defaultValue;
 
     /**
@@ -179,6 +179,12 @@ abstract class AbstractSettingDefinition<S extends AbstractSettingDefinition<S, 
     @Override
     public SettingType getType() {
         return this.type;
+    }
+
+    @SuppressWarnings("unchecked")
+    S setType(SettingType type) {
+        this.type = type;
+        return (S) this;
     }
 
     @Override

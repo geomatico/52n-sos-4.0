@@ -12,13 +12,10 @@
     <name>52North SOS Web Modules</name>
     <modules>
         <module>common-controller</module>
-        <module>common-views</module>
         <module>admin-controller</module>
-        <module>admin-views</module>
         <module>install-controller</module>
-        <module>install-views</module>
         <module>client-controller</module>
-        <module>client-views</module>
+        <module>views</module>
     </modules>
     <properties>
         <org.springframework.version>3.1.2.RELEASE</org.springframework.version>

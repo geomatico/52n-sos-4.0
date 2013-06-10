@@ -23,9 +23,6 @@
  */
 package org.n52.sos.web.install;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -34,7 +31,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.n52.sos.util.SQLHelper;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.install.InstallConstants.Step;
@@ -127,44 +123,6 @@ public abstract class AbstractInstallController extends AbstractController {
         Map<String, Object> model = toModel(e.getSettings());
         model.put(ControllerConstants.ERROR_MODEL_ATTRIBUTE, e.getMessage());
         return new ModelAndView(getStep().getView(), model);
-    }
-
-    protected Statement createStatement(Connection con,
-                                        InstallationConfiguration settings) throws InstallationSettingsError {
-        try {
-            return con.createStatement();
-        } catch (SQLException e) {
-            throw new InstallationSettingsError(settings, String.format(ErrorMessages.CAN_NOT_CREATE_STATEMENT, e
-                    .getMessage()), e);
-        }
-    }
-
-    protected String getSchema(InstallationConfiguration settings) {
-        return (String) settings.getDatabaseSetting(InstallConstants.SCHEMA_PARAMETER);
-    }
-
-    protected void setSchema(InstallationConfiguration settings, Connection con, boolean exludeOthers)
-            throws InstallationSettingsError {
-        String catalog = getSchema(settings);
-        if (catalog != null) {
-            Statement st = null;
-            try {
-                st = createStatement(con, settings);
-                String command;
-                if (exludeOthers) {
-                    command = String.format("SET search_path TO '%s';", catalog);
-                } else {
-                    command = String.format("SET search_path TO '$user', '%s', public;", catalog);
-                }
-                LOG.debug("Setting catalog: {}", command);
-                st.execute(command);
-            } catch (SQLException e) {
-                throw new InstallationSettingsError(settings, String.format(ErrorMessages.COULD_NOT_SET_CATALOG, e
-                        .getMessage()), e);
-            } finally {
-                SQLHelper.close(st);
-            }
-        }
     }
 
     protected abstract Step getStep();

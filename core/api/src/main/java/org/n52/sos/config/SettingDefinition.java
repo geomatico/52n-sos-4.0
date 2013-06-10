@@ -44,7 +44,8 @@ package org.n52.sos.config;
  * @author Christian Autermann <c.autermann@52north.org>
  * @since 4.0
  */
-public interface SettingDefinition<S extends SettingDefinition<S, T>, T> extends Ordered<S> {
+public interface SettingDefinition<S extends SettingDefinition<S, T>, T> extends
+        Ordered<S>, Cloneable {
     /**
      * @return the unique key of this definition
      */

@@ -50,13 +50,11 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class SessionFactoryProvider implements DataConnectionProvider {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SessionFactoryProvider.class);
-    
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(SessionFactoryProvider.class);
     public static final String HIBERNATE_RESOURCES = "HIBERNATE_RESOURCES";
-    
     public static final String HIBERNATE_DIRECTORY = "HIBERNATE_DIRECTORY";
-
+    public static final String PATH_SEPERATOR = ";";
     /**
      * SessionFactory instance
      */
@@ -64,7 +62,6 @@ public class SessionFactoryProvider implements DataConnectionProvider {
 
     /**
      * constructor. Opens a new Hibernate SessionFactory
-     *
      */
     public SessionFactoryProvider() {
 
@@ -150,10 +147,18 @@ public class SessionFactoryProvider implements DataConnectionProvider {
                         configuration.addResource(resource);
                 }
                 properties.remove(HIBERNATE_RESOURCES);
+            } else if (properties.containsKey(HIBERNATE_DIRECTORY)) {
+                String directories = (String) properties
+                        .get(HIBERNATE_DIRECTORY);
+                for (String directory : directories.split(PATH_SEPERATOR)) {
+                    configuration.addDirectory(new File(directory));
+                }
             } else {
-                // TODO use HIBERNATE_DIRECTORY and configure in datasource.properties
-              configuration.addDirectory(new File(this.getClass().getResource("/mapping/core").toURI()));
-              configuration.addDirectory(new File(this.getClass().getResource("/mapping/transactional").toURI()));
+                //FIXME keep this as fallback?
+                configuration.addDirectory(new File(getClass()
+                        .getResource("/mapping/core").toURI()));
+                configuration.addDirectory(new File(getClass()
+                        .getResource("/mapping/transactional").toURI()));
             }
             configuration.mergeProperties(properties);
             
@@ -161,8 +166,9 @@ public class SessionFactoryProvider implements DataConnectionProvider {
 
             configuration.registerTypeOverride(new UtcTimestampType());
             
-            ServiceRegistry serviceRegistry =
-                    new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
+            ServiceRegistry serviceRegistry = new ServiceRegistryBuilder()
+                    .applySettings(configuration.getProperties())
+                    .buildServiceRegistry();
             this.sessionFactory = configuration.buildSessionFactory(serviceRegistry);
         } catch (HibernateException he) {
             String exceptionText = "An error occurs during instantiation of the database connection pool!";

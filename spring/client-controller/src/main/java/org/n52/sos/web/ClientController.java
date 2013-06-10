@@ -33,6 +33,8 @@ import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.MultiMaps;
 import org.n52.sos.util.SetMultiMap;
+import org.n52.sos.web.AbstractController;
+import org.n52.sos.web.ControllerConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

@@ -17,6 +17,7 @@
         <module>dao</module>
         <module>dialect</module>
         <module>feature</module>
-        <module>h2</module>
+		<module>h2</module>
+		<module>datasource</module>
     </modules>
 </project>

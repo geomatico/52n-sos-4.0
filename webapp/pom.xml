@@ -71,15 +71,7 @@
                     <overlays>
                         <overlay>
                             <groupId>${project.groupId}</groupId>
-                            <artifactId>client-views</artifactId>
-                        </overlay>
-                        <overlay>
-                            <groupId>${project.groupId}</groupId>
-                            <artifactId>admin-views</artifactId>
-                        </overlay>
-                        <overlay>
-                            <groupId>${project.groupId}</groupId>
-                            <artifactId>install-views</artifactId>
+                            <artifactId>views</artifactId>
                         </overlay>
                     </overlays>
                 </configuration>
@@ -251,19 +243,36 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
+        <!-- installer/admin/client dependencies -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>client-views</artifactId>
-            <type>war</type>
+            <artifactId>client-controller</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>admin-views</artifactId>
-            <type>war</type>
+            <artifactId>install-controller</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>install-views</artifactId>
+            <artifactId>admin-controller</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common-controller</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-datasource-postgres</artifactId>
+        </dependency>
+        <!--
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-datasource-h2file</artifactId>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>views</artifactId>
             <type>war</type>
         </dependency>
         <dependency>

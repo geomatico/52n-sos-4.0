@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingValue;
+import org.n52.sos.ds.Datasource;
 
 /**
  * TODO JavaDoc
@@ -36,10 +37,15 @@ import org.n52.sos.config.SettingValue;
  */
 public class InstallationConfiguration {
 
-    private Map<SettingDefinition<?, ?>, SettingValue<?>> settings = new HashMap<SettingDefinition<?, ?>, SettingValue<?>>();
+    private Map<SettingDefinition<?, ?>, SettingValue<?>> settings =
+            new HashMap<SettingDefinition<?, ?>, SettingValue<?>>();
     private Map<String, Object> databaseSettings = new HashMap<String, Object>();
     private String username;
     private String password;
+    private Datasource datasource;
+    private boolean createSchema = false;
+    private boolean dropSchema = false;
+    private boolean createTestData = false;
 
     public InstallationConfiguration() {
     }
@@ -55,6 +61,14 @@ public class InstallationConfiguration {
 
     public Map<String, Object> getDatabaseSettings() {
         return databaseSettings;
+    }
+
+    public Datasource getDatasource() {
+        return datasource;
+    }
+
+    public void setDatasource(Datasource datasource) {
+        this.datasource = datasource;
     }
 
     public InstallationConfiguration setDatabaseSettings(Map<String, Object> databaseSettings) {
@@ -104,5 +118,29 @@ public class InstallationConfiguration {
     public InstallationConfiguration setSetting(SettingDefinition<?, ?> k, SettingValue<?> v) {
         settings.put(k, v);
         return this;
+    }
+
+    public boolean isCreateSchema() {
+        return createSchema;
+    }
+
+    public void setCreateSchema(boolean createSchema) {
+        this.createSchema = createSchema;
+    }
+
+    public boolean isDropSchema() {
+        return dropSchema;
+    }
+
+    public void setDropSchema(boolean dropSchema) {
+        this.dropSchema = dropSchema;
+    }
+
+    public boolean isCreateTestData() {
+        return createTestData;
+    }
+
+    public void setCreateTestData(boolean createTestData) {
+        this.createTestData = createTestData;
     }
 }

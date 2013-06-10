@@ -28,13 +28,13 @@ import java.io.InputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.n52.sos.service.AbstractLoggingConfigurator;
 import org.n52.sos.web.ControllerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -52,7 +52,7 @@ public class AdminLogFileDownloadController {
             if (is == null) {
                 throw new RuntimeException("Could not read log file.");
             }
-            FileCopyUtils.copy(is, response.getOutputStream());
+            IOUtils.copy(is, response.getOutputStream());
         } finally {
             if (is != null) {
                 try {

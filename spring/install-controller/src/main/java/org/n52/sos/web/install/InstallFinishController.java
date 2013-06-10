@@ -23,12 +23,6 @@
  */
 package org.n52.sos.web.install;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.Properties;
 
@@ -41,12 +35,10 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.n52.sos.config.SettingValue;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.ds.hibernate.util.DefaultHibernateConstants;
+import org.n52.sos.ds.Datasource;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.util.SQLHelper;
 import org.n52.sos.web.ControllerConstants;
-import org.n52.sos.web.JdbcUrl;
 import org.n52.sos.web.MetaDataHandler;
 import org.n52.sos.web.auth.UserService;
 import org.n52.sos.web.install.InstallConstants.Step;
@@ -84,52 +76,33 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
     protected void process(Map<String, String> param, InstallationConfiguration c) throws InstallationSettingsError {
         checkUsername(param, c);
         checkPassword(param, c);
-        Properties properties = createHibernateProperties(c);
-        loadDriver(properties, c);
+        clearSettings(c);
+        Datasource datasource = c.getDatasource();
 
         try {
-            getSettingsManager().deleteAll();
-        } catch (Throwable e) {
-            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_DELETE_PREVIOUS_SETTINGS, e
-                    .getMessage()));
-        }
-
-        Connection con = null;
-        try {
-            con = createConnection(properties);
-            setSchema(c, con, true);
-            dropTables(c, con);
-            setSchema(c, con, false);
-            createTables(c, con);
-            insertTestData(c, con);
-            insertSettings(c, con);
-            saveAdmin(c, properties);
-        } catch (InstallationSettingsError e) {
-            throw e;
+            if (c.isDropSchema()) {
+                datasource.dropSchema(c.getDatabaseSettings());
+            }
+            if (c.isCreateSchema()) {
+                datasource.createSchema(c.getDatabaseSettings());
+            }
+            if (c.isCreateTestData()) {
+                datasource.insertTestData(c.getDatabaseSettings());
+            }
         } catch (Throwable e) {
             throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_CONNECT_TO_THE_DATABASE,
                                                                  e.getMessage()), e);
-        } finally {
-            SQLHelper.close(con);
         }
+        saveServiceSettings(c);
+        createAdministratorUser(c);
+        Properties properties =
+                datasource.getDatasourceProperties(c.getDatabaseSettings());
+        // save the used datasource class
+        properties.put(Datasource.class.getCanonicalName(),
+                       datasource.getClass().getCanonicalName());
         instantiateConfigurator(properties, c);
         saveDatabaseProperties(properties, c);
         saveInstallationDate();
-    }
-
-    protected Properties createHibernateProperties(InstallationConfiguration c) throws InstallationSettingsError {
-        Properties p = checkJdbcUrl(c).toProperties();
-        addProperty(c, p, InstallConstants.DRIVER_PARAMETER, DefaultHibernateConstants.DRIVER_PROPERTY);
-        addProperty(c, p, InstallConstants.CONNECTION_POOL_PARAMETER, DefaultHibernateConstants.CONNECTION_POOL_PROPERTY);
-        addProperty(c, p, InstallConstants.DIALECT_PARAMETER, DefaultHibernateConstants.DIALECT_PROPERTY);
-        addProperty(c, p, InstallConstants.SCHEMA_PARAMETER, DefaultHibernateConstants.CATALOG_PROPERTY);
-        return p;
-    }
-
-    protected void addProperty(InstallationConfiguration c, Properties p, String parameter, String property) {
-        if (c.hasDatabaseSetting(parameter)) {
-            p.put(property, c.getDatabaseSetting(parameter));
-        }
     }
 
     protected void checkUsername(Map<String, String> param, InstallationConfiguration c) throws
@@ -188,57 +161,11 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         }
     }
 
-    protected void createTables(InstallationConfiguration c, Connection con) throws InstallationSettingsError {
-        boolean createTables = c.getBooleanDatabaseSetting(InstallConstants.CREATE_TABLES_PARAMETER);
-        if (createTables) {
-            try {
-                LOG.debug("Creating tables");
-                SQLHelper.executeSQLFile(con, new File(getContext()
-                        .getRealPath(ControllerConstants.CREATE_DATAMODEL_SQL_FILE)));
-            } catch (SQLException e) {
-                throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_CREATE_SOS_TABLES, e
-                        .getMessage()), e);
-            } catch (IOException e) {
-                throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_CREATE_SOS_TABLES, e
-                        .getMessage()), e);
-            }
-        }
-    }
-
-    protected void insertTestData(InstallationConfiguration settings, Connection con) throws InstallationSettingsError {
-        /* insert test data */
-        Boolean createTestData = (Boolean) settings.getDatabaseSetting(InstallConstants.CREATE_TEST_DATA_PARAMETER);
-        if (createTestData.booleanValue()) {
-            try {
-                LOG.debug("Inserting test data");
-                SQLHelper.executeSQLFile(con,
-                                        new File(getContext().getRealPath(
-                        ControllerConstants.INSERT_TEST_DATA_SQL_FILE)));
-            } catch (SQLException e) {
-                throw new InstallationSettingsError(settings, String.format(ErrorMessages.COULD_NOT_INSERT_TEST_DATA,
-                                                                            e.getMessage()), e);
-            } catch (IOException e) {
-                throw new InstallationSettingsError(settings, String.format(ErrorMessages.COULD_NOT_INSERT_TEST_DATA,
-                                                                            e.getMessage()), e);
-            }
-        }
-    }
-
-    protected void insertSettings(InstallationConfiguration c, Connection con) throws InstallationSettingsError {
+    protected void saveServiceSettings(InstallationConfiguration c) throws InstallationSettingsError {
         try {
-
             for (SettingValue<?> e : c.getSettings().values()) {
                 getSettingsManager().changeSetting(e);
             }
-
-//            try {
-//                s.put(MetaDataHandler.Metadata.VERSION.name(),
-//                      getMetaDataHandler().get(MetaDataHandler.Metadata.VERSION));
-//            } catch (ConfigurationException ex) {
-//                /* don't fail on this one... */
-//                LOG.error("Could not load SOS version", ex);
-//            }
-
         } catch (ConfigurationException e) {
             throw new InstallationSettingsError(c, String
                     .format(ErrorMessages.COULD_NOT_INSERT_SETTINGS, e.getMessage()), e);
@@ -248,8 +175,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         }
     }
 
-    protected void saveAdmin(InstallationConfiguration c, Properties properties) throws InstallationSettingsError {
-        /* save admin credentials */
+    protected void createAdministratorUser(InstallationConfiguration c) throws InstallationSettingsError {
         try {
             userService.createAdmin(c.getUsername(), c.getPassword());
         } catch (Throwable e) {
@@ -258,51 +184,14 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         }
     }
 
-    protected JdbcUrl checkJdbcUrl(InstallationConfiguration c) throws InstallationSettingsError {
-        String connectionString = (String) c.getDatabaseSetting(ControllerConstants.JDBC_PARAMETER);
-        JdbcUrl jdbc;
+    protected void clearSettings(InstallationConfiguration c) throws
+            InstallationSettingsError {
         try {
-            jdbc = new JdbcUrl(connectionString);
-        } catch (URISyntaxException ex) {
-            throw new InstallationSettingsError(c, ex.getMessage(), ex);
-        }
-        String error = jdbc.isValid();
-        if (error != null) {
-            throw new InstallationSettingsError(c, error);
-        }
-        return jdbc;
-    }
-
-    protected void loadDriver(Properties properties, InstallationConfiguration c) throws InstallationSettingsError {
-        try {
-            Class.forName(properties.getProperty(DefaultHibernateConstants.DRIVER_PROPERTY));
-        } catch (ClassNotFoundException e) {
-            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_CONNECT_TO_THE_DATABASE,
-                                                                 e.getMessage()), e);
-        }
-    }
-
-    private Connection createConnection(Properties properties) throws SQLException {
-        return DriverManager.getConnection(
-                properties.getProperty(DefaultHibernateConstants.CONNECTION_STRING_PROPERTY),
-                properties.getProperty(DefaultHibernateConstants.USER_PROPERTY),
-                properties.getProperty(DefaultHibernateConstants.PASS_PROPERTY));
-    }
-
-    protected void dropTables(InstallationConfiguration c, Connection con) throws InstallationSettingsError {
-        boolean overwriteTables = c.getBooleanDatabaseSetting(InstallConstants.OVERWRITE_TABLES_PARAMETER);
-        if (overwriteTables) {
-            try {
-                LOG.debug("Dropping tables");
-                SQLHelper.executeSQLFile(con, new File(getContext()
-                        .getRealPath(ControllerConstants.DROP_DATAMODEL_SQL_FILE)));
-            } catch (IOException e) {
-                throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_DROP_SOS_TABLES,
-                                                                     e.getMessage()), e);
-            } catch (SQLException e) {
-                throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_DROP_SOS_TABLES,
-                                                                     e.getMessage()), e);
-            }
+            getSettingsManager().deleteAll();
+        } catch (Throwable e) {
+            throw new InstallationSettingsError(c, String
+                    .format(ErrorMessages.COULD_NOT_DELETE_PREVIOUS_SETTINGS, e
+                    .getMessage()));
         }
     }
 }

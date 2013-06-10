@@ -31,8 +31,8 @@ public interface ControllerConstants {
         String LICENSE = "license";
         String GET_INVOLVED = "get-involved";
         String ADMIN_INDEX = "admin/index";
-        String ADMIN_DATABASE = "admin/database";
-        String ADMIN_DATABASE_SETTINGS = "admin/database-settings";
+        String ADMIN_DATASOURCE = "admin/datasource";
+        String ADMIN_DATASOURCE_SETTINGS = "admin/datasource-settings";
         String ADMIN_LOGIN = "admin/login";
         String ADMIN_RESET = "admin/reset";
         String ADMIN_LIBRARY_LIST = "admin/libs";
@@ -41,7 +41,7 @@ public interface ControllerConstants {
         String ADMIN_ENCODINGS = "admin/encodings";
         String ADMIN_BINDINGS = "admin/bindings";
         String INSTALL_INDEX = "install/index";
-        String INSTALL_DATABASE = "install/database";
+        String INSTALL_DATASOURCE = "install/datasource";
         String INSTALL_SETTINGS = "install/settings";
         String INSTALL_FINISH = "install/finish";
         String INSTALL_LOAD_SETTINGS = "install/load";
@@ -61,7 +61,7 @@ public interface ControllerConstants {
         String ADMIN_SETTINGS = "/admin/settings";
         String ADMIN_SETTINGS_DUMP = "/admin/settings.json";
         String ADMIN_SETTINGS_UPDATE = "/admin/settings";
-        String ADMIN_DATABASE = "/admin/database";
+        String ADMIN_DATABASE = "/admin/datasource";
         String ADMIN_LIBRARY_LIST = "/admin/libs";
         String ADMIN_OPERATIONS = "/admin/operations";
         String ADMIN_OPERATIONS_JSON_ENDPOINT = "/admin/operations/json";
@@ -69,22 +69,27 @@ public interface ControllerConstants {
         String ADMIN_ENCODINGS_JSON_ENDPOINT = "/admin/encodings/json";
         String ADMIN_BINDINGS = "/admin/bindings";
         String ADMIN_BINDINGS_JSON_ENDPOINT = "/admin/bindings/json";
-        String ADMIN_DATABASE_EXECUTE = "/admin/database";
-        String ADMIN_DATABASE_SETTINGS = "/admin/database/settings";
+        String ADMIN_DATABASE_EXECUTE = "/admin/datasource";
+        String ADMIN_DATABASE_SETTINGS = "/admin/datasource/settings";
         String ADMIN_RELOAD_CAPABILITIES_CACHE = "/admin/cache/reload";
-        String ADMIN_DATABASE_REMOVE_TEST_DATA = "/admin/database/testdata/remove";
-        String ADMIN_DATABASE_CREATE_TEST_DATA = "/admin/database/testdata/create";
-        String ADMIN_DATABASE_CLEAR = "/admin/database/clear";
-        String ADMIN_DATABASE_DELETE_DELETED_OBSERVATIONS = "/admin/database/deleteDeletedObservations";
+        String ADMIN_DATABASE_REMOVE_TEST_DATA =
+                "/admin/datasource/testdata/remove";
+        String ADMIN_DATABASE_CREATE_TEST_DATA =
+                "/admin/datasource/testdata/create";
+        String ADMIN_DATABASE_CLEAR =
+                "/admin/datasource/clear";
+        String ADMIN_DATABASE_DELETE_DELETED_OBSERVATIONS =
+                "/admin/datasource/deleteDeletedObservations";
         String ADMIN_RESET = "/admin/reset";
         String ADMIN_LOGGING = "/admin/logging";
         String ADMIN_LOGGING_FILE_DOWNLOAD = "/admin/logging/file";
         String INSTALL_ROOT = "/install";
         String INSTALL_INDEX = "/install/index";
-        String INSTALL_DATABASE = "/install/database";
+        String INSTALL_DATASOURCE = "/install/datasource";
         String INSTALL_SETTINGS = "/install/settings";
         String INSTALL_FINISH = "/install/finish";
         String INSTALL_LOAD_CONFIGURATION = "/install/load";
+        String INSTALL_DATASOURCE_DIALECTS = "/install/datasource/sources";
         String LOGIN = "/login";
         String LOGOUT = "/j_spring_security_logout";
     }

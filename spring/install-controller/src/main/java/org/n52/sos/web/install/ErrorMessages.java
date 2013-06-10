@@ -29,6 +29,7 @@ package org.n52.sos.web.install;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public interface ErrorMessages {
+    String INVALID_DATASOURCE = "The datasource %s is invalid!";
     String POST_GIS_IS_NOT_INSTALLED_IN_THE_DATABASE = "PostGIS is not installed in the database.";
     String COULD_NOT_INSERT_TEST_DATA = "Could not insert test data: %s";
     String NO_DRIVER_SPECIFIED = "no driver specified";

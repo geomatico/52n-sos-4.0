@@ -26,23 +26,18 @@ package org.n52.sos.web.install;
 import org.n52.sos.web.ControllerConstants;
 
 public interface InstallConstants {
-    String IS_POSTGIS_INSTALLED = "SELECT version(), postgis_version()";
-
     /* request parameters */
-    String DRIVER_PARAMETER = "driver";
-    String CONNECTION_POOL_PARAMETER = "connection_pool";
-    String DIALECT_PARAMETER = "dialect";
-    String SCHEMA_PARAMETER = "schema";
     String OVERWRITE_TABLES_PARAMETER = "overwrite_tables";
     String CREATE_TEST_DATA_PARAMETER = "create_test_data";
     String CREATE_TABLES_PARAMETER = "create_tables";
+    String DATASOURCE_PARAMETER = "datasource";
     
     enum Step {
         /* DECLARATION ORDER IS IMPORTANT! */
         WELCOME(ControllerConstants.Paths.INSTALL_INDEX,
                 ControllerConstants.Views.INSTALL_INDEX),
-        DATABASE(ControllerConstants.Paths.INSTALL_DATABASE,
-                 ControllerConstants.Views.INSTALL_DATABASE),
+        DATASOURCE(ControllerConstants.Paths.INSTALL_DATASOURCE,
+                 ControllerConstants.Views.INSTALL_DATASOURCE),
         SETTINGS(ControllerConstants.Paths.INSTALL_SETTINGS,
                  ControllerConstants.Views.INSTALL_SETTINGS),
         FINISH(ControllerConstants.Paths.INSTALL_FINISH,

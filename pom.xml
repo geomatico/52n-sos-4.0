@@ -175,6 +175,16 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-datasource-postgres</artifactId>
+                <version>${sos.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>hibernate-datasource-h2file</artifactId>
+                <version>${sos.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>binding-kvp</artifactId>
                 <version>${sos.version}</version>
             </dependency>
@@ -220,7 +230,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>common-views</artifactId>
+                <artifactId>views</artifactId>
                 <version>${sos.version}</version>
                 <type>war</type>
             </dependency>
@@ -231,20 +241,8 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>admin-views</artifactId>
-                <version>${sos.version}</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>install-controller</artifactId>
                 <version>${sos.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>install-views</artifactId>
-                <version>${sos.version}</version>
-                <type>war</type>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -256,12 +254,6 @@
                 <artifactId>test</artifactId>
                 <version>${sos.version}</version>
 				<scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>client-views</artifactId>
-                <version>${sos.version}</version>
-                <type>war</type>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>

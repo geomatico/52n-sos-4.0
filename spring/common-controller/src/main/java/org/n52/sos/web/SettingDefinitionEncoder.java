@@ -25,6 +25,8 @@ package org.n52.sos.web;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +38,7 @@ import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingDefinitionGroup;
 import org.n52.sos.config.SettingType;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
+import org.n52.sos.ds.Datasource;
 
 /**
  * TODO JavaDoc
@@ -48,6 +51,22 @@ import org.n52.sos.config.settings.IntegerSettingDefinition;
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class SettingDefinitionEncoder {
+    public Map<SettingDefinitionGroup, Set<SettingDefinition>> sortByGroup(
+            Set<SettingDefinition<?, ?>> defs) {
+        Map<SettingDefinitionGroup, Set<SettingDefinition>> map =
+                new HashMap<SettingDefinitionGroup, Set<SettingDefinition>>();
+        for (SettingDefinition def : defs) {
+            SettingDefinitionGroup group = def.hasGroup() ? def.getGroup()
+                                           : Datasource.ADVANCED_GROUP;
+            Set<SettingDefinition> groupDefs = map.get(group);
+            if (groupDefs == null) {
+                map.put(group, groupDefs = new HashSet<SettingDefinition>());
+            }
+            groupDefs.add(def);
+        }
+        return map;
+    }
+
     
     public JSONObject encode(Map<SettingDefinitionGroup, Set<SettingDefinition>> grouped) throws JSONException {
         JSONArray sections = new JSONArray();
