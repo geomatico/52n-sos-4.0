@@ -135,7 +135,7 @@ public abstract class AbstractHibernateDatasource implements Datasource {
         config.addDirectory(resource("/mapping/core"));
         Boolean transactional = (Boolean) settings.get(
                 this.transactionalDefiniton.getKey());
-        if (transactional.booleanValue()) {
+        if (transactional != null && transactional.booleanValue()) {
             config.addDirectory(resource("/mapping/transactional"));
         }
         config.buildMappings();

@@ -27,14 +27,11 @@ package org.n52.sos.ds.datasource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.hibernate.dialect.Dialect;
-import org.hibernate.spatial.dialect.h2geodb.GeoDBDialect;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
@@ -44,12 +41,8 @@ import org.n52.sos.util.CollectionHelper;
  * TODO JavaDoc
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class H2InMemoryDatasource extends AbstractHibernateDatasource {
+public class H2InMemoryDatasource extends AbstractH2Datasource {
     private static final String DIALECT = "H2/GeoDB (in memory)";
-    private static final String H2_DRIVER_CLASS = "org.h2.Driver";
-    private static final String H2_DIALECT_CLASS = GeoDBDialect.class.getName();
-    private static final String DEFAULT_USERNAME = "sa";
-    private static final String DEFAULT_PASSWORD = "";
     private static final String JDBC_URL =
             "jdbc:h2:mem:sos;DB_CLOSE_DELAY=-1;INIT=create domain if not exists geometry as blob";
 
@@ -62,11 +55,6 @@ public class H2InMemoryDatasource extends AbstractHibernateDatasource {
     public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
         return CollectionHelper
                 .<SettingDefinition<?, ?>>set(getTransactionalDefiniton());
-    }
-
-    @Override
-    public Set<SettingDefinition<?, ?>> getChangableSettingDefinitions() {
-        return Collections.emptySet();
     }
 
     @Override
@@ -100,16 +88,6 @@ public class H2InMemoryDatasource extends AbstractHibernateDatasource {
     }
 
     @Override
-    public boolean supportsClear() {
-        return false;
-    }
-
-    @Override
-    public void clear(Properties settings) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Properties getDatasourceProperties(Map<String, Object> settings) {
         Properties p = new Properties();
         p.put(HibernateConstants.CONNECTION_URL, JDBC_URL);
@@ -139,11 +117,6 @@ public class H2InMemoryDatasource extends AbstractHibernateDatasource {
     @Override
     protected void validatePrerequisites(Connection con,
                                          DatabaseMetadata metadata) {
-    }
-
-    @Override
-    protected Dialect createDialect() {
-        return new GeoDBDialect();
     }
 
     @Override

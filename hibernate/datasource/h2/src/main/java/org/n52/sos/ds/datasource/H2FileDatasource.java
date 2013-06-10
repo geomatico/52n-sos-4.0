@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -37,8 +36,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.hibernate.dialect.Dialect;
-import org.hibernate.spatial.dialect.h2geodb.GeoDBDialect;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.settings.StringSettingDefinition;
@@ -49,12 +46,8 @@ import org.n52.sos.util.CollectionHelper;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class H2FileDatasource extends AbstractHibernateDatasource {
-    private static final String H2_DRIVER_CLASS = "org.h2.Driver";
-    private static final String H2_DIALECT_CLASS = GeoDBDialect.class.getName();
+public class H2FileDatasource extends AbstractH2Datasource {
     private static final String DIALECT = "H2/GeoDB (file based)";
-    private static final String DEFAULT_USERNAME = "sa";
-    private static final String DEFAULT_PASSWORD = "";
     private static final Pattern JDBC_URL_PATTERN =
             Pattern.compile("^jdbc:h2:(.+); INIT=create domain if not exists geometry as blob$");
     private static final String JDBC_URL_FORMAT =
@@ -64,11 +57,6 @@ public class H2FileDatasource extends AbstractHibernateDatasource {
             .setDescription("Set this to the name/path of the database you want to use for SOS.")
             .setDefaultValue(System.getProperty("user.home") +
                              File.separator + "sos");
-
-    @Override
-    protected Dialect createDialect() {
-        return new GeoDBDialect();
-    }
 
     @Override
     protected Connection openConnection(Map<String, Object> settings) throws
@@ -92,11 +80,6 @@ public class H2FileDatasource extends AbstractHibernateDatasource {
     public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
         return CollectionHelper
                 .<SettingDefinition<?, ?>>set(h2Database, getTransactionalDefiniton());
-    }
-
-    @Override
-    public Set<SettingDefinition<?, ?>> getChangableSettingDefinitions() {
-        return Collections.emptySet();
     }
 
     @Override
@@ -169,12 +152,6 @@ public class H2FileDatasource extends AbstractHibernateDatasource {
     }
 
     @Override
-    public void clear(Properties settings) {
-        /* TODO implement org.n52.sos.ds.datasource.H2FileDatasource.clear() */
-        throw new UnsupportedOperationException("org.n52.sos.ds.datasource.H2FileDatasource.clear() not yet implemented");
-    }
-
-    @Override
     public void insertTestData(Map<String, Object> settings) {
         /* TODO implement org.n52.sos.ds.datasource.H2FileDatasource.insertTestData() */
         throw new UnsupportedOperationException("org.n52.sos.ds.datasource.H2FileDatasource.insertTestData() not yet implemented");
@@ -196,10 +173,5 @@ public class H2FileDatasource extends AbstractHibernateDatasource {
     public void removeTestData(Properties settings) {
         /* TODO implement org.n52.sos.ds.datasource.H2FileDatasource.removeTestData() */
         throw new UnsupportedOperationException("org.n52.sos.ds.datasource.H2FileDatasource.removeTestData() not yet implemented");
-    }
-
-    @Override
-    public boolean supportsClear() {
-        return false;
     }
 }

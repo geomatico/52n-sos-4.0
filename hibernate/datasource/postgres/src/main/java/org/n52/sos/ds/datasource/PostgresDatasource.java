@@ -28,6 +28,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -35,6 +38,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.hibernate.dialect.Dialect;
+import org.hibernate.mapping.Table;
 import org.hibernate.spatial.dialect.postgis.PostgisDialect;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.n52.sos.config.SettingDefinition;
@@ -43,6 +47,7 @@ import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.StringHelper;
 
 
 /**
@@ -252,13 +257,37 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
 
     @Override
     public boolean supportsClear() {
-        return false;
+        return true;
     }
 
     @Override
-    public void clear(Properties settings) {
-        //FIXME datasource clear
-        throw new UnsupportedOperationException("org.n52.sos.ds.datasource.PostgresDatasource.clearDatabase() not yet implemented");
+    public void clear(Properties properties) {
+        Map<String, Object> settings = parseDatasourceProperties(properties);
+        CustomConfiguration config = getConfig(settings);
+        Iterator<Table> tables = config.getTableMappings();
+        List<String> names = new LinkedList<String>();
+        while (tables.hasNext()) {
+            Table table = tables.next();
+            if (table.isPhysicalTable()) {
+                names.add(table.getName());
+            }
+        }
+        if (!names.isEmpty()) {
+            Connection conn = null;
+            Statement stmt = null;
+            try {
+                conn = openConnection(settings);
+                stmt = conn.createStatement();
+                stmt.execute(String
+                        .format("truncate %s restart identity cascade",
+                                StringHelper.join(", ", names)));
+            } catch (SQLException ex) {
+                throw new ConfigurationException(ex);
+            } finally {
+                close(stmt);
+                close(conn);
+            }
+        }
     }
 
     @Override
