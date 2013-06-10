@@ -43,6 +43,10 @@ public class AbstractDatasourceController extends AbstractAdminController {
             try {
                 String className = getDatabaseSettingsHandler()
                         .get(Datasource.class.getCanonicalName());
+                if (className == null) {
+                    LOG.error("Can not find datasource class in datasource.properties!");
+                    throw new RuntimeException("Missing Datasource Property!");
+                }
                 datasource = (Datasource) Class.forName(className).newInstance();
             } catch (ClassNotFoundException ex) {
                 LOG.error("Can not instantiate Datasource!", ex);
