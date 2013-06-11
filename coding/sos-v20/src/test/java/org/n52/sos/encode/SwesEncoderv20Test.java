@@ -38,8 +38,10 @@ import net.opengis.swes.x20.InsertSensorResponseDocument;
 import net.opengis.swes.x20.UpdateSensorDescriptionResponseDocument;
 
 import org.apache.xmlbeans.XmlObject;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.n52.sos.config.SettingsManager;
 import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -64,7 +66,12 @@ public class SwesEncoderv20Test {
 	public final static void initDecoders() {
 		CodingRepository.getInstance();
 	}
-	
+
+    @AfterClass
+    public static void cleanUp(){
+        SettingsManager.getInstance().cleanup();
+    }
+
 	@Test public final void 
 	should_return_correct_encoder_keys()
 	{
