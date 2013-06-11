@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.n52.sos.ogc.om.features.AbstractFeature;
-import org.n52.sos.ogc.sos.SosResultTemplate;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 
 /**
@@ -54,7 +53,7 @@ public class OmObservationConstellation implements Serializable, Cloneable {
     /** type of the observation */
     private String observationType;
     
-    private SosResultTemplate sosResultTemplate;
+//    private SosResultTemplate sosResultTemplate;
 
     /**
      * default constructor
@@ -265,18 +264,6 @@ public class OmObservationConstellation implements Serializable, Cloneable {
                 && !observationType.equals(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION) && !observationType
                     .equals(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION));
     }
-    
-    public SosResultTemplate getResultTemplate() {
-        return sosResultTemplate;
-    }
-    
-    public void setResultTemplate(SosResultTemplate sosResultTemplate) {
-        this.sosResultTemplate = sosResultTemplate;
-    }
-
-    public boolean isSetResultTemplate() {
-        return sosResultTemplate != null;
-    }
 
     public boolean isSetObservationType() {
         return observationType != null && !observationType.isEmpty();
@@ -294,7 +281,6 @@ public class OmObservationConstellation implements Serializable, Cloneable {
         clone.setObservationType(this.getObservationType());
         clone.setOfferings(new HashSet<String>(this.getOfferings()));
         clone.setProcedure(this.getProcedure());
-        clone.setResultTemplate(this.getResultTemplate());
         return clone;
     }
 }

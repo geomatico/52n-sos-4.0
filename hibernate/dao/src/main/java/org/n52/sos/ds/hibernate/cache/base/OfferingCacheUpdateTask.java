@@ -266,6 +266,8 @@ class OfferingCacheUpdateTask extends RunnableAction {
             observationTypes.add(OMConstants.OBS_TYPE_OBSERVATION);
         } else if (observationDAO.checkGeometryObservationsFor(getOffering().getIdentifier(), session)) {
             observationTypes.add(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION);
+        } else if (observationDAO.checkSweDataArrayObservationsFor(getOffering().getIdentifier(), session)) {
+            observationTypes.add(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
         }
         return observationTypes;
     }

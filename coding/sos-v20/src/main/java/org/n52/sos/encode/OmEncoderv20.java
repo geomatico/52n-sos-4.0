@@ -271,7 +271,7 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
             }
         } else if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)) {
             // TODO create SosSweDataArray
-            SweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
+            SweDataArray dataArray = SweHelper.createSosSweDataArray(sosObservation);
             Map<HelperValues, String> additionalValues =
                     new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
             additionalValues.put(HelperValues.FOR_OBSERVATION, null);
@@ -303,7 +303,7 @@ public class OmEncoderv20 extends AbstractOmEncoderv20 {
     private XmlObject createMultiObservationValueToResult(OmObservation sosObservation) throws OwsExceptionReport {
         MultiObservationValues<?> observationValue = (MultiObservationValues) sosObservation.getValue();
         // TODO create SosSweDataArray
-        SweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
+        SweDataArray dataArray = SweHelper.createSosSweDataArray(sosObservation);
         Map<HelperValues, String> additionalValues =
                 new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
         additionalValues.put(HelperValues.FOR_OBSERVATION, null);

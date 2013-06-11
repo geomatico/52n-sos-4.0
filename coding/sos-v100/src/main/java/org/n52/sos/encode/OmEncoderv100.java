@@ -485,7 +485,7 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
             }
         } else if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)
                 || observationType.equals(OMConstants.RESULT_MODEL_OBSERVATION)) {
-            SweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
+            SweDataArray dataArray = SweHelper.createSosSweDataArray(sosObservation);
             Map<HelperValues, String> additionalValues =
                     new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
             additionalValues.put(HelperValues.FOR_OBSERVATION, null);
@@ -498,7 +498,7 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
         Map<HelperValues, String> additionalValues =
                 new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
         additionalValues.put(HelperValues.FOR_OBSERVATION, null);
-        SweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
+        SweDataArray dataArray = SweHelper.createSosSweDataArray(sosObservation);
         xbResult.set(CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE_101, dataArray, additionalValues));
     }
 

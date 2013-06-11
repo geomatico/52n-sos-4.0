@@ -211,7 +211,7 @@ public interface Sos2Constants {
      * The names of the extensions that we know off and might support
      */
     enum Extensions {
-        Subsetting;
+        SplitDataArrayIntoObservations, MergeObservationsIntoDataArray;
     }
 
     /** Constant for actual implementing version */

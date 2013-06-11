@@ -41,7 +41,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.n52.sos.cache.ContentCache;
 import org.n52.sos.ds.FeatureQueryHandler;
-import org.n52.sos.ds.hibernate.dao.ResultTemplateDAO;
 import org.n52.sos.ds.hibernate.entities.BlobObservation;
 import org.n52.sos.ds.hibernate.entities.BooleanObservation;
 import org.n52.sos.ds.hibernate.entities.CategoryObservation;
@@ -54,8 +53,9 @@ import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
-import org.n52.sos.ds.hibernate.entities.ResultTemplate;
+import org.n52.sos.ds.hibernate.entities.SweDataArrayObservation;
 import org.n52.sos.ds.hibernate.entities.TextObservation;
+import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.time.Time;
@@ -63,7 +63,6 @@ import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.AbstractPhenomenon;
 import org.n52.sos.ogc.om.MultiObservationValues;
-import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.ObservationValue;
 import org.n52.sos.ogc.om.OmObservableProperty;
 import org.n52.sos.ogc.om.OmObservation;
@@ -85,8 +84,8 @@ import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
-import org.n52.sos.ogc.sos.SosResultTemplate;
 import org.n52.sos.ogc.swe.SweAbstractDataComponent;
+import org.n52.sos.ogc.swe.SweDataArray;
 import org.n52.sos.ogc.swe.SweDataRecord;
 import org.n52.sos.ogc.swe.simpleType.SweBoolean;
 import org.n52.sos.ogc.swe.simpleType.SweCategory;
@@ -98,9 +97,11 @@ import org.n52.sos.ogc.swe.simpleType.SweTimeRange;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.service.profile.Profile;
+import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.XmlHelper;
 
 public class HibernateObservationUtilities {
 
@@ -175,7 +176,6 @@ public class HibernateObservationUtilities {
         final Map<String, SosProcedureDescription> procedures = new HashMap<String, SosProcedureDescription>(0);
         final Map<Integer, OmObservationConstellation> observationConstellations =
                 new HashMap<Integer, OmObservationConstellation>(0);
-        final Map<String, SosResultTemplate> sosResultTemplates = new HashMap<String, SosResultTemplate>(0);
         if (observations != null) {
             // now iterate over resultset and create Measurement for each row
             for (final Observation hObservation : observations) {
@@ -229,73 +229,42 @@ public class HibernateObservationUtilities {
                 // String mimeType = SosConstants.PARAMETER_NOT_SET;
 
                 final Value<?> value = getValueFromObservation(hObservation);
-                if (hObservation.getUnit() != null) {
-                    value.setUnit(hObservation.getUnit().getUnit());
-                }
-                checkOrSetObservablePropertyUnit(obsProps.get(phenID), value.getUnit());
-                final OmObservationConstellation obsConst =
-                        new OmObservationConstellation(procedure, obsProps.get(phenID), features.get(foiID));
-                /* get the offerings to find the templates */
-                if (obsConst.getOfferings() == null) {
-                    final HashSet<String> offerings =
-                            new HashSet<String>(getCache().getOfferingsForObservableProperty(
-                                    obsConst.getObservableProperty().getIdentifier()));
-                    offerings.retainAll(getCache().getOfferingsForProcedure(obsConst.getProcedure().getIdentifier()));
-                    obsConst.setOfferings(offerings);
-                }
-                final int obsConstHash = obsConst.hashCode();
-                if (!observationConstellations.containsKey(obsConstHash)) {
-                    if (StringHelper.isNotEmpty(resultModel)) {
-                        obsConst.setObservationType(resultModel);
+                if (value != null) {
+                    if (hObservation.getUnit() != null) {
+                        value.setUnit(hObservation.getUnit().getUnit());
                     }
-                    final ObservationConstellation hObservationConstellation =
-                            getObservationConstellation(hProcedure, hObservableProperty, hObservation.getOfferings(),
-                                    session);
-                    if (hObservationConstellation != null) {
-                        final String observationType = hObservationConstellation.getObservationType().getObservationType();
-                        obsConst.setObservationType(observationType);
-                        if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)
-                                || observationType.equals(OMConstants.OBS_TYPE_OBSERVATION)) {
-                            final List<ResultTemplate> hResultTemplates =
-                                    new ResultTemplateDAO()
-                                            .getResultTemplateObjectsForObservationConstellationAndFeature(
-                                                    hObservationConstellation, obsConst.getFeatureOfInterest(),
-                                                    session);
-                            // Set<ResultTemplate> hResultTemplates =
-                            // hObservationConstellation.getResultTemplates();
-                            if (hResultTemplates != null && !hResultTemplates.isEmpty()) {
-                                for (final ResultTemplate hResultTemplate : hResultTemplates) {
-                                    if (hResultTemplate.getIdentifier() != null
-                                            && !hResultTemplate.getIdentifier().isEmpty()) {
-                                        org.n52.sos.ogc.sos.SosResultTemplate sosResultTemplate;
-                                        if (sosResultTemplates.containsKey(hResultTemplate.getIdentifier())) {
-                                            sosResultTemplate =
-                                                    sosResultTemplates.get(hResultTemplate.getIdentifier());
-                                        } else {
-                                            sosResultTemplate = new org.n52.sos.ogc.sos.SosResultTemplate();
-                                            sosResultTemplate.setXmlResultStructure(hResultTemplate
-                                                    .getResultStructure());
-                                            sosResultTemplate.setXmResultEncoding(hResultTemplate.getResultEncoding());
-                                            sosResultTemplates.put(hResultTemplate.getIdentifier(), sosResultTemplate);
-                                        }
-                                        obsConst.setResultTemplate(sosResultTemplate);
-                                        break;
-                                    }
-                                }
-                            }
+                    checkOrSetObservablePropertyUnit(obsProps.get(phenID), value.getUnit());
+                    final OmObservationConstellation obsConst =
+                            new OmObservationConstellation(procedure, obsProps.get(phenID), features.get(foiID));
+                    /* get the offerings to find the templates */
+                    if (obsConst.getOfferings() == null) {
+                        final HashSet<String> offerings =
+                                new HashSet<String>(getCache().getOfferingsForObservableProperty(
+                                        obsConst.getObservableProperty().getIdentifier()));
+                        offerings.retainAll(getCache().getOfferingsForProcedure(obsConst.getProcedure().getIdentifier()));
+                        obsConst.setOfferings(offerings);
+                    }
+                    final int obsConstHash = obsConst.hashCode();
+                    if (!observationConstellations.containsKey(obsConstHash)) {
+                        if (StringHelper.isNotEmpty(resultModel)) {
+                            obsConst.setObservationType(resultModel);
                         }
+                        final ObservationConstellation hObservationConstellation =
+                                getObservationConstellation(hProcedure, hObservableProperty, hObservation.getOfferings(),
+                                        session);
+                        if (hObservationConstellation != null) {
+                            final String observationType = hObservationConstellation.getObservationType().getObservationType();
+                            obsConst.setObservationType(observationType);
+                        }
+                        observationConstellations.put(obsConstHash, obsConst);
                     }
-                    observationConstellations.put(obsConstHash, obsConst);
+                    final OmObservation sosObservation =
+                            createNewObservation(observationConstellations, hObservation, value, obsConstHash);
+                    observationCollection.add(sosObservation);
+                    session.evict(hObservation);
+                    // TODO check for ScrollableResult vs setFetchSize/setMaxResult
+                    // + setFirstResult
                 }
-                final OmObservation sosObservation =
-                        createNewObservation(observationConstellations, hObservation, value, obsConstHash);
-                if (hObservation.getSetId() != null && !hObservation.getSetId().isEmpty()) {
-                    sosObservation.setSetId(hObservation.getSetId());
-                }
-                observationCollection.add(sosObservation);
-                session.evict(hObservation);
-                // TODO check for ScrollableResult vs setFetchSize/setMaxResult
-                // + setFirstResult
             }
         }
         return observationCollection;
@@ -402,8 +371,10 @@ public class HibernateObservationUtilities {
      * @param hObservation
      *            Observation object
      * @return Observation value
+     * @throws OwsExceptionReport 
+     * @throws CodedException 
      */
-    private static Value<?> getValueFromObservation(final Observation hObservation) {
+    private static Value<?> getValueFromObservation(final Observation hObservation) throws CodedException, OwsExceptionReport {
         if (hObservation instanceof NumericObservation) {
             return new QuantityValue(((NumericObservation) hObservation).getValue());
         } else if (hObservation instanceof BooleanObservation) {
@@ -420,6 +391,10 @@ public class HibernateObservationUtilities {
             return new org.n52.sos.ogc.om.values.GeometryValue(((GeometryObservation) hObservation).getValue());
         } else if (hObservation instanceof BlobObservation) {
             return new UnknownValue(((BlobObservation) hObservation).getValue());
+        } else if (hObservation instanceof SweDataArrayObservation) {
+            SweDataArrayValue sweDataArrayValue = new SweDataArrayValue();
+            sweDataArrayValue.setValue((SweDataArray)CodingHelper.decodeXmlElement(XmlHelper.parseXmlString(((SweDataArrayObservation) hObservation).getValue())));
+            return sweDataArrayValue;
         }
         return null;
     }

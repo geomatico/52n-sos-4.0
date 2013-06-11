@@ -27,7 +27,6 @@ import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -44,12 +43,12 @@ import org.n52.sos.ds.hibernate.entities.NumericObservation;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Offering;
+import org.n52.sos.ds.hibernate.entities.SweDataArrayObservation;
 import org.n52.sos.ds.hibernate.entities.TextObservation;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
 import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.OGCConstants;
-import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.time.Time;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
@@ -61,6 +60,7 @@ import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.CountValue;
 import org.n52.sos.ogc.om.values.GeometryValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
+import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.om.values.UnknownValue;
 import org.n52.sos.ogc.om.values.Value;
@@ -180,6 +180,19 @@ public class ObservationDAO extends TimeCreator {
      */
     public boolean checkGeometryObservationsFor(String offeringIdentifier, Session session) {
         return checkObservationFor(GeometryObservation.class, offeringIdentifier, session);
+    }
+    
+    /**
+     * Check if there are geometry observations for the offering
+     * 
+     * @param offeringIdentifier
+     *            Offering identifier
+     * @param session
+     *            Hibernate session
+     * @return If there are observations or not
+     */
+    public boolean checkSweDataArrayObservationsFor(String offeringIdentifier, Session session) {
+        return checkObservationFor(SweDataArrayObservation.class, offeringIdentifier, session);
     }
 
     /**
@@ -331,31 +344,7 @@ public class ObservationDAO extends TimeCreator {
      *             If an error occurs.
      */
     public void insertObservationSingleValue(Set<ObservationConstellation> observationConstellations,
-            FeatureOfInterest feature, OmObservation observation, Session session) throws CodedException {
-        insertObservationSingleValueWithSetId(observationConstellations, feature, observation, null, session);
-    }
-
-    /**
-     * Insert a sinlge observation for observation constellations and
-     * featureOfInterest and with a set id
-     * 
-     * @param observationConstellations
-     *            Observation constellation objects
-     * @param feature
-     *            FeatureOfInterest object
-     * @param sosObservation
-     *            SOS observation to insert
-     * @param setId
-     *            Set id
-     * @param session
-     *            Hibernate session
-     * @throws CodedException
-     *             If an error occurs.
-     */
-    @SuppressWarnings("rawtypes")
-    private void insertObservationSingleValueWithSetId(Set<ObservationConstellation> observationConstellations,
-            FeatureOfInterest feature, OmObservation sosObservation, String setId, Session session)
-            throws CodedException {
+            FeatureOfInterest feature, OmObservation sosObservation, Session session) throws CodedException {
         SingleObservationValue<?> value = (SingleObservationValue) sosObservation.getValue();
         Observation hObservation = createObservationFromValue(value.getValue(), session);
         hObservation.setDeleted(false);
@@ -368,10 +357,6 @@ public class ObservationDAO extends TimeCreator {
         }
         if (!hObservation.isSetCodespace()) {
             hObservation.setCodespace(new CodespaceDAO().getOrInsertCodespace(OGCConstants.UNKNOWN, session));
-        }
-
-        if (setId != null && !setId.isEmpty()) {
-            hObservation.setSetId(setId);
         }
         Iterator<ObservationConstellation> iterator = observationConstellations.iterator();
         boolean firstObsConst = true;
@@ -400,8 +385,6 @@ public class ObservationDAO extends TimeCreator {
         session.flush();
     }
 
-    // TODO setID not yet tested - request observations of subset by id is
-    // working
     /**
      * Insert a multi value observation for observation constellations and
      * featureOfInterest
@@ -421,58 +404,53 @@ public class ObservationDAO extends TimeCreator {
             FeatureOfInterest feature, OmObservation containerObservation, Session session) throws OwsExceptionReport {
         List<OmObservation> unfoldObservations =
                 HibernateObservationUtilities.unfoldObservation(containerObservation);
-        int subObservationIndex = 0;
-        String setId = getSetId(containerObservation);
         for (OmObservation sosObservation : unfoldObservations) {
-            String idExtension = subObservationIndex + "";
-            setIdentifier(containerObservation, sosObservation, setId, idExtension);
-            insertObservationSingleValueWithSetId(observationConstellations, feature, sosObservation, setId, session);
-            subObservationIndex++;
+            insertObservationSingleValue(observationConstellations, feature, sosObservation, session);
         }
     }
 
-    /**
-     * Set observation identifier from container observation to observation
-     * 
-     * @param containerObservation
-     *            Container observation
-     * @param sosObservation
-     *            Observation
-     * @param antiSubsettingId
-     *            Anti subsetting identifier
-     * @param idExtension
-     *            Extension for observation identifier
-     */
-    private void setIdentifier(OmObservation containerObservation, OmObservation sosObservation,
-            String antiSubsettingId, String idExtension) {
-        if (containerObservation.isSetIdentifier()) {
-            String subObservationIdentifier = String.format("%s-%s", antiSubsettingId, idExtension);
-            CodeWithAuthority subObsIdentifier = new CodeWithAuthority(subObservationIdentifier);
-            subObsIdentifier.setCodeSpace(containerObservation.getIdentifier().getCodeSpace());
-            sosObservation.setIdentifier(subObsIdentifier);
-        }
-    }
-
-    /**
-     * Set set id to observation
-     * 
-     * @param observation
-     *            Observation
-     * @return Set id
-     */
-    private String getSetId(OmObservation observation) {
-        String antiSubsettingId = null;
-        if (observation.getIdentifier() != null) {
-            antiSubsettingId = observation.getIdentifier().getValue();
-        }
-
-        if (antiSubsettingId == null || antiSubsettingId.isEmpty()) {
-            // if identifier of sweArrayObservation is not set, generate UUID
-            // for antisubsetting column
-            antiSubsettingId = UUID.randomUUID().toString();
-        }
-        return antiSubsettingId;
-    }
+//    /**
+//     * Set observation identifier from container observation to observation
+//     * 
+//     * @param containerObservation
+//     *            Container observation
+//     * @param sosObservation
+//     *            Observation
+//     * @param antiSubsettingId
+//     *            Anti subsetting identifier
+//     * @param idExtension
+//     *            Extension for observation identifier
+//     */
+//    private void setIdentifier(OmObservation containerObservation, OmObservation sosObservation,
+//            String antiSubsettingId, String idExtension) {
+//        if (containerObservation.isSetIdentifier()) {
+//            String subObservationIdentifier = String.format("%s-%s", antiSubsettingId, idExtension);
+//            CodeWithAuthority subObsIdentifier = new CodeWithAuthority(subObservationIdentifier);
+//            subObsIdentifier.setCodeSpace(containerObservation.getIdentifier().getCodeSpace());
+//            sosObservation.setIdentifier(subObsIdentifier);
+//        }
+//    }
+//
+//    /**
+//     * Set set id to observation
+//     * 
+//     * @param observation
+//     *            Observation
+//     * @return Set id
+//     */
+//    private String getSetId(OmObservation observation) {
+//        String antiSubsettingId = null;
+//        if (observation.getIdentifier() != null) {
+//            antiSubsettingId = observation.getIdentifier().getValue();
+//        }
+//
+//        if (antiSubsettingId == null || antiSubsettingId.isEmpty()) {
+//            // if identifier of sweArrayObservation is not set, generate UUID
+//            // for antisubsetting column
+//            antiSubsettingId = UUID.randomUUID().toString();
+//        }
+//        return antiSubsettingId;
+//    }
 
     /**
      * Add phenomenon and result time to observation object
@@ -598,6 +576,10 @@ public class ObservationDAO extends TimeCreator {
         } else if (value instanceof TextValue) {
             TextObservation observation = new TextObservation();
             observation.setValue(((TextValue) value).getValue());
+            return observation;
+        } else if (value instanceof SweDataArrayValue) {
+            SweDataArrayObservation observation = new SweDataArrayObservation();
+            observation.setValue(((SweDataArrayValue)value).getValue().getXml());
             return observation;
         }
         return new Observation();

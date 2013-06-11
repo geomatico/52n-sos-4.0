@@ -68,7 +68,6 @@ public class HibernateObservationUtilitiesTest extends HibernateTestCase {
     private static final String FEATURE = "1000";
     private static final String OBSERVABLE_PROPERTY =
                                 "http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl#Discharge";
-    private static final String SET_ID = "junit_setId";
     private static final String PROCEDURE_DESCRIPTION_FORMAT = "junit_procedure_description_format";
     public static final String FEATURE_OF_INTEREST_TYPE = "junit_feature_of_interest_type";
     public static final String OFFERING = "junit_offering";
@@ -140,7 +139,6 @@ public class HibernateObservationUtilitiesTest extends HibernateTestCase {
             hObservation.setOfferings(Collections.singleton(hOffering));
             hObservation.setObservableProperty(hObservableProperty);
             hObservation.setFeatureOfInterest(hFeatureOfInterest);
-            hObservation.setSetId(SET_ID);
             hObservation.setDeleted(false);
 
             List<Observation> observationsFromDataBase = new ArrayList<Observation>();

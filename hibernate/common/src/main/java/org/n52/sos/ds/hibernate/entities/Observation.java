@@ -54,8 +54,6 @@ public class Observation implements Serializable, HasIdentifier, HasDeletedFlag,
 
     public static final String RESULT_TIME = "resultTime";
 
-    public static final String SET_ID = "setId";
-
     private long observationId;
 
     private FeatureOfInterest featureOfInterest;
@@ -81,8 +79,6 @@ public class Observation implements Serializable, HasIdentifier, HasDeletedFlag,
     private Date validTimeEnd;
 
     private Unit unit;
-
-    private String setId;
 
     private Set<Offering> offerings = new HashSet<Offering>(0);
 
@@ -196,14 +192,6 @@ public class Observation implements Serializable, HasIdentifier, HasDeletedFlag,
     @Override
     public void setUnit(final Unit unit) {
         this.unit = unit;
-    }
-
-    public String getSetId() {
-        return setId;
-    }
-
-    public void setSetId(final String setId) {
-        this.setId = setId;
     }
 
     @Override

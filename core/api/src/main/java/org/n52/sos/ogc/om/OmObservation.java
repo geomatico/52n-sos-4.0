@@ -70,8 +70,6 @@ public class OmObservation implements Serializable {
      */
     private ObservationValue<?> value;
     
-    private String setId;
-
     /**
      * token separator for the value tuples contained in the result element of
      * the generic observation
@@ -372,18 +370,6 @@ public class OmObservation implements Serializable {
         multiValue.setValue(tvpValue);
         this.value = multiValue;
         return tvpValue;
-    }
-
-    public void setSetId(String setId) {
-        this.setId = setId;
-    }
-    
-    public String getSetId() {
-        return setId;
-    }
-
-    public boolean isSetSetId() {
-        return setId != null && !setId.isEmpty();
     }
     
     public boolean isSetObservationID() {

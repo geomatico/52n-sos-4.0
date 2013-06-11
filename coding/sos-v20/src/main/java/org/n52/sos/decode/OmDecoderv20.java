@@ -297,11 +297,18 @@ public class OmDecoderv20 implements Decoder<OmObservation, OMObservationType> {
             if (decodedObject instanceof ObservationValue) {
                 return (ObservationValue) decodedObject;
             } else if (decodedObject instanceof SweDataArray) {
-                MultiObservationValues<SweDataArray> result = new MultiObservationValues<SweDataArray>();
                 SweDataArrayValue value = new SweDataArrayValue();
                 value.setValue((SweDataArray) decodedObject);
-                result.setValue(value);
-                return result;
+                // TODO add check for swes:extension
+                if (false) {
+                    MultiObservationValues<SweDataArray> result = new MultiObservationValues<SweDataArray>();
+                    result.setValue(value);
+                    return result;
+                } else {
+                    SingleObservationValue<SweDataArray> result = new SingleObservationValue<SweDataArray>();
+                    result.setValue(value);
+                    return result;
+                }
             }
             throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
                     .withMessage("The requested result type is not supported by this service!");

@@ -24,9 +24,7 @@
 package org.n52.sos.response;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.n52.sos.ogc.om.OmObservation;
 
@@ -52,27 +50,6 @@ public class GetObservationResponse extends AbstractServiceResponse {
 
     public void setObservationCollection(List<OmObservation> observationCollection) {
         this.observationCollection = observationCollection;
-    }
-
-    public void mergeObservationsWithSameAntiSubsettingIdentifier() {
-        List<OmObservation> mergedObservations = new ArrayList<OmObservation>(0);
-        Map<String, OmObservation> antiSubsettingObservations = new HashMap<String, OmObservation>(0);
-        for (OmObservation sosObservation : observationCollection) {
-            // TODO merge observations with the same antiSubsetting identifier.
-            if (sosObservation.isSetSetId()) {
-                if (antiSubsettingObservations.containsKey(sosObservation.getSetId())) {
-                    OmObservation antiSubsettingObservation =
-                            antiSubsettingObservations.get(sosObservation.getSetId());
-                    antiSubsettingObservation.mergeWithObservation(sosObservation);
-                } else {
-                    antiSubsettingObservations.put(sosObservation.getSetId(), sosObservation);
-                }
-            } else {
-                mergedObservations.add(sosObservation);
-            }
-        }
-        mergedObservations.addAll(antiSubsettingObservations.values());
-        this.observationCollection = mergedObservations;
     }
 
     public void mergeObservationsWithSameX() {
@@ -104,15 +81,6 @@ public class GetObservationResponse extends AbstractServiceResponse {
             
             this.observationCollection = mergedObservations;
         }
-    }
-
-    public boolean hasObservationsWithResultTemplate() {
-        for (OmObservation sosObservation : observationCollection) {
-            if (sosObservation.getObservationConstellation().isSetResultTemplate()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public void setResultModel(String resultModel) {

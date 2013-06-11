@@ -27,22 +27,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.n52.sos.ogc.gml.time.Time;
-import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.MultiObservationValues;
+import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.OmObservation;
 import org.n52.sos.ogc.om.SingleObservationValue;
 import org.n52.sos.ogc.om.TimeValuePair;
 import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.CountValue;
-import org.n52.sos.ogc.om.values.Value;
 import org.n52.sos.ogc.om.values.NilTemplateValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.om.values.TVPValue;
 import org.n52.sos.ogc.om.values.TextValue;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.SosResultTemplate;
+import org.n52.sos.ogc.om.values.Value;
 import org.n52.sos.ogc.swe.SweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SweDataArray;
 import org.n52.sos.ogc.swe.SweDataRecord;
@@ -64,47 +62,47 @@ public final class SweHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SweHelper.class);
 
-    public static SweDataArray createSosSweDataArrayFromObservationValue(OmObservation sosObservation)
-            throws OwsExceptionReport {
-        if (sosObservation.getObservationConstellation().isSetResultTemplate()) {
-            return createSosSweDataArrayWithResultTemplate(sosObservation);
-        } else {
-            return createSosSweDataArrayWithoutResultTemplate(sosObservation);
-        }
-    }
+//    public static SweDataArray createSosSweDataArrayFromObservationValue(OmObservation sosObservation)
+//            throws OwsExceptionReport {
+//        if (sosObservation.getv) {
+//            return createSosSweDataArrayWithResultTemplate(sosObservation);
+//        } else {
+//            return createSosSweDataArrayWithoutResultTemplate(sosObservation);
+//        }
+//    }
+//
+//    private static SweDataArray createSosSweDataArrayWithResultTemplate(OmObservation sosObservation)
+//            throws OwsExceptionReport {
+//        SosResultTemplate sosResultTemplate = sosObservation.getObservationConstellation().getResultTemplate();
+//        String observablePropertyIdentifier =
+//                sosObservation.getObservationConstellation().getObservableProperty().getIdentifier();
+//        SweDataArrayValue dataArrayValue = new SweDataArrayValue();
+//        SweDataArray dataArray = new SweDataArray();
+//        dataArray.setElementType(sosResultTemplate.getResultStructure());
+//        dataArray.setEncoding(sosResultTemplate.getResultEncoding());
+//        dataArrayValue.setValue(dataArray);
+//        if (sosObservation.getValue() instanceof SingleObservationValue) {
+//            SingleObservationValue<?> singleValue = (SingleObservationValue) sosObservation.getValue();
+//            dataArrayValue.addBlock(createBlock(dataArray.getElementType(), sosObservation.getPhenomenonTime(),
+//                    observablePropertyIdentifier, singleValue.getValue()));
+//        } else if (sosObservation.getValue() instanceof MultiObservationValues) {
+//            MultiObservationValues<?> multiValue = (MultiObservationValues) sosObservation.getValue();
+//            if (multiValue.getValue() instanceof SweDataArrayValue) {
+//                return ((SweDataArrayValue) multiValue.getValue()).getValue();
+//            } else if (multiValue.getValue() instanceof TVPValue) {
+//                TVPValue tvpValues = (TVPValue) multiValue.getValue();
+//                for (TimeValuePair timeValuePair : tvpValues.getValue()) {
+//                    List<String> newBlock =
+//                            createBlock(dataArray.getElementType(), timeValuePair.getTime(),
+//                                    observablePropertyIdentifier, timeValuePair.getValue());
+//                    dataArrayValue.addBlock(newBlock);
+//                }
+//            }
+//        }
+//        return dataArrayValue.getValue();
+//    }
 
-    private static SweDataArray createSosSweDataArrayWithResultTemplate(OmObservation sosObservation)
-            throws OwsExceptionReport {
-        SosResultTemplate sosResultTemplate = sosObservation.getObservationConstellation().getResultTemplate();
-        String observablePropertyIdentifier =
-                sosObservation.getObservationConstellation().getObservableProperty().getIdentifier();
-        SweDataArrayValue dataArrayValue = new SweDataArrayValue();
-        SweDataArray dataArray = new SweDataArray();
-        dataArray.setElementType(sosResultTemplate.getResultStructure());
-        dataArray.setEncoding(sosResultTemplate.getResultEncoding());
-        dataArrayValue.setValue(dataArray);
-        if (sosObservation.getValue() instanceof SingleObservationValue) {
-            SingleObservationValue<?> singleValue = (SingleObservationValue) sosObservation.getValue();
-            dataArrayValue.addBlock(createBlock(dataArray.getElementType(), sosObservation.getPhenomenonTime(),
-                    observablePropertyIdentifier, singleValue.getValue()));
-        } else if (sosObservation.getValue() instanceof MultiObservationValues) {
-            MultiObservationValues<?> multiValue = (MultiObservationValues) sosObservation.getValue();
-            if (multiValue.getValue() instanceof SweDataArrayValue) {
-                return ((SweDataArrayValue) multiValue.getValue()).getValue();
-            } else if (multiValue.getValue() instanceof TVPValue) {
-                TVPValue tvpValues = (TVPValue) multiValue.getValue();
-                for (TimeValuePair timeValuePair : tvpValues.getValue()) {
-                    List<String> newBlock =
-                            createBlock(dataArray.getElementType(), timeValuePair.getTime(),
-                                    observablePropertyIdentifier, timeValuePair.getValue());
-                    dataArrayValue.addBlock(newBlock);
-                }
-            }
-        }
-        return dataArrayValue.getValue();
-    }
-
-    private static SweDataArray createSosSweDataArrayWithoutResultTemplate(OmObservation sosObservation) {
+    public static SweDataArray createSosSweDataArray(OmObservation sosObservation) {
         String observablePropertyIdentifier =
                 sosObservation.getObservationConstellation().getObservableProperty().getIdentifier();
         SweDataArrayValue dataArrayValue = new SweDataArrayValue();
@@ -113,9 +111,13 @@ public final class SweHelper {
         dataArrayValue.setValue(dataArray);
         if (sosObservation.getValue() instanceof SingleObservationValue) {
             SingleObservationValue<?> singleValue = (SingleObservationValue) sosObservation.getValue();
+            if (singleValue.getValue() instanceof SweDataArrayValue) {
+                return (SweDataArray)singleValue.getValue().getValue();
+            } else {
             dataArray.setElementType(createElementType(singleValue.getValue(), observablePropertyIdentifier));
             dataArrayValue.addBlock(createBlock(dataArray.getElementType(), sosObservation.getPhenomenonTime(),
                     observablePropertyIdentifier, singleValue.getValue()));
+            }
         } else if (sosObservation.getValue() instanceof MultiObservationValues) {
             MultiObservationValues<?> multiValue = (MultiObservationValues) sosObservation.getValue();
             if (multiValue.getValue() instanceof SweDataArrayValue) {

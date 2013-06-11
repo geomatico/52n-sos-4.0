@@ -55,7 +55,6 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.swes.SwesExtensions;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.response.ServiceResponse;
@@ -93,42 +92,15 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
         boolean zipCompression = checkResponseFormat(sosRequest);
         String responseFormat = sosRequest.getResponseFormat();
         try {
-            // check SOS version for response encoding
             String namespace = responseFormat;
-            // // O&M 1.0.0
-            // if (responseFormat.equals(OMConstants.CONTENT_TYPE_OM)
-            // || responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM)) {
-            // namespace = responseFormat;
-            // contentType = OMConstants.CONTENT_TYPE_OM;
-            // }
-            // // O&M 2.0 non SOS 2.0
-            // else if
-            // (!request.getVersion().equals(Sos2Constants.SERVICEVERSION)
-            // && (responseFormat.equals(OMConstants.CONTENT_TYPE_OM_2) ||
-            // responseFormat
-            // .equals(OMConstants.RESPONSE_FORMAT_OM_2))) {
-            // namespace.append(responseFormat);
-            // contentType = OMConstants.CONTENT_TYPE_OM_2;
-            // }
-            // O&M 2.0 for SOS 2.0
-            // TODO: check if responseFormat is OM-Subtype
-            // else
             if (sosRequest.getVersion().equals(Sos2Constants.SERVICEVERSION)
                     && checkForObservationAndMeasurementV20Type(responseFormat)) {
                 namespace = Sos2Constants.NS_SOS_20;
             }
 
             GetObservationResponse response = getDao().getObservation(sosRequest);
-            // TODO check for correct merging
-            if (responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2)) {
-                if (!isSubsettingExtensionSet(sosRequest.getExtensions())
-                    || Configurator.getInstance().getProfileHandler().getActiveProfile().isAllowSubsettingForSOS20OM20()) {
-                    response.mergeObservationsWithSameAntiSubsettingIdentifier();
-                } else {
-                    response.mergeObservationsWithSameX();
-                }
-            }
-            if (Configurator.getInstance().getProfileHandler().getActiveProfile().isMergeValues()) {
+            // TODO check for correct merging, add merge if swes:extension is set
+            if ((!responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2)) || Configurator.getInstance().getProfileHandler().getActiveProfile().isMergeValues()) {
                 response.mergeObservationsWithSameX();
             }
 
@@ -334,11 +306,6 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
         return zipCompression;
     }
 
-    private boolean isSubsettingExtensionSet(SwesExtensions extensions) {
-        return extensions != null ? extensions.isBooleanExtensionSet(Sos2Constants.Extensions.Subsetting.name())
-                : false;
-    }
-    
     @Override
     public WSDLOperation getSosOperationDefinition() {
         return WSDLConstants.Operations.GET_OBSERVATION;

@@ -72,7 +72,6 @@ public class GetObservationByIdDAO extends AbstractGetObservationByIdDAO {
     @SuppressWarnings("unchecked")
     private List<Observation> queryObservation(GetObservationByIdRequest request, Session session) {
         final Criteria c = new ObservationDAO().getObservationClassCriteriaForResultModel(request.getResultModel(), session);
-        return c.add(Restrictions.or(Restrictions.in(Observation.IDENTIFIER, request.getObservationIdentifier()),
-                                     Restrictions.in(Observation.SET_ID, request.getObservationIdentifier()))).list();
+        return c.add(Restrictions.in(Observation.IDENTIFIER, request.getObservationIdentifier())).list();
     }
 }
