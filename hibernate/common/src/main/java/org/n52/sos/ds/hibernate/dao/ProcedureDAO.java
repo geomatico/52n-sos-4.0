@@ -32,6 +32,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
@@ -179,7 +180,7 @@ public class ProcedureDAO {
                         .add(Restrictions.eq(Procedure.IDENTIFIER, procedure));
         Object min = criteria.uniqueResult();
         if (min != null) {
-            return new DateTime(min);
+            return new DateTime(min, DateTimeZone.UTC);
         }
         return null;
     }
@@ -211,9 +212,9 @@ public class ProcedureDAO {
         if (maxStart == null && maxEnd == null) {
             return null;
         } else {
-            DateTime start = new DateTime(maxStart);
+            DateTime start = new DateTime(maxStart, DateTimeZone.UTC);
             if (maxEnd != null) {
-                DateTime end = new DateTime(maxEnd);
+                DateTime end = new DateTime(maxEnd, DateTimeZone.UTC);
                 if (end.isAfter(start)) {
                     return end;
                 }

@@ -23,7 +23,6 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +41,6 @@ import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.TProcedure;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.exception.ows.concrete.GenericThrowableWrapperException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.util.CollectionHelper;
