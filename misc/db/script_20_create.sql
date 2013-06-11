@@ -34,7 +34,7 @@ create table featureRelation (parentFeatureId int8 not null, childFeatureId int8
 create table geometryValue (observationId int8 not null, value GEOMETRY, primary key (observationId));
 create table numericValue (observationId int8 not null, value numeric(19, 2), primary key (observationId));
 create table observableProperty (observablePropertyId int8 not null, hibernateDiscriminator char(1) not null, identifier varchar(255) not null unique, description varchar(255), primary key (observablePropertyId));
-create table observation (observationId int8 not null, featureOfInterestId int8 not null, observablePropertyId int8 not null, procedureId int8 not null, phenomenonTimeStart timestamp not null, phenomenonTimeEnd timestamp not null, resultTime timestamp not null, identifier varchar(255) unique, codespaceId int8, deleted char(1) default 'F' not null check (deleted in ('T','F')), validTimeStart timestamp, validTimeEnd timestamp, unitId int8, setId varchar(255), primary key (observationId), unique (featureOfInterestId, observablePropertyId, procedureId, phenomenonTimeStart, phenomenonTimeEnd, resultTime));
+create table observation (observationId int8 not null, featureOfInterestId int8 not null, observablePropertyId int8 not null, procedureId int8 not null, phenomenonTimeStart timestamp not null, phenomenonTimeEnd timestamp not null, resultTime timestamp not null, identifier varchar(255) unique, codespaceId int8, deleted char(1) default 'F' not null check (deleted in ('T','F')), validTimeStart timestamp, validTimeEnd timestamp, unitId int8, primary key (observationId), unique (featureOfInterestId, observablePropertyId, procedureId, phenomenonTimeStart, phenomenonTimeEnd, resultTime));
 create table observationConstellation (observationConstellationId int8 not null, observablePropertyId int8 not null, procedureId int8 not null, observationTypeId int8, offeringId int8 not null, deleted char(1) default 'F' not null check (deleted in ('T','F')), hiddenChild char(1) default 'F' not null check (hiddenChild in ('T','F')), primary key (observationConstellationId), unique (observablePropertyId, procedureId, offeringId));
 create table observationHasOffering (observationId int8 not null, offeringId int8 not null, primary key (observationId, offeringId));
 create table observationType (observationTypeId int8 not null, observationType varchar(255) not null unique, primary key (observationTypeId));
@@ -49,6 +49,7 @@ create table relatedFeatureHasRole (relatedFeatureId int8 not null, relatedFeatu
 create table relatedFeatureRole (relatedFeatureRoleId int8 not null, relatedFeatureRole varchar(255) not null unique, primary key (relatedFeatureRoleId));
 create table resultTemplate (resultTemplateId int8 not null, offeringId int8 not null, observablePropertyId int8 not null, procedureId int8 not null, featureOfInterestId int8 not null, identifier varchar(255) not null, resultStructure text not null, resultEncoding text not null, primary key (resultTemplateId));
 create table sensorSystem (parentSensorId int8 not null, childSensorId int8 not null, primary key (childSensorId, parentSensorId));
+create table sweDataArrayValue (observationId int8 not null, value text, primary key (observationId));
 create table textValue (observationId int8 not null, value text, primary key (observationId));
 create table unit (unitId int8 not null, unit varchar(255) not null unique, primary key (unitId));
 create table validProcedureTime (validProcedureTimeId int8 not null, procedureId int8 not null, startTime timestamp not null, endTime timestamp, descriptionXml text not null, primary key (validProcedureTimeId));
@@ -68,7 +69,6 @@ alter table numericValue add constraint observationNumericValueFk foreign key (o
 create index obsResultTimeIdx on observation (resultTime);
 create index obsPhenTimeEndIdx on observation (phenomenonTimeEnd);
 create index obsPhenTimeStartIdx on observation (phenomenonTimeStart);
-create index observationSetIdx on observation (setId);
 create index obsCodespaceIdx on observation (codespaceId);
 create index obsObsPropIdx on observation (observablePropertyId);
 create index observationIdentifierIdx on observation (identifier);
@@ -108,6 +108,7 @@ alter table resultTemplate add constraint resultTemplateOfferingIdx foreign key 
 alter table resultTemplate add constraint resultTemplateFeatureIdx foreign key (featureOfInterestId) references featureOfInterest;
 alter table sensorSystem add constraint procedureParenfFk foreign key (parentSensorId) references procedure;
 alter table sensorSystem add constraint procedureChildFk foreign key (childSensorId) references procedure;
+alter table sweDataArrayValue add constraint observationSweDataArrayValueFk foreign key (observationId) references observation;
 alter table textValue add constraint observationTextValueFk foreign key (observationId) references observation;
 create index validProcedureTimeEndTimeIdx on validProcedureTime (endTime);
 create index validProcedureTimeStartTimeIdx on validProcedureTime (startTime);

@@ -45,9 +45,6 @@
         <many-to-one name="unit" class="org.n52.sos.ds.hibernate.entities.Unit" fetch="join" foreign-key="observationUnitFk">
             <column name="unitId" not-null="false" />
         </many-to-one>
-        <property name="setId" type="java.lang.String">
-            <column index="observationSetIdx" name="setId" />
-        </property>
         <set name="offerings" table="observationHasOffering" inverse="false" lazy="true" fetch="select" >
             <key>
                 <column name="observationId" not-null="true" />
@@ -82,6 +79,10 @@
         </joined-subclass>
 		<joined-subclass name="org.n52.sos.ds.hibernate.entities.TextObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="textValue">
         	<key column="observationId" foreign-key="observationTextValueFk" />
+        	<property name="value" type="org.hibernate.type.StringClobType" />
+        </joined-subclass>
+        <joined-subclass name="org.n52.sos.ds.hibernate.entities.SweDataArrayObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="sweDataArrayValue">
+        	<key column="observationId" foreign-key="observationSweDataArrayValueFk" />
         	<property name="value" type="org.hibernate.type.StringClobType" />
         </joined-subclass>
     </class>
