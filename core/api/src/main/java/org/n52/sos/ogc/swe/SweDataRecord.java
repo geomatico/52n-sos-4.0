@@ -26,6 +26,8 @@ package org.n52.sos.ogc.swe;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.n52.sos.ogc.swe.SWEConstants.SweDataComponentType;
+
 /**
  * SOS internal representation of SWE dataRecord
  * 
@@ -84,6 +86,11 @@ public class SweDataRecord extends SweAbstractDataComponent implements DataRecor
     @Override
     public boolean isSetFields() {
         return fields != null && !fields.isEmpty();
+    }
+    
+    @Override
+    public SweDataComponentType getDataComponentType(){
+    	return SweDataComponentType.DataRecord;
     }
     
 }

@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.n52.sos.ogc.swe.SWEConstants.SweDataComponentType;
 import org.n52.sos.ogc.swe.encoding.SweAbstractEncoding;
 import org.n52.sos.ogc.swe.simpleType.SweCount;
 
@@ -199,4 +200,8 @@ public class SweDataArray extends SweAbstractDataComponent{
         return isSetElementTyp() && isSetEncoding() && isSetValues();
     }
     
+    @Override
+    public SweDataComponentType getDataComponentType(){
+    	return SweDataComponentType.DataArray;
+    }
 }

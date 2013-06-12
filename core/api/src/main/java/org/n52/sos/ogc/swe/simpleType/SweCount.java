@@ -23,16 +23,11 @@
  */
 package org.n52.sos.ogc.swe.simpleType;
 
-import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
+import org.n52.sos.ogc.swe.SWEConstants.SweDataComponentType;
 
 public class SweCount extends SweAbstractSimpleType<Integer> {
     
     private Integer value;
-
-    @Override
-    public SweSimpleType getSimpleType() {
-        return SweSimpleType.Count;
-    }
 
     @Override
     public Integer getValue() {
@@ -56,6 +51,11 @@ public class SweCount extends SweAbstractSimpleType<Integer> {
             return Integer.toString(value.intValue());
         }
         return null;
+    }
+    
+    @Override
+    public SweDataComponentType getDataComponentType(){
+    	return SweDataComponentType.Count;
     }
 
 }

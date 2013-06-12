@@ -25,7 +25,7 @@ package org.n52.sos.ogc.swe.simpleType;
 
 import org.joda.time.DateTime;
 import org.n52.sos.ogc.swe.RangeValue;
-import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
+import org.n52.sos.ogc.swe.SWEConstants.SweDataComponentType;
 
 
 /**
@@ -36,17 +36,6 @@ public class SweTimeRange extends SweAbstractUomType<RangeValue<DateTime>> {
     
     private RangeValue<DateTime> value;
     
-
-    /**
-     * SWE simple type type
-     */
-    private final SweSimpleType simpleType = SweSimpleType.TimeRange;
-
-    @Override
-    public SweSimpleType getSimpleType() {
-        return simpleType;
-    }
-
     @Override
     public RangeValue<DateTime> getValue() {
         return value;
@@ -66,6 +55,11 @@ public class SweTimeRange extends SweAbstractUomType<RangeValue<DateTime>> {
     public SweTimeRange setValue(final RangeValue<DateTime> value) {
         this.value = value;
         return this;
+    }
+    
+    @Override
+    public SweDataComponentType getDataComponentType(){
+    	return SweDataComponentType.TimeRange;
     }
 
 }

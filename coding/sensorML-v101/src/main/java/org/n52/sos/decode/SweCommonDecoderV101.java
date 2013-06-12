@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.opengis.swe.x101.AbstractDataArrayType;
 import net.opengis.swe.x101.AbstractDataComponentType;
 import net.opengis.swe.x101.AbstractDataRecordDocument;
 import net.opengis.swe.x101.AbstractDataRecordType;

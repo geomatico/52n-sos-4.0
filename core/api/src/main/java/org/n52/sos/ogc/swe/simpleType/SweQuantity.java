@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.swe.simpleType;
 
-import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
+import org.n52.sos.ogc.swe.SWEConstants.SweDataComponentType;
 
 /**
  * SOS internal representation of SWE simpleType quantity
@@ -47,11 +47,6 @@ public class SweQuantity extends SweAbstractUomType<Double> {
      * constructor
      */
     public SweQuantity() {
-    }
-
-    @Override
-    public SweSimpleType getSimpleType() {
-        return SweSimpleType.Quantity;
     }
 
     /**
@@ -125,5 +120,10 @@ public class SweQuantity extends SweAbstractUomType<Double> {
 
     public boolean isSetAxisID() {
         return axisID != null && !axisID.isEmpty();
+    }
+    
+    @Override
+    public SweDataComponentType getDataComponentType(){
+    	return SweDataComponentType.Quantity;
     }
 }

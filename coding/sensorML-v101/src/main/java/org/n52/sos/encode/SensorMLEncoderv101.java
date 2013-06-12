@@ -924,7 +924,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             final XmlObject encoded = (XmlObject) encoder.encode(sosSweData);
             if (sosSweData instanceof SweAbstractSimpleType) {
                 final SweAbstractSimpleType<?> sosSweSimpleType = (SweAbstractSimpleType<?>) sosSweData;
-                switch (sosSweSimpleType.getSimpleType()) {
+                switch (sosSweSimpleType.getDataComponentType()) {
                 case Boolean:
                     xbField.addNewBoolean().set(encoded);
                     break;
@@ -946,7 +946,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
                 default:
                     throw new NoApplicableCodeException().withMessage(
                             "The SWE simpleType '%s' is not supported by this SOS SensorML encoder!", sosSweSimpleType
-                                    .getSimpleType().name());
+                                    .getDataComponentType().name());
                 }
             } else {
                 throw new NoApplicableCodeException().withMessage(
@@ -970,41 +970,47 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
      * 
      * @throws OwsExceptionReport
      */
-    private void addIoComponentPropertyType(final IoComponentPropertyType ioComponentPopertyType,
+    private void addIoComponentPropertyType(final IoComponentPropertyType ioComponentPropertyType,
             final SmlIo<?> sosSMLIO) throws OwsExceptionReport {
-        ioComponentPopertyType.setName(sosSMLIO.getIoName());
+        ioComponentPropertyType.setName(sosSMLIO.getIoName());
         final XmlObject encodeObjectToXml = CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE_101, sosSMLIO.getIoValue());
-        switch (sosSMLIO.getIoValue().getSimpleType()) {
+        switch (sosSMLIO.getIoValue().getDataComponentType()) {
         case Boolean:
-            ioComponentPopertyType.addNewBoolean().set(encodeObjectToXml);
+            ioComponentPropertyType.addNewBoolean().set(encodeObjectToXml);
             break;
         case Category:
-            ioComponentPopertyType.addNewCategory().set(encodeObjectToXml);
+            ioComponentPropertyType.addNewCategory().set(encodeObjectToXml);
             break;
         case Count:
-            ioComponentPopertyType.addNewCount().set(encodeObjectToXml);
+            ioComponentPropertyType.addNewCount().set(encodeObjectToXml);
             break;
         case CountRange:
-            ioComponentPopertyType.addNewCountRange().set(encodeObjectToXml);
+            ioComponentPropertyType.addNewCountRange().set(encodeObjectToXml);
             break;
         case ObservableProperty:
-            ioComponentPopertyType.addNewObservableProperty().set(encodeObjectToXml);
+            ioComponentPropertyType.addNewObservableProperty().set(encodeObjectToXml);
             break;
         case Quantity:
-            ioComponentPopertyType.addNewQuantity().set(encodeObjectToXml);
+            ioComponentPropertyType.addNewQuantity().set(encodeObjectToXml);
             break;
         case QuantityRange:
-            ioComponentPopertyType.addNewQuantityRange().set(encodeObjectToXml);
+            ioComponentPropertyType.addNewQuantityRange().set(encodeObjectToXml);
             break;
         case Text:
-            ioComponentPopertyType.addNewText().set(encodeObjectToXml);
+            ioComponentPropertyType.addNewText().set(encodeObjectToXml);
             break;
         case Time:
-            ioComponentPopertyType.addNewTime().set(encodeObjectToXml);
+            ioComponentPropertyType.addNewTime().set(encodeObjectToXml);
             break;
         case TimeRange:
-            ioComponentPopertyType.addNewTimeRange().set(encodeObjectToXml);
+            ioComponentPropertyType.addNewTimeRange().set(encodeObjectToXml);
             break;
+        case DataArray:
+        	ioComponentPropertyType.addNewAbstractDataArray1().set(encodeObjectToXml);
+        	break;
+        case DataRecord:
+        	ioComponentPropertyType.addNewAbstractDataRecord().set(encodeObjectToXml);
+        	break;
         default:
 
         }

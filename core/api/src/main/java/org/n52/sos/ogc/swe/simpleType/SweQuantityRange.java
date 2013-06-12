@@ -24,7 +24,7 @@
 package org.n52.sos.ogc.swe.simpleType;
 
 import org.n52.sos.ogc.swe.RangeValue;
-import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
+import org.n52.sos.ogc.swe.SWEConstants.SweDataComponentType;
 
 /**
  * SOS internal representation of SWE simpleType quantity
@@ -48,12 +48,6 @@ public class SweQuantityRange extends SweAbstractUomType<RangeValue<Double>> {
 	 * constructor
 	 */
 	public SweQuantityRange() {
-	}
-
-	@Override
-	public SweSimpleType getSimpleType()
-	{
-		return SweSimpleType.QuantityRange;
 	}
 
 	/**
@@ -128,5 +122,10 @@ public class SweQuantityRange extends SweAbstractUomType<RangeValue<Double>> {
     
     public boolean isSetAxisID() {
         return axisID != null && !axisID.isEmpty();
+    }
+    
+    @Override
+    public SweDataComponentType getDataComponentType(){
+    	return SweDataComponentType.QuantityRange;
     }
 }

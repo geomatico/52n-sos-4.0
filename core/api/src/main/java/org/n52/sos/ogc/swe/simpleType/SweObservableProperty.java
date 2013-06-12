@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.swe.simpleType;
 
-import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
+import org.n52.sos.ogc.swe.SWEConstants.SweDataComponentType;
 
 /**
  * SOS internal representation of SWE simpleType observableProperty
@@ -40,11 +40,6 @@ public class SweObservableProperty extends SweAbstractSimpleType<String> {
      * constructor
      */
     public SweObservableProperty() {
-    }
-
-    @Override
-    public SweSimpleType getSimpleType() {
-        return SweSimpleType.ObservableProperty;
     }
 
     @Override
@@ -65,6 +60,11 @@ public class SweObservableProperty extends SweAbstractSimpleType<String> {
     @Override
     public boolean isSetValue() {
         return value != null && !value.isEmpty();
+    }
+    
+    @Override
+    public SweDataComponentType getDataComponentType(){
+    	return SweDataComponentType.ObservableProperty;
     }
 
 }

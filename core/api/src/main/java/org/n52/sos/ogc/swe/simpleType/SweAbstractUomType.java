@@ -70,6 +70,6 @@ public abstract class SweAbstractUomType<T> extends SweAbstractSimpleType<T> {
 	public String toString()
 	{
 		return String.format("%s [simpleType=%s, value=%s, uom=%s, quality=%s]", 
-                getClass().getSimpleName(), getSimpleType(), getValue(), getUom(), getQuality());
+                getClass().getSimpleName(), getDataComponentType(), getValue(), getUom(), getQuality());
 	}
 }

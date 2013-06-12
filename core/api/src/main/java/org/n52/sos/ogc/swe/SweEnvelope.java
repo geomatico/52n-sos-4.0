@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName;
+import org.n52.sos.ogc.swe.SWEConstants.SweDataComponentType;
 import org.n52.sos.ogc.swe.simpleType.SweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SweTimeRange;
 import org.n52.sos.util.CollectionHelper;
@@ -185,5 +186,10 @@ public class SweEnvelope extends SweAbstractDataComponent {
             return false;
         }
         return true;
+    }
+    
+    @Override
+    public SweDataComponentType getDataComponentType(){
+    	return SweDataComponentType.Envelope;
     }
 }

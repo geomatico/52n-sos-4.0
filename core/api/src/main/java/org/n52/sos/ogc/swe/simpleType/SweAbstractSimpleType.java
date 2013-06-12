@@ -23,7 +23,6 @@
  */
 package org.n52.sos.ogc.swe.simpleType;
 
-import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
 import org.n52.sos.ogc.swe.SweAbstractDataComponent;
 
 /**
@@ -36,13 +35,6 @@ import org.n52.sos.ogc.swe.SweAbstractDataComponent;
 public abstract class SweAbstractSimpleType<T> extends SweAbstractDataComponent {
 
     private SweQuality quality;
-
-	/**
-     * Get type of simpleType
-     * 
-     * @return Type of simpleType
-     */
-    public abstract SweSimpleType getSimpleType();
 
     /**
      * Get quality information
@@ -100,7 +92,7 @@ public abstract class SweAbstractSimpleType<T> extends SweAbstractDataComponent 
 				this.getClass().getSimpleName(),
 				getValue(),
 				getQuality(),
-				getSimpleType());
+				getDataComponentType());
 	}
     
     

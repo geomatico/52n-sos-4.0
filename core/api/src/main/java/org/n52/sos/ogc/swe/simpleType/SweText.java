@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.swe.simpleType;
 
-import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
+import org.n52.sos.ogc.swe.SWEConstants.SweDataComponentType;
 
 /**
  * SOS internal representation of SWE simpleType text
@@ -45,11 +45,6 @@ public class SweText extends SweAbstractSimpleType<String> {
     }
 
     @Override
-    public SweSimpleType getSimpleType() {
-        return SweSimpleType.Text;
-    }
-
-    @Override
     public String getValue() {
         return value;
     }
@@ -68,5 +63,10 @@ public class SweText extends SweAbstractSimpleType<String> {
     @Override
     public boolean isSetValue() {
         return value != null && !value.isEmpty();
+    }
+    
+    @Override
+    public SweDataComponentType getDataComponentType(){
+    	return SweDataComponentType.Text;
     }
 }

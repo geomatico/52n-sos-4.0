@@ -26,6 +26,8 @@ package org.n52.sos.ogc.swe;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.n52.sos.ogc.swe.SWEConstants.SweDataComponentType;
+
 public class SweSimpleDataRecord extends SweAbstractDataComponent implements DataRecord {
     /**
      * SimpleDataRecord fields
@@ -79,5 +81,10 @@ public class SweSimpleDataRecord extends SweAbstractDataComponent implements Dat
     @Override
     public boolean isSetFields() {
         return fields != null && !fields.isEmpty();
+    }
+    
+    @Override
+    public SweDataComponentType getDataComponentType(){
+    	return SweDataComponentType.SimpleDataRecord;
     }
 }

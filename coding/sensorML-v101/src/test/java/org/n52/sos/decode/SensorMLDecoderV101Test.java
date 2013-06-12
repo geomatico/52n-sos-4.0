@@ -36,10 +36,14 @@ import net.opengis.sensorML.x101.ComponentsDocument.Components.ComponentList;
 import net.opengis.sensorML.x101.ComponentsDocument.Components.ComponentList.Component;
 import net.opengis.sensorML.x101.IdentificationDocument.Identification.IdentifierList;
 import net.opengis.sensorML.x101.IdentificationDocument.Identification.IdentifierList.Identifier;
+import net.opengis.sensorML.x101.InputsDocument.Inputs.InputList;
+import net.opengis.sensorML.x101.OutputsDocument.Outputs.OutputList;
 import net.opengis.sensorML.x101.SensorMLDocument;
 import net.opengis.sensorML.x101.SystemType;
 import net.opengis.sensorML.x101.TermDocument.Term;
 import net.opengis.swe.x101.AnyScalarPropertyType;
+import net.opengis.swe.x101.DataArrayType;
+import net.opengis.swe.x101.DataRecordType;
 import net.opengis.swe.x101.SimpleDataRecordType;
 
 import org.junit.AfterClass;
@@ -54,6 +58,8 @@ import org.n52.sos.ogc.sensorML.System;
 import org.n52.sos.ogc.sos.SosOffering;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SWEConstants;
+import org.n52.sos.ogc.swe.SWEConstants.SweDataComponentType;
+import org.n52.sos.ogc.swe.simpleType.SweAbstractSimpleType;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 
@@ -233,6 +239,36 @@ public class SensorMLDecoderV101Test {
 				.substitute(SensorMLConstants.SYSTEM_QNAME, SystemType.type);
 		IdentifierList xbIdentifierList = xbSystem.addNewIdentification().addNewIdentifierList();
 		addIdentifier(xbIdentifierList, "anyname", OGCConstants.URN_UNIQUE_IDENTIFIER, identifier);		
+	}
+
+	@Test
+	public void should_decode_io_from_sml() throws OwsExceptionReport
+	{
+		SensorMLDocument xbSmlDoc = SensorMLDocument.Factory.newInstance(XmlOptionsHelper.getInstance()
+				.getXmlOptions());
+		SystemType xbSystem = (SystemType) xbSmlDoc.addNewSensorML().addNewMember().addNewProcess()
+				 .substitute(SensorMLConstants.SYSTEM_QNAME, SystemType.type);
+		InputList xbInputList = xbSystem.addNewInputs().addNewInputList();
+		OutputList xbOutputList = xbSystem.addNewOutputs().addNewOutputList();
+		xbInputList.addNewInput().addNewBoolean();
+		xbInputList.addNewInput().addNewCount();
+
+		
+		xbOutputList.addNewOutput().addNewQuantity();
+		xbOutputList.addNewOutput().addNewAbstractDataArray1().set(DataArrayType.Factory.newInstance());
+		xbOutputList.addNewOutput().addNewAbstractDataRecord().set(DataRecordType.Factory.newInstance());
+		
+		AbstractProcess absProcess = decodeAbstractProcess(xbSmlDoc);
+		assertThat(absProcess.getInputs().get(0).getIoValue().getDataComponentType(), is (SweDataComponentType.Boolean));
+//		assertThat( ((SweAbstractSimpleType)absProcess.getInputs().get(0).getIoValue()).getDataComponentType(), is (SweDataComponentType.Boolean));
+		assertThat(absProcess.getInputs().get(1).getIoValue().getDataComponentType(), is (SweDataComponentType.Count));
+//		assertThat( ((SweAbstractSimpleType)absProcess.getInputs().get(1).getIoValue()).getDataComponentType(), is (SweDataComponentType.Count));
+
+		
+		assertThat(absProcess.getOutputs().get(0).getIoValue().getDataComponentType(), is (SweDataComponentType.Quantity));
+//		assertThat( ((SweAbstractSimpleType)absProcess.getOutputs().get(0).getIoValue()).getDataComponentType(), is (SweDataComponentType.Quantity));
+		assertThat(absProcess.getOutputs().get(1).getIoValue().getDataComponentType(), is (SweDataComponentType.DataArray));
+	        assertThat(absProcess.getOutputs().get(2).getIoValue().getDataComponentType(), is (SweDataComponentType.DataRecord));
 	}
 
 }

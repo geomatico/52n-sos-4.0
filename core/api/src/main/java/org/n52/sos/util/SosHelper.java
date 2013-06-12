@@ -54,6 +54,7 @@ import org.n52.sos.ogc.sensorML.elements.SmlIo;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.swe.SweAbstractDataComponent;
 import org.n52.sos.ogc.swe.simpleType.SweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SweTime;
@@ -446,12 +447,12 @@ public class SosHelper {
     }
 
     public static OmObservableProperty createSosOberavablePropertyFromSosSMLIo(final SmlIo<?> output) {
-        final SweAbstractSimpleType<?> ioValue = output.getIoValue();
+        final SweAbstractDataComponent ioValue = output.getIoValue();
         final String identifier = ioValue.getDefinition();
         final String description = ioValue.getDescription();
         String unit = null;
         String valueType = SosConstants.NOT_DEFINED;
-        switch (ioValue.getSimpleType()) {
+        switch (ioValue.getDataComponentType()) {
         case Boolean:
             valueType = "swe:Boolean";
             break;
@@ -484,6 +485,12 @@ public class SosHelper {
         case TimeRange:
             valueType = "swe:TimeRange";
             break;
+        case DataArray:
+        	valueType = "swe:DataArray";
+        	break;
+        case DataRecord:
+        	valueType = "swe:DataRecord";
+        	break;
         default:
             break;
         }

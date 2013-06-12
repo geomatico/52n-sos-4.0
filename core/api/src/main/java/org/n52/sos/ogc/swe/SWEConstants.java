@@ -222,22 +222,6 @@ public interface SWEConstants {
     }
 
     /**
-     * Enum for SWE simple types
-     */
-    enum SweSimpleType {
-        Boolean,
-        Category,
-        Count,
-        CountRange,
-        Quantity,
-        QuantityRange,
-        Text,
-        Time,
-        TimeRange,
-        ObservableProperty
-    }
-
-    /**
      * Enum for coordinate names
      */
     enum SweCoordinateName {
@@ -252,5 +236,28 @@ public interface SWEConstants {
     enum SosSensorDescription {
         XmlStringDescription,
         SosDescription
+    }
+    
+    /**
+     * Enum for SWE DataComponent types
+     */
+    enum SweDataComponentType {
+        DataArray,
+        DataRecord,
+        SimpleDataRecord,
+        Envelope,
+        Field,
+        Vector,
+        Position,
+        Boolean,
+        Category,
+        Count,
+        CountRange,
+        Quantity,
+        QuantityRange,
+        Text,
+        Time,
+        TimeRange,
+        ObservableProperty
     }
 }

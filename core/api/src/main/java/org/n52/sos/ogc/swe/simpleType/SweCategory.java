@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.swe.simpleType;
 
-import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
+import org.n52.sos.ogc.swe.SWEConstants.SweDataComponentType;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk
@@ -33,11 +33,6 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
 public class SweCategory extends SweAbstractUomType<String> {
 
     private String value;
-
-    @Override
-    public SweSimpleType getSimpleType() {
-        return SweSimpleType.Category;
-    }
 
     @Override
     public String getValue() {
@@ -67,7 +62,7 @@ public class SweCategory extends SweAbstractUomType<String> {
     @Override
     public String toString() {
         return String.format("SosSweCategory [quality=%s, value=%s, codeSpace=%s, simpleType=%s]", getQuality(),
-                value, getUom(), getSimpleType());
+                value, getUom(), getDataComponentType());
     }
 
     @Override
@@ -79,5 +74,8 @@ public class SweCategory extends SweAbstractUomType<String> {
     public String getStringValue() {
         return value;
     }
-
+    @Override
+    public SweDataComponentType getDataComponentType(){
+    	return SweDataComponentType.Category;
+    }
 }

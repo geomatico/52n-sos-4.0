@@ -93,6 +93,7 @@ import org.n52.sos.ogc.sensorML.elements.SmlIo;
 import org.n52.sos.ogc.sensorML.elements.SmlPosition;
 import org.n52.sos.ogc.sos.SosOffering;
 import org.n52.sos.ogc.swe.DataRecord;
+import org.n52.sos.ogc.swe.SweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SweField;
 import org.n52.sos.ogc.swe.simpleType.SweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SweText;
@@ -670,8 +671,8 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
         }
 
         final Object decodedObject = CodingHelper.decodeXmlElement(toDecode);
-        if (decodedObject instanceof SweAbstractSimpleType) {
-            sosIo.setIoValue((SweAbstractSimpleType) decodedObject);
+        if (decodedObject instanceof SweAbstractDataComponent) {
+            sosIo.setIoValue((SweAbstractDataComponent) decodedObject);
         } 
         else
         {

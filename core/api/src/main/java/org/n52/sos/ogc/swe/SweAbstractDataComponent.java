@@ -23,6 +23,8 @@
  */
 package org.n52.sos.ogc.swe;
 
+import org.n52.sos.ogc.swe.SWEConstants.SweDataComponentType;
+
 public abstract class SweAbstractDataComponent {
     
     private String definition;
@@ -142,5 +144,7 @@ public abstract class SweAbstractDataComponent {
         }
         return true;
     }
-    
+
+    public abstract SweDataComponentType getDataComponentType(); 
+   
 }

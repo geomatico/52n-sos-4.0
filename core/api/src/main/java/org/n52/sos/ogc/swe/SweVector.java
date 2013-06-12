@@ -26,6 +26,8 @@ package org.n52.sos.ogc.swe;
 
 import java.util.List;
 
+import org.n52.sos.ogc.swe.SWEConstants.SweDataComponentType;
+
 
 public class SweVector extends SweAbstractDataComponent {
 
@@ -80,4 +82,10 @@ public class SweVector extends SweAbstractDataComponent {
         }
         return true;
     }
+    
+    @Override
+    public SweDataComponentType getDataComponentType(){
+    	return SweDataComponentType.Vector;
+    }
+    
 }

@@ -23,6 +23,8 @@
  */
 package org.n52.sos.ogc.swe;
 
+import org.n52.sos.ogc.swe.SWEConstants.SweDataComponentType;
+
 
 
 /**
@@ -121,5 +123,9 @@ public class SweField extends SweAbstractDataComponent{
     public String toString() {
         return String.format("SosSweField[name=%s, element=%s]", getName(), getElement());
     }
-
+    
+    @Override
+    public SweDataComponentType getDataComponentType(){
+    	return SweDataComponentType.Field;
+    }
 }

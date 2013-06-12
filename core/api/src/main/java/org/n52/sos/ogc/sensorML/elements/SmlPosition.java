@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.n52.sos.ogc.swe.SweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SweCoordinate;
+import org.n52.sos.ogc.swe.SWEConstants.SweDataComponentType;
 
 /**
  * SOS internal representation of SensorML position
@@ -133,6 +134,11 @@ public class SmlPosition extends SweAbstractDataComponent {
     public SmlPosition setPosition(final List<SweCoordinate<?>> position) {
         this.position = position;
         return this;
+    }
+    
+    @Override
+    public SweDataComponentType getDataComponentType(){
+    	return SweDataComponentType.Position;
     }
 
 }
