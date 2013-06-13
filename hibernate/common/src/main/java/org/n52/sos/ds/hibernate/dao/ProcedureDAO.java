@@ -58,7 +58,7 @@ public class ProcedureDAO {
      * @return Procedure objects
      */
     @SuppressWarnings("unchecked")
-    public List<Procedure> getProcedureObjects(Session session) {
+    public List<Procedure> getProcedureObjects(final Session session) {
         return session.createCriteria(Procedure.class).list();
     }
 
@@ -71,7 +71,7 @@ public class ProcedureDAO {
      *            Hibernate session
      * @return Procedure object
      */
-    public Procedure getProcedureForIdentifier(String identifier, Session session) {
+    public Procedure getProcedureForIdentifier(final String identifier, final Session session) {
         return (Procedure) session.createCriteria(Procedure.class)
                 .add(Restrictions.eq(Procedure.IDENTIFIER, identifier)).uniqueResult();
     }
@@ -86,7 +86,7 @@ public class ProcedureDAO {
      * @return Procedure objects
      */
     @SuppressWarnings("unchecked")
-    public List<Procedure> getProceduresForIdentifiers(Collection<String> identifiers, Session session) {
+    public List<Procedure> getProceduresForIdentifiers(final Collection<String> identifiers, final Session session) {
         if (identifiers == null || identifiers.isEmpty()) {
             return Collections.EMPTY_LIST;
         }
@@ -104,7 +104,7 @@ public class ProcedureDAO {
      * @return Related procedure identifiers
      */
     @SuppressWarnings("unchecked")
-    public List<String> getProceduresForFeatureOfInterest(Session session, FeatureOfInterest feature) {
+    public List<String> getProceduresForFeatureOfInterest(final Session session, final FeatureOfInterest feature) {
         return session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false))
                 .createCriteria(Observation.FEATURE_OF_INTEREST)
                 .add(Restrictions.eq(FeatureOfInterest.IDENTIFIER, feature.getIdentifier()))
@@ -121,8 +121,8 @@ public class ProcedureDAO {
      * @return Procedure identifiers
      */
     @SuppressWarnings("unchecked")
-    public List<String> getProcedureIdentifiersForOffering(String offeringIdentifier, Session session) {
-        Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
+    public List<String> getProcedureIdentifiersForOffering(final String offeringIdentifier, final Session session) {
+        final Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
         c.createCriteria(Observation.PROCEDURE).setProjection(
                 Projections.distinct(Projections.property(Procedure.IDENTIFIER)));
         c.createCriteria(Observation.OFFERINGS).add(Restrictions.eq(Offering.IDENTIFIER, offeringIdentifier));
@@ -139,9 +139,9 @@ public class ProcedureDAO {
      * @return Procedure identifiers
      */
     @SuppressWarnings("unchecked")
-    public Collection<String> getProcedureIdentifiersForObservableProperty(String observablePropertyIdentifier,
-            Session session) {
-        Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
+    public Collection<String> getProcedureIdentifiersForObservableProperty(final String observablePropertyIdentifier,
+            final Session session) {
+        final Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
         c.createCriteria(Observation.PROCEDURE).setProjection(
                 Projections.distinct(Projections.property(Procedure.IDENTIFIER)));
         c.createCriteria(Observation.OBSERVABLE_PROPERTY).add(
@@ -158,7 +158,7 @@ public class ProcedureDAO {
      *            Hibernate session
      * @return Transactional procedure object
      */
-    public TProcedure getTProcedureForIdentifier(String identifier, Session session) {
+    public TProcedure getTProcedureForIdentifier(final String identifier, final Session session) {
         return (TProcedure) session.createCriteria(TProcedure.class)
                 .add(Restrictions.eq(Procedure.IDENTIFIER, identifier)).uniqueResult();
     }
@@ -172,13 +172,13 @@ public class ProcedureDAO {
      *            Hibernate session
      * @return min time for procedure
      */
-    public DateTime getMinDate4Procedure(String procedure, Session session) {
-        Criteria criteria =
+    public DateTime getMinDate4Procedure(final String procedure, final Session session) {
+        final Criteria criteria =
                 session.createCriteria(Observation.class)
                         .setProjection(Projections.min(Observation.PHENOMENON_TIME_START))
                         .add(Restrictions.eq(Observation.DELETED, false)).createCriteria(Observation.PROCEDURE)
                         .add(Restrictions.eq(Procedure.IDENTIFIER, procedure));
-        Object min = criteria.uniqueResult();
+        final Object min = criteria.uniqueResult();
         if (min != null) {
             return new DateTime(min, DateTimeZone.UTC);
         }
@@ -194,27 +194,27 @@ public class ProcedureDAO {
      *            Hibernate session
      * @return max time for procedure
      */
-    public DateTime getMaxDate4Procedure(String procedure, Session session) {
-        Criteria cstart =
+    public DateTime getMaxDate4Procedure(final String procedure, final Session session) {
+        final Criteria cstart =
                 session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false))
                         .setProjection(Projections.max(Observation.PHENOMENON_TIME_START))
                         .createCriteria(Observation.PROCEDURE).add(Restrictions.eq(Procedure.IDENTIFIER, procedure));
 
-        Object maxStart = cstart.uniqueResult();
+        final Object maxStart = cstart.uniqueResult();
 
-        Criteria cend =
+        final Criteria cend =
                 session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false))
                         .setProjection(Projections.max(Observation.PHENOMENON_TIME_END))
                         .createCriteria(Observation.PROCEDURE).add(Restrictions.eq(Procedure.IDENTIFIER, procedure));
 
-        Object maxEnd = cend.uniqueResult();
+        final Object maxEnd = cend.uniqueResult();
 
         if (maxStart == null && maxEnd == null) {
             return null;
         } else {
-            DateTime start = new DateTime(maxStart, DateTimeZone.UTC);
+            final DateTime start = new DateTime(maxStart, DateTimeZone.UTC);
             if (maxEnd != null) {
-                DateTime end = new DateTime(maxEnd, DateTimeZone.UTC);
+                final DateTime end = new DateTime(maxEnd, DateTimeZone.UTC);
                 if (end.isAfter(start)) {
                     return end;
                 }
@@ -236,16 +236,15 @@ public class ProcedureDAO {
      *            Hibernate session
      * @return Procedure object
      */
-    public Procedure getOrInsertProcedure(String identifier, ProcedureDescriptionFormat procedureDecriptionFormat,
-            Collection<String> parentProcedures, Session session) {
-        ProcedureDAO procedureDAO = new ProcedureDAO();
-        Procedure result = procedureDAO.getProcedureForIdentifier(identifier, session);
+    public Procedure getOrInsertProcedure(final String identifier, final ProcedureDescriptionFormat procedureDecriptionFormat,
+            final Collection<String> parentProcedures, final Session session) {
+        Procedure result = getProcedureForIdentifier(identifier, session);
         if (result == null) {
-            TProcedure newResult = new TProcedure();
+            final TProcedure newResult = new TProcedure();
             newResult.setProcedureDescriptionFormat(procedureDecriptionFormat);
             newResult.setIdentifier(identifier);
             if (CollectionHelper.isNotEmpty(parentProcedures)) {
-                newResult.setParents(CollectionHelper.asSet(procedureDAO.getProceduresForIdentifiers(parentProcedures,
+                newResult.setParents(CollectionHelper.asSet(getProceduresForIdentifiers(parentProcedures,
                         session)));
             }
             result = newResult;
