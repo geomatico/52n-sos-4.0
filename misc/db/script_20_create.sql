@@ -28,7 +28,7 @@ create table categoryValue (observationId int8 not null, value varchar(255), pri
 create table codespace (codespaceId int8 not null, codespace varchar(255) not null unique, primary key (codespaceId));
 create table compositePhenomenon (parentObservablePropertyId int8 not null, childObservablePropertyId int8 not null, primary key (childObservablePropertyId, parentObservablePropertyId));
 create table countValue (observationId int8 not null, value int4, primary key (observationId));
-create table featureOfInterest (featureOfInterestId int8 not null, hibernateDiscriminator char(1) not null, featureOfInterestTypeId int8 not null, identifier varchar(255), codespaceId int8, names text, geom GEOMETRY, descriptionXml text, url varchar(255) unique, primary key (featureOfInterestId));
+create table featureOfInterest (featureOfInterestId int8 not null, hibernateDiscriminator char(1) not null, featureOfInterestTypeId int8 not null, identifier varchar(255) unique, codespaceId int8, names text, geom GEOMETRY, descriptionXml text, url varchar(255) unique, primary key (featureOfInterestId));
 create table featureOfInterestType (featureOfInterestTypeId int8 not null, featureOfInterestType varchar(255) not null unique, primary key (featureOfInterestTypeId));
 create table featureRelation (parentFeatureId int8 not null, childFeatureId int8 not null, primary key (childFeatureId, parentFeatureId));
 create table geometryValue (observationId int8 not null, value GEOMETRY, primary key (observationId));
@@ -59,7 +59,6 @@ alter table categoryValue add constraint observationCategoryValueFk foreign key 
 alter table compositePhenomenon add constraint observablePropertyChildFk foreign key (childObservablePropertyId) references observableProperty;
 alter table compositePhenomenon add constraint observablePropertyParentFk foreign key (parentObservablePropertyId) references observableProperty;
 alter table countValue add constraint observationCountValueFk foreign key (observationId) references observation;
-create index featureOfInterestIdentifierIdx on featureOfInterest (identifier);
 alter table featureOfInterest add constraint featureFeatureTypeFk foreign key (featureOfInterestTypeId) references featureOfInterestType;
 alter table featureOfInterest add constraint featureCodespaceFk foreign key (codespaceId) references codespace;
 alter table featureRelation add constraint featureOfInterestParentFk foreign key (parentFeatureId) references featureOfInterest;
@@ -71,7 +70,6 @@ create index obsPhenTimeEndIdx on observation (phenomenonTimeEnd);
 create index obsPhenTimeStartIdx on observation (phenomenonTimeStart);
 create index obsCodespaceIdx on observation (codespaceId);
 create index obsObsPropIdx on observation (observablePropertyId);
-create index observationIdentifierIdx on observation (identifier);
 create index obsFeatureIdx on observation (featureOfInterestId);
 create index obsProcedureIdx on observation (procedureId);
 alter table observation add constraint observationUnitFk foreign key (unitId) references unit;
@@ -112,7 +110,6 @@ alter table sweDataArrayValue add constraint observationSweDataArrayValueFk fore
 alter table textValue add constraint observationTextValueFk foreign key (observationId) references observation;
 create index validProcedureTimeEndTimeIdx on validProcedureTime (endTime);
 create index validProcedureTimeStartTimeIdx on validProcedureTime (startTime);
-alter table validProcedureTime add constraint FK70D221A4BAE84963 foreign key (procedureId) references procedure;
 alter table validProcedureTime add constraint validProcedureTimeProcedureFk foreign key (procedureId) references procedure;
 create sequence codespaceId_seq;
 create sequence featureOfInterestId_seq;
