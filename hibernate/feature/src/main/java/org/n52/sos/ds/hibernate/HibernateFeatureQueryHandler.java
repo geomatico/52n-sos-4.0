@@ -78,7 +78,7 @@ import com.vividsolutions.jts.geom.Geometry;
 @Configurable
 public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateFeatureQueryHandler.class);
-    private static final int EPSG_WGS84_3D = 4329;
+    private static final int EPSG_WGS84_3D = 4979;
     private static final int EPSG_WGS84 = 4326;
     private List<Range> epsgsWithReversedAxisOrder;
     private int defaultEPSG;
