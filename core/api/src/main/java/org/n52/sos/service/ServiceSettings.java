@@ -42,7 +42,7 @@ public class ServiceSettings implements SettingDefinitionProvider {
 
     public static final String SERVICE_URL = "service.sosUrl";
     public static final String MINIMUM_GZIP_SIZE = "service.minimumGzipSize";
-    public static final String SUPPORTS_QUALITY = "service.supportsQuality";
+//    public static final String SUPPORTS_QUALITY = "service.supportsQuality";
     public static final String SENSOR_DIRECTORY = "service.sensorDirectory";
     public static final String USE_DEFAULT_PREFIXES = "service.useDefaultPrefixes";
     public static final String ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR = "service.encodeFullChildrenInDescribeSensor";
@@ -77,13 +77,14 @@ public class ServiceSettings implements SettingDefinitionProvider {
             .setTitle("Maximum number of observations")
             .setDescription("Maximum number of observation in GetObservation responses. "
                             + "Set to <code>0</code> (zero) for unlimited number of observations.");
-    public static final BooleanSettingDefinition SUPPORTS_QUALITY_DEFINITION = new BooleanSettingDefinition()
-            .setGroup(GROUP)
-            .setOrder(5)
-            .setKey(SUPPORTS_QUALITY)
-            .setDefaultValue(true)
-            .setTitle("Supports quality")
-            .setDescription("Support quality information in observations.");
+    // TODO quality is not yet supported
+//    public static final BooleanSettingDefinition SUPPORTS_QUALITY_DEFINITION = new BooleanSettingDefinition()
+//            .setGroup(GROUP)
+//            .setOrder(5)
+//            .setKey(SUPPORTS_QUALITY)
+//            .setDefaultValue(true)
+//            .setTitle("Supports quality")
+//            .setDescription("Support quality information in observations.");
     
     public static final StringSettingDefinition SENSOR_DIRECTORY_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
@@ -117,7 +118,7 @@ public class ServiceSettings implements SettingDefinitionProvider {
             SERVICE_URL_DEFINITION,
             MINIMUM_GZIP_SIZE_DEFINITION,
             MAX_GET_OBSERVATION_RESULTS_DEFINITION,
-            SUPPORTS_QUALITY_DEFINITION,
+//            SUPPORTS_QUALITY_DEFINITION,
             SENSOR_DIRECTORY_DEFINITION,
             USE_DEFAULT_PREFIXES_DEFINITION,
             ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR_DEFINITION);

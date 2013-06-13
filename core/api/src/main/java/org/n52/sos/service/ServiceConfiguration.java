@@ -222,10 +222,10 @@ public class ServiceConfiguration {
         return supportsQuality;
     }
 
-    @Setting(SUPPORTS_QUALITY)
-    public void setSupportsQuality(final boolean supportsQuality) {
-        this.supportsQuality = supportsQuality;
-    }
+//    @Setting(SUPPORTS_QUALITY)
+//    public void setSupportsQuality(final boolean supportsQuality) {
+//        this.supportsQuality = supportsQuality;
+//    }
 
     @Setting(GML_DATE_FORMAT)
     public void setGmlDateFormat(final String format) {
