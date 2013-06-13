@@ -9,7 +9,7 @@
             	<param name="sequence">validProcedureTimeId_seq</param>
             </generator>
         </id>
-       <many-to-one name="procedure" class="org.n52.sos.ds.hibernate.entities.Procedure" fetch="join" foreign-key="validProcedureTimeProcedureFk">
+       <many-to-one name="procedure" class="org.n52.sos.ds.hibernate.entities.TProcedure" fetch="join" foreign-key="validProcedureTimeProcedureFk">
             <column name="procedureId" not-null="true" />
         </many-to-one>
         <property name="startTime" type="timestamp">
