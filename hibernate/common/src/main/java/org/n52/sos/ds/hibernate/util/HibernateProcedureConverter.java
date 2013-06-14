@@ -108,7 +108,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @author <a href="mailto:c.hollmann@52north.org">Carsten Hollmann</a>
  * @author <a href="mailto:c.autermann@52north.org">Christian Autermann</a>
- * @author ShaneStClair
+ * @author <a href="mailto:shane@axiomalaska.com">Shane StClair</a>
  * 
  * @since 4.0.0
  * 

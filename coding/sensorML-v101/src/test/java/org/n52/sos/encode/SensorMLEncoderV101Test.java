@@ -23,6 +23,8 @@
  */
 package org.n52.sos.encode;
 
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
@@ -46,7 +48,9 @@ import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.System;
 import org.n52.sos.ogc.sensorML.elements.SmlIdentifier;
+import org.n52.sos.ogc.sensorML.elements.SmlIo;
 import org.n52.sos.ogc.sos.SosOffering;
+import org.n52.sos.ogc.swe.simpleType.SweQuantity;
 import org.n52.sos.util.CodingHelper;
 
 /**
@@ -70,7 +74,7 @@ public class SensorMLEncoderV101Test {
 		System system = new System();
 		sensorMl.addMember(system);		
 		system.addIdentifier(new SmlIdentifier(TEST_NAME_1, OGCConstants.URN_UNIQUE_IDENTIFIER, TEST_ID_1));
-		SystemType xbSystem = decodeSystem(sensorMl);
+		SystemType xbSystem = encodeSystem(sensorMl);
 		assertThat(xbSystem.getIdentificationArray().length, is(1));
 		IdentifierList xbIdentifierList = xbSystem.getIdentificationArray()[0].getIdentifierList();
 		assertThat(xbIdentifierList.sizeOfIdentifierArray(), is(1));
@@ -80,7 +84,7 @@ public class SensorMLEncoderV101Test {
 		assertThat(xbIdentifier.getTerm().getValue(), is(TEST_ID_1));
 	}
 
-	private SystemType decodeSystem(SensorML sensorMl) throws OwsExceptionReport {
+	private SystemType encodeSystem(SensorML sensorMl) throws OwsExceptionReport {
 		XmlObject encodedSml = CodingHelper.encodeObjectToXml(SensorMLConstants.NS_SML, sensorMl);
 		assertThat(encodedSml, instanceOf(SensorMLDocument.class));
 		net.opengis.sensorML.x101.SensorMLDocument.SensorML xbSml = ((SensorMLDocument) encodedSml).getSensorML();
@@ -89,12 +93,12 @@ public class SensorMLEncoderV101Test {
 		return (SystemType) xbSml.getMemberArray()[0].getProcess();
 	}
 
-	private SimpleDataRecordType decodeSimpleDataRecord(SensorML sensorMl, String capName, int fields)
+	private SimpleDataRecordType encodeSimpleDataRecord(SensorML sensorMl, String capName, int fields)
 			throws OwsExceptionReport {
-		return decodeSimpleDataRecord(decodeSystem(sensorMl), capName, fields);
+		return encodeSimpleDataRecord(encodeSystem(sensorMl), capName, fields);
 	}
 	
-	private SimpleDataRecordType decodeSimpleDataRecord(SystemType xbSystem, String capName, int fields) {
+	private SimpleDataRecordType encodeSimpleDataRecord(SystemType xbSystem, String capName, int fields) {
 		assertThat(xbSystem.getCapabilitiesArray().length, is(1));
 		Capabilities xbCapabilities = xbSystem.getCapabilitiesArray()[0];
 		assertThat(xbCapabilities.getName(), is(capName));
@@ -120,7 +124,7 @@ public class SensorMLEncoderV101Test {
 		sensorMl.addMember(system);		
 		system.addFeatureOfInterest(TEST_ID_1);
 		system.addFeatureOfInterest(TEST_ID_2);
-		SimpleDataRecordType xbSimpleDataRecord = decodeSimpleDataRecord(sensorMl,
+		SimpleDataRecordType xbSimpleDataRecord = encodeSimpleDataRecord(sensorMl,
 				SensorMLConstants.ELEMENT_NAME_FEATURES_OF_INTEREST, 2);
 		validateField(xbSimpleDataRecord.getFieldArray()[0],
 				SensorMLConstants.FEATURE_OF_INTEREST_FIELD_NAME + 1,
@@ -138,7 +142,7 @@ public class SensorMLEncoderV101Test {
 		sensorMl.addMember(system);		
 		system.addOffering(new SosOffering(TEST_ID_1,TEST_NAME_1));
 		system.addOffering(new SosOffering(TEST_ID_2,TEST_NAME_2));
-		SimpleDataRecordType xbSimpleDataRecord = decodeSimpleDataRecord(sensorMl,
+		SimpleDataRecordType xbSimpleDataRecord = encodeSimpleDataRecord(sensorMl,
 				SensorMLConstants.ELEMENT_NAME_OFFERINGS, 2);
 		validateField(xbSimpleDataRecord.getFieldArray()[0], TEST_NAME_1,
 				SensorMLConstants.OFFERING_FIELD_DEFINITION, TEST_ID_1);
@@ -154,7 +158,7 @@ public class SensorMLEncoderV101Test {
 		sensorMl.addMember(system);		
 		system.addParentProcedure(TEST_ID_1);
 		system.addParentProcedure(TEST_ID_2);
-		SimpleDataRecordType xbSimpleDataRecord = decodeSimpleDataRecord(sensorMl,
+		SimpleDataRecordType xbSimpleDataRecord = encodeSimpleDataRecord(sensorMl,
 				SensorMLConstants.ELEMENT_NAME_PARENT_PROCEDURES, 2);
 		validateField(xbSimpleDataRecord.getFieldArray()[0],
 				SensorMLConstants.PARENT_PROCEDURE_FIELD_NAME + 1,
@@ -173,15 +177,63 @@ public class SensorMLEncoderV101Test {
 		System childProcedure = new System();
 		system.addChildProcedure(childProcedure);
 		childProcedure.addFeatureOfInterest(TEST_ID_1);
-		SystemType xbSystemType = decodeSystem(sensorMl);
+		SystemType xbSystemType = encodeSystem(sensorMl);
 		assertThat(xbSystemType.getComponents().getComponentList().sizeOfComponentArray(), is(1));
 		Component xbComponent = xbSystemType.getComponents().getComponentList().getComponentArray(0);
 		assertThat(xbComponent.getProcess(), instanceOf(SystemType.class));
 		SystemType xbComponentSystem = (SystemType) xbComponent.getProcess();
-		SimpleDataRecordType xbSimpleDataRecord = decodeSimpleDataRecord(xbComponentSystem,
+		SimpleDataRecordType xbSimpleDataRecord = encodeSimpleDataRecord(xbComponentSystem,
 				SensorMLConstants.ELEMENT_NAME_FEATURES_OF_INTEREST, 1);
 		validateField(xbSimpleDataRecord.getFieldArray(0), SensorMLConstants.FEATURE_OF_INTEREST_FIELD_NAME,
 				SensorMLConstants.FEATURE_OF_INTEREST_FIELD_DEFINITION, TEST_ID_1);
 	}
+
 	
+    @Test
+    public void should_aggregate_child_outputs() throws OwsExceptionReport
+    {
+        SweQuantity q1 = new SweQuantity();
+        q1.setDefinition("def1");
+        q1.setUom("uom1");
+        final SmlIo<?> output1 = new SmlIo<SweQuantity>(q1);
+
+        SweQuantity q2 = new SweQuantity();
+        q2.setDefinition("def2");
+        q2.setUom("uom2");
+        final SmlIo<?> output2 = new SmlIo<SweQuantity>(q2);
+        
+        SweQuantity q3 = new SweQuantity();
+        q3.setDefinition("def3");
+        q3.setUom("uom3");
+        final SmlIo<?> output3 = new SmlIo<SweQuantity>(q3);
+        
+        SensorML sensorMl = new SensorML();
+        sensorMl.setIdentifier("sensorMl");
+        System system = new System();
+        system.setIdentifier("system");
+        sensorMl.addMember(system);
+        system.getOutputs().add(output1);
+        
+        SensorML childSml = new SensorML();
+        childSml.setIdentifier("childSml");
+        System childSystem = new System();
+        childSystem.setIdentifier("childSystem");
+        childSml.addMember(childSystem);
+        system.addChildProcedure(childSml);
+        childSystem.getOutputs().add(output2);
+        
+        SensorML grandchildSml = new SensorML();
+        grandchildSml.setIdentifier("grandchildSml");
+        System grandchildSystem = new System();
+        grandchildSystem.setIdentifier("grandchildSystem");
+        grandchildSml.addMember(grandchildSystem);
+        childSystem.addChildProcedure(grandchildSml);
+        grandchildSystem.getOutputs().add(output3);
+        
+        encodeSystem(sensorMl);
+                
+        assertThat(system.getOutputs(), hasItems(output1, output2, output3));
+        assertThat(childSystem.getOutputs(), hasItems(output2, output3));
+        assertThat(grandchildSystem.getOutputs(), hasItem(output3));
+    }
 }
