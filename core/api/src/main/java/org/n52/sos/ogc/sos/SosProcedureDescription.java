@@ -170,4 +170,9 @@ public abstract class SosProcedureDescription {
         }
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "SosProcedureDescription [identifier=" + identifier + "]";
+    }
 }
