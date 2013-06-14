@@ -111,7 +111,7 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
     }
 
     @Override
-    public AbstractServiceRequest decode(XmlObject xmlObject) throws OwsExceptionReport {
+    public AbstractServiceRequest decode(final XmlObject xmlObject) throws OwsExceptionReport {
         LOGGER.debug("REQUESTTYPE:" + xmlObject.getClass());
         XmlHelper.validateDocument(xmlObject);
         if (xmlObject instanceof DescribeSensorDocument) {
@@ -139,9 +139,9 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
      * @throws OwsExceptionReport
      *             * if validation of the request failed
      */
-    private AbstractServiceRequest parseDescribeSensor(DescribeSensorDocument xbDescSenDoc) throws OwsExceptionReport {
-        DescribeSensorRequest descSensorRequest = new DescribeSensorRequest();
-        DescribeSensorType xbDescSensor = xbDescSenDoc.getDescribeSensor();
+    private AbstractServiceRequest parseDescribeSensor(final DescribeSensorDocument xbDescSenDoc) throws OwsExceptionReport {
+        final DescribeSensorRequest descSensorRequest = new DescribeSensorRequest();
+        final DescribeSensorType xbDescSensor = xbDescSenDoc.getDescribeSensor();
         descSensorRequest.setService(xbDescSensor.getService());
         descSensorRequest.setVersion(xbDescSensor.getVersion());
         descSensorRequest.setProcedures(xbDescSensor.getProcedure());
@@ -154,9 +154,9 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
         return descSensorRequest;
     }
 
-    private AbstractServiceRequest parseInsertSensor(InsertSensorDocument xbInsSensDoc) throws OwsExceptionReport {
-        InsertSensorRequest request = new InsertSensorRequest();
-        InsertSensorType xbInsertSensor = xbInsSensDoc.getInsertSensor();
+    private AbstractServiceRequest parseInsertSensor(final InsertSensorDocument xbInsSensDoc) throws OwsExceptionReport {
+        final InsertSensorRequest request = new InsertSensorRequest();
+        final InsertSensorType xbInsertSensor = xbInsSensDoc.getInsertSensor();
         request.setService(xbInsertSensor.getService());
         request.setVersion(xbInsertSensor.getVersion());
         // format
@@ -167,7 +167,10 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
             request.setObservableProperty(Arrays.asList(xbInsertSensor.getObservablePropertyArray()));
         }
         // related features
-        request.setRelatedFeature(parseRelatedFeature(xbInsertSensor.getRelatedFeatureArray()));
+        if (xbInsertSensor.getRelatedFeatureArray() != null 
+        		&& xbInsertSensor.getRelatedFeatureArray().length > 0) {
+        	request.setRelatedFeature(parseRelatedFeature(xbInsertSensor.getRelatedFeatureArray()));
+        }
         // metadata
         if (xbInsertSensor.getMetadataArray() != null && xbInsertSensor.getMetadataArray().length > 0) {
             request.setMetadata(parseMetadata(xbInsertSensor.getMetadataArray()));
@@ -176,31 +179,31 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
                 Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name());
 
         try {
-            XmlObject xmlObject =
+            final XmlObject xbProcedureDescription =
                     XmlObject.Factory.parse(getNodeFromNodeList(xbInsertSensor.getProcedureDescription().getDomNode()
                             .getChildNodes()));
 
-            Decoder<?, XmlObject> decoder = CodingRepository.getInstance().getDecoder(
-                    new XmlNamespaceDecoderKey(xbInsertSensor.getProcedureDescriptionFormat(), xmlObject.getClass()));
+            final Decoder<?, XmlObject> decoder = CodingRepository.getInstance().getDecoder(
+                    new XmlNamespaceDecoderKey(xbInsertSensor.getProcedureDescriptionFormat(), xbProcedureDescription.getClass()));
             if (decoder == null) {
                 throw new InvalidParameterValueException().at(
                         Sos2Constants.InsertSensorParams.procedureDescriptionFormat)
                         .withMessage("The requested %s is not supported!",
                         Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name());
             }
-            Object decodedObject = decoder.decode(xmlObject);
-            if (decodedObject instanceof SosProcedureDescription) {
-                request.setProcedureDescription((SosProcedureDescription) decodedObject);
+            final Object decodedProcedureDescription = decoder.decode(xbProcedureDescription);
+            if (decodedProcedureDescription instanceof SosProcedureDescription) {
+                request.setProcedureDescription((SosProcedureDescription) decodedProcedureDescription);
             }
-        } catch (XmlException xmle) {
+        } catch (final XmlException xmle) {
             throw new NoApplicableCodeException().causedBy(xmle)
                     .withMessage("Error while parsing procedure description of InsertSensor request!");
         }
         return request;
     }
 
-    private AbstractServiceRequest parseDeleteSensor(DeleteSensorDocument xbDelSenDoc) {
-        DeleteSensorRequest request = new DeleteSensorRequest();
+    private AbstractServiceRequest parseDeleteSensor(final DeleteSensorDocument xbDelSenDoc) {
+        final DeleteSensorRequest request = new DeleteSensorRequest();
         request.setService(xbDelSenDoc.getDeleteSensor().getService());
         request.setVersion(xbDelSenDoc.getDeleteSensor().getVersion());
         request.setProcedureIdentifier(xbDelSenDoc.getDeleteSensor().getProcedure());
@@ -218,21 +221,21 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
      * @throws OwsExceptionReport
      *             * if an error occurs.
      */
-    private AbstractServiceRequest parseUpdateSensorDescription(UpdateSensorDescriptionDocument xbUpSenDoc)
+    private AbstractServiceRequest parseUpdateSensorDescription(final UpdateSensorDescriptionDocument xbUpSenDoc)
             throws OwsExceptionReport {
-        UpdateSensorRequest request = new UpdateSensorRequest();
-        UpdateSensorDescriptionType xbUpdateSensor = xbUpSenDoc.getUpdateSensorDescription();
+        final UpdateSensorRequest request = new UpdateSensorRequest();
+        final UpdateSensorDescriptionType xbUpdateSensor = xbUpSenDoc.getUpdateSensorDescription();
         request.setService(xbUpdateSensor.getService());
         request.setVersion(xbUpdateSensor.getVersion());
         request.setProcedureIdentifier(xbUpdateSensor.getProcedure());
         request.setProcedureDescriptionFormat(xbUpdateSensor.getProcedureDescriptionFormat());
 
-        for (Description description : xbUpdateSensor.getDescriptionArray()) {
+        for (final Description description : xbUpdateSensor.getDescriptionArray()) {
             try {
-                XmlObject xmlObject =
+                final XmlObject xmlObject =
                         XmlObject.Factory.parse(getNodeFromNodeList(description.getSensorDescription().getData()
                                 .getDomNode().getChildNodes()));
-                Decoder<?, XmlObject> decoder =
+                final Decoder<?, XmlObject> decoder =
                         CodingRepository.getInstance().getDecoder(CodingHelper.getDecoderKey(xmlObject));
                 if (decoder == null) {
                     throw new InvalidParameterValueException().at(
@@ -240,11 +243,11 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
                             "The requested procedureDescritpionFormat is not supported!");
                 }
 
-                Object decodedObject = decoder.decode(xmlObject);
+                final Object decodedObject = decoder.decode(xmlObject);
                 if (decodedObject instanceof SosProcedureDescription) {
                     request.addProcedureDescriptionString((SosProcedureDescription) decodedObject);
                 }
-            } catch (XmlException xmle) {
+            } catch (final XmlException xmle) {
                 throw new NoApplicableCodeException().causedBy(xmle).withMessage(
                         "Error while parsing procedure description of UpdateSensor request!");
             }
@@ -252,19 +255,19 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
         return request;
     }
 
-    private SosInsertionMetadata parseMetadata(Metadata[] metadataArray) throws OwsExceptionReport {
+    private SosInsertionMetadata parseMetadata(final Metadata[] metadataArray) throws OwsExceptionReport {
 
-        SosInsertionMetadata sosMetadata = new SosInsertionMetadata();
+        final SosInsertionMetadata sosMetadata = new SosInsertionMetadata();
         try {
-            for (Metadata metadata : metadataArray) {
+            for (final Metadata metadata : metadataArray) {
                 SosInsertionMetadataType xbSosInsertionMetadata = null;
                 if (metadata.getInsertionMetadata() != null
                         && metadata.getInsertionMetadata().schemaType() == SosInsertionMetadataType.type) {
                     xbSosInsertionMetadata = (SosInsertionMetadataType) metadata.getInsertionMetadata();
                 } else {
                     if (metadata.getDomNode().hasChildNodes()) {
-                        Node node = getNodeFromNodeList(metadata.getDomNode().getChildNodes());
-                        SosInsertionMetadataPropertyType xbMetadata =
+                        final Node node = getNodeFromNodeList(metadata.getDomNode().getChildNodes());
+                        final SosInsertionMetadataPropertyType xbMetadata =
                                 SosInsertionMetadataPropertyType.Factory.parse(node);
                         xbSosInsertionMetadata = xbMetadata.getSosInsertionMetadata();
                     }
@@ -282,20 +285,20 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
                     }
                 }
             }
-        } catch (XmlException xmle) {
+        } catch (final XmlException xmle) {
             throw new NoApplicableCodeException().causedBy(xmle).withMessage(
                     "An error occurred while parsing the metadata in the http post request");
         }
         return sosMetadata;
     }
 
-    private List<SwesFeatureRelationship> parseRelatedFeature(RelatedFeature[] relatedFeatureArray) {
-        List<SwesFeatureRelationship> sosRelatedFeatures =
+    private List<SwesFeatureRelationship> parseRelatedFeature(final RelatedFeature[] relatedFeatureArray) {
+        final List<SwesFeatureRelationship> sosRelatedFeatures =
                 new ArrayList<SwesFeatureRelationship>(relatedFeatureArray.length);
-        for (RelatedFeature relatedFeature : relatedFeatureArray) {
-            SwesFeatureRelationship sosFeatureRelationship = new SwesFeatureRelationship();
+        for (final RelatedFeature relatedFeature : relatedFeatureArray) {
+            final SwesFeatureRelationship sosFeatureRelationship = new SwesFeatureRelationship();
 
-            FeaturePropertyType fpt = relatedFeature.getFeatureRelationship().getTarget();
+            final FeaturePropertyType fpt = relatedFeature.getFeatureRelationship().getTarget();
             if (fpt.getHref() != null && !fpt.getHref().isEmpty()) {
                 String identifier;
                 if (fpt.getTitle() != null && !fpt.getTitle().isEmpty()) {
@@ -303,7 +306,7 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
                 } else {
                     identifier = fpt.getHref();
                 }
-                SamplingFeature feature = new SamplingFeature(new CodeWithAuthority(identifier));
+                final SamplingFeature feature = new SamplingFeature(new CodeWithAuthority(identifier));
                 if (checkForRequestUrl(fpt.getHref())) {
                     feature.setUrl(fpt.getHref());
                 }
@@ -318,11 +321,11 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
         return sosRelatedFeatures;
     }
 
-    private boolean checkForRequestUrl(String href) {
+    private boolean checkForRequestUrl(final String href) {
         return href.toLowerCase().contains("request=");
     }
 
-    private Node getNodeFromNodeList(NodeList nodeList) {
+    private Node getNodeFromNodeList(final NodeList nodeList) {
         if (nodeList != null && nodeList.getLength() > 0) {
             for (int i = 0; i < nodeList.getLength(); i++) {
                 if (nodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
