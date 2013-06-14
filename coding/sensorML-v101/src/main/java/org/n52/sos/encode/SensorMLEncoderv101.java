@@ -608,7 +608,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
      * @param identifications
      *            SOS SWE representation.
      */
-    private Identification[] createIdentification(final List<SmlIdentifier> identifications) {
+    protected Identification[] createIdentification(final List<SmlIdentifier> identifications) {
         final Identification xbIdentification =
                 Identification.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         final IdentifierList xbIdentifierList = xbIdentification.addNewIdentifierList();
