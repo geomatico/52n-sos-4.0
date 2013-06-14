@@ -699,7 +699,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         return characteristicsList.toArray(new Characteristics[characteristicsList.size()]);
     }
 
-    private Documentation[] createDocumentationArray(final List<AbstractSmlDocumentation> sosDocumentation) {
+    protected Documentation[] createDocumentationArray(final List<AbstractSmlDocumentation> sosDocumentation) {
         final List<Documentation> documentationList = new ArrayList<Documentation>(sosDocumentation.size());
         for (final AbstractSmlDocumentation abstractSosSMLDocumentation : sosDocumentation) {
             final Documentation documentation = Documentation.Factory.newInstance();
