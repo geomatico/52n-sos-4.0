@@ -67,35 +67,36 @@ import org.n52.sos.response.InsertSensorResponse;
 
 public class InsertSensorDAO extends AbstractInsertSensorDAO {
 
-    private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    private final HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
     
     public InsertSensorDAO() {
         super(SosConstants.SOS);
     }
 
     @Override
-    public synchronized InsertSensorResponse insertSensor(InsertSensorRequest request) throws OwsExceptionReport {
-        InsertSensorResponse response = new InsertSensorResponse();
+    public synchronized InsertSensorResponse insertSensor(final InsertSensorRequest request) throws OwsExceptionReport {
+        final InsertSensorResponse response = new InsertSensorResponse();
         response.setService(request.getService());
         response.setVersion(request.getVersion());
-        String assignedProcedureID = request.getAssignedProcedureIdentifier();
-        SosOffering firstAssignedOffering = request.getFirstAssignedOffering();
+        final String assignedProcedureID = request.getAssignedProcedureIdentifier();
+        // we use only the first offering for the response because swes 2.0 specifies only one single element
+        final SosOffering firstAssignedOffering = request.getFirstAssignedOffering();
         Session session = null;
         Transaction transaction = null;
         try {
             session = sessionHolder.getSession();
             transaction = session.beginTransaction();
-            ProcedureDescriptionFormat procedureDescriptionFormat =
+            final ProcedureDescriptionFormat procedureDescriptionFormat =
                     new ProcedureDescriptionFormatDAO().getOrInsertProcedureDescriptionFormat(
                             request.getProcedureDescriptionFormat(), session);
-            List<ObservationType> observationTypes =
+            final List<ObservationType> observationTypes =
                     new ObservationTypeDAO().getOrInsertObservationTypes(request.getMetadata()
                             .getObservationTypes(), session);
-            List<FeatureOfInterestType> featureOfInterestTypes =
+            final List<FeatureOfInterestType> featureOfInterestTypes =
                     new FeatureOfInterestTypeDAO().getOrInsertFeatureOfInterestTypes(request.getMetadata()
                             .getFeatureOfInterestTypes(), session);
             if (procedureDescriptionFormat != null && observationTypes != null && featureOfInterestTypes != null) {
-                Procedure hProcedure =
+                final Procedure hProcedure =
                         new ProcedureDAO().getOrInsertProcedure(assignedProcedureID,
                                 procedureDescriptionFormat, request.getProcedureDescription().getParentProcedures()
                                 ,session);
@@ -104,14 +105,14 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
                         hProcedure,
                         getSensorDescriptionFromProcedureDescription(request.getProcedureDescription(),
                                 assignedProcedureID), new DateTime(), session);
-                List<ObservableProperty> hObservableProperties =
+                final List<ObservableProperty> hObservableProperties =
                         getOrInsertNewObservableProperties(request.getObservableProperty(), session);
-                ObservationConstellationDAO observationConstellationDAO = new ObservationConstellationDAO();
-                for (SosOffering assignedOffering : request.getAssignedOfferings()) {
-                    Offering hOffering =
+                final ObservationConstellationDAO observationConstellationDAO = new ObservationConstellationDAO();
+                for (final SosOffering assignedOffering : request.getAssignedOfferings()) {
+                    final Offering hOffering =
                             getAndUpdateOrInsertNewOffering(assignedOffering, request.getRelatedFeatures(), observationTypes,
                                     featureOfInterestTypes, session);
-                    for (ObservableProperty hObservableProperty : hObservableProperties) {
+                    for (final ObservableProperty hObservableProperty : hObservableProperties) {
                         observationConstellationDAO.checkOrInsertObservationConstellation(
                                 hProcedure, hObservableProperty, hOffering, assignedOffering.isParentOffering(),
                                 session);
@@ -128,7 +129,7 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
             }
             session.flush();
             transaction.commit();
-        } catch (HibernateException he) {
+        } catch (final HibernateException he) {
             if (transaction != null) {
                 transaction.rollback();
             }
@@ -140,15 +141,15 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
         return response;
     }
 
-    private Offering getAndUpdateOrInsertNewOffering(SosOffering assignedOffering, List<SwesFeatureRelationship> relatedFeatures,
-            List<ObservationType> observationTypes, List<FeatureOfInterestType> featureOfInterestTypes, Session session)
+    private Offering getAndUpdateOrInsertNewOffering(final SosOffering assignedOffering, final List<SwesFeatureRelationship> relatedFeatures,
+            final List<ObservationType> observationTypes, final List<FeatureOfInterestType> featureOfInterestTypes, final Session session)
             throws OwsExceptionReport {
-        List<RelatedFeature> hRelatedFeatures = new LinkedList<RelatedFeature>();
+        final List<RelatedFeature> hRelatedFeatures = new LinkedList<RelatedFeature>();
         if (relatedFeatures != null && !relatedFeatures.isEmpty()) {
-            RelatedFeatureDAO relatedFeatureDAO = new RelatedFeatureDAO();
-            RelatedFeatureRoleDAO relatedFeatureRoleDAO = new RelatedFeatureRoleDAO();
-            for (SwesFeatureRelationship relatedFeature : relatedFeatures) {
-                List<RelatedFeatureRole> relatedFeatureRoles =
+            final RelatedFeatureDAO relatedFeatureDAO = new RelatedFeatureDAO();
+            final RelatedFeatureRoleDAO relatedFeatureRoleDAO = new RelatedFeatureRoleDAO();
+            for (final SwesFeatureRelationship relatedFeature : relatedFeatures) {
+                final List<RelatedFeatureRole> relatedFeatureRoles =
                         relatedFeatureRoleDAO.getOrInsertRelatedFeatureRole(
                                 relatedFeature.getRole(), session);
                 hRelatedFeatures.addAll(relatedFeatureDAO.getOrInsertRelatedFeature(
@@ -160,18 +161,18 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
                 session);
     }
 
-    private List<ObservableProperty> getOrInsertNewObservableProperties(List<String> obsProps, Session session) {
-        List<OmObservableProperty> observableProperties = new ArrayList<OmObservableProperty>(obsProps.size());
-        for (String observableProperty : obsProps) {
+    private List<ObservableProperty> getOrInsertNewObservableProperties(final List<String> obsProps, final Session session) {
+        final List<OmObservableProperty> observableProperties = new ArrayList<OmObservableProperty>(obsProps.size());
+        for (final String observableProperty : obsProps) {
             observableProperties.add(new OmObservableProperty(observableProperty));
         }
         return new ObservablePropertyDAO().getOrInsertObservableProperty(observableProperties, session);
     }
 
-    private String getSensorDescriptionFromProcedureDescription(SosProcedureDescription procedureDescription,
-            String procedureIdentifier) {
+    private String getSensorDescriptionFromProcedureDescription(final SosProcedureDescription procedureDescription,
+            final String procedureIdentifier) {
         if (procedureDescription instanceof SensorML) {
-            SensorML sensorML = (SensorML) procedureDescription;
+            final SensorML sensorML = (SensorML) procedureDescription;
             // if SensorML is not a wrapper
             if (!sensorML.isWrapper()) {
                 return sensorML.getSensorDescriptionXmlString();
@@ -192,7 +193,7 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
 
     @Override
     public SwesExtension getExtension() throws OwsExceptionReport {
-        SosInsertionCapabilities insertionCapabilities = new SosInsertionCapabilities();
+        final SosInsertionCapabilities insertionCapabilities = new SosInsertionCapabilities();
         insertionCapabilities.addFeatureOfInterestTypes(getCache().getFeatureOfInterestTypes());
         insertionCapabilities.addObservationTypes(getCache().getObservationTypes());
         insertionCapabilities.addProcedureDescriptionFormats(getCache().getProcedureDescriptionFormats());
