@@ -24,7 +24,7 @@
 package org.n52.sos.util;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.n52.sos.util.ReverseOf.reverseOf;
 
 import java.util.Random;
@@ -100,6 +100,20 @@ public class JTSHelperTest extends JTSHelper {
         assertThat(g.getSRID(), is(4326));
     }
 
+    @Test
+    public void shouldPointWKTString() throws OwsExceptionReport {
+        String coordinates = "52.0 7.0"; 
+        StringBuilder builder = new StringBuilder();
+        builder.append(JTSConstants.WKT_POINT);
+        builder.append("(");
+        builder.append(coordinates);
+        builder.append(")");
+        assertEquals(builder.toString(), createWKTPointFromCoordinateString(coordinates));
+        assertEquals(createGeometryFromWKT(builder.toString(), 4326) ,createGeometryFromWKT(createWKTPointFromCoordinateString(coordinates), 4326));
+    }
+    
+    
+    
     @Test
     public void shouldReverseLinearRing() throws OwsExceptionReport {
         testReverse(getGeometryFactoryForSRID(4326).createLinearRing(randomCoordinateRing(10)));

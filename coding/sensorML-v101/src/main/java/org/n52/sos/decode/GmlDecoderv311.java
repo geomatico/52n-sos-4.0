@@ -51,6 +51,7 @@ import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.DateTimeHelper;
+import org.n52.sos.util.JTSConstants;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
@@ -194,11 +195,11 @@ public class GmlDecoderv311 implements Decoder<Object, XmlObject> {
                 srid = SosHelper.parseSrsName(xbPos.getSrsName());
             }
             String directPosition = getString4Pos(xbPos);
-            geomWKT = "POINT(" + directPosition + ")";
+            geomWKT = JTSHelper.createWKTPointFromCoordinateString(directPosition);
         } else if (xbPointType.getCoordinates() != null) {
             CoordinatesType xbCoords = xbPointType.getCoordinates();
             String directPosition = getString4Coordinates(xbCoords);
-            geomWKT = "POINT" + directPosition;
+            geomWKT = JTSHelper.createWKTPointFromCoordinateString(directPosition);
         } else {
             throw new NoApplicableCodeException().withMessage("For geometry type 'gml:Point' only elements "
                                                               + "'gml:pos' and 'gml:coordinates' are allowed");
@@ -233,7 +234,7 @@ public class GmlDecoderv311 implements Decoder<Object, XmlObject> {
      * @return Returns String with coordinates for WKT.
      */
     private String getString4Coordinates(CoordinatesType xbCoordinates) {
-        String coordinateString = "(" + xbCoordinates.getStringValue() + ")";
+        String coordinateString = xbCoordinates.getStringValue();
 
         // replace cs, decimal and ts if different from default.
         if (!xbCoordinates.getCs().equals(CS)) {

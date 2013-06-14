@@ -43,11 +43,15 @@ import com.vividsolutions.jts.io.WKTReader;
 public class JTSHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JTSHelper.class);
+
     public static final char C_BLANK = ' ';
+
     public static final char COMMA = ',';
+
     public static final String S_BLANK = " ";
+
     public static final CoordinateFilter COORDINATE_SWITCHING_FILTER = new CoordinateFilter() {
-        @Override 
+        @Override
         public void filter(Coordinate coord) {
             double tmp = coord.x;
             coord.x = coord.y;
@@ -56,15 +60,19 @@ public class JTSHelper {
     };
 
     /**
-     * Creates a JTS Geometry from an WKT representation. Switches the coordinate order if needed.
+     * Creates a JTS Geometry from an WKT representation. Switches the
+     * coordinate order if needed.
      * <p/>
+     * 
      * @param wkt
-     * WKT representation of the geometry
-     * @param srid the SRID of the newly created geometry
-     * <p/>
+     *            WKT representation of the geometry
+     * @param srid
+     *            the SRID of the newly created geometry
+     *            <p/>
      * @return JTS Geometry object
-     * <p/>
-     * @throws OwsExceptionReport If an error occurs
+     *         <p/>
+     * @throws OwsExceptionReport
+     *             If an error occurs
      */
     public static Geometry createGeometryFromWKT(String wkt, int srid) throws OwsExceptionReport {
         WKTReader wktReader = getWKTReaderForSRID(srid);
@@ -72,8 +80,8 @@ public class JTSHelper {
             LOGGER.debug("FOI Geometry: {}", wkt);
             return wktReader.read(wkt);
         } catch (ParseException pe) {
-            throw new InvalidParameterValueException().causedBy(pe)
-                    .withMessage("Error while parsing the geometry of featureOfInterest parameter");
+            throw new InvalidParameterValueException().causedBy(pe).withMessage(
+                    "Error while parsing the geometry of featureOfInterest parameter");
         }
     }
 
@@ -85,14 +93,17 @@ public class JTSHelper {
     }
 
     /**
-     * Get the coordinates of a Geometry as String. Switches the coordinate order if needed (SRID is taken from the
-     * geometry).
+     * Get the coordinates of a Geometry as String. Switches the coordinate
+     * order if needed (SRID is taken from the geometry).
      * <p/>
-     * @param geom Geometry to get coordinates
-     * <p/>
+     * 
+     * @param geom
+     *            Geometry to get coordinates
+     *            <p/>
      * @return Coordinates as String
-     * <p/>
-     * @throws OwsExceptionReport if the SRID is <= 0
+     *         <p/>
+     * @throws OwsExceptionReport
+     *             if the SRID is <= 0
      */
     public static String getCoordinatesString(Geometry geom) throws OwsExceptionReport {
         StringBuilder builder = new StringBuilder();
@@ -120,11 +131,12 @@ public class JTSHelper {
     /**
      * Creates a WKT Polygon representation from lower and upper corner values.
      * <p/>
+     * 
      * @param lowerCorner
-     * Lower corner coordinates
+     *            Lower corner coordinates
      * @param upperCorner
-     * Upper corner coordinates
-     * <p/>
+     *            Upper corner coordinates
+     *            <p/>
      * @return WKT Polygon
      */
     public static String createWKTPolygonFromEnvelope(String lowerCorner, String upperCorner) {
@@ -147,12 +159,17 @@ public class JTSHelper {
     /**
      * Switches the coordinates of a JTS Geometry.
      * <p/>
-     * @param <G> the geometry type
-     * @param geometry Geometry to switch coordinates.
-     * <p/>
+     * 
+     * @param <G>
+     *            the geometry type
+     * @param geometry
+     *            Geometry to switch coordinates.
+     *            <p/>
      * @return Geometry with switched coordinates
-     * <p/>
-     * @throws OwsExceptionReport     * <p/>
+     *         <p/>
+     * @throws OwsExceptionReport
+     *             *
+     *             <p/>
      */
     public static <G extends Geometry> G switchCoordinateAxisOrder(G geometry) throws OwsExceptionReport {
         if (geometry == null) {
@@ -175,6 +192,17 @@ public class JTSHelper {
 
     public static GeometryFactory getGeometryFactoryForSRID(int srid) {
         return new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), srid);
+    }
+
+    /**
+     * Creates a WKT Point string form coordinate string.
+     * 
+     * @param coordinates
+     *            Coordinate string
+     * @return WKT Point string
+     */
+    public static String createWKTPointFromCoordinateString(String coordinates) {
+        return JTSConstants.WKT_POINT + "(" + coordinates + ")";
     }
 
     protected JTSHelper() {
