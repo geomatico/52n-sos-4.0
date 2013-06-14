@@ -23,14 +23,14 @@
  */
 package org.n52.sos.ds;
 
-import org.n52.sos.ogc.ows.OwsOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sensorML.SensorMLConstants;
+import org.n52.sos.ogc.ows.OwsOperation;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.response.DescribeSensorResponse;
+import org.n52.sos.service.CodingRepository;
 
 /**
  * interface for getting procedure description for a passed DescribeSensor
@@ -45,14 +45,13 @@ public abstract class AbstractDescribeSensorDAO extends AbstractOperationDAO {
     @Override
     protected void setOperationsMetadata(OwsOperation opsMeta, String service, String version)
             throws OwsExceptionReport {
-        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());
-        // FIXME: getTypes from Decoder
+        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());        
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             opsMeta.addPossibleValuesParameter(Sos1Constants.DescribeSensorParams.outputFormat,
-                    SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE);
+                    CodingRepository.getInstance().getAllProcedureDescriptionFormats());
         } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
             opsMeta.addPossibleValuesParameter(Sos2Constants.DescribeSensorParams.procedureDescriptionFormat,
-                    SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
+                    CodingRepository.getInstance().getAllProcedureDescriptionFormats());
         }
     }
     
