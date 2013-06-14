@@ -291,7 +291,7 @@ public class ServiceConfiguration {
 
     @Setting(SRS_NAME_PREFIX_SOS_V1)
     public void setSrsNamePrefixForSosV1(String prefix) {
-        if (!prefix.endsWith(":") && !prefix.isEmpty()) {
+        if (!prefix.endsWith(":") && !prefix.isEmpty() && prefix.startsWith("urn")) {
             prefix += ":";
         }
         srsNamePrefix = prefix;
@@ -312,7 +312,7 @@ public class ServiceConfiguration {
 
     @Setting(SRS_NAME_PREFIX_SOS_V2)
     public void setSrsNamePrefixForSosV2(String prefix) {
-        if (!prefix.endsWith("/") && !prefix.isEmpty()) {
+        if (!prefix.endsWith("/") && !prefix.isEmpty() && prefix.startsWith("http")) {
             prefix += "/";
         }
         srsNamePrefixSosV2 = prefix;
