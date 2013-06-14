@@ -31,9 +31,9 @@ import javax.xml.namespace.QName;
 
 import org.joda.time.DateTime;
 import org.n52.sos.ogc.om.OMConstants;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.OwsOperation;
 import org.n52.sos.ogc.ows.OwsParameterValueRange;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -52,15 +52,15 @@ import org.n52.sos.util.SosHelper;
  */
 public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
 
-    public AbstractGetObservationDAO(String service) {
+    public AbstractGetObservationDAO(final String service) {
         super(service, SosConstants.Operations.GetObservation.name());
     }
 
     @Override
-    protected void setOperationsMetadata(OwsOperation opsMeta, String service, String version)
+    protected void setOperationsMetadata(final OwsOperation opsMeta, final String service, final String version)
             throws OwsExceptionReport {
 
-        Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeaturesOfInterest(), version);
+        final Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeaturesOfInterest(), version);
 
         opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.offering, getCache().getOfferings());
         opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());
@@ -78,13 +78,13 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
 
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
             // SOS 2.0 parameter
-            OwsParameterValueRange temporalFilter = new OwsParameterValueRange(getPhenomenonTime());
+            final OwsParameterValueRange temporalFilter = new OwsParameterValueRange(getPhenomenonTime());
             opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.temporalFilter, temporalFilter);
             SosEnvelope envelope = null;
             if (featureIDs != null && !featureIDs.isEmpty()) {
                 envelope = getCache().getGlobalEnvelope();
             }
-            if (envelope != null) {
+            if (envelope != null && envelope.isSetEnvelope()) {
                 opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.spatialFilter,
                         SosHelper.getMinMaxFromEnvelope(envelope.getEnvelope()));
             }
@@ -108,8 +108,8 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
      * @throws OwsExceptionReport     *             If an error occurs.
      */
     private MinMax<String> getPhenomenonTime() throws OwsExceptionReport {
-        DateTime minDate = getCache().getMinPhenomenonTime();
-        DateTime maxDate = getCache().getMaxPhenomenonTime();
+        final DateTime minDate = getCache().getMinPhenomenonTime();
+        final DateTime maxDate = getCache().getMaxPhenomenonTime();
         return new MinMax<String>()
                 .setMinimum(minDate != null ? DateTimeHelper.formatDateTime2ResponseString(minDate) : null)
                 .setMaximum(maxDate != null ? DateTimeHelper.formatDateTime2ResponseString(maxDate) : null);
@@ -124,16 +124,16 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
      * @throws OwsExceptionReport     *             If an error occurs.
      */
     private MinMax<String> getResultTime() throws OwsExceptionReport {
-        DateTime minDate = getCache().getMinResultTime();
-        DateTime maxDate = getCache().getMaxResultTime();
+        final DateTime minDate = getCache().getMinResultTime();
+        final DateTime maxDate = getCache().getMaxResultTime();
         return new MinMax<String>()
                 .setMinimum(minDate != null ? DateTimeHelper.formatDateTime2ResponseString(minDate) : null)
                 .setMaximum(maxDate != null ? DateTimeHelper.formatDateTime2ResponseString(maxDate) : null);
     }
     
     private List<String> getResultModels() {
-        List<String> resultModelsList = new ArrayList<String>(OMConstants.RESULT_MODELS.size());
-        for (QName qname : OMConstants.RESULT_MODELS) {
+        final List<String> resultModelsList = new ArrayList<String>(OMConstants.RESULT_MODELS.size());
+        for (final QName qname : OMConstants.RESULT_MODELS) {
             resultModelsList.add(qname.getPrefix() + ":" + qname.getLocalPart());
         }
         return resultModelsList;

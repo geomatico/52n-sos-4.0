@@ -28,8 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.n52.sos.ogc.ows.OwsOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.OwsOperation;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -39,14 +39,14 @@ import org.n52.sos.response.GetFeatureOfInterestResponse;
 import org.n52.sos.util.SosHelper;
 
 public abstract class AbstractGetFeatureOfInterestDAO extends AbstractOperationDAO {
-    public AbstractGetFeatureOfInterestDAO(String service) {
+    public AbstractGetFeatureOfInterestDAO(final String service) {
         super(service, SosConstants.Operations.GetFeatureOfInterest.name());
     }
 
     @Override
-    protected void setOperationsMetadata(OwsOperation opsMeta, String service, String version) throws OwsExceptionReport {
+    protected void setOperationsMetadata(final OwsOperation opsMeta, final String service, final String version) throws OwsExceptionReport {
 
-        Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeaturesOfInterest(), version);
+        final Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeaturesOfInterest(), version);
 
         if (getConfigurator().getProfileHandler().getActiveProfile().isShowFullOperationsMetadataForObservations()) {
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache()
@@ -71,7 +71,7 @@ public abstract class AbstractGetFeatureOfInterestDAO extends AbstractOperationD
             envelope = getCache().getGlobalEnvelope();
         }
 
-        if (envelope != null) {
+        if (envelope != null && envelope.isSetEnvelope()) {
             opsMeta.addRangeParameterValue(parameterName, SosHelper.getMinMaxFromEnvelope(envelope.getEnvelope()));
         } else {
             opsMeta.addAnyParameterValue(parameterName);
@@ -81,14 +81,14 @@ public abstract class AbstractGetFeatureOfInterestDAO extends AbstractOperationD
     public abstract GetFeatureOfInterestResponse getFeatureOfInterest(GetFeatureOfInterestRequest request)
             throws OwsExceptionReport;
     
-    protected boolean isRelatedFeature(String featureIdentifier) {
-        Set<String> relatedFeatures = getCache().getRelatedFeatures();
+    protected boolean isRelatedFeature(final String featureIdentifier) {
+        final Set<String> relatedFeatures = getCache().getRelatedFeatures();
         return relatedFeatures.contains(featureIdentifier);
     }
     
-    protected Set<String> checkFeatureIdentifiersForRelatedFeatures(List<String> featureIdentifiers) {
-        Set<String> allFeatureIdentifiers = new HashSet<String>();
-        for (String featureIdentifier : featureIdentifiers) {
+    protected Set<String> checkFeatureIdentifiersForRelatedFeatures(final List<String> featureIdentifiers) {
+        final Set<String> allFeatureIdentifiers = new HashSet<String>();
+        for (final String featureIdentifier : featureIdentifiers) {
             if (isRelatedFeature(featureIdentifier)) {
                 allFeatureIdentifiers.addAll(getFeatureIdentifierForRelatedFeature(featureIdentifier));
             } else {
@@ -98,11 +98,11 @@ public abstract class AbstractGetFeatureOfInterestDAO extends AbstractOperationD
         return allFeatureIdentifiers;
     }
 
-    protected Collection<? extends String> getFeatureIdentifierForRelatedFeature(String featureIdentifier) {
-        Set<String> featureIdentifiers = new HashSet<String>();
+    protected Collection<? extends String> getFeatureIdentifierForRelatedFeature(final String featureIdentifier) {
+        final Set<String> featureIdentifiers = new HashSet<String>();
         // FIXME change to get only the features related to related feature, e.g. feature hierarchy
-        Set<String> offerings = getCache().getOfferings();
-        for (String offering : offerings) {
+        final Set<String> offerings = getCache().getOfferings();
+        for (final String offering : offerings) {
             if (getCache().getRelatedFeaturesForOffering(offering).contains(featureIdentifier)) {
                 featureIdentifiers.addAll(getCache().getFeaturesOfInterestForOffering(offering));
             }
