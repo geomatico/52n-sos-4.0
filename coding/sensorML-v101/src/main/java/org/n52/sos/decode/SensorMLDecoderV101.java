@@ -61,6 +61,7 @@ import net.opengis.sensorML.x101.PositionDocument.Position;
 import net.opengis.sensorML.x101.ProcessModelType;
 import net.opengis.sensorML.x101.SensorMLDocument;
 import net.opengis.sensorML.x101.SensorMLDocument.SensorML.Member;
+import net.opengis.sensorML.x101.SmlLocation.SmlLocation2;
 import net.opengis.sensorML.x101.SystemType;
 import net.opengis.sensorML.x101.ValidTimeDocument.ValidTime;
 
@@ -90,12 +91,12 @@ import org.n52.sos.ogc.sensorML.elements.SmlClassifier;
 import org.n52.sos.ogc.sensorML.elements.SmlComponent;
 import org.n52.sos.ogc.sensorML.elements.SmlIdentifier;
 import org.n52.sos.ogc.sensorML.elements.SmlIo;
+import org.n52.sos.ogc.sensorML.elements.SmlLocation;
 import org.n52.sos.ogc.sensorML.elements.SmlPosition;
 import org.n52.sos.ogc.sos.SosOffering;
 import org.n52.sos.ogc.swe.DataRecord;
 import org.n52.sos.ogc.swe.SweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SweField;
-import org.n52.sos.ogc.swe.simpleType.SweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SweText;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
@@ -105,6 +106,8 @@ import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vividsolutions.jts.geom.Point;
 
 public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject> {
 
@@ -242,6 +245,9 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
             final AbstractComponent abstractComponent) throws OwsExceptionReport {
         if (xbAbstractDerivableComponent.isSetPosition()) {
             abstractComponent.setPosition(parsePosition(xbAbstractDerivableComponent.getPosition()));
+        }
+        if (xbAbstractDerivableComponent.isSetSmlLocation()) {
+            abstractComponent.setLocation(parseLocation(xbAbstractDerivableComponent.getSmlLocation()));
         }
         // TODO ...
     }
@@ -522,6 +528,31 @@ public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject>
             sosSMLPosition.setName(position.getName());
         }
         return sosSMLPosition;
+    }
+
+    /**
+     * Parses the location
+     * 
+     * @param location
+     *            XML location
+     * @return SOS location
+     * 
+     * 
+     * @throws OwsExceptionReport
+     *             * if an error occurs
+     */
+    private SmlLocation parseLocation(final SmlLocation2 location) throws OwsExceptionReport {
+        SmlLocation sosSmlLocation = null;
+        if (location.isSetPoint()) {
+            final Object point = CodingHelper.decodeXmlElement(location.getPoint());
+            if (point instanceof Point) {
+                sosSmlLocation = new SmlLocation((Point) point);
+            }
+        } else {
+            throw new InvalidParameterValueException().at(XmlHelper.getLocalName(location)).withMessage(
+                    "Error while parsing the sml:location of the SensorML (point is not set, only point is supported)!");
+        }
+        return sosSmlLocation;
     }
 
     private Time parseValidTime(final ValidTime validTime) {

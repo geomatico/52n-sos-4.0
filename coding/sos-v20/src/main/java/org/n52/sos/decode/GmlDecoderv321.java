@@ -658,8 +658,7 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
 
     private void checkSrid(int srid) throws OwsExceptionReport {
         if (srid == 0 || srid == -1) {
-            throw new NoApplicableCodeException().withMessage("No SrsName ist specified for geometry!");
+            throw new NoApplicableCodeException().withMessage("No SrsName is specified for geometry!");
         }
     }
-
 }

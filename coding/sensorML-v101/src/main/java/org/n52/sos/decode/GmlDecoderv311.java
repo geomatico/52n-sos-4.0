@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 import net.opengis.gml.CodeType;
+import net.opengis.gml.CoordinatesType;
+import net.opengis.gml.DirectPositionType;
 import net.opengis.gml.EnvelopeDocument;
 import net.opengis.gml.EnvelopeType;
 import net.opengis.gml.TimeInstantDocument;
@@ -35,6 +37,7 @@ import net.opengis.gml.TimeInstantType;
 import net.opengis.gml.TimePeriodDocument;
 import net.opengis.gml.TimePeriodType;
 import net.opengis.gml.TimePositionType;
+import net.opengis.gml.PointType;
 
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
@@ -64,8 +67,13 @@ public class GmlDecoderv311 implements Decoder<Object, XmlObject> {
                                                                                             TimePeriodType.class,
                                                                                             TimeInstantDocument.class,
                                                                                             TimePeriodDocument.class,
-                                                                                            CodeType.class);
+                                                                                            CodeType.class,
+                                                                                            PointType.class);
 
+    private static final String CS = ",";
+    private static final String DECIMAL = ".";
+    private static final String TS = " ";
+    
     public GmlDecoderv311() {
         LOGGER.debug("Decoder for the following keys initialized successfully: {}!",
                      StringHelper.join(", ", DECODER_KEYS));
@@ -100,6 +108,8 @@ public class GmlDecoderv311 implements Decoder<Object, XmlObject> {
             return parseTimePeriod(((TimePeriodDocument) xmlObject).getTimePeriod());
         } else if (xmlObject instanceof CodeType) {
             return parseCodeType((CodeType) xmlObject);
+        } else if (xmlObject instanceof PointType) {
+            return parsePointType((PointType) xmlObject);            
         } else {
             throw new UnsupportedDecoderInputException(this, xmlObject);
         }
@@ -171,4 +181,77 @@ public class GmlDecoderv311 implements Decoder<Object, XmlObject> {
         return codeType;
     }
 
+    private Object parsePointType(PointType xbPointType) throws OwsExceptionReport {
+        String geomWKT = null;
+        int srid = -1;
+        if (xbPointType.getSrsName() != null) {
+            srid = SosHelper.parseSrsName(xbPointType.getSrsName());
+        }
+
+        if (xbPointType.getPos() != null) {
+            DirectPositionType xbPos = xbPointType.getPos();
+            if (srid == -1 && xbPos.getSrsName() != null) {
+                srid = SosHelper.parseSrsName(xbPos.getSrsName());
+            }
+            String directPosition = getString4Pos(xbPos);
+            geomWKT = "POINT(" + directPosition + ")";
+        } else if (xbPointType.getCoordinates() != null) {
+            CoordinatesType xbCoords = xbPointType.getCoordinates();
+            String directPosition = getString4Coordinates(xbCoords);
+            geomWKT = "POINT" + directPosition;
+        } else {
+            throw new NoApplicableCodeException().withMessage("For geometry type 'gml:Point' only elements "
+                                                              + "'gml:pos' and 'gml:coordinates' are allowed");
+        }
+
+        checkSrid(srid);
+        if (srid == -1) {
+            throw new NoApplicableCodeException()
+                    .withMessage("No SrsName ist specified for geometry!");
+        }
+        
+        return JTSHelper.createGeometryFromWKT(geomWKT, srid);
+    }
+
+    /**
+     * parses XmlBeans DirectPosition to a String with coordinates for WKT.
+     * 
+     * @param xbPos
+     *            XmlBeans generated DirectPosition.
+     * @return Returns String with coordinates for WKT.
+     */
+    private String getString4Pos(DirectPositionType xbPos) {
+        return xbPos.getStringValue();
+    }
+    
+    /**
+     * parses XmlBeans Coordinates to a String with coordinates for WKT.
+     * Replaces cs, decimal and ts if different from default.
+     * 
+     * @param xbCoordinates
+     *            XmlBeans generated Coordinates.
+     * @return Returns String with coordinates for WKT.
+     */
+    private String getString4Coordinates(CoordinatesType xbCoordinates) {
+        String coordinateString = "(" + xbCoordinates.getStringValue() + ")";
+
+        // replace cs, decimal and ts if different from default.
+        if (!xbCoordinates.getCs().equals(CS)) {
+            coordinateString = coordinateString.replace(xbCoordinates.getCs(), CS);
+        }
+        if (!xbCoordinates.getDecimal().equals(DECIMAL)) {
+            coordinateString = coordinateString.replace(xbCoordinates.getDecimal(), DECIMAL);
+        }
+        if (!xbCoordinates.getTs().equals(TS)) {
+            coordinateString = coordinateString.replace(xbCoordinates.getTs(), TS);
+        }
+
+        return coordinateString;
+    }
+
+    private void checkSrid(int srid) throws OwsExceptionReport {
+        if (srid == 0 || srid == -1) {
+            throw new NoApplicableCodeException().withMessage("No SrsName is specified for geometry!");
+        }
+    }    
 }

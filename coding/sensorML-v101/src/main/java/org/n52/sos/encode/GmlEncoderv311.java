@@ -304,18 +304,24 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
     private XmlObject createPosition(Geometry geom, String foiId) throws OwsExceptionReport {
         if (geom instanceof Point) {
             PointType xbPoint = PointType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-            xbPoint.setId("point_" + foiId);
+            if (foiId != null) {
+                xbPoint.setId("point_" + foiId);
+            }
             createPointFromJtsGeometry((Point) geom, xbPoint);
             return xbPoint;
         } else if (geom instanceof LineString) {
             LineStringType xbLineString =
                     LineStringType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-            xbLineString.setId("lineString_" + foiId);
+            if (foiId != null) {
+                xbLineString.setId("lineString_" + foiId);
+            }
             createLineStringFromJtsGeometry((LineString) geom, xbLineString);
             return xbLineString;
         } else if (geom instanceof Polygon) {
             PolygonType xbPolygon = PolygonType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-            xbPolygon.setId("polygon_" + foiId);
+            if (foiId != null) {
+                xbPolygon.setId("polygon_" + foiId);
+            }
             createPolygonFromJtsGeometry((Polygon) geom, xbPolygon);
             return xbPolygon;
         } else {

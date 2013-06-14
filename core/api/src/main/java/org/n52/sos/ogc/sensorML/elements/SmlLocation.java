@@ -21,39 +21,50 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ogc.sensorML;
+package org.n52.sos.ogc.sensorML.elements;
 
-import org.n52.sos.ogc.sensorML.elements.SmlLocation;
-import org.n52.sos.ogc.sensorML.elements.SmlPosition;
+import com.vividsolutions.jts.geom.Point;
 
-public class AbstractComponent extends AbstractProcess {
+/**
+ * SOS internal representation of SensorML location
+ * 
+ */
+public class SmlLocation {
+    //TODO AssociationAttributeGroup values?
+    //TODO support _Curve?
     
-    private SmlPosition position;
-    private SmlLocation location;
-    
-    public SmlPosition getPosition() {
-        return position;
+    private Point point;
+
+    /**
+     * constructor
+     * 
+     * @param point
+     *            Point
+     */
+    public SmlLocation(final Point point) {
+        super();
+        this.point = point;
     }
 
-    public AbstractComponent setPosition(final SmlPosition position) {
-        this.position = position;
-        return this;
-    }
-    
-    public boolean isSetPosition() {
-        return position != null;
+    /**
+     * @return the point
+     */
+    public Point getPoint() {
+        return point;
     }
 
-    public SmlLocation getLocation() {
-        return location;
-    }
-
-    public AbstractComponent setLocation(final SmlLocation location) {
-        this.location = location;
-        return this;
+    /**
+     * @return if the point is set
+     */
+    public boolean isSetPoint() {
+        return point != null;
     }
     
-    public boolean isSetLocation() {
-        return location != null;
-    }    
+    /**
+     * @param point
+     *            Point
+     */
+    public void setPoint(final Point point) {
+        this.point = point;
+    }
 }

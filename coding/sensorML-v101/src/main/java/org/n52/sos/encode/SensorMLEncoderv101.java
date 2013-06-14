@@ -37,6 +37,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import net.opengis.gml.PointType;
 import net.opengis.sensorML.x101.AbstractProcessType;
 import net.opengis.sensorML.x101.CapabilitiesDocument.Capabilities;
 import net.opengis.sensorML.x101.CharacteristicsDocument.Characteristics;
@@ -71,6 +72,7 @@ import net.opengis.sensorML.x101.ProcessModelType;
 import net.opengis.sensorML.x101.ResponsiblePartyDocument.ResponsibleParty;
 import net.opengis.sensorML.x101.SensorMLDocument;
 import net.opengis.sensorML.x101.SensorMLDocument.SensorML.Member;
+import net.opengis.sensorML.x101.SmlLocation.SmlLocation2;
 import net.opengis.sensorML.x101.SystemDocument;
 import net.opengis.sensorML.x101.SystemType;
 import net.opengis.sensorML.x101.TermDocument.Term;
@@ -87,6 +89,7 @@ import org.n52.sos.binding.BindingRepository;
 import org.n52.sos.exception.CodedException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
+import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
 import org.n52.sos.ogc.sensorML.AbstractSensorML;
@@ -108,6 +111,7 @@ import org.n52.sos.ogc.sensorML.elements.SmlDocumentationList;
 import org.n52.sos.ogc.sensorML.elements.SmlDocumentationListMember;
 import org.n52.sos.ogc.sensorML.elements.SmlIdentifier;
 import org.n52.sos.ogc.sensorML.elements.SmlIo;
+import org.n52.sos.ogc.sensorML.elements.SmlLocation;
 import org.n52.sos.ogc.sensorML.elements.SmlPosition;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -537,6 +541,10 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         if (system.isSetPosition()) {
             xbSystem.setPosition(createPosition(system.getPosition()));
         }
+        // set location
+        if (system.isSetLocation()) {
+            xbSystem.setSmlLocation(createLocation(system.getLocation()));
+        }        
         // set components
         final List<SmlComponent> smlComponents = new ArrayList<SmlComponent>();
         if (system.isSetComponents() || system.isSetChildProcedures()) {
@@ -774,6 +782,28 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
         return xbPosition;
     }
 
+    /**
+     * Creates the location section of the SensorML description.
+     * 
+     * @param xbSmlLocation
+     *            Xml location object
+     * @param location
+     *            SOS SWE location representation.
+     * 
+     * 
+     * @throws OwsExceptionReport
+     */
+    private SmlLocation2 createLocation(final SmlLocation location) throws OwsExceptionReport {
+        final SmlLocation2 xbLocation = SmlLocation2.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        if (location.isSetPoint()) {
+            XmlObject xbPoint = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML, location.getPoint());
+            if (xbPoint instanceof PointType) {
+                xbLocation.setPoint((PointType) xbPoint);
+            }
+        }
+        return xbLocation;
+    }
+    
     /**
      * Creates the inputs section of the SensorML description.
      * 
