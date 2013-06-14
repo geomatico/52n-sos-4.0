@@ -44,7 +44,7 @@ public class CodespaceDAO {
      *            Hibernate session
      * @return Codespace object
      */
-    public Codespace getCodespace(String codespace, Session session) {
+    public Codespace getCodespace(final String codespace, final Session session) {
         return (Codespace) session.createCriteria(Codespace.class)
                 .add(Restrictions.eq(Codespace.CODESPACE, codespace)).uniqueResult();
     }
@@ -58,8 +58,8 @@ public class CodespaceDAO {
      *            Hibernate session
      * @return Codespace object
      */
-    public Codespace getOrInsertCodespace(String codespace, Session session) {
-        Codespace result = new CodespaceDAO().getCodespace(codespace, session);
+    public Codespace getOrInsertCodespace(final String codespace, final Session session) {
+        Codespace result = getCodespace(codespace, session);
         if (result == null) {
             result = new Codespace();
             result.setCodespace(codespace);

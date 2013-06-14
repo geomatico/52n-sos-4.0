@@ -54,7 +54,7 @@ public class ObservablePropertyDAO {
      * @return Observable property objects
      */
     @SuppressWarnings("unchecked")
-    public List<ObservableProperty> getObservableProperties(List<String> identifiers, Session session) {
+    public List<ObservableProperty> getObservableProperties(final List<String> identifiers, final Session session) {
         return session.createCriteria(ObservableProperty.class)
                 .add(Restrictions.in(ObservableProperty.IDENTIFIER, identifiers)).list();
     }
@@ -69,8 +69,8 @@ public class ObservablePropertyDAO {
      * @return Observable property identifiers
      */
     @SuppressWarnings("unchecked")
-    public List<String> getObservablePropertyIdentifiersForOffering(String offeringIdentifier, Session session) {
-        Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
+    public List<String> getObservablePropertyIdentifiersForOffering(final String offeringIdentifier, final Session session) {
+        final Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
         c.createCriteria(Observation.OBSERVABLE_PROPERTY).setProjection(
                 Projections.distinct(Projections.property(ObservableProperty.IDENTIFIER)));
         c.createCriteria(Observation.OFFERINGS).add(Restrictions.eq(Offering.IDENTIFIER, offeringIdentifier));
@@ -87,8 +87,8 @@ public class ObservablePropertyDAO {
      * @return Observable property identifiers
      */
     @SuppressWarnings("unchecked")
-    public List<String> getObservablePropertyIdentifiersForProcedure(String procedureIdentifier, Session session) {
-        Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
+    public List<String> getObservablePropertyIdentifiersForProcedure(final String procedureIdentifier, final Session session) {
+        final Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
         c.createCriteria(Observation.OBSERVABLE_PROPERTY).setProjection(
                 Projections.distinct(Projections.property(ObservableProperty.IDENTIFIER)));
         c.createCriteria(Observation.PROCEDURE).add(Restrictions.eq(Procedure.IDENTIFIER, procedureIdentifier));
@@ -103,7 +103,7 @@ public class ObservablePropertyDAO {
      * @return Observable property objects
      */
     @SuppressWarnings("unchecked")
-    public List<ObservableProperty> getObservablePropertyObjects(Session session) {
+    public List<ObservableProperty> getObservablePropertyObjects(final Session session) {
         return session.createCriteria(ObservableProperty.class).list();
     }
 
@@ -117,23 +117,23 @@ public class ObservablePropertyDAO {
      *            Hibernate session
      * @return Observable property objects
      */
-    public List<ObservableProperty> getOrInsertObservableProperty(List<OmObservableProperty> observableProperty,
-            Session session) {
-        List<String> identifiers = new ArrayList<String>(observableProperty.size());
-        for (OmObservableProperty sosObservableProperty : observableProperty) {
+    public List<ObservableProperty> getOrInsertObservableProperty(final List<OmObservableProperty> observableProperty,
+            final Session session) {
+        final List<String> identifiers = new ArrayList<String>(observableProperty.size());
+        for (final OmObservableProperty sosObservableProperty : observableProperty) {
             identifiers.add(sosObservableProperty.getIdentifier());
         }
-        List<ObservableProperty> obsProps = new ObservablePropertyDAO().getObservableProperties(identifiers, session);
-        for (OmObservableProperty sosObsProp : observableProperty) {
+        final List<ObservableProperty> obsProps = getObservableProperties(identifiers, session);
+        for (final OmObservableProperty sosObsProp : observableProperty) {
             boolean exists = false;
-            for (ObservableProperty obsProp : obsProps) {
+            for (final ObservableProperty obsProp : obsProps) {
                 if (obsProp.getIdentifier().equals(sosObsProp.getIdentifier())) {
                     exists = true;
                     break;
                 }
             }
             if (!exists) {
-                ObservableProperty obsProp = new ObservableProperty();
+                final ObservableProperty obsProp = new ObservableProperty();
                 obsProp.setIdentifier(sosObsProp.getIdentifier());
                 obsProp.setDescription(sosObsProp.getDescription());
                 session.save(obsProp);

@@ -61,7 +61,7 @@ public class ResultTemplateDAO {
      *            Hibernate session
      * @return Result template object
      */
-    public ResultTemplate getResultTemplateObject(String identifier, Session session) {
+    public ResultTemplate getResultTemplateObject(final String identifier, final Session session) {
         return (ResultTemplate) session.createCriteria(ResultTemplate.class)
                 .add(Restrictions.eq(ResultTemplate.IDENTIFIER, identifier))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).uniqueResult();
@@ -74,12 +74,12 @@ public class ResultTemplateDAO {
      *            Hibernate session
      * @return Result template objects
      */
-    public List<ResultTemplate> getResultTemplateObjects(Session session) {
-        List<ObservationConstellation> observationConstellations =
+    public List<ResultTemplate> getResultTemplateObjects(final Session session) {
+        final List<ObservationConstellation> observationConstellations =
                 new ObservationConstellationDAO().getObservationConstellations(session);
-        List<ResultTemplate> resultTemplates = CollectionHelper.list();
-        for (ObservationConstellation observationConstellation : observationConstellations) {
-            ResultTemplate resultTemplate =
+        final List<ResultTemplate> resultTemplates = CollectionHelper.list();
+        for (final ObservationConstellation observationConstellation : observationConstellations) {
+            final ResultTemplate resultTemplate =
                     getResultTemplateObjectsForObservationConstellation(observationConstellation, session);
             if (resultTemplate != null) {
                 resultTemplates.add(resultTemplate);
@@ -98,7 +98,7 @@ public class ResultTemplateDAO {
      * @return Result template object
      */
     public ResultTemplate getResultTemplateObjectsForObservationConstellation(
-            ObservationConstellation observationConstellation, Session session) {
+            final ObservationConstellation observationConstellation, final Session session) {
         return getResultTemplateObject(observationConstellation.getOffering().getIdentifier(),
                 observationConstellation.getObservableProperty().getIdentifier(), session);
     }
@@ -116,7 +116,7 @@ public class ResultTemplateDAO {
      * @return Result template objects
      */
     public List<ResultTemplate> getResultTemplateObjectsForObservationConstellationAndFeature(
-            ObservationConstellation observationConstellation, AbstractFeature sosAbstractFeature, Session session) {
+            final ObservationConstellation observationConstellation, final AbstractFeature sosAbstractFeature, final Session session) {
         return getResultTemplateObject(observationConstellation.getOffering().getIdentifier(),
                 observationConstellation.getObservableProperty().getIdentifier(),
                 CollectionHelper.asList(sosAbstractFeature.getIdentifier().getValue()), session);
@@ -135,13 +135,13 @@ public class ResultTemplateDAO {
      * @return Result template object
      */
     @SuppressWarnings("unchecked")
-    public ResultTemplate getResultTemplateObject(String offering, String observedProperty, Session session) {
-        Criteria rtc = session.createCriteria(ResultTemplate.class).setMaxResults(1);
+    public ResultTemplate getResultTemplateObject(final String offering, final String observedProperty, final Session session) {
+        final Criteria rtc = session.createCriteria(ResultTemplate.class).setMaxResults(1);
         rtc.createCriteria(ObservationConstellation.OFFERING).add(Restrictions.eq(Offering.IDENTIFIER, offering));
         rtc.createCriteria(ObservationConstellation.OBSERVABLE_PROPERTY).add(
                 Restrictions.eq(ObservableProperty.IDENTIFIER, observedProperty));
         /* there can be multiple but equal result templates... */
-        List<ResultTemplate> templates = (List<ResultTemplate>) rtc.list();
+        final List<ResultTemplate> templates = rtc.list();
         return templates.isEmpty() ? null : templates.iterator().next();
     }
 
@@ -160,9 +160,9 @@ public class ResultTemplateDAO {
      * @return Result template objects
      */
     @SuppressWarnings("unchecked")
-    public List<ResultTemplate> getResultTemplateObject(String offering, String observedProperty,
-            Collection<String> featureOfInterest, Session session) {
-        Criteria rtc =
+    public List<ResultTemplate> getResultTemplateObject(final String offering, final String observedProperty,
+            final Collection<String> featureOfInterest, final Session session) {
+        final Criteria rtc =
                 session.createCriteria(ResultTemplate.class).setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         rtc.createCriteria(ObservationConstellation.OFFERING).add(Restrictions.eq(Offering.IDENTIFIER, offering));
         rtc.createCriteria(ObservationConstellation.OBSERVABLE_PROPERTY).add(
@@ -188,21 +188,21 @@ public class ResultTemplateDAO {
      * @throws OwsExceptionReport
      *             If the requested structure/encoding is invalid
      */
-    public void checkOrInsertResultTemplate(InsertResultTemplateRequest request,
-            ObservationConstellation observationConstellation, FeatureOfInterest featureOfInterest, Session session)
+    public void checkOrInsertResultTemplate(final InsertResultTemplateRequest request,
+            final ObservationConstellation observationConstellation, final FeatureOfInterest featureOfInterest, final Session session)
             throws OwsExceptionReport {
-        List<ResultTemplate> resultTemplates =
-                new ResultTemplateDAO().getResultTemplateObject(
+        final List<ResultTemplate> resultTemplates =
+                getResultTemplateObject(
                         observationConstellation.getOffering().getIdentifier(), observationConstellation
                                 .getObservableProperty().getIdentifier(), null, session);
         if (CollectionHelper.isEmpty(resultTemplates)) {
             createAndSaveResultTemplate(request, observationConstellation, featureOfInterest, session);
         } else {
-            List<String> storedIdentifiers = new ArrayList<String>(0);
-            for (ResultTemplate storedResultTemplate : resultTemplates) {
+            final List<String> storedIdentifiers = new ArrayList<String>(0);
+            for (final ResultTemplate storedResultTemplate : resultTemplates) {
                 storedIdentifiers.add(storedResultTemplate.getIdentifier());
-                SosResultStructure storedStructure = new SosResultStructure(storedResultTemplate.getResultStructure());
-                SosResultStructure newStructure = new SosResultStructure(request.getResultStructure().getXml());
+                final SosResultStructure storedStructure = new SosResultStructure(storedResultTemplate.getResultStructure());
+                final SosResultStructure newStructure = new SosResultStructure(request.getResultStructure().getXml());
 
                 if (!storedStructure.equals(newStructure)) {
                     throw new InvalidParameterValueException().at(
@@ -213,8 +213,8 @@ public class ResultTemplateDAO {
                             observationConstellation.getObservableProperty().getIdentifier(),
                             observationConstellation.getOffering().getIdentifier());
                 }
-                SosResultEncoding storedEncoding = new SosResultEncoding(storedResultTemplate.getResultEncoding());
-                SosResultEncoding newEndoding = new SosResultEncoding(request.getResultEncoding().getXml());
+                final SosResultEncoding storedEncoding = new SosResultEncoding(storedResultTemplate.getResultEncoding());
+                final SosResultEncoding newEndoding = new SosResultEncoding(request.getResultEncoding().getXml());
                 if (!storedEncoding.equals(newEndoding)) {
                     throw new InvalidParameterValueException().at(
                             Sos2Constants.InsertResultTemplateParams.proposedTemplate).withMessage(
@@ -244,9 +244,9 @@ public class ResultTemplateDAO {
      * @param session
      *            Hibernate session
      */
-    private void createAndSaveResultTemplate(InsertResultTemplateRequest request,
-            ObservationConstellation observationConstellation, FeatureOfInterest featureOfInterest, Session session) {
-        ResultTemplate resultTemplate = new ResultTemplate();
+    private void createAndSaveResultTemplate(final InsertResultTemplateRequest request,
+            final ObservationConstellation observationConstellation, final FeatureOfInterest featureOfInterest, final Session session) {
+        final ResultTemplate resultTemplate = new ResultTemplate();
         resultTemplate.setIdentifier(request.getIdentifier());
         resultTemplate.setProcedure(observationConstellation.getProcedure());
         resultTemplate.setObservableProperty(observationConstellation.getObservableProperty());

@@ -51,7 +51,7 @@ public class FeatureOfInterestTypeDAO {
      * @return All featureOfInterest types
      */
     @SuppressWarnings("unchecked")
-    public List<String> getFeatureOfInterestTypes(Session session) {
+    public List<String> getFeatureOfInterestTypes(final Session session) {
         return session
                 .createCriteria(FeatureOfInterestType.class)
                 .add(Restrictions.ne(FeatureOfInterestType.FEATURE_OF_INTEREST_TYPE, OGCConstants.UNKNOWN))
@@ -69,7 +69,7 @@ public class FeatureOfInterestTypeDAO {
      *            Hibernate session
      * @return FeatureOfInterest type object
      */
-    public FeatureOfInterestType getFeatureOfInterestTypeObject(String featureOfInterestType, Session session) {
+    public FeatureOfInterestType getFeatureOfInterestTypeObject(final String featureOfInterestType, final Session session) {
         return (FeatureOfInterestType) session.createCriteria(FeatureOfInterestType.class)
                 .add(Restrictions.eq(FeatureOfInterestType.FEATURE_OF_INTEREST_TYPE, featureOfInterestType))
                 .uniqueResult();
@@ -85,8 +85,8 @@ public class FeatureOfInterestTypeDAO {
      * @return FeatureOfInterest type objects
      */
     @SuppressWarnings("unchecked")
-    public List<FeatureOfInterestType> getFeatureOfInterestTypeObjects(List<String> featureOfInterestType,
-            Session session) {
+    public List<FeatureOfInterestType> getFeatureOfInterestTypeObjects(final List<String> featureOfInterestType,
+            final Session session) {
         return session.createCriteria(FeatureOfInterestType.class)
                 .add(Restrictions.in(FeatureOfInterestType.FEATURE_OF_INTEREST_TYPE, featureOfInterestType)).list();
     }
@@ -101,8 +101,8 @@ public class FeatureOfInterestTypeDAO {
      * @return FeatureOfInterest type objects
      */
     @SuppressWarnings("unchecked")
-    public List<String> getFeatureOfInterestTypesForFeatureOfInterest(Collection<String> featureOfInterestIdentifiers,
-            Session session) {
+    public List<String> getFeatureOfInterestTypesForFeatureOfInterest(final Collection<String> featureOfInterestIdentifiers,
+            final Session session) {
         return session
                 .createCriteria(FeatureOfInterest.class)
                 .add(Restrictions.in(FeatureOfInterest.IDENTIFIER, featureOfInterestIdentifiers))
@@ -122,9 +122,8 @@ public class FeatureOfInterestTypeDAO {
      *            Hibernate session
      * @return FeatureOfInterest type object
      */
-    public FeatureOfInterestType getOrInsertFeatureOfInterestType(String featureType, Session session) {
-        FeatureOfInterestType featureOfInterestType =
-                new FeatureOfInterestTypeDAO().getFeatureOfInterestTypeObject(featureType, session);
+    public FeatureOfInterestType getOrInsertFeatureOfInterestType(final String featureType, final Session session) {
+        FeatureOfInterestType featureOfInterestType = getFeatureOfInterestTypeObject(featureType, session);
         if (featureOfInterestType == null) {
             featureOfInterestType = new FeatureOfInterestType();
             featureOfInterestType.setFeatureOfInterestType(featureType);
@@ -144,10 +143,10 @@ public class FeatureOfInterestTypeDAO {
      *            Hibernate session
      * @return FeatureOfInterest type objects
      */
-    public List<FeatureOfInterestType> getOrInsertFeatureOfInterestTypes(Set<String> featureOfInterestTypes,
-            Session session) {
-        List<FeatureOfInterestType> featureTypes = new LinkedList<FeatureOfInterestType>();
-        for (String featureType : featureOfInterestTypes) {
+    public List<FeatureOfInterestType> getOrInsertFeatureOfInterestTypes(final Set<String> featureOfInterestTypes,
+            final Session session) {
+        final List<FeatureOfInterestType> featureTypes = new LinkedList<FeatureOfInterestType>();
+        for (final String featureType : featureOfInterestTypes) {
             featureTypes.add(getOrInsertFeatureOfInterestType(featureType, session));
         }
         return featureTypes;

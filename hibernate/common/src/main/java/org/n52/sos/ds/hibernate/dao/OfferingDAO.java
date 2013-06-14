@@ -70,7 +70,7 @@ public class OfferingDAO extends TimeCreator {
      *            Hibernate session
      * @return Transactional offering object
      */
-    public TOffering getTOfferingForIdentifier(String identifier, Session session) {
+    public TOffering getTOfferingForIdentifier(final String identifier, final Session session) {
         return (TOffering) session.createCriteria(TOffering.class)
                 .add(Restrictions.eq(Offering.IDENTIFIER, identifier)).uniqueResult();
     }
@@ -83,7 +83,7 @@ public class OfferingDAO extends TimeCreator {
      * @return Offering objects
      */
     @SuppressWarnings("unchecked")
-    public List<Offering> getOfferingObjects(Session session) {
+    public List<Offering> getOfferingObjects(final Session session) {
         return session.createCriteria(Offering.class).list();
     }
 
@@ -96,7 +96,7 @@ public class OfferingDAO extends TimeCreator {
      *            Hibernate session
      * @return Offering object
      */
-    public Offering getOfferingForIdentifier(String identifier, Session session) {
+    public Offering getOfferingForIdentifier(final String identifier, final Session session) {
         return (Offering) session.createCriteria(Offering.class).add(Restrictions.eq(Offering.IDENTIFIER, identifier))
                 .uniqueResult();
     }
@@ -111,8 +111,8 @@ public class OfferingDAO extends TimeCreator {
      * @return Offering identifiers
      */
     @SuppressWarnings("unchecked")
-    public List<String> getOfferingIdentifiersForProcedure(String procedureIdentifier, Session session) {
-        Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
+    public List<String> getOfferingIdentifiersForProcedure(final String procedureIdentifier, final Session session) {
+        final Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
         c.createCriteria(Observation.OFFERINGS).setProjection(
                 Projections.distinct(Projections.property(Offering.IDENTIFIER)));
         c.createCriteria(Observation.PROCEDURE).add(Restrictions.eq(Procedure.IDENTIFIER, procedureIdentifier));
@@ -129,9 +129,9 @@ public class OfferingDAO extends TimeCreator {
      * @return Offering identifiers
      */
     @SuppressWarnings("unchecked")
-    public Collection<String> getOfferingIdentifiersForObservableProperty(String observablePropertyIdentifier,
-            Session session) {
-        Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
+    public Collection<String> getOfferingIdentifiersForObservableProperty(final String observablePropertyIdentifier,
+            final Session session) {
+        final Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
         c.createCriteria(Observation.OFFERINGS).setProjection(
                 Projections.distinct(Projections.property(Offering.IDENTIFIER)));
         c.createCriteria(Observation.OBSERVABLE_PROPERTY).add(
@@ -148,13 +148,13 @@ public class OfferingDAO extends TimeCreator {
      *            Hibernate session Hibernate session
      * @return min time for offering
      */
-    public DateTime getMinDate4Offering(String offering, Session session) {
-        Criteria criteria =
+    public DateTime getMinDate4Offering(final String offering, final Session session) {
+        final Criteria criteria =
                 session.createCriteria(Observation.class)
                         .setProjection(Projections.min(Observation.PHENOMENON_TIME_START))
                         .add(Restrictions.eq(Observation.DELETED, false)).createCriteria(Observation.OFFERINGS)
                         .add(Restrictions.eq(Offering.IDENTIFIER, offering));
-        Object min = criteria.uniqueResult();
+        final Object min = criteria.uniqueResult();
         if (min != null) {
             return new DateTime(min, DateTimeZone.UTC);
         }
@@ -170,27 +170,27 @@ public class OfferingDAO extends TimeCreator {
      *            Hibernate session Hibernate session
      * @return max time for offering
      */
-    public DateTime getMaxDate4Offering(String offering, Session session) {
-        Criteria cstart =
+    public DateTime getMaxDate4Offering(final String offering, final Session session) {
+        final Criteria cstart =
                 session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false))
                         .setProjection(Projections.max(Observation.PHENOMENON_TIME_START))
                         .createCriteria(Observation.OFFERINGS).add(Restrictions.eq(Offering.IDENTIFIER, offering));
 
-        Object maxStart = cstart.uniqueResult();
+        final Object maxStart = cstart.uniqueResult();
 
-        Criteria cend =
+        final Criteria cend =
                 session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false))
                         .setProjection(Projections.max(Observation.PHENOMENON_TIME_END))
                         .createCriteria(Observation.OFFERINGS).add(Restrictions.eq(Offering.IDENTIFIER, offering));
 
-        Object maxEnd = cend.uniqueResult();
+        final Object maxEnd = cend.uniqueResult();
 
         if (maxStart == null && maxEnd == null) {
             return null;
         } else {
-            DateTime start = new DateTime(maxStart, DateTimeZone.UTC);
+            final DateTime start = new DateTime(maxStart, DateTimeZone.UTC);
             if (maxEnd != null) {
-                DateTime end = new DateTime(maxEnd, DateTimeZone.UTC);
+                final DateTime end = new DateTime(maxEnd, DateTimeZone.UTC);
                 if (end.isAfter(start)) {
                     return end;
                 }
@@ -209,14 +209,14 @@ public class OfferingDAO extends TimeCreator {
      * 
      * @return min result time for offering
      */
-    public DateTime getMinResultTime4Offering(String offering, Session session) {
-        Criteria criteria =
+    public DateTime getMinResultTime4Offering(final String offering, final Session session) {
+        final Criteria criteria =
                 session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false))
                         .setProjection(Projections.min(Observation.RESULT_TIME));
 
         criteria.createCriteria(Observation.OFFERINGS).add(Restrictions.eq(Offering.IDENTIFIER, offering));
 
-        Object min = criteria.uniqueResult();
+        final Object min = criteria.uniqueResult();
         if (min != null) {
             return new DateTime(min, DateTimeZone.UTC);
         }
@@ -233,12 +233,12 @@ public class OfferingDAO extends TimeCreator {
      * 
      * @return max result time for offering
      */
-    public DateTime getMaxResultTime4Offering(String offering, Session session) {
-        Criteria c =
+    public DateTime getMaxResultTime4Offering(final String offering, final Session session) {
+        final Criteria c =
                 session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false))
                         .setProjection(Projections.max(Observation.RESULT_TIME));
         c.createCriteria(Observation.OFFERINGS).add(Restrictions.eq(Offering.IDENTIFIER, offering));
-        Object maxStart = c.uniqueResult();
+        final Object maxStart = c.uniqueResult();
         if (maxStart == null) {
             return null;
         } else {
@@ -253,9 +253,9 @@ public class OfferingDAO extends TimeCreator {
      *            Hibernate session
      * @return a Map containing the temporal bounding box for each offering
      */
-    public Map<String, TimePeriod> getTemporalBoundingBoxesForOfferings(Session session) {
+    public Map<String, TimePeriod> getTemporalBoundingBoxesForOfferings(final Session session) {
         if (session != null) {
-            Criteria criteria =
+            final Criteria criteria =
                     session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
             criteria.createAlias(Observation.OFFERINGS, "off");
             criteria.setProjection(Projections.projectionList()
@@ -264,14 +264,14 @@ public class OfferingDAO extends TimeCreator {
                     .add(Projections.max(Observation.PHENOMENON_TIME_END))
                     .add(Projections.groupProperty("off." + Offering.IDENTIFIER)));
 
-            List<?> temporalBoundingBoxes = criteria.list();
+            final List<?> temporalBoundingBoxes = criteria.list();
             if (!temporalBoundingBoxes.isEmpty()) {
-                HashMap<String, TimePeriod> temporalBBoxMap =
+                final HashMap<String, TimePeriod> temporalBBoxMap =
                         new HashMap<String, TimePeriod>(temporalBoundingBoxes.size());
-                for (Object recordObj : temporalBoundingBoxes) {
+                for (final Object recordObj : temporalBoundingBoxes) {
                     if (recordObj instanceof Object[]) {
-                        Object[] record = (Object[]) recordObj;
-                        TimePeriod value =
+                        final Object[] record = (Object[]) recordObj;
+                        final TimePeriod value =
                                 createTimePeriod((Timestamp) record[0], (Timestamp) record[1], (Timestamp) record[2]);
                         temporalBBoxMap.put((String) record[3], value);
                     }
@@ -300,11 +300,11 @@ public class OfferingDAO extends TimeCreator {
      *            Hibernate session
      * @return Offering object
      */
-    public Offering getAndUpdateOrInsertNewOffering(String offeringIdentifier, String offeringName,
-            List<RelatedFeature> relatedFeatures, List<ObservationType> observationTypes,
-            List<FeatureOfInterestType> featureOfInterestTypes, Session session) {
+    public Offering getAndUpdateOrInsertNewOffering(final String offeringIdentifier, final String offeringName,
+            final List<RelatedFeature> relatedFeatures, final List<ObservationType> observationTypes,
+            final List<FeatureOfInterestType> featureOfInterestTypes, final Session session) {
 
-        TOffering offering = new OfferingDAO().getTOfferingForIdentifier(offeringIdentifier, session);
+        TOffering offering = getTOfferingForIdentifier(offeringIdentifier, session);
         if (offering == null) {
             offering = new TOffering();
             offering.setIdentifier(offeringIdentifier);
