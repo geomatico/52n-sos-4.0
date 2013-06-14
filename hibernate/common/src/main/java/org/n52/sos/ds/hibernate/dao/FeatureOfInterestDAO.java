@@ -32,12 +32,14 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
+import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.TFeatureOfInterest;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.om.features.AbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -61,7 +63,7 @@ public class FeatureOfInterestDAO {
      *            Hibernate session Hibernate session
      * @return
      */
-    public FeatureOfInterest getFeatureOfInterest(String identifier, Session session) {
+    public FeatureOfInterest getFeatureOfInterest(final String identifier, final Session session) {
         return (FeatureOfInterest) session.createCriteria(FeatureOfInterest.class)
                 .add(Restrictions.eq(FeatureOfInterest.IDENTIFIER, identifier)).uniqueResult();
     }
@@ -77,8 +79,8 @@ public class FeatureOfInterestDAO {
      */
     @SuppressWarnings("unchecked")
     public List<String> getFeatureOfInterestIdentifiersForObservationConstellation(
-            ObservationConstellation observationConstellation, Session session) {
-        Criteria criteria =
+            final ObservationConstellation observationConstellation, final Session session) {
+        final Criteria criteria =
                 session.createCriteria(Observation.class)
                         .add(Restrictions.eq(Observation.DELETED, false))
                         .add(Restrictions.eq(Observation.PROCEDURE, observationConstellation.getProcedure()))
@@ -101,8 +103,8 @@ public class FeatureOfInterestDAO {
      * @return FeatureOfInterest identifiers for offering
      */
     @SuppressWarnings("unchecked")
-    public List<String> getFeatureOfInterestIdentifiersForOffering(String offeringIdentifiers, Session session) {
-        Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
+    public List<String> getFeatureOfInterestIdentifiersForOffering(final String offeringIdentifiers, final Session session) {
+        final Criteria c = session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false));
         c.createCriteria(Observation.FEATURE_OF_INTEREST).setProjection(
                 Projections.distinct(Projections.property(FeatureOfInterest.IDENTIFIER)));
         c.createCriteria(Observation.OFFERINGS).add(Restrictions.eq(Offering.IDENTIFIER, offeringIdentifiers));
@@ -119,7 +121,7 @@ public class FeatureOfInterestDAO {
      * @return FeatureOfInterest objects
      */
     @SuppressWarnings("unchecked")
-    public List<FeatureOfInterest> getFeatureOfInterestObject(Collection<String> identifiers, Session session) {
+    public List<FeatureOfInterest> getFeatureOfInterestObject(final Collection<String> identifiers, final Session session) {
         if (identifiers != null && !identifiers.isEmpty()) {
             return session.createCriteria(FeatureOfInterest.class)
                     .add(Restrictions.in(FeatureOfInterest.IDENTIFIER, identifiers)).list();
@@ -135,7 +137,7 @@ public class FeatureOfInterestDAO {
      * @return FeatureOfInterest objects
      */
     @SuppressWarnings("unchecked")
-    public List<FeatureOfInterest> getFeatureOfInterestObjects(Session session) {
+    public List<FeatureOfInterest> getFeatureOfInterestObjects(final Session session) {
         return session.createCriteria(FeatureOfInterest.class).list();
     }
 
@@ -150,14 +152,16 @@ public class FeatureOfInterestDAO {
      *            Hibernate session
      * @return FeatureOfInterest object
      */
-    public FeatureOfInterest getOrInsertFeatureOfInterest(String identifier, String url, Session session) {
-        FeatureOfInterest feature = new FeatureOfInterestDAO().getFeatureOfInterest(identifier, session);
+    public FeatureOfInterest getOrInsertFeatureOfInterest(final String identifier, final String url, final Session session) {
+        FeatureOfInterest feature = getFeatureOfInterest(identifier, session);
         if (feature == null) {
             feature = new FeatureOfInterest();
             feature.setIdentifier(identifier);
             if (url != null && !url.isEmpty()) {
                 feature.setUrl(url);
             }
+            final FeatureOfInterestType featureOfInterestType = new FeatureOfInterestTypeDAO().getOrInsertFeatureOfInterestType(OGCConstants.UNKNOWN, session);
+            feature.setFeatureOfInterestType(featureOfInterestType);
             session.save(feature);
             session.flush();
         } else if (feature.getUrl() != null && !feature.getUrl().isEmpty() && url != null && !url.isEmpty()) {
@@ -178,8 +182,8 @@ public class FeatureOfInterestDAO {
      * @param session
      *            Hibernate session
      */
-    public void insertFeatureOfInterestRelationShip(TFeatureOfInterest parentFeature, FeatureOfInterest childFeature,
-            Session session) {
+    public void insertFeatureOfInterestRelationShip(final TFeatureOfInterest parentFeature, final FeatureOfInterest childFeature,
+            final Session session) {
         parentFeature.getChilds().add(childFeature);
         session.saveOrUpdate(parentFeature);
         session.flush();
@@ -196,12 +200,12 @@ public class FeatureOfInterestDAO {
      * @param session
      *            Hibernate session
      */
-    public void checkOrInsertFeatureOfInterestRelatedFeatureRelation(FeatureOfInterest featureOfInterest,
-            Offering offering, Session session) {
-        List<RelatedFeature> relatedFeatures =
+    public void checkOrInsertFeatureOfInterestRelatedFeatureRelation(final FeatureOfInterest featureOfInterest,
+            final Offering offering, final Session session) {
+        final List<RelatedFeature> relatedFeatures =
                 new RelatedFeatureDAO().getRelatedFeatureForOffering(offering.getIdentifier(), session);
         if (CollectionHelper.isNotEmpty(relatedFeatures)) {
-            for (RelatedFeature relatedFeature : relatedFeatures) {
+            for (final RelatedFeature relatedFeature : relatedFeatures) {
                 insertFeatureOfInterestRelationShip((TFeatureOfInterest) relatedFeature.getFeatureOfInterest(),
                         featureOfInterest, session);
             }
@@ -219,10 +223,10 @@ public class FeatureOfInterestDAO {
      * @throws OwsExceptionReport
      *             If SOS feature type is not supported
      */
-    public FeatureOfInterest checkOrInsertFeatureOfInterest(AbstractFeature featureOfInterest, Session session)
+    public FeatureOfInterest checkOrInsertFeatureOfInterest(final AbstractFeature featureOfInterest, final Session session)
             throws OwsExceptionReport {
         if (featureOfInterest instanceof SamplingFeature) {
-            String featureIdentifier =
+            final String featureIdentifier =
                     Configurator.getInstance().getFeatureQueryHandler()
                             .insertFeature((SamplingFeature) featureOfInterest, session);
             return getOrInsertFeatureOfInterest(featureIdentifier, ((SamplingFeature) featureOfInterest).getUrl(),
