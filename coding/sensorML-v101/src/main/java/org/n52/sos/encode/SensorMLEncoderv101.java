@@ -1092,7 +1092,9 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
             final String fieldDefinition, final String fieldName, final Set<String> values) {
     	final Map<String,String> valueNamePairs = new HashMap<String,String>();
     	int counter = 0;
-    	for (final String value : values) {
+    	List<String> valueList = CollectionHelper.asList(values);
+    	Collections.sort(valueList);
+    	for (final String value : valueList) {
     		final String name = values.size() > 1 ? fieldName + ++counter : fieldName; 
     		valueNamePairs.put(value, name);
     	}
