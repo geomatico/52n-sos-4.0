@@ -24,6 +24,7 @@
 package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,14 +52,14 @@ import org.n52.sos.response.GetFeatureOfInterestResponse;
 
 public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
 
-    private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    private final HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
     
     public GetFeatureOfInterestDAO() {
         super(SosConstants.SOS);
     }
 
     @Override
-    public GetFeatureOfInterestResponse getFeatureOfInterest(GetFeatureOfInterestRequest request)
+    public GetFeatureOfInterestResponse getFeatureOfInterest(final GetFeatureOfInterestRequest request)
             throws OwsExceptionReport {
         Session session = null;
         try {
@@ -72,13 +73,13 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
                 } else if ((request.getFeatureIdentifiers() != null && !request.getFeatureIdentifiers().isEmpty())
                         || (request.getSpatialFilters() != null && !request.getSpatialFilters().isEmpty())) {
                     // good
-                    Set<String> foiIDs = new HashSet<String>(queryFeatureIdentifiersForParameter(request, session));
+                    final Set<String> foiIDs = new HashSet<String>(queryFeatureIdentifiersForParameter(request, session));
                     // feature of interest
-                    FeatureCollection featureCollection =
+                    final FeatureCollection featureCollection =
                             new FeatureCollection(getConfigurator().getFeatureQueryHandler().getFeatures(
                                     new ArrayList<String>(foiIDs), request.getSpatialFilters(), session,
                                     request.getVersion(), -1));
-                    GetFeatureOfInterestResponse response = new GetFeatureOfInterestResponse();
+                    final GetFeatureOfInterestResponse response = new GetFeatureOfInterestResponse();
                     response.setService(request.getService());
                     response.setVersion(request.getVersion());
                     response.setAbstractFeature(featureCollection);
@@ -89,19 +90,19 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
                             new MissingParameterValueException(Sos1Constants.GetFeatureOfInterestParams.location));
                 }
             } else {
-                Set<String> foiIDs = new HashSet<String>(queryFeatureIdentifiersForParameter(request, session));
+                final Set<String> foiIDs = new HashSet<String>(queryFeatureIdentifiersForParameter(request, session));
                 // feature of interest
-                FeatureCollection featureCollection =
+                final FeatureCollection featureCollection =
                         new FeatureCollection(getConfigurator().getFeatureQueryHandler().getFeatures(
                                 new ArrayList<String>(foiIDs), request.getSpatialFilters(), session,
                                 request.getVersion(), -1));
-                GetFeatureOfInterestResponse response = new GetFeatureOfInterestResponse();
+                final GetFeatureOfInterestResponse response = new GetFeatureOfInterestResponse();
                 response.setService(request.getService());
                 response.setVersion(request.getVersion());
                 response.setAbstractFeature(featureCollection);
                 return response;
             }
-        } catch (HibernateException he) {
+        } catch (final HibernateException he) {
             throw new NoApplicableCodeException().causedBy(he)
                     .withMessage("Error while querying feature of interest data!");
         } finally {
@@ -110,18 +111,21 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
     }
 
     @SuppressWarnings("unchecked")
-    private List<String> queryFeatureIdentifiersForParameter(GetFeatureOfInterestRequest req, Session session)
+    private List<String> queryFeatureIdentifiersForParameter(final GetFeatureOfInterestRequest req, final Session session)
             throws OwsExceptionReport {
         // TODO get foi ids from foi table. Else only fois returned which
-        Criteria c = session.createCriteria(Observation.class);
-        Criteria fc = c.createCriteria(Observation.FEATURE_OF_INTEREST);
+        final Criteria c = session.createCriteria(Observation.class);
+        final Criteria fc = c.createCriteria(Observation.FEATURE_OF_INTEREST);
 
         fc.setProjection(Projections.distinct(Projections.property(FeatureOfInterest.IDENTIFIER)));
 
         // relates to observations.
         if (req.isSetFeatureOfInterestIdentifiers()) {
-            fc.add(Restrictions.in(FeatureOfInterest.IDENTIFIER,
-                                   checkFeatureIdentifiersForRelatedFeatures(req.getFeatureIdentifiers())));
+        	// FIXME clarify logic here! What do we want if the requested feature is only a relatedFeature of an procedure?
+        	final Collection<String> features = checkFeatureIdentifiersForRelatedFeatures(req.getFeatureIdentifiers());
+        	if (features != null && !features.isEmpty()) {
+        		fc.add(Restrictions.in(FeatureOfInterest.IDENTIFIER,features));
+        	}
         }
         // observableProperties
         if (req.isSetObservableProperties()) {
