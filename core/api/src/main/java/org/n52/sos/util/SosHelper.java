@@ -307,6 +307,8 @@ public class SosHelper {
         return parents;
 }
 
+    
+    
     /**
      * creates a HTTP-GET string for DescribeSensor.
      * 
@@ -316,13 +318,16 @@ public class SosHelper {
      *            the service url
      * @param procedureId
      *            The procedureId for the DescribeSensor request
+     * @param procedureDescriptionFormat
+     *            The procedureDescriptionFormat for the DescribeSensor request            
      * 
      * @param urlPattern
      *            the url pattern (e.g. /kvp)
      * @return Get-URL as String
      * @throws UnsupportedEncodingException
      */
-    public static String getDescribeSensorUrl(final String version, final String serviceURL, final String procedureId, final String urlPattern)
+    public static String getDescribeSensorUrl(final String version, final String serviceURL, final String procedureId, final String urlPattern,
+            String procedureDescriptionFormat)
             throws UnsupportedEncodingException {
         final StringBuilder url = new StringBuilder();
         // service URL
@@ -342,10 +347,10 @@ public class SosHelper {
         // outputFormat
         if (version.equalsIgnoreCase(Sos1Constants.SERVICEVERSION)) {
             url.append("&").append(Sos1Constants.DescribeSensorParams.outputFormat).append("=")
-                    .append(URLEncoder.encode(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE, "UTF-8"));
+                    .append(URLEncoder.encode(procedureDescriptionFormat, "UTF-8"));
         } else {
             url.append("&").append(Sos2Constants.DescribeSensorParams.procedureDescriptionFormat).append("=")
-                    .append(URLEncoder.encode(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL, "UTF-8"));
+                    .append(URLEncoder.encode(procedureDescriptionFormat, "UTF-8"));
 }
 
         return url.toString();

@@ -1142,7 +1142,7 @@ public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
 
                         component.setHref(SosHelper.getDescribeSensorUrl(version, ServiceConfiguration.getInstance()
                                 .getServiceURL(), childProcedure.getIdentifier(),
-                                BindingConstants.KVP_BINDING_ENDPOINT));
+                                BindingConstants.KVP_BINDING_ENDPOINT, childProcedure.getDescriptionFormat()));
                     } else {
                         component.setHref(childProcedure.getIdentifier());
                     }
