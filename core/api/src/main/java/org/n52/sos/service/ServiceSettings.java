@@ -46,7 +46,6 @@ public class ServiceSettings implements SettingDefinitionProvider {
     public static final String SENSOR_DIRECTORY = "service.sensorDirectory";
     public static final String USE_DEFAULT_PREFIXES = "service.useDefaultPrefixes";
     public static final String ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR = "service.encodeFullChildrenInDescribeSensor";
-    public static final String GENERATE_OFFERING_WHEN_NOT_SPECIFIED = "service.generateOfferingWhenNotSpecified";
     public static final String MAX_GET_OBSERVATION_RESULTS = "service.maxGetObservationResults";
     
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
