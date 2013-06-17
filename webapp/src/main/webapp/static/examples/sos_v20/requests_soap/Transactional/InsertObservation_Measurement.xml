@@ -12,7 +12,8 @@
 			xmlns:om="http://www.opengis.net/om/2.0"
 			xmlns:sams="http://www.opengis.net/samplingSpatial/2.0" 
 			xmlns:sf="http://www.opengis.net/sampling/2.0"
-			xsi:schemaLocation="http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sos.xsd">
+			xsi:schemaLocation="http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sos.xsd
+											http://www.opengis.net/samplingSpatial/2.0 http://schemas.opengis.net/samplingSpatial/2.0/spatialSamplingFeature.xsd">
 			<!-- multiple offerings are possible -->
 			<sos:offering>http://www.52north.org/test/offering/9</sos:offering>
 			<sos:observation>
