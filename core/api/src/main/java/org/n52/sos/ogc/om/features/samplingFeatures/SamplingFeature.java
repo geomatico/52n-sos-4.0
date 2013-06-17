@@ -44,7 +44,7 @@ public class SamplingFeature extends AbstractFeature {
 
     private static final long serialVersionUID = 4660755526492323288L;
 
-    private List<CodeType> name = new LinkedList<CodeType>();
+    private final List<CodeType> name = new LinkedList<CodeType>();
 
     private String description;
 
@@ -56,9 +56,9 @@ public class SamplingFeature extends AbstractFeature {
 
     private String url;
 
-    private List<AbstractFeature> sampledFeatures = new LinkedList<AbstractFeature>();
+    private final List<AbstractFeature> sampledFeatures = new LinkedList<AbstractFeature>();
 
-    private List<NamedValue<?>> parameters = new LinkedList<NamedValue<?>>();
+    private final List<NamedValue<?>> parameters = new LinkedList<NamedValue<?>>();
 
     private boolean encode = true;
 
@@ -68,11 +68,11 @@ public class SamplingFeature extends AbstractFeature {
      * @param featureIdentifier
      *            identifier of sampling feature
      */
-    public SamplingFeature(CodeWithAuthority featureIdentifier) {
+    public SamplingFeature(final CodeWithAuthority featureIdentifier) {
         super(featureIdentifier);
     }
 
-    public SamplingFeature(CodeWithAuthority featureIdentifier, String gmlId) {
+    public SamplingFeature(final CodeWithAuthority featureIdentifier, final String gmlId) {
         super(featureIdentifier, gmlId);
     }
 
@@ -80,11 +80,11 @@ public class SamplingFeature extends AbstractFeature {
         return Collections.unmodifiableList(name);
     }
 
-    public void setName(List<CodeType> name) {
+    public void setName(final List<CodeType> name) {
         this.name.addAll(name);
     }
 
-    public void addName(CodeType name) {
+    public void addName(final CodeType name) {
         this.name.add(name);
     }
 
@@ -92,7 +92,7 @@ public class SamplingFeature extends AbstractFeature {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
@@ -104,7 +104,7 @@ public class SamplingFeature extends AbstractFeature {
         return xmlDescription != null && !xmlDescription.isEmpty();
     }
 
-    public void setXmlDescription(String xmlDescription) {
+    public void setXmlDescription(final String xmlDescription) {
         this.xmlDescription = xmlDescription;
     }
 
@@ -112,7 +112,7 @@ public class SamplingFeature extends AbstractFeature {
         return geometry;
     }
 
-    public void setGeometry(Geometry geometry) {
+    public void setGeometry(final Geometry geometry) {
         if (geometry != null && geometry.getSRID() == 0) {
             throw new RuntimeException("No SRID specified!");
         }
@@ -123,7 +123,7 @@ public class SamplingFeature extends AbstractFeature {
         return featureType;
     }
 
-    public void setFeatureType(String featureType) {
+    public void setFeatureType(final String featureType) {
         this.featureType = featureType;
     }
 
@@ -135,11 +135,11 @@ public class SamplingFeature extends AbstractFeature {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(final String url) {
         this.url = url;
     }
 
-    public void setSampledFeatures(List<AbstractFeature> sampledFeatures) {
+    public void setSampledFeatures(final List<AbstractFeature> sampledFeatures) {
         this.sampledFeatures.addAll(sampledFeatures);
     }
 
@@ -173,11 +173,11 @@ public class SamplingFeature extends AbstractFeature {
         return geometry != null && !geometry.isEmpty();
     }
 
-    public void addParameter(NamedValue<?> namedValue) {
-        this.parameters.add(namedValue);
+    public void addParameter(final NamedValue<?> namedValue) {
+        parameters.add(namedValue);
     }
     
-    public void setParameters(List<NamedValue<?>> parameters) {
+    public void setParameters(final List<NamedValue<?>> parameters) {
         this.parameters.addAll(parameters);
     }
 
@@ -193,15 +193,16 @@ public class SamplingFeature extends AbstractFeature {
         return encode;
     }
 
-    public void setEncode(boolean encode) {
+    public void setEncode(final boolean encode) {
         this.encode = encode;
     }
 
-    @Override
-    public String toString() {
-        return String
-                .format("SosSamplingFeature [name=%s, description=%s, geometry=%s, featureType=%s, url=%s, sampledFeatures=%s]",
-                        name, description, geometry, featureType, url, sampledFeatures);
-    }
+	@Override
+	public String toString()
+	{
+		return String.format(
+				"SamplingFeature [name=%s, description=%s, xmlDescription=%s, geometry=%s, featureType=%s, url=%s, sampledFeatures=%s, parameters=%s, encode=%s, getIdentifier()=%s, getGmlId()=%s]",
+				name, description, xmlDescription, geometry, featureType, url, sampledFeatures, parameters, encode, getIdentifier(), getGmlId());
+	}
 
 }
