@@ -98,8 +98,8 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
             if (procedureDescriptionFormat != null && observationTypes != null && featureOfInterestTypes != null) {
                 final Procedure hProcedure =
                         new ProcedureDAO().getOrInsertProcedure(assignedProcedureID,
-                                procedureDescriptionFormat, request.getProcedureDescription().getParentProcedures()
-                                ,session);
+                                procedureDescriptionFormat, request.getProcedureDescription().getParentProcedures(),
+                                session);
                 // TODO: set correct validTime,
                 new ValidProcedureTimeDAO().insertValidProcedureTime(
                         hProcedure,
@@ -108,10 +108,23 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
                 final List<ObservableProperty> hObservableProperties =
                         getOrInsertNewObservableProperties(request.getObservableProperty(), session);
                 final ObservationConstellationDAO observationConstellationDAO = new ObservationConstellationDAO();
+                final OfferingDAO offeringDAO = new OfferingDAO();
                 for (final SosOffering assignedOffering : request.getAssignedOfferings()) {
-                    final Offering hOffering =
-                            getAndUpdateOrInsertNewOffering(assignedOffering, request.getRelatedFeatures(), observationTypes,
-                                    featureOfInterestTypes, session);
+                	final List<RelatedFeature> hRelatedFeatures = new LinkedList<RelatedFeature>();
+                    if (request.getRelatedFeatures() != null && !request.getRelatedFeatures().isEmpty()) {
+                    	final RelatedFeatureDAO relatedFeatureDAO = new RelatedFeatureDAO();
+                    	final RelatedFeatureRoleDAO relatedFeatureRoleDAO = new RelatedFeatureRoleDAO();
+                        for (final SwesFeatureRelationship relatedFeature : request.getRelatedFeatures()) {
+                            final List<RelatedFeatureRole> relatedFeatureRoles =
+                                    relatedFeatureRoleDAO.getOrInsertRelatedFeatureRole(
+                                            relatedFeature.getRole(), session);
+                            hRelatedFeatures.addAll(relatedFeatureDAO.getOrInsertRelatedFeature(
+                                    relatedFeature.getFeature(), relatedFeatureRoles, session));
+                        }
+                    }
+					final Offering hOffering = offeringDAO.getAndUpdateOrInsertNewOffering(assignedOffering.getOfferingIdentifier(),
+                            assignedOffering.getOfferingName(), hRelatedFeatures, observationTypes, featureOfInterestTypes,
+                            session);
                     for (final ObservableProperty hObservableProperty : hObservableProperties) {
                         observationConstellationDAO.checkOrInsertObservationConstellation(
                                 hProcedure, hObservableProperty, hOffering, assignedOffering.isParentOffering(),
@@ -139,26 +152,6 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
             sessionHolder.returnSession(session);
         }
         return response;
-    }
-
-    private Offering getAndUpdateOrInsertNewOffering(final SosOffering assignedOffering, final List<SwesFeatureRelationship> relatedFeatures,
-            final List<ObservationType> observationTypes, final List<FeatureOfInterestType> featureOfInterestTypes, final Session session)
-            throws OwsExceptionReport {
-        final List<RelatedFeature> hRelatedFeatures = new LinkedList<RelatedFeature>();
-        if (relatedFeatures != null && !relatedFeatures.isEmpty()) {
-            final RelatedFeatureDAO relatedFeatureDAO = new RelatedFeatureDAO();
-            final RelatedFeatureRoleDAO relatedFeatureRoleDAO = new RelatedFeatureRoleDAO();
-            for (final SwesFeatureRelationship relatedFeature : relatedFeatures) {
-                final List<RelatedFeatureRole> relatedFeatureRoles =
-                        relatedFeatureRoleDAO.getOrInsertRelatedFeatureRole(
-                                relatedFeature.getRole(), session);
-                hRelatedFeatures.addAll(relatedFeatureDAO.getOrInsertRelatedFeature(
-                        relatedFeature.getFeature(), relatedFeatureRoles, session));
-            }
-        }
-        return new OfferingDAO().getAndUpdateOrInsertNewOffering(assignedOffering.getOfferingIdentifier(),
-                assignedOffering.getOfferingName(), hRelatedFeatures, observationTypes, featureOfInterestTypes,
-                session);
     }
 
     private List<ObservableProperty> getOrInsertNewObservableProperties(final List<String> obsProps, final Session session) {
