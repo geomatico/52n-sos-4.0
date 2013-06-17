@@ -23,6 +23,8 @@
  */
 package org.n52.sos.ds.hibernate.dao;
 
+import static org.n52.sos.util.CollectionHelper.*;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +42,6 @@ import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat;
 import org.n52.sos.ds.hibernate.entities.TProcedure;
-import org.n52.sos.util.CollectionHelper;
 
 /**
  * Hibernate data access class for procedure
@@ -227,7 +228,7 @@ public class ProcedureDAO {
      * Insert and get procedure object
      * 
      * @param identifier
-     *            Procedrue identifier
+     *            Procedure identifier
      * @param procedureDecriptionFormat
      *            Procedure description format object
      * @param parentProcedures
@@ -238,22 +239,22 @@ public class ProcedureDAO {
      */
     public Procedure getOrInsertProcedure(final String identifier, final ProcedureDescriptionFormat procedureDecriptionFormat,
             final Collection<String> parentProcedures, final Session session) {
-        Procedure result = getProcedureForIdentifier(identifier, session);
-        if (result == null) {
-            final TProcedure newResult = new TProcedure();
-            newResult.setProcedureDescriptionFormat(procedureDecriptionFormat);
-            newResult.setIdentifier(identifier);
-            if (CollectionHelper.isNotEmpty(parentProcedures)) {
-                newResult.setParents(CollectionHelper.asSet(getProceduresForIdentifiers(parentProcedures,
+        Procedure procedure = getProcedureForIdentifier(identifier, session);
+        if (procedure == null) {
+            final TProcedure tProcedure = new TProcedure();
+            tProcedure.setProcedureDescriptionFormat(procedureDecriptionFormat);
+            tProcedure.setIdentifier(identifier);
+            if (isNotEmpty(parentProcedures)) {
+                tProcedure.setParents(asSet(getProceduresForIdentifiers(parentProcedures,
                         session)));
             }
-            result = newResult;
+            procedure = tProcedure;
         }
-        result.setDeleted(false);
-        session.saveOrUpdate(result);
+        procedure.setDeleted(false);
+        session.saveOrUpdate(procedure);
         session.flush();
-        session.refresh(result);
-        return result;
+        session.refresh(procedure);
+        return procedure;
     }
 
 }
