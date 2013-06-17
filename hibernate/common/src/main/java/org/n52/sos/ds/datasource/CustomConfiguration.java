@@ -60,7 +60,7 @@ public class CustomConfiguration extends Configuration {
     /**
      * Based on
      * {@link org.hibernate.cfg.Configuration#generateDropSchemaScript(Dialect)}.
-     * Rewritten to only create drop commands for exisisting tables/sequences.
+     * Rewritten to only create drop commands for existing tables/sequences.
 
      *
      * @param d
@@ -70,13 +70,13 @@ public class CustomConfiguration extends Configuration {
      *
      * @throws HibernateException
      */
-    public String[] generateDropSchemaScript(Dialect d,
-                                             DatabaseMetadata m)
+    public String[] generateDropSchemaScript(final Dialect d,
+                                             final DatabaseMetadata m)
             throws HibernateException {
         secondPassCompile();
-        String c = getProperties().getProperty(Environment.DEFAULT_CATALOG);
-        String s = getProperties().getProperty(Environment.DEFAULT_SCHEMA);
-        List<String> script = new LinkedList<String>();
+        final String c = getProperties().getProperty(Environment.DEFAULT_CATALOG);
+        final String s = getProperties().getProperty(Environment.DEFAULT_SCHEMA);
+        final List<String> script = new LinkedList<String>();
         script.addAll(generateAuxiliaryDatabaseObjectDropScript(d, c, s));
         if (d.dropConstraints()) {
             script.addAll(generateConstraintDropScript(d, c, s, m));
@@ -91,15 +91,15 @@ public class CustomConfiguration extends Configuration {
      * {@link org.hibernate.cfg.Configuration#iterateGenerators(Dialect)}.
      */
     private Iterator<PersistentIdentifierGenerator> iterateGenerators(
-            Dialect d, String c, String s) throws MappingException {
-        TreeMap<Object, PersistentIdentifierGenerator> generators =
+            final Dialect d, final String c, final String s) throws MappingException {
+        final TreeMap<Object, PersistentIdentifierGenerator> generators =
                 new TreeMap<Object, PersistentIdentifierGenerator>();
-        for (PersistentClass pc : classes.values()) {
+        for (final PersistentClass pc : classes.values()) {
             if (!pc.isInherited()) {
-                IdentifierGenerator ig = pc.getIdentifier().createIdentifierGenerator(
+                final IdentifierGenerator ig = pc.getIdentifier().createIdentifierGenerator(
                         getIdentifierGeneratorFactory(), d, c, s, (RootClass) pc);
                 if (ig instanceof PersistentIdentifierGenerator) {
-                    PersistentIdentifierGenerator pig =
+                    final PersistentIdentifierGenerator pig =
                             (PersistentIdentifierGenerator) ig;
                     generators.put(pig.generatorKey(), pig);
                 } else if (ig instanceof IdentifierGeneratorAggregator) {
@@ -108,13 +108,13 @@ public class CustomConfiguration extends Configuration {
                 }
             }
         }
-        for (Collection collection : collections.values()) {
+        for (final Collection collection : collections.values()) {
             if (collection.isIdentified()) {
-                IdentifierGenerator ig = ((IdentifierCollection) collection)
+                final IdentifierGenerator ig = ((IdentifierCollection) collection)
                         .getIdentifier().createIdentifierGenerator(
                         getIdentifierGeneratorFactory(), d, c, s, null);
                 if (ig instanceof PersistentIdentifierGenerator) {
-                    PersistentIdentifierGenerator pig =
+                    final PersistentIdentifierGenerator pig =
                             (PersistentIdentifierGenerator) ig;
                     generators.put(pig.generatorKey(), pig);
                 }
@@ -125,20 +125,21 @@ public class CustomConfiguration extends Configuration {
     }
 
     protected List<String> generateConstraintDropScript(
-            Dialect d, String c, String s, DatabaseMetadata m)
+            final Dialect d, final String c, final String s, final DatabaseMetadata m)
             throws HibernateException {
-        List<String> script = new LinkedList<String>();
-        Iterator<Table> itr = getTableMappings();
+        final List<String> script = new LinkedList<String>();
+        final Iterator<Table> itr = getTableMappings();
         while (itr.hasNext()) {
-            Table table = itr.next();
-            String tableName = table.getQualifiedName(d, c, s);
+            final Table table = itr.next();
+            final String tableName = table.getQualifiedName(d, c, s);
             if (table.isPhysicalTable() && m.isTable(tableName)) {
                 @SuppressWarnings("unchecked")
+				final
                 Iterator<ForeignKey> subItr = table.getForeignKeyIterator();
-                TableMetadata tableMeta = m.getTableMetadata(
+                final TableMetadata tableMeta = m.getTableMetadata(
                         table.getName(), s, c, true);
                 while (subItr.hasNext()) {
-                    ForeignKey fk = subItr.next();
+                    final ForeignKey fk = subItr.next();
                     if (fk.isPhysicalConstraint() &&
                         tableMeta.getForeignKeyMetadata(fk) != null) {
                         script.add(fk.sqlDropString(d, c, s));
@@ -150,13 +151,13 @@ public class CustomConfiguration extends Configuration {
     }
 
     protected List<String> generateTableDropScript(
-            Dialect d, String c, String s, DatabaseMetadata m)
+            final Dialect d, final String c, final String s, final DatabaseMetadata m)
             throws HibernateException {
-        List<String> script = new LinkedList<String>();
-        Iterator<Table> itr = getTableMappings();
+        final List<String> script = new LinkedList<String>();
+        final Iterator<Table> itr = getTableMappings();
         while (itr.hasNext()) {
-            Table table = itr.next();
-            String tableName = table.getQualifiedName(d, c, s);
+            final Table table = itr.next();
+            final String tableName = table.getQualifiedName(d, c, s);
             if (table.isPhysicalTable() && m.isTable(tableName)) {
                 script.add(table.sqlDropString(d, c, s));
             }
@@ -165,15 +166,15 @@ public class CustomConfiguration extends Configuration {
     }
 
     protected List<String> generateAuxiliaryDatabaseObjectDropScript(
-            Dialect d, String c, String s) {
-        List<String> script = new LinkedList<String>();
-        ListIterator<AuxiliaryDatabaseObject> itr =
+            final Dialect d, final String c, final String s) {
+        final List<String> script = new LinkedList<String>();
+        final ListIterator<AuxiliaryDatabaseObject> itr =
                 auxiliaryDatabaseObjects
                 .listIterator(auxiliaryDatabaseObjects
                 .size());
         while (itr.hasPrevious()) {
             // FIXME how to check if ADO exists?
-            AuxiliaryDatabaseObject object = itr.previous();
+            final AuxiliaryDatabaseObject object = itr.previous();
             if (object.appliesToDialect(d)) {
                 script.add(object.sqlDropString(d, c, s));
             }
@@ -182,14 +183,14 @@ public class CustomConfiguration extends Configuration {
     }
 
     protected List<String> generateIdentifierGeneratorDropScript(
-            Dialect d, String c, String s, DatabaseMetadata m)
+            final Dialect d, final String c, final String s, final DatabaseMetadata m)
             throws MappingException, HibernateException {
-        List<String> script = new LinkedList<String>();
-        Iterator<PersistentIdentifierGenerator> itr = iterateGenerators(d, c, s);
+        final List<String> script = new LinkedList<String>();
+        final Iterator<PersistentIdentifierGenerator> itr = iterateGenerators(d, c, s);
         while (itr.hasNext()) {
-            PersistentIdentifierGenerator pig = itr.next();
+            final PersistentIdentifierGenerator pig = itr.next();
             if (pig instanceof SequenceGenerator) {
-                SequenceGenerator sg = (SequenceGenerator) pig;
+                final SequenceGenerator sg = (SequenceGenerator) pig;
                 if (!m.isSequence(sg.getSequenceName())) {
                     continue;
                 }
