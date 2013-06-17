@@ -266,6 +266,10 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-datasource-oracle</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-datasource-h2</artifactId>
         </dependency>
         <dependency>

@@ -23,47 +23,30 @@
  */
 package org.n52.sos.ds.datasource;
 
-import static org.n52.sos.ds.datasource.AbstractHibernateDatasource.DATABASE_DEFAULT_VALUE;
-import static org.n52.sos.ds.datasource.AbstractHibernateDatasource.HOST_DEFAULT_VALUE;
-
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.mapping.Table;
 import org.hibernate.spatial.dialect.postgis.PostgisDialect;
-import org.hibernate.spatial.dialect.postgis.PostgisDialect52N;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
-import org.n52.sos.config.SettingDefinition;
-import org.n52.sos.config.settings.IntegerSettingDefinition;
-import org.n52.sos.config.settings.StringSettingDefinition;
-import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.exception.ConfigurationException;
-import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
 
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class PostgresDatasource extends AbstractHibernateDatasource {
-    private static final String TRUE = "true";
+public class PostgresDatasource extends AbstractHibernateFullDBDatasource {
     private static final String DIALECT_NAME = "PostgreSQL/PostGIS";
-    private static final String C3P0_CONNCETION_PROVIDER_CLASS =
-            "org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider";
-    private static final String POSTGIS_DIALECT_CLASS =
-            PostgisDialect52N.class.getName();
     private static final String POSTGRES_DRIVER_CLASS = "org.postgresql.Driver";
     private static final Pattern JDBC_URL_PATTERN =
             Pattern.compile("^jdbc:postgresql://([^:]+):([0-9]+)/(.*)$");
@@ -91,59 +74,8 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
     }
 
     @Override
-    protected Connection openConnection(Map<String, Object> settings) throws
-            SQLException {
-        try {
-            String jdbc = toURL(settings);
-            Class.forName(POSTGRES_DRIVER_CLASS);
-            String pass = (String) settings
-                    .get(HibernateConstants.CONNECTION_PASSWORD);
-            String user = (String) settings
-                    .get(HibernateConstants.CONNECTION_USERNAME);
-            return DriverManager.getConnection(jdbc, user, pass);
-        } catch (ClassNotFoundException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    @Override
-    public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
-        return CollectionHelper.<SettingDefinition<?, ?>>set(
-                createUsernameDefinition(USERNAME_DEFAULT_VALUE),
-                createPasswordDefinition(PASSWORD_DEFAULT_VALUE),
-                createDatabaseDefinition(DATABASE_DEFAULT_VALUE),
-                createHostDefinition(HOST_DEFAULT_VALUE),
-                createPortDefinition(PORT_DEFAULT_VALUE),
-                createCatalogDefinition(CATALOG_DEFAULT_VALUE),
-                getTransactionalDefiniton());
-    }
-
-    protected StringSettingDefinition createUsernameDefinition(String defaultValue) {
-        return createUsernameDefinition().setDescription(USERNAME_DESCRIPTION)
-                .setDefaultValue(defaultValue);
-    }
-
-    protected StringSettingDefinition createPasswordDefinition(String defaultValue) {
-        return createPasswordDefinition().setDescription(PASSWORD_DESCRIPTION)
-                .setDefaultValue(defaultValue);
-    }
-
-    protected StringSettingDefinition createDatabaseDefinition(String defaultValue) {
-        return createDatabaseDefinition().setDefaultValue(defaultValue);
-    }
-
-    protected StringSettingDefinition createHostDefinition(String defaultValue) {
-        return createHostDefinition().setDescription(HOST_DESCRIPTION)
-                .setDefaultValue(defaultValue);
-    }
-
-    protected IntegerSettingDefinition createPortDefinition(int defaultValue) {
-        return createPortDefinition().setDescription(PORT_DESCRIPTION)
-                .setDefaultValue(defaultValue);
-    }
-
-    protected StringSettingDefinition createCatalogDefinition(String defaultValue) {
-        return createCatalogDefinition().setDefaultValue(defaultValue);
+    protected String getDriverClass() {
+        return POSTGRES_DRIVER_CLASS;
     }
 
     @Override
@@ -213,35 +145,6 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
         }
     }
 
-    @Override
-    public Properties getDatasourceProperties(
-            Map<String, Object> settings) {
-        Properties p = new Properties();
-        p.put(HibernateConstants.DEFAULT_CATALOG,
-              settings.get(CATALOG_KEY));
-        p.put(HibernateConstants.CONNECTION_USERNAME,
-              settings.get(USERNAME_KEY));
-        p.put(HibernateConstants.CONNECTION_PASSWORD,
-              settings.get(PASSWORD_KEY));
-        p.put(HibernateConstants.CONNECTION_URL,
-              toURL(settings));
-        p.put(HibernateConstants.CONNECTION_PROVIDER_CLASS,
-              C3P0_CONNCETION_PROVIDER_CLASS);
-        p.put(HibernateConstants.DIALECT, POSTGIS_DIALECT_CLASS);
-        p.put(HibernateConstants.DRIVER_CLASS, POSTGRES_DRIVER_CLASS);
-        p.put(HibernateConstants.C3P0_MIN_SIZE, "10");
-        p.put(HibernateConstants.C3P0_MAX_SIZE, "30");
-        p.put(HibernateConstants.C3P0_IDLE_TEST_PERIOD, "1");
-        p.put(HibernateConstants.C3P0_ACQUIRE_INCREMENT, "1");
-        p.put(HibernateConstants.C3P0_TIMEOUT, "0");
-        p.put(HibernateConstants.C3P0_MAX_STATEMENTS, "0");
-        p.put(HibernateConstants.CONNECTION_AUTO_RECONNECT, TRUE);
-        p.put(HibernateConstants.CONNECTION_AUTO_RECONNECT_FOR_POOLS, TRUE);
-        p.put(HibernateConstants.CONNECTION_TEST_ON_BORROW, TRUE);
-        addMappingFileDirectories(settings, p);
-        return p;
-    }
-
     protected String toURL(
             Map<String, Object> settings) {
         String url = String.format("jdbc:postgresql://%s:%d/%s",
@@ -252,41 +155,11 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
     }
 
     @Override
-    protected Map<String, Object> parseDatasourceProperties(Properties current) {
-        Map<String, Object> settings = new HashMap<String, Object>(current
-                .size());
-        settings.put(CATALOG_KEY,
-                     current.getProperty(HibernateConstants.DEFAULT_CATALOG));
-        settings.put(USERNAME_KEY,
-                     current.getProperty(HibernateConstants.CONNECTION_USERNAME));
-        settings.put(PASSWORD_KEY,
-                     current.getProperty(HibernateConstants.CONNECTION_PASSWORD));
-        settings.put(TRANSACTIONAL_KEY,
-                     isTransactional(current));
-        String url = current.getProperty(HibernateConstants.CONNECTION_URL);
+    protected String[] parseURL(String url) {
         Matcher matcher = JDBC_URL_PATTERN.matcher(url);
         matcher.find();
-        String host = matcher.group(1);
-        String port = matcher.group(2);
-        String db = matcher.group(3);
-        settings.put(createHostDefinition().getKey(), host);
-        settings.put(createPortDefinition().getKey(),
-                     port == null ? null : Integer.valueOf(port));
-        settings.put(createDatabaseDefinition().getKey(), db);
-        return settings;
-    }
-
-    @Override
-    public Set<SettingDefinition<?, ?>> getChangableSettingDefinitions(
-            Properties current) {
-        Map<String, Object> settings = parseDatasourceProperties(current);
-        return CollectionHelper.<SettingDefinition<?, ?>>set(
-                createUsernameDefinition((String) settings.get(USERNAME_KEY)),
-                createPasswordDefinition((String) settings.get(PASSWORD_KEY)),
-                createDatabaseDefinition((String) settings.get(DATABASE_KEY)),
-                createHostDefinition((String) settings.get(HOST_KEY)),
-                createPortDefinition((Integer) settings.get(PORT_KEY)),
-                createCatalogDefinition((String) settings.get(CATALOG_KEY)));
+        return new String[] { matcher.group(1), matcher.group(2),
+        	    matcher.group(3) };
     }
 
     @Override

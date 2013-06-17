@@ -13,6 +13,7 @@
 	<description>52North Sensor Observation Service Hibernate common module</description>
 	<modules>
 		<module>postgres</module>
+		<module>oracle</module>
         <module>h2</module>
 	</modules>
     <dependencies>
