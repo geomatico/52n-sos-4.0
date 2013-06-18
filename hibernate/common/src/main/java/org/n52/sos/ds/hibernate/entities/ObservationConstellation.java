@@ -34,7 +34,9 @@ import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasProcedure;
 
 public class ObservationConstellation implements Serializable, HasProcedure, HasObservableProperty,
     HasOffering, HasObservationType, HasHiddenChildFlag, HasDeletedFlag {
-public static final String ID = "observationConstellationId";
+
+	public static final String ID = "observationConstellationId";
+	
     private static final long serialVersionUID = -3890149740562709928L;
     private long observationConstellationId;
     private ObservableProperty observableProperty;
@@ -110,7 +112,8 @@ public static final String ID = "observationConstellationId";
         return deleted;
     }
     
-    public ObservationConstellation setHiddenChild(final boolean hiddenChild) {
+    @Override
+	public ObservationConstellation setHiddenChild(final boolean hiddenChild) {
         this.hiddenChild = hiddenChild;
         return this;
     }
@@ -119,7 +122,15 @@ public static final String ID = "observationConstellationId";
         return hiddenChild;
     }
     
-    public boolean isHiddenChild() {
+    @Override
+	public boolean isHiddenChild() {
         return hiddenChild;
     }
+    
+    @Override
+	public String toString()
+	{
+		return String.format("ObservationConstellation [observationConstellationId=%s, observableProperty=%s, procedure=%s, observationType=%s, offering=%s, deleted=%s, hiddenChild=%s]",
+				observationConstellationId, observableProperty, procedure, observationType, offering, deleted, hiddenChild);
+	}
 }
