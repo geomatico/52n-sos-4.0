@@ -25,14 +25,7 @@ package org.n52.sos.ds.hibernate;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
-import net.opengis.swe.x20.DataRecordDocument;
-import net.opengis.swe.x20.DataRecordType;
-import net.opengis.swe.x20.TextEncodingDocument;
-import net.opengis.swe.x20.TextEncodingType;
-
-import org.apache.xmlbeans.XmlObject;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -43,31 +36,18 @@ import org.n52.sos.ds.hibernate.dao.ObservationConstellationDAO;
 import org.n52.sos.ds.hibernate.dao.ObservationDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
-import org.n52.sos.ds.hibernate.entities.ResultTemplate;
-import org.n52.sos.encode.Encoder;
-import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.exception.ows.concrete.NoEncoderForKeyException;
-import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.MultiObservationValues;
 import org.n52.sos.ogc.om.OmObservation;
 import org.n52.sos.ogc.om.OmObservationConstellation;
 import org.n52.sos.ogc.om.SingleObservationValue;
-import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.swe.SWEConstants;
-import org.n52.sos.ogc.swe.SweAbstractDataComponent;
-import org.n52.sos.ogc.swe.SweDataArray;
-import org.n52.sos.ogc.swe.encoding.SweAbstractEncoding;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.response.InsertObservationResponse;
-import org.n52.sos.service.CodingRepository;
-import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.HTTPConstants.StatusCode;
-import org.n52.sos.util.XmlOptionsHelper;
 
 public class InsertObservationDAO extends AbstractInsertObservationDAO {
     private final HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
@@ -104,7 +84,7 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
                         exceptions.add(owse);
                     }
                     if (hObservationConstellation != null) {
-                        FeatureOfInterestDAO featureOfInterestDAO = new FeatureOfInterestDAO();
+                        final FeatureOfInterestDAO featureOfInterestDAO = new FeatureOfInterestDAO();
                         hFeature =
                                 featureOfInterestDAO.checkOrInsertFeatureOfInterest(sosObservation
                                         .getObservationConstellation().getFeatureOfInterest(), session);
@@ -115,7 +95,7 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
                 }
 
                 if (!hObservationConstellations.isEmpty()) {
-                    ObservationDAO observationDAO = new ObservationDAO();
+                    final ObservationDAO observationDAO = new ObservationDAO();
                     if (sosObservation.getValue() instanceof SingleObservationValue) {
                         observationDAO.insertObservationSingleValue(
                                 hObservationConstellations, hFeature, sosObservation, session);
@@ -136,7 +116,7 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
                 transaction.rollback();
             }
             StatusCode status = StatusCode.INTERNAL_SERVER_ERROR;
-            String exceptionMsg = "Error while inserting new observation!";
+            final String exceptionMsg = "Error while inserting new observation!";
             if (he instanceof ConstraintViolationException) {
                 final ConstraintViolationException cve = (ConstraintViolationException) he;
 //                if (cve.getConstraintName() != null) {
