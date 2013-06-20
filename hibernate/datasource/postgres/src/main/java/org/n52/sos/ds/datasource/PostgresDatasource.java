@@ -23,9 +23,6 @@
  */
 package org.n52.sos.ds.datasource;
 
-import static org.n52.sos.ds.datasource.AbstractHibernateDatasource.DATABASE_DEFAULT_VALUE;
-import static org.n52.sos.ds.datasource.AbstractHibernateDatasource.HOST_DEFAULT_VALUE;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -53,32 +50,48 @@ import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
 
-
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class PostgresDatasource extends AbstractHibernateDatasource {
     private static final String TRUE = "true";
+
     private static final String DIALECT_NAME = "PostgreSQL/PostGIS";
+
     private static final String C3P0_CONNCETION_PROVIDER_CLASS =
             "org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider";
-    private static final String POSTGIS_DIALECT_CLASS =
-            PostgisDialect52N.class.getName();
+
+    private static final String POSTGIS_DIALECT_CLASS = PostgisDialect52N.class.getName();
+
     private static final String POSTGRES_DRIVER_CLASS = "org.postgresql.Driver";
-    private static final Pattern JDBC_URL_PATTERN =
-            Pattern.compile("^jdbc:postgresql://([^:]+):([0-9]+)/(.*)$");
+
+    private static final Pattern JDBC_URL_PATTERN = Pattern.compile("^jdbc:postgresql://([^:]+):([0-9]+)/(.*)$");
+
     public static final String USERNAME_DESCRIPTION =
             "Your database server user name. The default value for PostgreSQL is \"postgres\".";
+
     public static final String USERNAME_DEFAULT_VALUE = "postgres";
+
     public static final String PASSWORD_DESCRIPTION =
             "Your database server password. The default value is \"postgres\".";
+
     public static final String PASSWORD_DEFAULT_VALUE = "postgres";
+
     public static final String HOST_DESCRIPTION =
             "Set this to the IP/net location of PostgreSQL database server. The default value for PostgreSQL is \"localhost\".";
+
     public static final String PORT_DESCRIPTION =
             "Set this to the port number of your PostgreSQL server. The default value for PostgreSQL is 5432.";
+
     public static final int PORT_DEFAULT_VALUE = 5432;
-    public static final String CATALOG_DEFAULT_VALUE = "public";
+
+//    public static final String CATALOG_DEFAULT_VALUE = "public";
+
+    public static final String SCHEMA_DEFAULT_VALUE = "public";
+
+    public static final String FUNC_POSTGIS_VERSION = "postgis_version()";
+
+    public static final String TAB_SPATIAL_REF_SYS = "spatial_ref_sys";
 
     @Override
     public String getDialectName() {
@@ -91,15 +104,12 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
     }
 
     @Override
-    protected Connection openConnection(Map<String, Object> settings) throws
-            SQLException {
+    protected Connection openConnection(Map<String, Object> settings) throws SQLException {
         try {
             String jdbc = toURL(settings);
             Class.forName(POSTGRES_DRIVER_CLASS);
-            String pass = (String) settings
-                    .get(HibernateConstants.CONNECTION_PASSWORD);
-            String user = (String) settings
-                    .get(HibernateConstants.CONNECTION_USERNAME);
+            String pass = (String) settings.get(HibernateConstants.CONNECTION_PASSWORD);
+            String user = (String) settings.get(HibernateConstants.CONNECTION_USERNAME);
             return DriverManager.getConnection(jdbc, user, pass);
         } catch (ClassNotFoundException ex) {
             throw new RuntimeException(ex);
@@ -108,24 +118,20 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
 
     @Override
     public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
-        return CollectionHelper.<SettingDefinition<?, ?>>set(
-                createUsernameDefinition(USERNAME_DEFAULT_VALUE),
-                createPasswordDefinition(PASSWORD_DEFAULT_VALUE),
-                createDatabaseDefinition(DATABASE_DEFAULT_VALUE),
-                createHostDefinition(HOST_DEFAULT_VALUE),
-                createPortDefinition(PORT_DEFAULT_VALUE),
-                createCatalogDefinition(CATALOG_DEFAULT_VALUE),
+        return CollectionHelper.<SettingDefinition<?, ?>> set(createUsernameDefinition(USERNAME_DEFAULT_VALUE),
+                createPasswordDefinition(PASSWORD_DEFAULT_VALUE), createDatabaseDefinition(DATABASE_DEFAULT_VALUE),
+                createHostDefinition(HOST_DEFAULT_VALUE), createPortDefinition(PORT_DEFAULT_VALUE),
+//                createCatalogDefinition(CATALOG_DEFAULT_VALUE), 
+                createSchemaDefinition(SCHEMA_DEFAULT_VALUE),
                 getTransactionalDefiniton());
     }
 
     protected StringSettingDefinition createUsernameDefinition(String defaultValue) {
-        return createUsernameDefinition().setDescription(USERNAME_DESCRIPTION)
-                .setDefaultValue(defaultValue);
+        return createUsernameDefinition().setDescription(USERNAME_DESCRIPTION).setDefaultValue(defaultValue);
     }
 
     protected StringSettingDefinition createPasswordDefinition(String defaultValue) {
-        return createPasswordDefinition().setDescription(PASSWORD_DESCRIPTION)
-                .setDefaultValue(defaultValue);
+        return createPasswordDefinition().setDescription(PASSWORD_DESCRIPTION).setDefaultValue(defaultValue);
     }
 
     protected StringSettingDefinition createDatabaseDefinition(String defaultValue) {
@@ -133,22 +139,24 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
     }
 
     protected StringSettingDefinition createHostDefinition(String defaultValue) {
-        return createHostDefinition().setDescription(HOST_DESCRIPTION)
-                .setDefaultValue(defaultValue);
+        return createHostDefinition().setDescription(HOST_DESCRIPTION).setDefaultValue(defaultValue);
     }
 
     protected IntegerSettingDefinition createPortDefinition(int defaultValue) {
-        return createPortDefinition().setDescription(PORT_DESCRIPTION)
-                .setDefaultValue(defaultValue);
+        return createPortDefinition().setDescription(PORT_DESCRIPTION).setDefaultValue(defaultValue);
     }
 
-    protected StringSettingDefinition createCatalogDefinition(String defaultValue) {
-        return createCatalogDefinition().setDefaultValue(defaultValue);
+//    protected StringSettingDefinition createCatalogDefinition(String defaultValue) {
+//        return createCatalogDefinition().setDefaultValue(defaultValue);
+//    }
+
+    private StringSettingDefinition createSchemaDefinition(String defaultValue) {
+        return createSchemaDefinition().setDefaultValue(defaultValue);
     }
 
     @Override
     public boolean supportsTestData() {
-        //FIXME
+        // FIXME
         return false;
     }
 
@@ -159,15 +167,12 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
         try {
             conn = openConnection(settings);
             stmt = conn.createStatement();
-            String schema = (String) settings.get(createCatalogDefinition()
-                    .getKey());
+            String schema = (String) settings.get(createSchemaDefinition().getKey());
             schema = schema == null ? "" : "." + schema;
-            final String command = String.format(
-                    "BEGIN; " +
-                    "DROP TABLE IF EXISTS \"%1$ssos_installer_test_table\"; " +
-                    "CREATE TABLE \"%1$ssos_installer_test_table\" (id integer NOT NULL); " +
-                    "DROP TABLE \"%1$ssos_installer_test_table\"; " +
-                    "END;", schema);
+            final String command =
+                    String.format("BEGIN; " + "DROP TABLE IF EXISTS \"%1$ssos_installer_test_table\"; "
+                            + "CREATE TABLE \"%1$ssos_installer_test_table\" (id integer NOT NULL); "
+                            + "DROP TABLE \"%1$ssos_installer_test_table\"; " + "END;", schema);
             stmt.execute(command);
             return true;
         } catch (SQLException e) {
@@ -179,17 +184,21 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
     }
 
     @Override
-    protected void validatePrerequisites(Connection con,
-                                         DatabaseMetadata metadata) {
-        checkPostgis(con);
-        checkSpatialRefSys(con, metadata);
+    protected void validatePrerequisites(Connection con, DatabaseMetadata metadata, Map<String, Object> settings) {
+        checkPostgis(con, settings);
+        checkSpatialRefSys(con, metadata, settings);
     }
 
-    protected void checkPostgis(Connection con) {
+    protected void checkPostgis(Connection con, Map<String, Object> settings) {
         Statement stmt = null;
         try {
+            StringBuilder builder = new StringBuilder();
+            builder.append(SELECT);
+            builder.append(SPACE);
+            builder.append(FUNC_POSTGIS_VERSION);
+            builder.append(SEMICOLON);
             stmt = con.createStatement();
-            stmt.execute("SELECT postgis_version()");
+            stmt.execute(builder.toString());
             // TODO check PostGIS version
         } catch (SQLException ex) {
             throw new ConfigurationException("PostGIS does not seem to be installed.", ex);
@@ -198,14 +207,23 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
         }
     }
 
-    protected void checkSpatialRefSys(Connection con, DatabaseMetadata metadata) {
+    protected void checkSpatialRefSys(Connection con, DatabaseMetadata metadata, Map<String, Object> settings) {
         Statement stmt = null;
         try {
             if (!metadata.isTable("spatial_ref_sys")) {
                 throw new ConfigurationException("Missing 'spatial_ref_sys' table.");
             }
+            StringBuilder builder = new StringBuilder();
+            builder.append(SELECT);
+            builder.append(SPACE);
+            builder.append(DEFAULT_COUNT);
+            builder.append(SPACE);
+            builder.append(FROM);
+            builder.append(SPACE);
+            builder.append(TAB_SPATIAL_REF_SYS);
+            builder.append(SEMICOLON);
             stmt = con.createStatement();
-            stmt.execute("SELECT count(*) from spatial_ref_sys");
+            stmt.execute(builder.toString());
         } catch (SQLException ex) {
             throw new ConfigurationException("Can not read from table 'spatial_ref_sys'", ex);
         } finally {
@@ -214,19 +232,14 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
     }
 
     @Override
-    public Properties getDatasourceProperties(
-            Map<String, Object> settings) {
+    public Properties getDatasourceProperties(Map<String, Object> settings) {
         Properties p = new Properties();
-        p.put(HibernateConstants.DEFAULT_CATALOG,
-              settings.get(CATALOG_KEY));
-        p.put(HibernateConstants.CONNECTION_USERNAME,
-              settings.get(USERNAME_KEY));
-        p.put(HibernateConstants.CONNECTION_PASSWORD,
-              settings.get(PASSWORD_KEY));
-        p.put(HibernateConstants.CONNECTION_URL,
-              toURL(settings));
-        p.put(HibernateConstants.CONNECTION_PROVIDER_CLASS,
-              C3P0_CONNCETION_PROVIDER_CLASS);
+//        p.put(HibernateConstants.DEFAULT_CATALOG, settings.get(CATALOG_KEY));
+        p.put(HibernateConstants.DEFAULT_SCHEMA, settings.get(SCHEMA_KEY));
+        p.put(HibernateConstants.CONNECTION_USERNAME, settings.get(USERNAME_KEY));
+        p.put(HibernateConstants.CONNECTION_PASSWORD, settings.get(PASSWORD_KEY));
+        p.put(HibernateConstants.CONNECTION_URL, toURL(settings));
+        p.put(HibernateConstants.CONNECTION_PROVIDER_CLASS, C3P0_CONNCETION_PROVIDER_CLASS);
         p.put(HibernateConstants.DIALECT, POSTGIS_DIALECT_CLASS);
         p.put(HibernateConstants.DRIVER_CLASS, POSTGRES_DRIVER_CLASS);
         p.put(HibernateConstants.C3P0_MIN_SIZE, "10");
@@ -242,27 +255,21 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
         return p;
     }
 
-    protected String toURL(
-            Map<String, Object> settings) {
-        String url = String.format("jdbc:postgresql://%s:%d/%s",
-                                   settings.get(HOST_KEY),
-                                   settings.get(PORT_KEY),
-                                   settings.get(DATABASE_KEY));
+    protected String toURL(Map<String, Object> settings) {
+        String url =
+                String.format("jdbc:postgresql://%s:%d/%s", settings.get(HOST_KEY), settings.get(PORT_KEY),
+                        settings.get(DATABASE_KEY));
         return url;
     }
 
     @Override
     protected Map<String, Object> parseDatasourceProperties(Properties current) {
-        Map<String, Object> settings = new HashMap<String, Object>(current
-                .size());
-        settings.put(CATALOG_KEY,
-                     current.getProperty(HibernateConstants.DEFAULT_CATALOG));
-        settings.put(USERNAME_KEY,
-                     current.getProperty(HibernateConstants.CONNECTION_USERNAME));
-        settings.put(PASSWORD_KEY,
-                     current.getProperty(HibernateConstants.CONNECTION_PASSWORD));
-        settings.put(TRANSACTIONAL_KEY,
-                     isTransactional(current));
+        Map<String, Object> settings = new HashMap<String, Object>(current.size());
+//        settings.put(CATALOG_KEY, current.getProperty(HibernateConstants.DEFAULT_CATALOG));
+        settings.put(SCHEMA_KEY, current.getProperty(HibernateConstants.DEFAULT_SCHEMA));
+        settings.put(USERNAME_KEY, current.getProperty(HibernateConstants.CONNECTION_USERNAME));
+        settings.put(PASSWORD_KEY, current.getProperty(HibernateConstants.CONNECTION_PASSWORD));
+        settings.put(TRANSACTIONAL_KEY, isTransactional(current));
         String url = current.getProperty(HibernateConstants.CONNECTION_URL);
         Matcher matcher = JDBC_URL_PATTERN.matcher(url);
         matcher.find();
@@ -270,23 +277,22 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
         String port = matcher.group(2);
         String db = matcher.group(3);
         settings.put(createHostDefinition().getKey(), host);
-        settings.put(createPortDefinition().getKey(),
-                     port == null ? null : Integer.valueOf(port));
+        settings.put(createPortDefinition().getKey(), port == null ? null : Integer.valueOf(port));
         settings.put(createDatabaseDefinition().getKey(), db);
         return settings;
     }
 
     @Override
-    public Set<SettingDefinition<?, ?>> getChangableSettingDefinitions(
-            Properties current) {
+    public Set<SettingDefinition<?, ?>> getChangableSettingDefinitions(Properties current) {
         Map<String, Object> settings = parseDatasourceProperties(current);
-        return CollectionHelper.<SettingDefinition<?, ?>>set(
+        return CollectionHelper.<SettingDefinition<?, ?>> set(
                 createUsernameDefinition((String) settings.get(USERNAME_KEY)),
                 createPasswordDefinition((String) settings.get(PASSWORD_KEY)),
                 createDatabaseDefinition((String) settings.get(DATABASE_KEY)),
                 createHostDefinition((String) settings.get(HOST_KEY)),
                 createPortDefinition((Integer) settings.get(PORT_KEY)),
-                createCatalogDefinition((String) settings.get(CATALOG_KEY)));
+//                createCatalogDefinition((String) settings.get(CATALOG_KEY)),
+                createSchemaDefinition((String) settings.get(SCHEMA_KEY)));
     }
 
     @Override
@@ -312,9 +318,7 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
             try {
                 conn = openConnection(settings);
                 stmt = conn.createStatement();
-                stmt.execute(String
-                        .format("truncate %s restart identity cascade",
-                                StringHelper.join(", ", names)));
+                stmt.execute(String.format("truncate %s restart identity cascade", StringHelper.join(", ", names)));
             } catch (SQLException ex) {
                 throw new ConfigurationException(ex);
             } finally {
@@ -326,25 +330,42 @@ public class PostgresDatasource extends AbstractHibernateDatasource {
 
     @Override
     public void insertTestData(Map<String, Object> settings) {
-        /* TODO implement org.n52.sos.ds.datasource.PostgresDatasource.insertTestData() */
-        throw new UnsupportedOperationException("org.n52.sos.ds.datasource.PostgresDatasource.insertTestData() not yet implemented");
+        /*
+         * TODO implement
+         * org.n52.sos.ds.datasource.PostgresDatasource.insertTestData()
+         */
+        throw new UnsupportedOperationException(
+                "org.n52.sos.ds.datasource.PostgresDatasource.insertTestData() not yet implemented");
     }
 
     @Override
     public void insertTestData(Properties settings) {
-        /* TODO implement org.n52.sos.ds.datasource.PostgresDatasource.insertTestData() */
-        throw new UnsupportedOperationException("org.n52.sos.ds.datasource.PostgresDatasource.insertTestData() not yet implemented");
+        /*
+         * TODO implement
+         * org.n52.sos.ds.datasource.PostgresDatasource.insertTestData()
+         */
+        throw new UnsupportedOperationException(
+                "org.n52.sos.ds.datasource.PostgresDatasource.insertTestData() not yet implemented");
     }
 
     @Override
     public boolean isTestDataPresent(Properties settings) {
-        /* TODO implement org.n52.sos.ds.datasource.PostgresDatasource.isTestDataPresent() */
-        throw new UnsupportedOperationException("org.n52.sos.ds.datasource.PostgresDatasource.isTestDataPresent() not yet implemented");
+        /*
+         * TODO implement
+         * org.n52.sos.ds.datasource.PostgresDatasource.isTestDataPresent()
+         */
+        throw new UnsupportedOperationException(
+                "org.n52.sos.ds.datasource.PostgresDatasource.isTestDataPresent() not yet implemented");
     }
 
     @Override
     public void removeTestData(Properties settings) {
-        /* TODO implement org.n52.sos.ds.datasource.PostgresDatasource.removeTestData() */
-        throw new UnsupportedOperationException("org.n52.sos.ds.datasource.PostgresDatasource.removeTestData() not yet implemented");
+        /*
+         * TODO implement
+         * org.n52.sos.ds.datasource.PostgresDatasource.removeTestData()
+         */
+        throw new UnsupportedOperationException(
+                "org.n52.sos.ds.datasource.PostgresDatasource.removeTestData() not yet implemented");
     }
+
 }

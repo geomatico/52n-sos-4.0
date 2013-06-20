@@ -142,7 +142,7 @@ public class H2FileDatasource extends AbstractH2Datasource {
 
     @Override
     protected void validatePrerequisites(Connection con,
-                                         DatabaseMetadata metadata) {
+                                         DatabaseMetadata metadata, Map<String, Object> settings) {
     }
 
     @Override

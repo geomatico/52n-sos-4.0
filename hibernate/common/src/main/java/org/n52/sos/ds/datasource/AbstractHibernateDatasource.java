@@ -24,9 +24,6 @@
 
 package org.n52.sos.ds.datasource;
 
-import static org.n52.sos.ds.Datasource.ADVANCED_GROUP;
-import static org.n52.sos.ds.Datasource.BASE_GROUP;
-
 import java.io.File;
 import java.net.URISyntaxException;
 import java.sql.Connection;
@@ -48,13 +45,15 @@ import org.n52.sos.ds.Datasource;
 import org.n52.sos.ds.hibernate.SessionFactoryProvider;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.exception.ConfigurationException;
+import org.n52.sos.util.SQLConstants;
+import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class AbstractHibernateDatasource implements Datasource {
+public abstract class AbstractHibernateDatasource implements Datasource, SQLConstants {
     private static final Logger LOG = LoggerFactory
             .getLogger(AbstractHibernateDatasource.class);
     public static final String CORE_MAPPINGS_PATH = "/mapping/core";
@@ -74,10 +73,15 @@ public abstract class AbstractHibernateDatasource implements Datasource {
     public static final String HOST_DEFAULT_VALUE = "localhost";
     public static final String PORT_KEY = "jdbc.port";
     public static final String PORT_TITLE = "Database Port";
-    public static final String CATALOG_TITLE = "Schema";
-    public static final String CATALOG_DESCRIPTION =
-            "Qualifies unqualified table names with the given schema in generated SQL.";
-    public static final String CATALOG_DEFAULT_VALUE = "public";
+//    public static final String CATALOG_KEY = HibernateConstants.DEFAULT_CATALOG;
+//    public static final String CATALOG_TITLE = "Catalog";
+//    public static final String CATALOG_DESCRIPTION =
+//            "Qualifies unqualified table names with the given catalog in generated SQL.";
+//    public static final String CATALOG_DEFAULT_VALUE = "public";
+    public static final String SCHEMA_KEY = HibernateConstants.DEFAULT_SCHEMA;
+    public static final String SCHEMA_TITLE = "Schema";
+    public static final String SCHEMA_DESCRIPTION = "Qualifies unqualified table names with the given schema in generated SQL.";
+    public static final String SCHMEA_DEFAULT_VALUE = "public";
     public static final String TRANSACTIONAL_TITLE = "Transactional Profile";
     public static final String TRANSACTIONAL_DESCRIPTION =
             "Should the database support the transactional profile?";
@@ -87,7 +91,6 @@ public abstract class AbstractHibernateDatasource implements Datasource {
             HibernateConstants.CONNECTION_USERNAME;
     public static final String PASSWORD_KEY =
             HibernateConstants.CONNECTION_PASSWORD;
-    public static final String CATALOG_KEY = HibernateConstants.DEFAULT_CATALOG;
     private Dialect dialect;
     private final BooleanSettingDefinition transactionalDefiniton =
             createTransactionalDefinition();
@@ -135,14 +138,23 @@ public abstract class AbstractHibernateDatasource implements Datasource {
                 .setKey(PORT_KEY)
                 .setTitle(PORT_TITLE);
     }
-    protected StringSettingDefinition createCatalogDefinition() {
+//    protected StringSettingDefinition createCatalogDefinition() {
+//        return new StringSettingDefinition()
+//                .setGroup(ADVANCED_GROUP)
+//                .setOrder(1)
+//                .setKey(CATALOG_KEY)
+//                .setTitle(CATALOG_TITLE)
+//                .setDescription(CATALOG_DESCRIPTION)
+//                .setDefaultValue(CATALOG_DEFAULT_VALUE);
+//    }
+    protected StringSettingDefinition createSchemaDefinition() {
         return new StringSettingDefinition()
                 .setGroup(ADVANCED_GROUP)
                 .setOrder(1)
-                .setKey(CATALOG_KEY)
-                .setTitle(CATALOG_TITLE)
-                .setDescription(CATALOG_DESCRIPTION)
-                .setDefaultValue(CATALOG_DEFAULT_VALUE);
+                .setKey(SCHEMA_KEY)
+                .setTitle(SCHEMA_TITLE)
+                .setDescription(SCHEMA_DESCRIPTION)
+                .setDefaultValue(SCHMEA_DEFAULT_VALUE);
     }
 
     protected BooleanSettingDefinition createTransactionalDefinition() {
@@ -164,6 +176,11 @@ public abstract class AbstractHibernateDatasource implements Datasource {
         if (transactional != null && transactional.booleanValue()) {
             config.addDirectory(resource("/mapping/transactional"));
         }
+        if (isSetSchema(settings)) {
+            Properties properties = new Properties();
+            properties.put(HibernateConstants.DEFAULT_SCHEMA, settings.get(HibernateConstants.DEFAULT_SCHEMA));
+            config.addProperties(properties);
+        }
         config.buildMappings();
         return config;
     }
@@ -177,7 +194,7 @@ public abstract class AbstractHibernateDatasource implements Datasource {
     }
 
     @Override
-    public void createSchema(Map<String, Object> settings) {
+    public String[] createSchema(Map<String, Object> settings) {
         String[] script = getConfig(settings)
                 .generateSchemaCreationScript(getDialectInternal());
         String[] pre = getPreSchemaScript();
@@ -187,12 +204,11 @@ public abstract class AbstractHibernateDatasource implements Datasource {
                  ? (post == null) ? script : concat(script, post)
                  : (post == null) ? concat(pre, script)
                    : concat(pre, script, post);
-
-        execute(script, settings);
+        return script;
     }
 
     @Override
-    public void dropSchema(Map<String, Object> settings) {
+    public String[] dropSchema(Map<String, Object> settings) {
         Connection conn = null;
         try {
             conn = openConnection(settings);
@@ -200,7 +216,7 @@ public abstract class AbstractHibernateDatasource implements Datasource {
                     new DatabaseMetadata(conn, getDialectInternal(), true);
             String[] dropScript = getConfig(settings)
                     .generateDropSchemaScript(getDialectInternal(), metadata);
-            execute(dropScript, settings);
+            return dropScript;
         } catch (SQLException ex) {
             throw new ConfigurationException(ex);
         } finally {
@@ -256,7 +272,7 @@ public abstract class AbstractHibernateDatasource implements Datasource {
         return dialect;
     }
 
-    protected void execute(String[] sql,
+    public void execute(String[] sql,
                            Map<String, Object> settings)
             throws HibernateException {
         Connection conn = null;
@@ -332,7 +348,7 @@ public abstract class AbstractHibernateDatasource implements Datasource {
             conn = openConnection(settings);
             DatabaseMetadata metadata =
                     new DatabaseMetadata(conn, getDialectInternal(), true);
-            validatePrerequisites(conn, metadata);
+            validatePrerequisites(conn, metadata, settings);
         } catch (SQLException ex) {
             throw new ConfigurationException(ex);
         } finally {
@@ -425,12 +441,26 @@ public abstract class AbstractHibernateDatasource implements Datasource {
     protected String[] getPostSchemaScript() {
         return null;
     }
+    
+    protected boolean isSetSchema(Map<String, Object> settings) {
+        if (settings.containsKey(HibernateConstants.DEFAULT_SCHEMA)) {
+            return StringHelper.isNotEmpty((String)settings.get(HibernateConstants.DEFAULT_SCHEMA));
+        }
+        return false;
+    }
+
+    protected String getSchema(Map<String, Object> settings) {
+        if (isSetSchema(settings)) {
+            return (String)settings.get(HibernateConstants.DEFAULT_SCHEMA) + ".";
+        }
+        return "";
+    }
 
     protected abstract Map<String, Object> parseDatasourceProperties(
             Properties current);
 
     protected abstract void validatePrerequisites(Connection con,
-                                                  DatabaseMetadata metadata);
+                                                  DatabaseMetadata metadata, Map<String, Object> settings);
 
     protected abstract Dialect createDialect();
 

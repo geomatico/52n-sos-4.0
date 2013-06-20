@@ -116,7 +116,7 @@ public class H2InMemoryDatasource extends AbstractH2Datasource {
 
     @Override
     protected void validatePrerequisites(Connection con,
-                                         DatabaseMetadata metadata) {
+                                         DatabaseMetadata metadata, Map<String, Object> settings) {
     }
 
     @Override
