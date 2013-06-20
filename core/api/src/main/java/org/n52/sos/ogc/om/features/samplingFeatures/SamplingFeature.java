@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.n52.sos.exception.ows.concrete.InvalidSridException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
@@ -112,9 +113,9 @@ public class SamplingFeature extends AbstractFeature {
         return geometry;
     }
 
-    public void setGeometry(final Geometry geometry) {
+    public void setGeometry(final Geometry geometry) throws InvalidSridException {
         if (geometry != null && geometry.getSRID() == 0) {
-            throw new RuntimeException("No SRID specified!");
+            throw new InvalidSridException(0);
         }
         this.geometry = geometry;
     }

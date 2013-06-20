@@ -24,6 +24,8 @@
 package org.n52.sos.util.builder;
 
 import com.vividsolutions.jts.geom.Coordinate;
+
+import org.n52.sos.exception.ows.concrete.InvalidSridException;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.AbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
@@ -79,7 +81,7 @@ public class SamplingFeatureBuilder {
 		return this;
 	}
 
-	public AbstractFeature build()
+	public AbstractFeature build() 
 	{
 		SamplingFeature feature = new SamplingFeature(new CodeWithAuthority(featureIdentifier));
 		if (codespace != null && !codespace.isEmpty())
@@ -90,7 +92,12 @@ public class SamplingFeatureBuilder {
 		{
 			GeometryFactory geometryFactory = JTSHelper.getGeometryFactoryForSRID(epsgCode);
 			Geometry geom = geometryFactory.createPoint(new Coordinate(xCoord, yCoord));
-			feature.setGeometry(geom);
+			try {
+				feature.setGeometry(geom);
+			} catch (InvalidSridException e) {
+				// This should never happen
+				e.printStackTrace();
+			}
 		}
 		if (featureType != null && !featureType.isEmpty())
 		{
