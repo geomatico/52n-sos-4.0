@@ -273,15 +273,21 @@ public abstract class AbstractHibernateDatasource implements Datasource {
                            Connection conn)
             throws HibernateException {
         Statement stmt = null;
+        String lastCmd = null;
         try {
             stmt = conn.createStatement();
 
             for (String cmd : sql) {
+            	lastCmd = cmd;
                 stmt.execute(cmd);
             }
-
         } catch (SQLException ex) {
-            throw new ConfigurationException(ex);
+            if (lastCmd != null) {
+                throw new ConfigurationException(ex.getMessage()
+                        + ". Command: " + lastCmd, ex);
+            } else {
+                throw new ConfigurationException(ex);
+            }
         } finally {
             close(stmt);
         }
