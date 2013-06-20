@@ -15,6 +15,6 @@
         <module>sensorML-v101</module>
         <module>sos-v100</module>
         <module>sos-v20</module>
-        <module>wml-v20</module>
+        <!--<module>wml-v20</module>-->
     </modules>
 </project>
