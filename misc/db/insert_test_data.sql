@@ -35,21 +35,21 @@
 
 CREATE OR REPLACE FUNCTION getObservationType(text) RETURNS bigint AS
 $$
-	SELECT observationTypeId FROM observationType 
+	SELECT observationTypeId FROM public.observationType 
 	WHERE observationType = 'http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_'::text || $1;
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION getProcedure(text) RETURNS bigint AS
 $$
-	SELECT procedureId FROM procedure WHERE identifier = $1; 
+	SELECT procedureId FROM public.procedure WHERE identifier = $1; 
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION getFeatureOfInterestType(text) RETURNS bigint AS
 $$
 	SELECT featureOfInterestTypeId 
-	FROM featureOfInterestType 
+	FROM public.featureOfInterestType 
 	WHERE featureOfInterestType = $1;
 $$
 LANGUAGE 'sql';
@@ -62,61 +62,61 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION getFeatureOfInterest(text) RETURNS bigint AS
 $$
-	SELECT featureOfInterestId FROM featureOfInterest WHERE identifier = $1;
+	SELECT featureOfInterestId FROM public.featureOfInterest WHERE identifier = $1;
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION getSensor_mlDescriptionFormat() RETURNS bigint AS
 $$
-	SELECT procedureDescriptionFormatId FROM procedureDescriptionFormat 
+	SELECT procedureDescriptionFormatId FROM public.procedureDescriptionFormat 
 	WHERE procedureDescriptionFormat = 'http://www.opengis.net/sensorML/1.0.1'::text;
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION getOffering(text) RETURNS bigint AS
 $$
-	SELECT offeringId FROM offering WHERE identifier = $1;
+	SELECT offeringId FROM public.offering WHERE identifier = $1;
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION getObservableProperty(text) RETURNS bigint AS
 $$ 
-	SELECT observablePropertyId FROM observableProperty WHERE identifier = $1;
+	SELECT observablePropertyId FROM public.observableProperty WHERE identifier = $1;
 $$
 LANGUAGE 'sql';
 
 ---- INSERTION FUNCTIONS
 CREATE OR REPLACE FUNCTION insertObservationType(text) RETURNS bigint AS
 $$
-	INSERT INTO observationType(observationTypeId, observationType) SELECT nextval('observationTypeId_seq'),$1 WHERE $1 NOT IN (SELECT observationType FROM observationType);
-	SELECT observationTypeId FROM observationType WHERE observationType = $1;
+	INSERT INTO public.observationType(observationTypeId, observationType) SELECT nextval('public.observationTypeId_seq'),$1 WHERE $1 NOT IN (SELECT observationType FROM public.observationType);
+	SELECT observationTypeId FROM public.observationType WHERE observationType = $1;
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertFeatureOfInterestType(text) RETURNS bigint AS
 $$
-	INSERT INTO featureOfInterestType(featureOfInterestTypeId, featureOfInterestType) SELECT nextval('featureOfInterestTypeId_seq'),$1 WHERE $1 NOT IN (SELECT featureOfInterestType FROM featureOfInterestType);
-	SELECT featureOfInterestTypeId FROM featureOfInterestType WHERE featureOfInterestType = $1;
+	INSERT INTO public.featureOfInterestType(featureOfInterestTypeId, featureOfInterestType) SELECT nextval('public.featureOfInterestTypeId_seq'),$1 WHERE $1 NOT IN (SELECT featureOfInterestType FROM public.featureOfInterestType);
+	SELECT featureOfInterestTypeId FROM public.featureOfInterestType WHERE featureOfInterestType = $1;
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertOffering(text) RETURNS bigint AS
 $$
-	INSERT INTO offering(offeringId,hibernateDiscriminator, identifier, name) 
-		SELECT nextval('offeringId_seq'),'T',$1, $1 || ' name'::text
+	INSERT INTO public.offering(offeringId,hibernateDiscriminator, identifier, name) 
+		SELECT nextval('public.offeringId_seq'),'T',$1, $1 || ' name'::text
 		WHERE $1 NOT IN (
-			SELECT identifier FROM offering);
-	SELECT offeringId FROM offering WHERE identifier = $1;
+			SELECT identifier FROM public.offering);
+	SELECT offeringId FROM public.offering WHERE identifier = $1;
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertAllowedObservationTypesForOffering(bigint, bigint) RETURNS VOID AS
 $$
-	INSERT INTO offeringAllowedObservationType (offeringId, observationTypeId) 
+	INSERT INTO public.offeringAllowedObservationType (offeringId, observationTypeId) 
 	SELECT $1, $2
 	WHERE $1 NOT IN (
 		SELECT offeringId 
-		FROM offeringAllowedObservationType 
+		FROM public.offeringAllowedObservationType 
 		WHERE offeringId = $1 
 		  AND observationTypeId = $2
 	);
@@ -131,11 +131,11 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertAllowedFeatureOfInterestTypesForOffering(bigint, bigint) RETURNS VOID AS
 $$
-	INSERT INTO offeringAllowedFeatureType (offeringId, featureOfInterestTypeId) 
+	INSERT INTO public.offeringAllowedFeatureType (offeringId, featureOfInterestTypeId) 
 	SELECT $1, $2 
 	WHERE $1 NOT in (
 		SELECT offeringId 
-		FROM offeringAllowedFeatureType 
+		FROM public.offeringAllowedFeatureType 
 		WHERE offeringId = $1 
 		  AND featureOfInterestTypeId = $2
 		);
@@ -151,22 +151,22 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertUnit(text) RETURNS bigint AS
 $$
-	INSERT INTO unit(unitId,unit) SELECT nextval('unitId_seq'),$1 WHERE $1 NOT IN (SELECT unit FROM unit);
-	SELECT unitId FROM unit WHERE unit = $1;
+	INSERT INTO public.unit(unitId,unit) SELECT nextval('public.unitId_seq'),$1 WHERE $1 NOT IN (SELECT unit FROM public.unit);
+	SELECT unitId FROM public.unit WHERE unit = $1;
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertProcedureDescriptionFormat(text) RETURNS bigint AS
 $$
-	INSERT INTO procedureDescriptionFormat(procedureDescriptionFormatId,procedureDescriptionFormat) SELECT nextval('procDescFormatId_seq'),$1 WHERE $1 NOT IN (SELECT procedureDescriptionFormat FROM procedureDescriptionFormat);
-	SELECT procedureDescriptionFormatId FROM procedureDescriptionFormat WHERE procedureDescriptionFormat = $1;
+	INSERT INTO public.procedureDescriptionFormat(procedureDescriptionFormatId,procedureDescriptionFormat) SELECT nextval('public.procDescFormatId_seq'),$1 WHERE $1 NOT IN (SELECT procedureDescriptionFormat FROM public.procedureDescriptionFormat);
+	SELECT procedureDescriptionFormatId FROM public.procedureDescriptionFormat WHERE procedureDescriptionFormat = $1;
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertFeatureOfInterest(text, numeric, numeric, text) RETURNS bigint AS
 $$
-	INSERT INTO featureOfInterest(featureOfInterestId, hibernateDiscriminator,featureOfInterestTypeId, identifier, names, geom, descriptionXml) 
-	SELECT nextval('featureOfInterestId_seq'),'T', getSpatialSamplingFeatureType('Point'), $1, $4, ST_GeomFromText('POINT(' || $2 || ' ' || $3 || ')', 4326), 
+	INSERT INTO public.featureOfInterest(featureOfInterestId, hibernateDiscriminator,featureOfInterestTypeId, identifier, names, geom, descriptionXml) 
+	SELECT nextval('public.featureOfInterestId_seq'),'T', getSpatialSamplingFeatureType('Point'), $1, $4, ST_GeomFromText('POINT(' || $2 || ' ' || $3 || ')', 4326), 
 '<sams:SFSpatialSamplingFeature 
 	xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns:sams="http://www.opengis.net/samplingSpatial/2.0" 
@@ -182,16 +182,16 @@ $$
 		</gml:Point>
 	</sams:shape>
 </sams:SFSpatialSamplingFeature>'::text
-	WHERE $1 NOT IN (SELECT identifier FROM featureOfInterest);
-	SELECT featureOfInterestId FROM featureOfInterest WHERE identifier = $1;
+	WHERE $1 NOT IN (SELECT identifier FROM public.featureOfInterest);
+	SELECT featureOfInterestId FROM public.featureOfInterest WHERE identifier = $1;
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertObservableProperty(text) RETURNS bigint AS
 $$
-	INSERT INTO observableProperty(observablePropertyId,hibernateDiscriminator,identifier, description) SELECT nextval('observablePropertyId_seq'),'T',$1, $1
-	WHERE $1 NOT IN (SELECT identifier FROM observableProperty WHERE identifier = $1);
-	SELECT observablePropertyId FROM observableProperty WHERE identifier = $1
+	INSERT INTO public.observableProperty(observablePropertyId,hibernateDiscriminator,identifier, description) SELECT nextval('public.observablePropertyId_seq'),'T',$1, $1
+	WHERE $1 NOT IN (SELECT identifier FROM public.observableProperty WHERE identifier = $1);
+	SELECT observablePropertyId FROM public.observableProperty WHERE identifier = $1
 $$
 LANGUAGE 'sql';
 
@@ -274,20 +274,20 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertProcedure(text,timestamp with time zone,text,numeric,numeric,numeric, text, text) RETURNS bigint AS
 $$
-	INSERT INTO procedure(procedureId, hibernateDiscriminator, identifier, procedureDescriptionFormatId, deleted) SELECT 
-		nextval('procedureId_seq'),'T',$1, getSensor_mlDescriptionFormat(), 'F' WHERE $1 NOT IN (
-			SELECT identifier FROM procedure WHERE identifier = $1);
-	INSERT INTO validProcedureTime(validProcedureTimeId,procedureId, startTime, descriptionXml) 
-		SELECT nextval('validProcedureTimeId_seq'),getProcedure($1), $2, createSensorDescription($1, $3, $4, $5, $6, $7, $8)
+	INSERT INTO public.procedure(procedureId, hibernateDiscriminator, identifier, procedureDescriptionFormatId, deleted) SELECT 
+		nextval('public.procedureId_seq'),'T',$1, getSensor_mlDescriptionFormat(), 'F' WHERE $1 NOT IN (
+			SELECT identifier FROM public.procedure WHERE identifier = $1);
+	INSERT INTO public.validProcedureTime(validProcedureTimeId,procedureId, startTime, descriptionXml) 
+		SELECT nextval('public.validProcedureTimeId_seq'),getProcedure($1), $2, createSensorDescription($1, $3, $4, $5, $6, $7, $8)
 		WHERE getProcedure($1) NOT IN (
-			SELECT procedureId FROM validProcedureTime WHERE procedureId = getProcedure($1));
+			SELECT procedureId FROM public.validProcedureTime WHERE procedureId = getProcedure($1));
 	SELECT getProcedure($1);
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION getObservationConstellation(bigint,bigint,bigint,bigint) RETURNS bigint AS
 $$
-	SELECT observationConstellationId FROM observationConstellation WHERE procedureId = $1 AND observablePropertyId = $2 AND offeringId = $3 AND observationTypeId = $4;
+	SELECT observationConstellationId FROM public.observationConstellation WHERE procedureId = $1 AND observablePropertyId = $2 AND offeringId = $3 AND observationTypeId = $4;
 $$
 LANGUAGE 'sql';
 
@@ -299,7 +299,7 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertObservationConstellation(bigint,bigint,bigint,bigint) RETURNS VOID AS
 $$
-	INSERT INTO observationConstellation (observationConstellationId,procedureId, observablePropertyId, offeringId, observationTypeId) VALUES (nextval('observationConstellationId_seq'),$1, $2, $3, $4);
+	INSERT INTO public.observationConstellation (observationConstellationId,procedureId, observablePropertyId, offeringId, observationTypeId) VALUES (nextval('public.observationConstellationId_seq'),$1, $2, $3, $4);
 $$
 LANGUAGE 'sql';
 
@@ -312,39 +312,39 @@ LANGUAGE 'sql';
 -- UNIT
 CREATE OR REPLACE FUNCTION getUnit(text) RETURNS bigint AS
 $$
-	SELECT unitId FROM unit WHERE unit = $1;
+	SELECT unitId FROM public.unit WHERE unit = $1;
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertNumericObservation(bigint, numeric) RETURNS VOID AS
 $$
-	INSERT INTO numericValue(observationId, value) VALUES ($1,$2);
+	INSERT INTO public.numericValue(observationId, value) VALUES ($1,$2);
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertObservationOffering(bigint, bigint) RETURNS VOID AS
 $$
-	INSERT INTO observationHasOffering (observationId, offeringId) VALUES ($1, $2);
+	INSERT INTO public.observationHasOffering (observationId, offeringId) VALUES ($1, $2);
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertObservation(text, text, text, text, timestamp with time zone, text) RETURNS bigint AS
 $$ 
-	INSERT INTO observation(observationId, procedureId, observablePropertyId, featureOfInterestId, unitId, phenomenonTimeStart, phenomenonTimeEnd, resultTime)
-	SELECT nextval('observationId_seq'),getProcedure($1), getObservableProperty($2), getFeatureOfInterest($3), getUnit($4), $5, $5, $5 WHERE getProcedure($1) NOT IN (
-		SELECT procedureId FROM observation
+	INSERT INTO public.observation(observationId, procedureId, observablePropertyId, featureOfInterestId, unitId, phenomenonTimeStart, phenomenonTimeEnd, resultTime)
+	SELECT nextval('public.observationId_seq'),getProcedure($1), getObservableProperty($2), getFeatureOfInterest($3), getUnit($4), $5, $5, $5 WHERE getProcedure($1) NOT IN (
+		SELECT procedureId FROM public.observation
 		WHERE procedureId = getProcedure($1) AND observablePropertyId = getObservableProperty($2) AND featureOfInterestId = getFeatureOfInterest($3) 
 				AND unitId = getUnit($4) AND phenomenonTimeStart = $5 AND phenomenonTimeEnd = $5 AND resultTime = $5)
-		AND getObservableProperty($2) NOT IN (SELECT observablePropertyId FROM observation
+		AND getObservableProperty($2) NOT IN (SELECT observablePropertyId FROM public.observation
 		WHERE procedureId = getProcedure($1) AND observablePropertyId = getObservableProperty($2) AND featureOfInterestId = getFeatureOfInterest($3) 
 				AND unitId = getUnit($4) AND phenomenonTimeStart = $5 AND phenomenonTimeEnd = $5 AND resultTime = $5);
 				
-	SELECT insertObservationOffering((SELECT observationId FROM observation 
+	SELECT insertObservationOffering((SELECT observationId FROM public.observation 
 	WHERE featureOfInterestId = getFeatureOfInterest($3)
 		AND procedureId = getProcedure($1) AND observablePropertyId = getObservableProperty($2) AND unitId = getUnit($4) 
 		AND phenomenonTimeStart = $5), getOffering($6));
 
-	SELECT observationId FROM observation 
+	SELECT observationId FROM public.observation 
 	WHERE featureOfInterestId = getFeatureOfInterest($3)
 		AND procedureId = getProcedure($1) AND observablePropertyId = getObservableProperty($2) AND unitId = getUnit($4) 
 		AND phenomenonTimeStart = $5;
@@ -353,7 +353,7 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION getObservation(bigint, bigint, text, text, timestamp with time zone) RETURNS bigint AS
 $$ 
-	SELECT observationId FROM observation 
+	SELECT observationId FROM public.observation 
 	WHERE featureOfInterestId = getFeatureOfInterest($3)
 		AND procedureId = $1 AND observablePropertyId = $2 AND unitId = getUnit($4) 
 		AND phenomenonTimeStart = $5;
@@ -362,34 +362,34 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertBooleanObservation(bigint, char) RETURNS VOID AS
 $$ 
- 	INSERT INTO booleanValue(observationId, value)
+ 	INSERT INTO public.booleanValue(observationId, value)
 	VALUES ($1,$2);
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertCountObservation(bigint, int) RETURNS VOID AS
 $$ 
- 	INSERT INTO countValue(observationId, value) VALUES ($1, $2);
+ 	INSERT INTO public.countValue(observationId, value) VALUES ($1, $2);
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertTextObservation(bigint, text) RETURNS VOID AS
 $$ 
- 	INSERT INTO textValue(observationId, value) VALUES ($1,$2);
+ 	INSERT INTO public.textValue(observationId, value) VALUES ($1,$2);
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertCategoryObservation(bigint, text) RETURNS VOID AS
 $$ 
- 	INSERT INTO categoryValue(observationId, value) VALUES ($1, $2);
+ 	INSERT INTO public.categoryValue(observationId, value) VALUES ($1, $2);
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insertResultTemplate(bigint,bigint,bigint,bigint,text,text,text) RETURNS bigint AS
 $$ 
- 	INSERT INTO resultTemplate(resultTemplateId,procedureId,observablePropertyId, offeringId, featureOfInterestId, identifier, resultStructure, resultEncoding)
- 	SELECT  nextval('resultTemplateId_seq'),$1, $2, $3, $4, $5, $6, $7 WHERE $5 NOT IN (
- 		SELECT identifier FROM resultTemplate 
+ 	INSERT INTO public.resultTemplate(resultTemplateId,procedureId,observablePropertyId, offeringId, featureOfInterestId, identifier, resultStructure, resultEncoding)
+ 	SELECT  nextval('public.resultTemplateId_seq'),$1, $2, $3, $4, $5, $6, $7 WHERE $5 NOT IN (
+ 		SELECT identifier FROM public.resultTemplate 
  		WHERE procedureId = $1 
  			AND observablePropertyId = $2 
  			AND offeringId = $3
@@ -397,7 +397,7 @@ $$
 	 		AND identifier = $5 
 	 		AND resultStructure = $6 
 	 		AND resultEncoding = $7);
- 	SELECT resultTemplateId FROM resultTemplate WHERE identifier = $5;
+ 	SELECT resultTemplateId FROM public.resultTemplate WHERE identifier = $5;
 $$
 LANGUAGE 'sql';
 
@@ -606,32 +606,32 @@ SELECT insertNumericObservation(insertObservation('http://www.52north.org/test/p
 SELECT insertNumericObservation(insertObservation('http://www.52north.org/test/procedure/6', 'http://www.52north.org/test/observableProperty/6', 'http://www.52north.org/test/featureOfInterest/6', 'test_unit_6', '2012-11-19 13:08Z', 'http://www.52north.org/test/offering/6'), 2.0);
 SELECT insertNumericObservation(insertObservation('http://www.52north.org/test/procedure/6', 'http://www.52north.org/test/observableProperty/6', 'http://www.52north.org/test/featureOfInterest/6', 'test_unit_6', '2012-11-19 13:09Z', 'http://www.52north.org/test/offering/6'), 2.1);
 
-INSERT INTO observation(observationId,procedureId, observablePropertyId, featureOfInterestId, unitId, phenomenonTimeStart, phenomenonTimeEnd, resultTime, identifier)
-	SELECT  nextval('observationId_seq'),getProcedure('http://www.52north.org/test/procedure/1'), getObservableProperty('http://www.52north.org/test/observableProperty/1'),
+INSERT INTO public.observation(observationId,procedureId, observablePropertyId, featureOfInterestId, unitId, phenomenonTimeStart, phenomenonTimeEnd, resultTime, identifier)
+	SELECT  nextval('public.observationId_seq'),getProcedure('http://www.52north.org/test/procedure/1'), getObservableProperty('http://www.52north.org/test/observableProperty/1'),
 			getFeatureOfInterest('http://www.52north.org/test/featureOfInterest/1'), getUnit('test_unit_1'), '2012-11-19 13:10Z', '2012-11-19 13:15Z', '2012-11-19 13:16Z', 'http://www.52north.org/test/observation/1'
-	WHERE 'http://www.52north.org/test/observation/1' NOT IN (SELECT identifier FROM observation WHERE identifier = 'http://www.52north.org/test/observation/1');
+	WHERE 'http://www.52north.org/test/observation/1' NOT IN (SELECT identifier FROM public.observation WHERE identifier = 'http://www.52north.org/test/observation/1');
 
-INSERT INTO observationHasOffering (observationId, offeringId) VALUES ((SELECT observationId FROM observation WHERE identifier = 'http://www.52north.org/test/observation/1'), getOffering('http://www.52north.org/test/offering/1'));
+INSERT INTO public.observationHasOffering (observationId, offeringId) VALUES ((SELECT observationId FROM public.observation WHERE identifier = 'http://www.52north.org/test/observation/1'), getOffering('http://www.52north.org/test/offering/1'));
 	
-INSERT INTO numericValue(observationId, value) 
+INSERT INTO public.numericValue(observationId, value) 
 		SELECT o.observationId, 3.5
-		FROM observation AS o 
+		FROM public.observation AS o 
 		WHERE o.identifier = 'http://www.52north.org/test/observation/1'
-			AND o.observationId NOT IN (SELECT observationId FROM numericValue AS ohnv
+			AND o.observationId NOT IN (SELECT observationId FROM public.numericValue AS ohnv
 											WHERE ohnv.observationId = o.observationId);
 
-INSERT INTO observation(observationId,procedureId, observablePropertyId, featureOfInterestId, unitId, phenomenonTimeStart, phenomenonTimeEnd, resultTime, identifier)
-	SELECT  nextval('observationId_seq'),getProcedure('http://www.52north.org/test/procedure/1'), getObservableProperty('http://www.52north.org/test/observableProperty/1'),
+INSERT INTO public.observation(observationId,procedureId, observablePropertyId, featureOfInterestId, unitId, phenomenonTimeStart, phenomenonTimeEnd, resultTime, identifier)
+	SELECT  nextval('public.observationId_seq'),getProcedure('http://www.52north.org/test/procedure/1'), getObservableProperty('http://www.52north.org/test/observableProperty/1'),
 			getFeatureOfInterest('http://www.52north.org/test/featureOfInterest/1'), getUnit('test_unit_1'), '2012-11-19 13:15Z', '2012-11-19 13:20Z', '2012-11-19 13:21Z', 'http://www.52north.org/test/observation/2'
-	WHERE 'http://www.52north.org/test/observation/2' NOT IN (SELECT identifier FROM observation WHERE identifier = 'http://www.52north.org/test/observation/2');
+	WHERE 'http://www.52north.org/test/observation/2' NOT IN (SELECT identifier FROM public.observation WHERE identifier = 'http://www.52north.org/test/observation/2');
 
-INSERT INTO observationHasOffering (observationId, offeringId) VALUES ((SELECT observationId FROM observation WHERE identifier = 'http://www.52north.org/test/observation/2'), getOffering('http://www.52north.org/test/offering/1'));	
+INSERT INTO public.observationHasOffering (observationId, offeringId) VALUES ((SELECT observationId FROM public.observation WHERE identifier = 'http://www.52north.org/test/observation/2'), getOffering('http://www.52north.org/test/offering/1'));	
 	
-INSERT INTO numericValue(observationId, value) 
+INSERT INTO public.numericValue(observationId, value) 
 		SELECT o.observationId, 4.2
-		FROM observation AS o 
+		FROM public.observation AS o 
 		WHERE o.identifier = 'http://www.52north.org/test/observation/2'
-			AND o.observationId NOT IN (SELECT observationId FROM numericValue AS ohnv
+			AND o.observationId NOT IN (SELECT observationId FROM public.numericValue AS ohnv
 											WHERE ohnv.observationId = o.observationId);
 											
 -- INSERT OBSERVATIONS
