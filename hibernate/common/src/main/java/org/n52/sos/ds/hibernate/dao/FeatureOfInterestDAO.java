@@ -158,7 +158,7 @@ public class FeatureOfInterestDAO {
     public FeatureOfInterest getOrInsertFeatureOfInterest(final String identifier, final String url, final Session session) {
         FeatureOfInterest feature = getFeatureOfInterest(identifier, session);
         if (feature == null) {
-            feature = new FeatureOfInterest();
+            feature = new TFeatureOfInterest();
             feature.setIdentifier(identifier);
             if (url != null && !url.isEmpty()) {
                 feature.setUrl(url);
