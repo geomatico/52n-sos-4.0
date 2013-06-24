@@ -23,6 +23,8 @@
  */
 package org.n52.sos.ds.hibernate.dao;
 
+import static org.n52.sos.util.HTTPConstants.StatusCode.BAD_REQUEST;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +47,7 @@ import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.HTTPConstants;
 
 /**
  * Hibernate data access class for featureOfInterest
@@ -220,8 +223,8 @@ public class FeatureOfInterestDAO {
      * @param session
      *            Hibernate session
      * @return FeatureOfInterest object
-     * @throws OwsExceptionReport
-     *             If SOS feature type is not supported
+     * @throws NoApplicableCodeException
+     *             If SOS feature type is not supported (with status {@link HTTPConstants.StatusCode}.BAD_REQUEST
      */
     public FeatureOfInterest checkOrInsertFeatureOfInterest(final AbstractFeature featureOfInterest, final Session session)
             throws OwsExceptionReport {
@@ -232,8 +235,9 @@ public class FeatureOfInterestDAO {
             return getOrInsertFeatureOfInterest(featureIdentifier, ((SamplingFeature) featureOfInterest).getUrl(),
                     session);
         } else {
-            // TODO: throw exception
-            throw new NoApplicableCodeException();
+            throw new NoApplicableCodeException()
+            	.withMessage("The used feature type '%s' is not supported.", featureOfInterest!=null?featureOfInterest.getClass().getName():featureOfInterest)
+            	.setStatus(BAD_REQUEST);
         }
     }
 
