@@ -31,6 +31,7 @@ public interface HibernateConstants {
     String CONNECTION_USERNAME = "hibernate.connection.username";
     String CONNECTION_PASSWORD = "hibernate.connection.password";
     String DEFAULT_CATALOG = "hibernate.default_catalog";
+    String DEFAULT_SCHEMA = "hibernate.default_schema";
     String CONNECTION_DRIVER_CLASS = "hibernate.connection.driver_class";
     String HBM2DDL_AUTO = "hibernate.hbm2ddl.auto";
     String CONNECTION_POOL_SIZE = "hibernate.connection.pool_size";

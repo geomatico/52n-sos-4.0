@@ -173,7 +173,7 @@ public interface Datasource {
      *
      * @param settings the settings to connect
      */
-    void createSchema(Map<String, Object> settings);
+    String[] createSchema(Map<String, Object> settings);
 
     /**
      * Drop the present schema (or parts of it). Will only be called if
@@ -183,7 +183,9 @@ public interface Datasource {
      *
      * @param settings the settings to connect
      */
-    void dropSchema(Map<String, Object> settings);
+    String[] dropSchema(Map<String, Object> settings);
+    
+    void execute(String[] sql, Map<String, Object> settings);
 
     /**
      * @return if this datasource supports the insertion/removal of a test data

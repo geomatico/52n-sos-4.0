@@ -133,7 +133,7 @@ public class OracleDatasourceTest extends TestCase {
 		settings.put(AbstractHibernateDatasource.USERNAME_KEY, "oracle");
 		settings.put(AbstractHibernateDatasource.PASSWORD_KEY, "oracle");
 		settings.put(AbstractHibernateDatasource.DATABASE_KEY, "db");
-		settings.put(AbstractHibernateDatasource.CATALOG_KEY, "catalog");
+		settings.put(AbstractHibernateDatasource.SCHEMA_KEY, "schema");
 
 		assertEquals("jdbc:oracle:thin://localhost:1521/db", ds.toURL(settings));
 	}

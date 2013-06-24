@@ -22,7 +22,7 @@ public abstract class AbstractHibernateFullDBDatasource extends
 	protected String hostDefault, hostDescription;
 	protected int portDefault;
 	protected String portDescription;
-	protected String catalogDefault, catalogDescription;
+	protected String schemaDefault, schemaDescription;
 
 	AbstractHibernateFullDBDatasource() {
 	}
@@ -32,7 +32,7 @@ public abstract class AbstractHibernateFullDBDatasource extends
 			String passwordDescription, String databaseDefault,
 			String databaseDescription, String hostDefault,
 			String hostDescription, int portDefault, String portDescription,
-			String catalogDefault, String catalogDescription) {
+			String schemaDefault, String schemaDescription) {
 		super();
 		this.usernameDefault = usernameDefault;
 		this.usernameDescription = usernameDescription;
@@ -44,8 +44,8 @@ public abstract class AbstractHibernateFullDBDatasource extends
 		this.hostDescription = hostDescription;
 		this.portDefault = portDefault;
 		this.portDescription = portDescription;
-		this.catalogDefault = catalogDefault;
-		this.catalogDescription = catalogDescription;
+		this.schemaDefault = schemaDefault;
+		this.schemaDescription = schemaDescription;
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public abstract class AbstractHibernateFullDBDatasource extends
 				createDatabaseDefinition(databaseDefault),
 				createHostDefinition(hostDefault),
 				createPortDefinition(portDefault),
-				createCatalogDefinition(catalogDefault),
+				createSchemaDefinition(schemaDefault),
 				getTransactionalDefiniton());
 	}
 
@@ -70,7 +70,7 @@ public abstract class AbstractHibernateFullDBDatasource extends
 				createDatabaseDefinition((String) settings.get(DATABASE_KEY)),
 				createHostDefinition((String) settings.get(HOST_KEY)),
 				createPortDefinition((Integer) settings.get(PORT_KEY)),
-				createCatalogDefinition((String) settings.get(CATALOG_KEY)));
+				createSchemaDefinition((String) settings.get(SCHEMA_KEY)));
 	}
 
 	protected StringSettingDefinition createUsernameDefinition(
@@ -101,15 +101,14 @@ public abstract class AbstractHibernateFullDBDatasource extends
 				.setDefaultValue(defaultValue);
 	}
 
-	protected StringSettingDefinition createCatalogDefinition(
-			String defaultValue) {
-		return createCatalogDefinition().setDefaultValue(defaultValue);
+	protected StringSettingDefinition createSchemaDefinition(String defaultValue) {
+		return createSchemaDefinition().setDefaultValue(defaultValue);
 	}
 
 	@Override
 	public Properties getDatasourceProperties(Map<String, Object> settings) {
 		Properties p = new Properties();
-		p.put(HibernateConstants.DEFAULT_CATALOG, settings.get(CATALOG_KEY));
+		p.put(HibernateConstants.DEFAULT_SCHEMA, settings.get(SCHEMA_KEY));
 		p.put(HibernateConstants.CONNECTION_USERNAME,
 				settings.get(USERNAME_KEY));
 		p.put(HibernateConstants.CONNECTION_PASSWORD,
@@ -137,14 +136,13 @@ public abstract class AbstractHibernateFullDBDatasource extends
 	protected Map<String, Object> parseDatasourceProperties(Properties current) {
 		Map<String, Object> settings = new HashMap<String, Object>(
 				current.size());
-		settings.put(AbstractHibernateDatasource.CATALOG_KEY,
-				current.getProperty(HibernateConstants.DEFAULT_CATALOG));
-		settings.put(AbstractHibernateDatasource.USERNAME_KEY,
+		settings.put(SCHEMA_KEY,
+				current.getProperty(HibernateConstants.DEFAULT_SCHEMA));
+		settings.put(USERNAME_KEY,
 				current.getProperty(HibernateConstants.CONNECTION_USERNAME));
-		settings.put(AbstractHibernateDatasource.PASSWORD_KEY,
+		settings.put(PASSWORD_KEY,
 				current.getProperty(HibernateConstants.CONNECTION_PASSWORD));
-		settings.put(AbstractHibernateDatasource.TRANSACTIONAL_KEY,
-				isTransactional(current));
+		settings.put(TRANSACTIONAL_KEY, isTransactional(current));
 		String url = current.getProperty(HibernateConstants.CONNECTION_URL);
 
 		String[] parsed = parseURL(url);

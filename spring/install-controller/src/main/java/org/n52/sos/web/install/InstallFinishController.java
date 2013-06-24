@@ -81,10 +81,12 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
 
         try {
             if (c.isDropSchema()) {
-                datasource.dropSchema(c.getDatabaseSettings());
+                String[] dropSchema = datasource.dropSchema(c.getDatabaseSettings());
+                datasource.execute(dropSchema, c.getDatabaseSettings());
             }
             if (c.isCreateSchema()) {
-                datasource.createSchema(c.getDatabaseSettings());
+                String[] createSchema = datasource.createSchema(c.getDatabaseSettings());
+                datasource.execute(createSchema, c.getDatabaseSettings());
             }
             if (c.isCreateTestData()) {
                 datasource.insertTestData(c.getDatabaseSettings());

@@ -41,27 +41,41 @@ import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.util.StringHelper;
 
-
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class PostgresDatasource extends AbstractHibernateFullDBDatasource {
     private static final String DIALECT_NAME = "PostgreSQL/PostGIS";
+
     private static final String POSTGRES_DRIVER_CLASS = "org.postgresql.Driver";
-    private static final Pattern JDBC_URL_PATTERN =
-            Pattern.compile("^jdbc:postgresql://([^:]+):([0-9]+)/(.*)$");
+
+    private static final Pattern JDBC_URL_PATTERN = Pattern.compile("^jdbc:postgresql://([^:]+):([0-9]+)/(.*)$");
+
     public static final String USERNAME_DESCRIPTION =
             "Your database server user name. The default value for PostgreSQL is \"postgres\".";
+
     public static final String USERNAME_DEFAULT_VALUE = "postgres";
+
     public static final String PASSWORD_DESCRIPTION =
             "Your database server password. The default value is \"postgres\".";
+
     public static final String PASSWORD_DEFAULT_VALUE = "postgres";
+
     public static final String HOST_DESCRIPTION =
             "Set this to the IP/net location of PostgreSQL database server. The default value for PostgreSQL is \"localhost\".";
+
     public static final String PORT_DESCRIPTION =
             "Set this to the port number of your PostgreSQL server. The default value for PostgreSQL is 5432.";
+
     public static final int PORT_DEFAULT_VALUE = 5432;
-    public static final String CATALOG_DEFAULT_VALUE = "public";
+
+//    public static final String CATALOG_DEFAULT_VALUE = "public";
+
+    public static final String SCHEMA_DEFAULT_VALUE = "public";
+
+    public static final String FUNC_POSTGIS_VERSION = "postgis_version()";
+
+    public static final String TAB_SPATIAL_REF_SYS = "spatial_ref_sys";
 
     @Override
     public String getDialectName() {
@@ -80,7 +94,7 @@ public class PostgresDatasource extends AbstractHibernateFullDBDatasource {
 
     @Override
     public boolean supportsTestData() {
-        //FIXME
+        // FIXME
         return false;
     }
 
@@ -91,15 +105,12 @@ public class PostgresDatasource extends AbstractHibernateFullDBDatasource {
         try {
             conn = openConnection(settings);
             stmt = conn.createStatement();
-            String schema = (String) settings.get(createCatalogDefinition()
-                    .getKey());
+            String schema = (String) settings.get(createSchemaDefinition().getKey());
             schema = schema == null ? "" : "." + schema;
-            final String command = String.format(
-                    "BEGIN; " +
-                    "DROP TABLE IF EXISTS \"%1$ssos_installer_test_table\"; " +
-                    "CREATE TABLE \"%1$ssos_installer_test_table\" (id integer NOT NULL); " +
-                    "DROP TABLE \"%1$ssos_installer_test_table\"; " +
-                    "END;", schema);
+            final String command =
+                    String.format("BEGIN; " + "DROP TABLE IF EXISTS \"%1$ssos_installer_test_table\"; "
+                            + "CREATE TABLE \"%1$ssos_installer_test_table\" (id integer NOT NULL); "
+                            + "DROP TABLE \"%1$ssos_installer_test_table\"; " + "END;", schema);
             stmt.execute(command);
             return true;
         } catch (SQLException e) {
@@ -111,17 +122,21 @@ public class PostgresDatasource extends AbstractHibernateFullDBDatasource {
     }
 
     @Override
-    protected void validatePrerequisites(Connection con,
-                                         DatabaseMetadata metadata) {
-        checkPostgis(con);
-        checkSpatialRefSys(con, metadata);
+    protected void validatePrerequisites(Connection con, DatabaseMetadata metadata, Map<String, Object> settings) {
+        checkPostgis(con, settings);
+        checkSpatialRefSys(con, metadata, settings);
     }
 
-    protected void checkPostgis(Connection con) {
+    protected void checkPostgis(Connection con, Map<String, Object> settings) {
         Statement stmt = null;
         try {
+            StringBuilder builder = new StringBuilder();
+            builder.append(SELECT);
+            builder.append(SPACE);
+            builder.append(FUNC_POSTGIS_VERSION);
+            builder.append(SEMICOLON);
             stmt = con.createStatement();
-            stmt.execute("SELECT postgis_version()");
+            stmt.execute(builder.toString());
             // TODO check PostGIS version
         } catch (SQLException ex) {
             throw new ConfigurationException("PostGIS does not seem to be installed.", ex);
@@ -130,14 +145,23 @@ public class PostgresDatasource extends AbstractHibernateFullDBDatasource {
         }
     }
 
-    protected void checkSpatialRefSys(Connection con, DatabaseMetadata metadata) {
+    protected void checkSpatialRefSys(Connection con, DatabaseMetadata metadata, Map<String, Object> settings) {
         Statement stmt = null;
         try {
             if (!metadata.isTable("spatial_ref_sys")) {
                 throw new ConfigurationException("Missing 'spatial_ref_sys' table.");
             }
+            StringBuilder builder = new StringBuilder();
+            builder.append(SELECT);
+            builder.append(SPACE);
+            builder.append(DEFAULT_COUNT);
+            builder.append(SPACE);
+            builder.append(FROM);
+            builder.append(SPACE);
+            builder.append(TAB_SPATIAL_REF_SYS);
+            builder.append(SEMICOLON);
             stmt = con.createStatement();
-            stmt.execute("SELECT count(*) from spatial_ref_sys");
+            stmt.execute(builder.toString());
         } catch (SQLException ex) {
             throw new ConfigurationException("Can not read from table 'spatial_ref_sys'", ex);
         } finally {
@@ -145,6 +169,7 @@ public class PostgresDatasource extends AbstractHibernateFullDBDatasource {
         }
     }
 
+    @Override
     protected String toURL(
             Map<String, Object> settings) {
         String url = String.format("jdbc:postgresql://%s:%d/%s",
@@ -185,9 +210,7 @@ public class PostgresDatasource extends AbstractHibernateFullDBDatasource {
             try {
                 conn = openConnection(settings);
                 stmt = conn.createStatement();
-                stmt.execute(String
-                        .format("truncate %s restart identity cascade",
-                                StringHelper.join(", ", names)));
+                stmt.execute(String.format("truncate %s restart identity cascade", StringHelper.join(", ", names)));
             } catch (SQLException ex) {
                 throw new ConfigurationException(ex);
             } finally {
@@ -199,25 +222,42 @@ public class PostgresDatasource extends AbstractHibernateFullDBDatasource {
 
     @Override
     public void insertTestData(Map<String, Object> settings) {
-        /* TODO implement org.n52.sos.ds.datasource.PostgresDatasource.insertTestData() */
-        throw new UnsupportedOperationException("org.n52.sos.ds.datasource.PostgresDatasource.insertTestData() not yet implemented");
+        /*
+         * TODO implement
+         * org.n52.sos.ds.datasource.PostgresDatasource.insertTestData()
+         */
+        throw new UnsupportedOperationException(
+                "org.n52.sos.ds.datasource.PostgresDatasource.insertTestData() not yet implemented");
     }
 
     @Override
     public void insertTestData(Properties settings) {
-        /* TODO implement org.n52.sos.ds.datasource.PostgresDatasource.insertTestData() */
-        throw new UnsupportedOperationException("org.n52.sos.ds.datasource.PostgresDatasource.insertTestData() not yet implemented");
+        /*
+         * TODO implement
+         * org.n52.sos.ds.datasource.PostgresDatasource.insertTestData()
+         */
+        throw new UnsupportedOperationException(
+                "org.n52.sos.ds.datasource.PostgresDatasource.insertTestData() not yet implemented");
     }
 
     @Override
     public boolean isTestDataPresent(Properties settings) {
-        /* TODO implement org.n52.sos.ds.datasource.PostgresDatasource.isTestDataPresent() */
-        throw new UnsupportedOperationException("org.n52.sos.ds.datasource.PostgresDatasource.isTestDataPresent() not yet implemented");
+        /*
+         * TODO implement
+         * org.n52.sos.ds.datasource.PostgresDatasource.isTestDataPresent()
+         */
+        throw new UnsupportedOperationException(
+                "org.n52.sos.ds.datasource.PostgresDatasource.isTestDataPresent() not yet implemented");
     }
 
     @Override
     public void removeTestData(Properties settings) {
-        /* TODO implement org.n52.sos.ds.datasource.PostgresDatasource.removeTestData() */
-        throw new UnsupportedOperationException("org.n52.sos.ds.datasource.PostgresDatasource.removeTestData() not yet implemented");
+        /*
+         * TODO implement
+         * org.n52.sos.ds.datasource.PostgresDatasource.removeTestData()
+         */
+        throw new UnsupportedOperationException(
+                "org.n52.sos.ds.datasource.PostgresDatasource.removeTestData() not yet implemented");
     }
+
 }

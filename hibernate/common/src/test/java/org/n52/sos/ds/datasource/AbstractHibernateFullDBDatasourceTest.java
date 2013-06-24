@@ -79,7 +79,7 @@ public class AbstractHibernateFullDBDatasourceTest extends TestCase {
 		assertTrue(keys.contains(AbstractHibernateDatasource.DATABASE_KEY));
 		assertTrue(keys.contains(AbstractHibernateDatasource.USERNAME_KEY));
 		assertTrue(keys.contains(AbstractHibernateDatasource.PASSWORD_KEY));
-		assertTrue(keys.contains(AbstractHibernateDatasource.CATALOG_KEY));
+		assertTrue(keys.contains(AbstractHibernateDatasource.SCHEMA_KEY));
 	}
 
 	private class MockDatasource extends AbstractHibernateFullDBDatasource {
@@ -146,7 +146,7 @@ public class AbstractHibernateFullDBDatasourceTest extends TestCase {
 
 		@Override
 		protected void validatePrerequisites(Connection con,
-				DatabaseMetadata metadata) {
+				DatabaseMetadata metadata, Map<String, Object> settings) {
 		}
 	}
 }

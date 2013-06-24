@@ -50,14 +50,14 @@ public class OracleDatasource extends AbstractHibernateFullDBDatasource {
 	public static final String PORT_DESCRIPTION = "Set this to the port number of your "
 			+ "Oracle Spatial server. The default value for Oracle is 1521.";
 	public static final int PORT_DEFAULT_VALUE = 1521;
-	public static final String CATALOG_DEFAULT_VALUE = "oracle";
+	public static final String SCHEMA_DEFAULT_VALUE = "oracle";
 
 	public OracleDatasource() {
 		super(USERNAME_DEFAULT_VALUE, USERNAME_DESCRIPTION,
 				PASSWORD_DEFAULT_VALUE, PASSWORD_DESCRIPTION,
 				DATABASE_DEFAULT_VALUE, null, HOST_DEFAULT_VALUE,
 				HOST_DESCRIPTION, PORT_DEFAULT_VALUE, PORT_DESCRIPTION,
-				CATALOG_DEFAULT_VALUE, CATALOG_DESCRIPTION);
+				SCHEMA_DEFAULT_VALUE, SCHEMA_DESCRIPTION);
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class OracleDatasource extends AbstractHibernateFullDBDatasource {
 		try {
 			conn = openConnection(settings);
 			stmt = conn.createStatement();
-			doCheckSchemaCreation((String) settings.get(CATALOG_KEY), stmt);
+			doCheckSchemaCreation((String) settings.get(SCHEMA_KEY), stmt);
 			return true;
 		} catch (SQLException e) {
 			return false;
@@ -162,7 +162,7 @@ public class OracleDatasource extends AbstractHibernateFullDBDatasource {
 
 	@Override
 	protected void validatePrerequisites(Connection con,
-			DatabaseMetadata metadata) {
+			DatabaseMetadata metadata, Map<String, Object> settings) {
 	}
 
 	@Override
