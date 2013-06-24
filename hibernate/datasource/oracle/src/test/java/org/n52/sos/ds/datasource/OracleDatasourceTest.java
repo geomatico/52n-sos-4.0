@@ -149,22 +149,7 @@ public class OracleDatasourceTest extends TestCase {
 	}
 
 	public void testTestData() throws Exception {
-		assertFalse(ds.supportsTestData());
-		try {
-			ds.insertTestData((Map<String, Object>) null);
-			fail();
-		} catch (UnsupportedOperationException e) {
-		}
-		try {
-			ds.insertTestData((Properties) null);
-			fail();
-		} catch (UnsupportedOperationException e) {
-		}
-		try {
-			ds.isTestDataPresent(null);
-			fail();
-		} catch (UnsupportedOperationException e) {
-		}
+		assertTrue(ds.supportsTestData());
 		try {
 			ds.removeTestData(null);
 			fail();

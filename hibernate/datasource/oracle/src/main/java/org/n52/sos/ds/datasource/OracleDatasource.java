@@ -1,10 +1,17 @@
 package org.n52.sos.ds.datasource;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,8 +19,18 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.spatial.dialect.oracle.OracleSpatial10gDialect;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.n52.sos.ds.Datasource;
+import org.n52.sos.service.Configurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OracleDatasource extends AbstractHibernateFullDBDatasource {
+	private static final Logger LOG = LoggerFactory
+			.getLogger(AbstractHibernateDatasource.class);
+
+	private static final String SQL_FILE_INSERT_TEST_DATA = "insert_test_data.sql";
+
+	private static final String TEST_ID_PREFIX = "http://www.52north.org/test/";
+
 	private static final String DIALECT_NAME = "Oracle Spatial";
 
 	private static final String ORACLE_DRIVER_CLASS = "oracle.jdbc.OracleDriver";
@@ -65,6 +82,11 @@ public class OracleDatasource extends AbstractHibernateFullDBDatasource {
 		}
 	}
 
+	@Override
+	protected String[] getPreSchemaScript() {
+		return new String[] { "ALTER SESSION SET deferred_segment_creation=false" };
+	}
+
 	/**
 	 * A statement provided version of
 	 * {@link Datasource#checkSchemaCreation(Map)} for testing
@@ -90,26 +112,35 @@ public class OracleDatasource extends AbstractHibernateFullDBDatasource {
 
 	@Override
 	public boolean supportsTestData() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public void insertTestData(Map<String, Object> settings) {
-		throw new UnsupportedOperationException(getClass().getCanonicalName()
-				+ ".insertTestData() not yet implemented");
-
+		try {
+			String[] script = readFile(SQL_FILE_INSERT_TEST_DATA);
+			execute(script, settings);
+		} catch (IOException e) {
+			LOG.error("Cannot read SQL file for removing test data", e);
+		}
 	}
 
 	@Override
 	public void insertTestData(Properties settings) {
-		throw new UnsupportedOperationException(getClass().getCanonicalName()
-				+ ".insertTestData() not yet implemented");
+		insertTestData(parseDatasourceProperties(settings));
 	}
 
 	@Override
 	public boolean isTestDataPresent(Properties settings) {
-		throw new UnsupportedOperationException(getClass().getCanonicalName()
-				+ ".isTestDataPresent() not yet implemented");
+		Set<String> offerings = Configurator.getInstance().getCache()
+				.getFeaturesOfInterest();
+		for (String offering : offerings) {
+			if (offering.startsWith(TEST_ID_PREFIX)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override
@@ -158,5 +189,25 @@ public class OracleDatasource extends AbstractHibernateFullDBDatasource {
 	@Override
 	protected String getDriverClass() {
 		return ORACLE_DRIVER_CLASS;
+	}
+
+	private String[] readFile(String file) throws IOException {
+		InputStream resource = getClass().getResourceAsStream(file);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(
+				resource));
+		String line;
+		List<String> lines = new ArrayList<String>();
+		String current = "";
+		while ((line = reader.readLine()) != null) {
+			if (line.endsWith(";")) {
+				current += line.substring(0, line.length() - 1);
+				lines.add(current);
+				current = "";
+			} else {
+				current += line + " ";
+			}
+		}
+
+		return lines.toArray(new String[lines.size()]);
 	}
 }
