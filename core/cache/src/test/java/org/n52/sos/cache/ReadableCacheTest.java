@@ -61,5 +61,31 @@ public class ReadableCacheTest {
 		
 		assertThat(cache.hasMinResultTimeForOffering(OFFERING_IDENTIFIER), is(FALSE));
 	}
+	
+	@Test
+	public void should_return_false_if_relatedFeature_has_no_children()
+	{
+		final ReadableCache readCache = new WritableCache();
+		final String relatedFeature = "test-feature";
+		((WritableContentCache)readCache).addRelatedFeatureForOffering("test-offering", relatedFeature);
+		
+		assertThat(readCache.isRelatedFeatureSampled(null), is(FALSE));
+		assertThat(readCache.isRelatedFeatureSampled(""), is(FALSE));
+		assertThat(readCache.isRelatedFeatureSampled(relatedFeature), is(FALSE));
+	}
+	
+	@Test
+	public void should_return_true_if_relatedFeature_has_one_or_more_children()
+	{
+		final ReadableCache readCache = new WritableCache();
+		final String relatedFeature = "test-feature";
+		final String relatedFeature2 = "test-feature-2";
+		final String offering = "test-offering";
+		((WritableContentCache)readCache).addRelatedFeatureForOffering(offering, relatedFeature);
+		((WritableContentCache)readCache).addRelatedFeatureForOffering(offering, relatedFeature2 );
+		((WritableContentCache)readCache).addParentFeature(relatedFeature2, relatedFeature);
+		
+		assertThat(readCache.isRelatedFeatureSampled(relatedFeature), is(TRUE));
+	}
 
 }
