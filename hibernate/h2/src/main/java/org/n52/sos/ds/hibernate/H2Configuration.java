@@ -55,19 +55,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class H2Configuration {
-    private static final Logger LOG = LoggerFactory.getLogger(H2Configuration.class);
-
-    private static final String HIBERNATE_CONNECTION_URL = SQLiteSessionFactory.HIBERNATE_CONNECTION_URL;
-
+    private static final Logger LOG = LoggerFactory
+            .getLogger(H2Configuration.class);
+    private static final String HIBERNATE_CONNECTION_URL =
+            SQLiteSessionFactory.HIBERNATE_CONNECTION_URL;
     private static final String HIBERNATE_CONNECTION_DRIVER_CLASS =
             SQLiteSessionFactory.HIBERNATE_CONNECTION_DRIVER_CLASS;
-
-    private static final String HIBERNATE_DIALECT = SQLiteSessionFactory.HIBERNATE_DIALECT;
-
+    private static final String HIBERNATE_DIALECT =
+            SQLiteSessionFactory.HIBERNATE_DIALECT;
     private static final String H2_DRIVER = "org.h2.Driver";
-
-    private static final String H2_CONNECTION_URL = "jdbc:h2:mem:sos;DB_CLOSE_DELAY=-1";
-
+    private static final String H2_CONNECTION_URL =
+            "jdbc:h2:mem:sos;DB_CLOSE_DELAY=-1";
     private static Properties properties = new Properties() {
         private static final long serialVersionUID = 3109256773218160485L;
 
@@ -91,7 +89,8 @@ public class H2Configuration {
             resources.add("mapping/core/ProcedureDescriptionFormat.hbm.xml");
             resources.add("mapping/core/Unit.hbm.xml");
             // transactional module
-            resources.add("mapping/transactional/ObservationConstellation.hbm.xml");
+            resources
+                    .add("mapping/transactional/ObservationConstellation.hbm.xml");
             resources.add("mapping/transactional/ObservationType.hbm.xml");
             resources.add("mapping/transactional/RelatedFeature.hbm.xml");
             resources.add("mapping/transactional/RelatedFeatureRole.hbm.xml");
@@ -104,17 +103,11 @@ public class H2Configuration {
             return resources;
         }
     };
-
     private static final Object LOCK = new Object();
-
     private static H2Configuration instance;
-
     private File tempDir;
-
     private Configuration configuration;
-
     private String[] createScript;
-
     private String[] dropScript;
 
     public static void assertInitialized() {
@@ -133,18 +126,20 @@ public class H2Configuration {
         }
     }
 
-    protected static Session getSession() {
+    public static Session getSession() {
         H2Configuration.assertInitialized();
         try {
-            return (Session) Configurator.getInstance().getDataConnectionProvider().getConnection();
+            return (Session) Configurator.getInstance()
+                    .getDataConnectionProvider().getConnection();
         } catch (final ConnectionProviderException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    protected static void returnSession(final Session session) {
+    public static void returnSession(final Session session) {
         if (session != null) {
-            Configurator.getInstance().getDataConnectionProvider().returnConnection(session);
+            Configurator.getInstance().getDataConnectionProvider()
+                    .returnConnection(session);
         }
     }
 
@@ -160,7 +155,8 @@ public class H2Configuration {
                 transaction = session.beginTransaction();
                 session.doWork(new Work() {
                     @Override
-                    public void execute(final Connection connection) throws SQLException {
+                    public void execute(final Connection connection) throws
+                            SQLException {
                         Statement stmt = null;
                         try {
                             stmt = connection.createStatement();
@@ -195,7 +191,8 @@ public class H2Configuration {
             if (instance == null) {
                 throw new IllegalStateException("Database is not initialized");
             }
-            final Iterator<Table> tableMappings = instance.getConfiguration().getTableMappings();
+            final Iterator<Table> tableMappings = instance.getConfiguration()
+                    .getTableMappings();
             final List<String> tableNames = new LinkedList<String>();
             while (tableMappings.hasNext()) {
                 tableNames.add(tableMappings.next().getName());
@@ -207,7 +204,8 @@ public class H2Configuration {
                 transaction = session.beginTransaction();
                 session.doWork(new Work() {
                     @Override
-                    public void execute(final Connection connection) throws SQLException {
+                    public void execute(final Connection connection) throws
+                            SQLException {
                         Statement stmt = null;
                         try {
                             stmt = connection.createStatement();
@@ -236,7 +234,8 @@ public class H2Configuration {
         }
     }
 
-    private H2Configuration() throws IOException, OwsExceptionReport, ConnectionProviderException {
+    private H2Configuration() throws IOException, OwsExceptionReport,
+                                     ConnectionProviderException {
         init();
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
@@ -266,7 +265,8 @@ public class H2Configuration {
     }
 
     private void setDefaultSettings() {
-        ScheduledContentCacheControllerSettings.CACHE_UPDATE_INTERVAL_DEFINITION.setDefaultValue(0);
+        ScheduledContentCacheControllerSettings.CACHE_UPDATE_INTERVAL_DEFINITION
+                .setDefaultValue(0);
     }
 
     private File getTempDir() {
@@ -298,8 +298,10 @@ public class H2Configuration {
             final String cmd = "create domain geometry as blob";
             LOG.debug("Executing {}", cmd);
             stmt.execute(cmd);
-            configuration = new Configuration().configure("/sos-hibernate.cfg.xml");
-            List<String> resources = (List<String>) properties.get(SessionFactoryProvider.HIBERNATE_RESOURCES);
+            configuration = new Configuration()
+                    .configure("/sos-hibernate.cfg.xml");
+            List<String> resources = (List<String>) properties
+                    .get(SessionFactoryProvider.HIBERNATE_RESOURCES);
             for (String resource : resources) {
                 configuration.addResource(resource);
             }
