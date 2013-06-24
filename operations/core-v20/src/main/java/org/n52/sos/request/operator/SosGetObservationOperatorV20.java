@@ -158,7 +158,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
             checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(),
                                               SosConstants.GetObservationParams.featureOfInterest.name());
             if (sosRequest.isSetFeatureOfInterest()) {
-            	sosRequest.setProcedures(addChildFeatures(sosRequest.getFeatureIdentifiers()));
+            	sosRequest.setFeatureIdentifiers(addChildFeatures(sosRequest.getFeatureIdentifiers()));
             }
         } catch (final OwsExceptionReport owse) {
             exceptions.add(owse);
