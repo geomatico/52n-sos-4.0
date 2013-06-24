@@ -87,10 +87,10 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
     }
 
     @Override
-    public ServiceResponse receive(GetObservationRequest sosRequest) throws OwsExceptionReport {
+    public ServiceResponse receive(final GetObservationRequest sosRequest) throws OwsExceptionReport {
         checkRequestedParameters(sosRequest);
-        boolean zipCompression = checkResponseFormat(sosRequest);
-        String responseFormat = sosRequest.getResponseFormat();
+        final boolean zipCompression = checkResponseFormat(sosRequest);
+        final String responseFormat = sosRequest.getResponseFormat();
         try {
             String namespace = responseFormat;
             if (sosRequest.getVersion().equals(Sos2Constants.SERVICEVERSION)
@@ -98,7 +98,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
                 namespace = Sos2Constants.NS_SOS_20;
             }
 
-            GetObservationResponse response = getDao().getObservation(sosRequest);
+            final GetObservationResponse response = getDao().getObservation(sosRequest);
             // TODO check for correct merging, add merge if swes:extension is set
             if ((!responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2)) || Configurator.getInstance().getProfileHandler().getActiveProfile().isMergeValues()) {
                 response.mergeObservationsWithSameX();
@@ -107,42 +107,42 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
             Encoder<XmlObject, GetObservationResponse> encoder;
             try {
                 encoder = CodingHelper.getEncoder(namespace, response);
-            } catch (OwsExceptionReport e) {
+            } catch (final OwsExceptionReport e) {
                 throw new InvalidResponseFormatParameterException(responseFormat).causedBy(e);
             }
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            XmlObject encodedObject = encoder.encode(response);
-            String contentType = encoder.getContentType();
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            final XmlObject encodedObject = encoder.encode(response);
+            final String contentType = encoder.getContentType();
             encodedObject.save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
             return new ServiceResponse(baos, contentType, zipCompression, true);
-        } catch (IOException ioe) {
+        } catch (final IOException ioe) {
             throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
 
     }
 
-    private void checkRequestedParameters(GetObservationRequest sosRequest) throws OwsExceptionReport {
-        CompositeOwsException exceptions = new CompositeOwsException();
+    private void checkRequestedParameters(final GetObservationRequest sosRequest) throws OwsExceptionReport {
+        final CompositeOwsException exceptions = new CompositeOwsException();
         try {
             checkServiceParameter(sosRequest.getService());
-        } catch (OwsExceptionReport owse) {
+        } catch (final OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
             checkSingleVersionParameter(sosRequest);
-        } catch (OwsExceptionReport owse) {
+        } catch (final OwsExceptionReport owse) {
             exceptions.add(owse);
         }
 
         try {
             checkOfferingId(sosRequest.getOfferings());
-        } catch (OwsExceptionReport owse) {
+        } catch (final OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
             checkObservedProperties(sosRequest.getObservedProperties());
-        } catch (OwsExceptionReport owse) {
+        } catch (final OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
@@ -151,19 +151,22 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
             if (sosRequest.isSetProcedure()) {
                 sosRequest.setProcedures(addChildProcedures(sosRequest.getProcedures()));
             }
-        } catch (OwsExceptionReport owse) {
+        } catch (final OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
             checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(),
                                               SosConstants.GetObservationParams.featureOfInterest.name());
-        } catch (OwsExceptionReport owse) {
+            if (sosRequest.isSetFeatureOfInterest()) {
+            	sosRequest.setProcedures(addChildFeatures(sosRequest.getFeatureIdentifiers()));
+            }
+        } catch (final OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
             checkSpatialFilter(sosRequest.getSpatialFilter(),
                     SosConstants.GetObservationParams.featureOfInterest.name());
-        } catch (OwsExceptionReport owse) {
+        } catch (final OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
@@ -175,18 +178,18 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
                 if (Configurator.getInstance().getProfileHandler().getActiveProfile()
                         .isReturnLatestValueIfTemporalFilterIsMissingInGetObservation()) {
                     // TODO check this for pofile
-                    List<TemporalFilter> filters = new ArrayList<TemporalFilter>(1);
-                    TemporalFilter filter = new TemporalFilter();
+                    final List<TemporalFilter> filters = new ArrayList<TemporalFilter>(1);
+                    final TemporalFilter filter = new TemporalFilter();
                     filter.setOperator(TimeOperator.TM_Equals);
                     filter.setValueReference("phenomenonTime");
-                    TimeInstant timeInstant = new TimeInstant();
+                    final TimeInstant timeInstant = new TimeInstant();
                     timeInstant.setIndeterminateValue(SosConstants.FirstLatest.latest.name());
                     filter.setTime(timeInstant);
                     filters.add(filter);
                     sosRequest.setTemporalFilters(filters);
                 }
             }
-        } catch (OwsExceptionReport owse) {
+        } catch (final OwsExceptionReport owse) {
             exceptions.add(owse);
         }
 
@@ -206,7 +209,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
     }
 
     @Setting(CoreProfileOperatorSettings.BLOCK_GET_OBSERVATION_REQUESTS_WITHOUT_RESTRICTION)
-    public void setBlockRequestsWithoutRestriction(boolean blockRequestsWithoutRestriction) {
+    public void setBlockRequestsWithoutRestriction(final boolean blockRequestsWithoutRestriction) {
         this.blockRequestsWithoutRestriction = blockRequestsWithoutRestriction;
     }
 
@@ -223,12 +226,12 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
      *
      * @throws OwsExceptionReport * if the parameter does not containing any matching     *             observedProperty for the requested offering
      */
-    private void checkObservedProperties(List<String> observedProperties) throws OwsExceptionReport {
+    private void checkObservedProperties(final List<String> observedProperties) throws OwsExceptionReport {
         if (observedProperties != null) {
-            CompositeOwsException exceptions = new CompositeOwsException();
-            Collection<String> validObservedProperties =
+            final CompositeOwsException exceptions = new CompositeOwsException();
+            final Collection<String> validObservedProperties =
                                Configurator.getInstance().getCache().getObservableProperties();
-            for (String obsProp : observedProperties) {
+            for (final String obsProp : observedProperties) {
                 if (obsProp.isEmpty()) {
                     exceptions.add(new MissingObservedPropertyParameterException());
                 } else {
@@ -252,15 +255,15 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
      *
      * @throws OwsExceptionReport * if the passed offeringId is not supported
      */
-    private void checkOfferingId(List<String> offeringIds) throws OwsExceptionReport {
+    private void checkOfferingId(final List<String> offeringIds) throws OwsExceptionReport {
         if (offeringIds != null) {
-            Set<String> offerings = Configurator.getInstance().getCache().getOfferings();
-            CompositeOwsException exceptions = new CompositeOwsException();
-            for (String offeringId : offeringIds) {
+            final Set<String> offerings = Configurator.getInstance().getCache().getOfferings();
+            final CompositeOwsException exceptions = new CompositeOwsException();
+            for (final String offeringId : offeringIds) {
                 if (offeringId == null || offeringId.isEmpty()) {
                     exceptions.add(new MissingOfferingParameterException());
                 } else if (offeringId.contains(SosConstants.SEPARATOR_4_OFFERINGS)) {
-                    String[] offArray = offeringId.split(SosConstants.SEPARATOR_4_OFFERINGS);
+                    final String[] offArray = offeringId.split(SosConstants.SEPARATOR_4_OFFERINGS);
                     if (!offerings.contains(offArray[0])
                         || !Configurator.getInstance().getCache()
                             .getProceduresForOffering(offArray[0]).contains(offArray[1])) {
@@ -275,15 +278,15 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
         }
     }
 
-    private boolean checkForObservationAndMeasurementV20Type(String responseFormat) throws OwsExceptionReport {
-        Encoder<XmlObject, OmObservation> encoder = CodingHelper.getEncoder(responseFormat, new OmObservation());
+    private boolean checkForObservationAndMeasurementV20Type(final String responseFormat) throws OwsExceptionReport {
+        final Encoder<XmlObject, OmObservation> encoder = CodingHelper.getEncoder(responseFormat, new OmObservation());
         if (encoder instanceof ObservationEncoder) {
-            return ((ObservationEncoder) encoder).isObservationAndMeasurmentV20Type();
+            return ((ObservationEncoder<?,?>) encoder).isObservationAndMeasurmentV20Type();
         }
         return false;
     }
 
-    private boolean checkResponseFormat(GetObservationRequest request) throws OwsExceptionReport {
+    private boolean checkResponseFormat(final GetObservationRequest request) throws OwsExceptionReport {
         boolean zipCompression = false;
         if (request.getResponseFormat() == null) {
             request.setResponseFormat(Configurator.getInstance().getProfileHandler().getActiveProfile()
@@ -296,7 +299,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
                 request.setResponseFormat(Configurator.getInstance().getProfileHandler().getActiveProfile()
                         .getObservationResponseFormat());
             } else {
-                Collection<String> supportedResponseFormats = CodingRepository.getInstance()
+                final Collection<String> supportedResponseFormats = CodingRepository.getInstance()
                         .getSupportedResponseFormats(request.getService(), request.getVersion());
                 if (!supportedResponseFormats.contains(request.getResponseFormat())) {
                     throw new InvalidResponseFormatParameterException(request.getResponseFormat());
