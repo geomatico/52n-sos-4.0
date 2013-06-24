@@ -109,6 +109,13 @@ public interface FeatureQueryHandler {
     SosEnvelope getEnvelopeForFeatureIDs(Collection<String> featureIDs, Object connection) throws
             OwsExceptionReport;
     
+    /**
+     * FIXME Add javadoc to clarify the semantics of this method
+     * @param samplingFeature
+     * @param connection
+     * @return
+     * @throws OwsExceptionReport
+     */
     String insertFeature(SamplingFeature samplingFeature, Object connection) throws OwsExceptionReport;
 
     int getDefaultEPSG();
