@@ -638,4 +638,12 @@ public interface ContentCache extends Serializable {
      * @return {@code true} if it exists
      */
     boolean hasEpsgCode(Integer epsgCode);
+    
+    /**
+     * Checks whether the specified related feature has been used as sampling feature
+     * 
+     * @param relatedFeatureIdentifier the relatedFeature identifier
+     * @return <tt>true</tt>, if the relatedFeature is related to any feature which is part of an observation.
+     */
+    boolean isRelatedFeatureSampled(String relatedFeatureIdentifier);
 }
