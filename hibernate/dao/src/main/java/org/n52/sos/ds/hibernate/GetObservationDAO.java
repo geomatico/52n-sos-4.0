@@ -222,7 +222,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
     }
 
     protected List<OmObservation> toSosObservation(final Collection<Observation> observations, final String version,
-            String resultModel, final Session session) throws OwsExceptionReport {
+            final String resultModel, final Session session) throws OwsExceptionReport {
         if (!observations.isEmpty()) {
             final long startProcess = System.currentTimeMillis();
             final List<OmObservation> sosObservations =
