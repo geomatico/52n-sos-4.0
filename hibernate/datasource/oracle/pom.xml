@@ -21,11 +21,9 @@
 			<artifactId>hibernate-common</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>oracle</groupId>
+			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
-			<version>oracle</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/ojdbc6.jar</systemPath>
+			<version>11.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
