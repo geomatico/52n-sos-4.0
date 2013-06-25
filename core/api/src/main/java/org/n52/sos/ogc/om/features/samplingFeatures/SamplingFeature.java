@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ogc.om.features.samplingFeatures;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.NamedValue;
 import org.n52.sos.ogc.om.features.AbstractFeature;
+import org.n52.sos.util.CollectionHelper;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -61,6 +63,8 @@ public class SamplingFeature extends AbstractFeature {
     private final List<NamedValue<?>> parameters = new LinkedList<NamedValue<?>>();
 
     private boolean encode = true;
+
+	private Collection<SamplingFeatureComplex> relatedSamplingFeatures;
 
     /**
      * constructor
@@ -151,7 +155,7 @@ public class SamplingFeature extends AbstractFeature {
     }
 
     public boolean isSetNames() {
-        return name != null && !name.isEmpty();
+        return CollectionHelper.isNotEmpty(name);
     }
 
     public CodeType getFirstName() {
@@ -162,7 +166,7 @@ public class SamplingFeature extends AbstractFeature {
     }
 
     public boolean isSetSampledFeatures() {
-        return sampledFeatures != null && !sampledFeatures.isEmpty();
+        return CollectionHelper.isNotEmpty(sampledFeatures);
     }
 
     public boolean isSetUrl() {
@@ -186,7 +190,7 @@ public class SamplingFeature extends AbstractFeature {
     }
 
     public boolean isSetParameter() {
-        return parameters != null && !parameters.isEmpty();
+        return CollectionHelper.isNotEmpty(parameters);
     }
 
     public boolean isEncode() {
@@ -197,12 +201,42 @@ public class SamplingFeature extends AbstractFeature {
         this.encode = encode;
     }
 
+	public void addRelatedSamplingFeature(final SamplingFeatureComplex relatedSamplingFeature)
+	{
+		if (!isSetRelatedSamplingFeatures()) {
+			relatedSamplingFeatures = CollectionHelper.set();
+		}
+		if (relatedSamplingFeature != null) {
+			relatedSamplingFeatures.add(relatedSamplingFeature);
+		}
+	}
+	
+	public void addAllRelatedSamplingFeatures(final Collection<SamplingFeatureComplex> relatedSamplingFeatures) {
+		if (isSetRelatedSamplingFeatures()) {
+			this.relatedSamplingFeatures.addAll(relatedSamplingFeatures);
+		} else {
+			this.relatedSamplingFeatures = relatedSamplingFeatures;
+		}
+	}
+	
+	public void setRelatedSamplingFeatures(final Collection<SamplingFeatureComplex> relatedSamplingFeatures) {
+		this.relatedSamplingFeatures = relatedSamplingFeatures;
+	}
+	
+	public List<SamplingFeatureComplex> getRelatedSamplingFeatures(){
+		return CollectionHelper.asList(relatedSamplingFeatures);
+	}
+	
+	public boolean isSetRelatedSamplingFeatures() {
+		return CollectionHelper.isNotEmpty(relatedSamplingFeatures);
+	}
+
 	@Override
 	public String toString()
 	{
 		return String.format(
-				"SamplingFeature [name=%s, description=%s, xmlDescription=%s, geometry=%s, featureType=%s, url=%s, sampledFeatures=%s, parameters=%s, encode=%s, getIdentifier()=%s, getGmlId()=%s]",
-				name, description, xmlDescription, geometry, featureType, url, sampledFeatures, parameters, encode, getIdentifier(), getGmlId());
+				"SamplingFeature [name=%s, description=%s, xmlDescription=%s, geometry=%s, featureType=%s, url=%s, sampledFeatures=%s, parameters=%s, encode=%s, relatedSamplingFeatures=%s]", name,
+				description, xmlDescription, geometry, featureType, url, sampledFeatures, parameters, encode, relatedSamplingFeatures);
 	}
 
 }
