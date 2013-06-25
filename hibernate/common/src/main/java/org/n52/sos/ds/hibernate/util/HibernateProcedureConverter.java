@@ -222,7 +222,6 @@ public class HibernateProcedureConverter {
 		// enrich according to OGC#09-033 Profile for sensor discovery
 		if (procedureSettings().isEnrichWithDiscoveryInformation() && procedureDescription instanceof AbstractSensorML)
 		{
-			// TODO Eike: implement enrichment according OGC#09-033 and move already implemented stuff from ProcedureConverter to this class
 			if (procedureDescription instanceof AbstractSensorML)
 			{
 				final AbstractSensorML abstractSensorML = (AbstractSensorML)procedureDescription;

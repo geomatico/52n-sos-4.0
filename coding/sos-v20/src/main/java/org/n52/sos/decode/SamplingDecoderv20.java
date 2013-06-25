@@ -183,7 +183,6 @@ public class SamplingDecoderv20 implements Decoder<AbstractFeature, XmlObject> {
                 } else {
                     final SamplingFeature sampFeat = new SamplingFeature(new CodeWithAuthority(sampledFeature.getHref()));
                     if (sampledFeature.getTitle() != null && !sampledFeature.getTitle().isEmpty()) {
-                        
                         sampFeat.addName(new CodeType(sampledFeature.getTitle()));
                     }
                     sampledFeatures.add(sampFeat);

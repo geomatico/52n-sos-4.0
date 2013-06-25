@@ -50,6 +50,7 @@ import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
 import org.n52.sos.ogc.OGCConstants;
+import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -300,13 +301,11 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
 
             final FeaturePropertyType fpt = relatedFeature.getFeatureRelationship().getTarget();
             if (fpt.getHref() != null && !fpt.getHref().isEmpty()) {
-                String identifier;
-                if (fpt.getTitle() != null && !fpt.getTitle().isEmpty()) {
-                    identifier = fpt.getTitle();
-                } else {
-                    identifier = fpt.getHref();
-                }
+                final String identifier = fpt.getHref();
                 final SamplingFeature feature = new SamplingFeature(new CodeWithAuthority(identifier));
+                if (fpt.getTitle() != null && !fpt.getTitle().isEmpty()) {
+                   feature.setName(CollectionHelper.asList(new CodeType(fpt.getTitle())));
+                }
                 if (checkForRequestUrl(fpt.getHref())) {
                     feature.setUrl(fpt.getHref());
                 }

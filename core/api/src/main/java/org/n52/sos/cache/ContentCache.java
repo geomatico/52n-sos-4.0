@@ -558,7 +558,7 @@ public interface ContentCache extends Serializable {
      * and including itself.
      *
      * @param featuresOfInterest the feature id's to find parents for
-     * @param fullHierarchy      whether or not to navigate the full feature hierarchy
+     * @param fullHierarchy      whether or not to traverse the full feature hierarchy in one direction starting from <tt>featureOfInterest</tt>
      * @param includeSelves      whether or not to include the passed feature id's in the result
      *
      * @return a set containing the passed procedure id's parents (and optionally itself)
@@ -570,7 +570,7 @@ public interface ContentCache extends Serializable {
      * including itself.
      *
      * @param featureOfInterest feature id to find children for
-     * @param fullHierarchy     whether or not to navigate the full feature hierarchy
+     * @param fullHierarchy     whether or not to traverse the full feature hierarchy in one direction starting from <tt>featureOfInterest</tt>
      * @param includeSelf       whether or not to include the passed feature id in the result
      *
      * @return Collection<String> containing the passed feature id's children (and optionally itself)
@@ -582,7 +582,7 @@ public interface ContentCache extends Serializable {
      * hierarchy and including itself.
      *
      * @param procedure     the procedure id to find parents for
-     * @param fullHierarchy whether or not to navigate the full procedure hierarchy
+     * @param fullHierarchy whether or not to traverse the full procedure hierarchy in one direction starting from <tt>procedure</tt>
      * @param includeSelf   whether or not to include the passed procedure id in the result
      *
      * @return a set containing the passed procedure id's parents (and optionally itself)
@@ -594,7 +594,7 @@ public interface ContentCache extends Serializable {
      * hierarchy and including itself.
      *
      * @param procedures    the procedure id's to find parents for
-     * @param fullHierarchy whether or not to navigate the full procedure hierarchy
+     * @param fullHierarchy whether or not to traverse the full procedure hierarchy in one direction starting from <tt>procedure</tt>
      * @param includeSelves whether or not to include the passed procedure id in the result
      *
      * @return a set containing the passed procedure id's parents (and optionally itself)
@@ -638,4 +638,12 @@ public interface ContentCache extends Serializable {
      * @return {@code true} if it exists
      */
     boolean hasEpsgCode(Integer epsgCode);
+    
+    /**
+     * Checks whether the specified related feature has been used as sampling feature
+     * 
+     * @param relatedFeatureIdentifier the relatedFeature identifier
+     * @return <tt>true</tt>, if the relatedFeature is related to any feature which is part of an observation.
+     */
+    boolean isRelatedFeatureSampled(String relatedFeatureIdentifier);
 }

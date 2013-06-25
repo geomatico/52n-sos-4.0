@@ -193,6 +193,12 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.n52.sos.ds.FeatureQueryHandler#insertFeature(org.n52.sos.ogc.om.features.samplingFeatures.SamplingFeature, java.lang.Object)
+     * 
+     * FIXME check semantics of this method in respect to its name and the documentation in the super class
+     */
     @Override
     public String insertFeature(final SamplingFeature samplingFeature, final Object connection) throws OwsExceptionReport {
         if (isFeatureReferenced(samplingFeature)) {
