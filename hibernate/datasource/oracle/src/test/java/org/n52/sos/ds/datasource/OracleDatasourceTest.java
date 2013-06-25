@@ -22,12 +22,13 @@ public class OracleDatasourceTest extends TestCase {
 	private static final String SOS_TEST_CONF = "SOS_TEST_CONF";
 	private static final String ORACLE_HOST = "oracle_host";
 	private static final String ORACLE_PORT = "oracle_port";
+	private static final String ORACLE_SCHEMA = "oracle_schema";
 	private static final String ORACLE_USER = "oracle_user";
 	private static final String ORACLE_PASS = "oracle_pass";
 	private static final String ORACLE_USER_NO_RIGHTS = "oracle_user_no_rights";
 	private static final String ORACLE_PASS_NO_RIGHTS = "oracle_pass_no_rights";
 
-	private static String host, user, pass, userNoRights, passNoRights;
+	private static String host, user, pass, schema, userNoRights, passNoRights;
 	private static int port;
 
 	static {
@@ -50,6 +51,7 @@ public class OracleDatasourceTest extends TestCase {
 
 		host = props.getProperty(ORACLE_HOST);
 		port = Integer.parseInt(props.getProperty(ORACLE_PORT));
+		schema = props.getProperty(ORACLE_SCHEMA);
 		user = props.getProperty(ORACLE_USER);
 		pass = props.getProperty(ORACLE_PASS);
 		userNoRights = props.getProperty(ORACLE_USER_NO_RIGHTS);
@@ -76,6 +78,7 @@ public class OracleDatasourceTest extends TestCase {
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
+
 		if (stmt != null && !stmt.isClosed()) {
 			stmt.close();
 		}
@@ -148,30 +151,14 @@ public class OracleDatasourceTest extends TestCase {
 		assertEquals("db", parsed[2]);
 	}
 
-	public void testTestData() throws Exception {
-		assertTrue(ds.supportsTestData());
-		try {
-			ds.removeTestData(null);
-			fail();
-		} catch (UnsupportedOperationException e) {
-		}
-	}
-
-	public void testClear() throws Exception {
-		assertFalse(ds.supportsClear());
-		try {
-			ds.clear(null);
-			fail();
-		} catch (UnsupportedOperationException e) {
-		}
-	}
-
-	private Map<String, Object> getDefaultSettings() {
+	private static Map<String, Object> getDefaultSettings() {
 		Map<String, Object> settings = new HashMap<String, Object>();
 		settings.put(AbstractHibernateDatasource.HOST_KEY, host);
 		settings.put(AbstractHibernateDatasource.PORT_KEY, port);
 		settings.put(AbstractHibernateDatasource.USERNAME_KEY, user);
 		settings.put(AbstractHibernateDatasource.PASSWORD_KEY, pass);
+		settings.put(AbstractHibernateDatasource.SCHEMA_KEY, schema);
+		settings.put(AbstractHibernateDatasource.TRANSACTIONAL_KEY, true);
 		return settings;
 	}
 }

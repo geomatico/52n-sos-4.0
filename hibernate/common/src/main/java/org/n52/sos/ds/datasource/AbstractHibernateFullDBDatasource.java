@@ -8,10 +8,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.hibernate.Session;
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
 import org.n52.sos.config.settings.StringSettingDefinition;
+import org.n52.sos.ds.ConnectionProvider;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
+import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CollectionHelper;
 
 public abstract class AbstractHibernateFullDBDatasource extends
@@ -175,6 +179,54 @@ public abstract class AbstractHibernateFullDBDatasource extends
 
 	private String getDialectClass() {
 		return createDialect().getClass().getCanonicalName();
+	}
+
+	@Override
+	public boolean supportsTestData() {
+		return true;
+	}
+
+	@Override
+	public void insertTestData(Map<String, Object> settings) {
+		insertTestData(Configurator.getInstance().getDataConnectionProvider());
+	}
+
+	@Override
+	public void insertTestData(Properties settings) {
+		insertTestData(Configurator.getInstance().getDataConnectionProvider());
+	}
+
+	protected void insertTestData(ConnectionProvider connectionProvider) {
+		Session session;
+		try {
+			session = (Session) connectionProvider.getConnection();
+		} catch (ConnectionProviderException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		try {
+			HibernateTestDataHandler.insertTestData(session);
+			Configurator.getInstance().getCacheController().update();
+		} catch (Exception e) {
+			throw new RuntimeException("An error has occurred while "
+					+ "inserting test data!", e);
+		} finally {
+			if (session != null) {
+				Configurator.getInstance().getDataConnectionProvider()
+						.returnConnection(session);
+			}
+		}
+	}
+
+	@Override
+	public boolean isTestDataPresent(Properties settings) {
+		return HibernateTestDataHandler.hasTestData();
+	}
+
+	@Override
+	public void removeTestData(Properties settings) {
+		throw new UnsupportedOperationException(getClass().getCanonicalName()
+				+ ".removeTestData() not yet implemented");
 	}
 
 	/**

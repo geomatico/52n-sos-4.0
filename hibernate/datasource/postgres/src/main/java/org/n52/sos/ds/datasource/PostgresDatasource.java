@@ -93,12 +93,6 @@ public class PostgresDatasource extends AbstractHibernateFullDBDatasource {
     }
 
     @Override
-    public boolean supportsTestData() {
-        // FIXME
-        return false;
-    }
-
-    @Override
     public boolean checkSchemaCreation(Map<String, Object> settings) {
         Connection conn = null;
         Statement stmt = null;
@@ -219,45 +213,4 @@ public class PostgresDatasource extends AbstractHibernateFullDBDatasource {
             }
         }
     }
-
-    @Override
-    public void insertTestData(Map<String, Object> settings) {
-        /*
-         * TODO implement
-         * org.n52.sos.ds.datasource.PostgresDatasource.insertTestData()
-         */
-        throw new UnsupportedOperationException(
-                "org.n52.sos.ds.datasource.PostgresDatasource.insertTestData() not yet implemented");
-    }
-
-    @Override
-    public void insertTestData(Properties settings) {
-        /*
-         * TODO implement
-         * org.n52.sos.ds.datasource.PostgresDatasource.insertTestData()
-         */
-        throw new UnsupportedOperationException(
-                "org.n52.sos.ds.datasource.PostgresDatasource.insertTestData() not yet implemented");
-    }
-
-    @Override
-    public boolean isTestDataPresent(Properties settings) {
-        /*
-         * TODO implement
-         * org.n52.sos.ds.datasource.PostgresDatasource.isTestDataPresent()
-         */
-        throw new UnsupportedOperationException(
-                "org.n52.sos.ds.datasource.PostgresDatasource.isTestDataPresent() not yet implemented");
-    }
-
-    @Override
-    public void removeTestData(Properties settings) {
-        /*
-         * TODO implement
-         * org.n52.sos.ds.datasource.PostgresDatasource.removeTestData()
-         */
-        throw new UnsupportedOperationException(
-                "org.n52.sos.ds.datasource.PostgresDatasource.removeTestData() not yet implemented");
-    }
-
 }
