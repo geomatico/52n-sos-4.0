@@ -577,6 +577,7 @@ public class SosHelper {
         }
     }
 
+    @Deprecated
     public static void checkSection(List<String> sections) throws CodedException {
         for (String section : sections) {
             if (section == null || section.isEmpty()) {
