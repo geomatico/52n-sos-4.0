@@ -180,8 +180,8 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         } else {
             throw new UnsupportedEncoderInputException(this, element);
         }
-        LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
-                XmlHelper.validateDocument(encodedObject));
+//        LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
+//                XmlHelper.validateDocument(encodedObject));
         return encodedObject;
     }
 

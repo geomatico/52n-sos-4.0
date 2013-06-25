@@ -135,8 +135,8 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
         XmlObject encodedObject = null;
         if (element instanceof org.n52.sos.ogc.filter.FilterCapabilities) {
             encodedObject = encodeFilterCapabilities((org.n52.sos.ogc.filter.FilterCapabilities) element);
-            LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
-                    XmlHelper.validateDocument(encodedObject));
+//            LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
+//                    XmlHelper.validateDocument(encodedObject));
         } else if (element instanceof TemporalFilter) {
             encodedObject = encodeTemporalFilter((TemporalFilter) element);
         } else if (element instanceof SpatialFilter) {

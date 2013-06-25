@@ -152,8 +152,8 @@ public abstract class AbstractOmEncoderv20 implements ObservationEncoder<XmlObje
         } else {
             throw new UnsupportedEncoderInputException(this, element);
         }
-        LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
-                XmlHelper.validateDocument(encodedObject));
+//        LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
+//                XmlHelper.validateDocument(encodedObject));
         return encodedObject;
     }
 
