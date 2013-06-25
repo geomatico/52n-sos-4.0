@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.n52.sos.ogc.om.features.FeatureCollection;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.OwsOperation;
 import org.n52.sos.ogc.sos.Sos1Constants;
@@ -82,31 +83,45 @@ public abstract class AbstractGetFeatureOfInterestDAO extends AbstractOperationD
             throws OwsExceptionReport;
     
     protected boolean isRelatedFeature(final String featureIdentifier) {
-        final Set<String> relatedFeatures = getCache().getRelatedFeatures();
-        return relatedFeatures.contains(featureIdentifier);
+        return getCache().getRelatedFeatures().contains(featureIdentifier);
     }
     
-    protected Set<String> checkFeatureIdentifiersForRelatedFeatures(final List<String> featureIdentifiers) {
+    protected Set<String> getFeatureIdentifiers(final List<String> featureIdentifiers) {
         final Set<String> allFeatureIdentifiers = new HashSet<String>();
         for (final String featureIdentifier : featureIdentifiers) {
             if (isRelatedFeature(featureIdentifier)) {
-                allFeatureIdentifiers.addAll(getFeatureIdentifierForRelatedFeature(featureIdentifier));
+                allFeatureIdentifiers.addAll(getCache().getChildFeatures(featureIdentifier, true, true));
             } else {
                 allFeatureIdentifiers.add(featureIdentifier);
             }
         }
         return allFeatureIdentifiers;
     }
-
-    protected Collection<? extends String> getFeatureIdentifierForRelatedFeature(final String featureIdentifier) {
-        final Set<String> featureIdentifiers = new HashSet<String>();
-        // FIXME change to get only the features related to related feature, e.g. feature hierarchy
-        final Set<String> offerings = getCache().getOfferings();
-        for (final String offering : offerings) {
-            if (getCache().getRelatedFeaturesForOffering(offering).contains(featureIdentifier)) {
-                featureIdentifiers.addAll(getCache().getFeaturesOfInterestForOffering(offering));
-            }
-        }
-        return featureIdentifiers;
+    
+    /**
+     * TODO add javadoc
+     * @param request
+     * @param featuresToProcess
+     * @return
+     */
+	protected FeatureCollection processRelatedFeatures(final GetFeatureOfInterestRequest request, final FeatureCollection featuresToProcess) {
+        // TODO Eike: relatedFeatures: compare feature collection with request
+//        final Collection<String> relatedFeatureIdentifiers = null;
+//        if (request.isSetFeatureOfInterestIdentifiers() && relatedFeatureIdentifiers != null) {
+//            // for each f in featureCollection
+//            for (final AbstractFeature abstractFeature : featuresToProcess.getMembers().values()) {
+//				
+//            	// is f is child of requested relatedFeature
+//            		// true: add to list for relatedFeature
+//            		// false: nothing()
+//            	// is f requested
+//                    // true: keep
+//                    // false: skip
+//            }
+//            // for each rf in relatedFeatures
+//            	// create sampling feature with relatedSF with role "isSampledAt" <-- get from settings
+//        }
+    	return featuresToProcess;
     }
+
 }
