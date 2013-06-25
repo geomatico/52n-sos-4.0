@@ -101,7 +101,7 @@ public class ServiceConfiguration {
     /**
      * boolean indicates, whether SOS supports quality information in observations.
      */
-    private boolean supportsQuality = true;
+    private final boolean supportsQuality = true;
     /**
      * token separator for result element.
      */
@@ -110,6 +110,8 @@ public class ServiceConfiguration {
      * tuple separator for result element.
      */
     private String tupleSeparator;
+
+	private String relatedSamplingFeatureRoleForChildFeatures;
     /**
      * Returns the default token seperator for results.
      * <p/>
@@ -317,5 +319,19 @@ public class ServiceConfiguration {
         }
         srsNamePrefixSosV2 = prefix;
     }
+
+    @Setting(MiscSettings.RELATED_SAMPLING_FEATURE_ROLE_FOR_CHILD_FEATURES)
+    public void setRelatedSamplingFeatureRoleForChildFeatures(final String relatedSamplingFeatureRoleForChildFeatures) 
+    {
+    	Validation.notNullOrEmpty(
+    			MiscSettings.RELATED_SAMPLING_FEATURE_ROLE_FOR_CHILD_FEATURES,
+    			relatedSamplingFeatureRoleForChildFeatures);
+    	this.relatedSamplingFeatureRoleForChildFeatures = relatedSamplingFeatureRoleForChildFeatures;
+    }
+    
+	public String getRelatedSamplingFeatureRoleForChildFeatures()
+	{
+		return relatedSamplingFeatureRoleForChildFeatures;
+	}
     
 }

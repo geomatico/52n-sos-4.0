@@ -52,6 +52,7 @@ public class MiscSettings implements SettingDefinitionProvider {
     public static final String DEFAULT_OBSERVABLEPROPERTY_PREFIX = "misc.defaultObservablePropertyPrefix";
     public static final String DEFAULT_FEATURE_PREFIX = "misc.defaultFeaturePrefix";
     public static final String HTTP_STATUS_CODE_USE_IN_KVP_POX_BINDING = "misc.httpResponseCodeUseInKvpAndPoxBinding";
+    public static final String RELATED_SAMPLING_FEATURE_ROLE_FOR_CHILD_FEATURES = "misc.relatedSamplingFeatureRoleForChildFeatures";
     
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
             .setTitle("Miscellaneous").setOrder(3);
@@ -63,6 +64,7 @@ public class MiscSettings implements SettingDefinitionProvider {
             .setDefaultValue(",")
             .setTitle("Token separator")
             .setDescription("Token separator in result element (a character)");
+    
     public static final StringSettingDefinition TUPLE_SEPERATOR_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(0)
@@ -70,6 +72,7 @@ public class MiscSettings implements SettingDefinitionProvider {
             .setDefaultValue(";")
             .setTitle("Tuple separator")
             .setDescription("Tuple separator in result element (a character)");
+    
     public static final StringSettingDefinition GML_DATE_FORMAT_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(1)
@@ -77,6 +80,7 @@ public class MiscSettings implements SettingDefinitionProvider {
             .setOptional(true)
             .setTitle("Date format of GML")
             .setDescription("Date format of Geography Markup Language");
+    
     public static final StringSettingDefinition SRS_NAME_PREFIX_SOS_V1_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(2)
@@ -84,6 +88,7 @@ public class MiscSettings implements SettingDefinitionProvider {
             .setDefaultValue("urn:ogc:def:crs:EPSG::")
             .setTitle("SOSv1 SRS Prefix")
             .setDescription("Prefix for the SRS name in SOS v1.0.0.");
+    
     public static final StringSettingDefinition SRS_NAME_PREFIX_SOS_V2_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(3)
@@ -91,6 +96,7 @@ public class MiscSettings implements SettingDefinitionProvider {
             .setDefaultValue("http://www.opengis.net/def/crs/EPSG/0/")
             .setTitle("SOSv2 SRS Prefix")
             .setDescription("Prefix for the SRS name in SOS v2.0.0.");
+    
     public static final StringSettingDefinition CHARACTER_ENCODING_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(5)
@@ -139,6 +145,14 @@ public class MiscSettings implements SettingDefinitionProvider {
     		.setTitle("Use HTTP Status Codes in KVP and POX Binding?")
     		.setDescription("Should the response returned by KVP and POX binding use the exception specific HTTP status code or always <tt>HTTP 200 - OK</tt>.");
     
+    public static final StringSettingDefinition RELATED_SAMPLING_FEATURE_ROLE_FOR_CHILD_FEATURES_DEFINITION = new StringSettingDefinition()
+            .setGroup(GROUP)
+            .setKey(RELATED_SAMPLING_FEATURE_ROLE_FOR_CHILD_FEATURES)
+            .setDefaultValue("isSampledAt")
+            .setTitle("Role for childs of related features")
+            .setDescription("The value for the role of an child feature. It is used when a related feature is already sampled at the child feature")
+            .setOrder(13);
+    
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
             TOKEN_SEPERATOR_DEFINITION,
             TUPLE_SEPERATOR_DEFINITION,
@@ -150,8 +164,9 @@ public class MiscSettings implements SettingDefinitionProvider {
             DEFAULT_OBSERVABLEPROPERTY_PREFIX_DEFINITION,
             DEFAULT_FEATURE_PREFIX_DEFINITION,
             CHARACTER_ENCODING_DEFINITION,
-            HTTP_STATUS_CODE_USE_IN_KVP_POX_BINDING_DEFINITION);
-
+            HTTP_STATUS_CODE_USE_IN_KVP_POX_BINDING_DEFINITION,
+            RELATED_SAMPLING_FEATURE_ROLE_FOR_CHILD_FEATURES_DEFINITION);
+    
     @Override
     public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
         return Collections.unmodifiableSet(DEFINITIONS);
