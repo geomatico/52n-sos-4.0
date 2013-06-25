@@ -40,10 +40,13 @@ import net.opengis.gml.x32.EnvelopeType;
 import net.opengis.gml.x32.FeatureCollectionDocument;
 import net.opengis.gml.x32.FeatureCollectionType;
 import net.opengis.gml.x32.FeaturePropertyType;
+import net.opengis.gml.x32.LineStringDocument;
 import net.opengis.gml.x32.LineStringType;
 import net.opengis.gml.x32.LinearRingType;
 import net.opengis.gml.x32.MeasureType;
+import net.opengis.gml.x32.PointDocument;
 import net.opengis.gml.x32.PointType;
+import net.opengis.gml.x32.PolygonDocument;
 import net.opengis.gml.x32.PolygonType;
 import net.opengis.gml.x32.ReferenceType;
 import net.opengis.gml.x32.TimeInstantDocument;
@@ -155,27 +158,31 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
 
     @Override
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+        XmlObject encodedObject = null;
         if (element instanceof Time) {
-            return createTime((Time) element, additionalValues);
+            encodedObject = createTime((Time) element, additionalValues);
         } else if (element instanceof Geometry) {
-            return createPosition((Geometry) element, additionalValues.get(HelperValues.GMLID));
+            encodedObject = createPosition((Geometry) element, additionalValues);
         } else if (element instanceof CategoryValue) {
-            return createReferenceTypeForCategroyValue((CategoryValue) element);
+            encodedObject = createReferenceTypeForCategroyValue((CategoryValue) element);
         } else if (element instanceof org.n52.sos.ogc.gml.ReferenceType) {
-            return createReferencType((org.n52.sos.ogc.gml.ReferenceType) element);
+            encodedObject = createReferencType((org.n52.sos.ogc.gml.ReferenceType) element);
         } else if (element instanceof CodeWithAuthority) {
-            return createCodeWithAuthorityType((CodeWithAuthority) element);
+            encodedObject = createCodeWithAuthorityType((CodeWithAuthority) element);
         } else if (element instanceof QuantityValue) {
-            return createMeasureType((QuantityValue)element);
+            encodedObject = createMeasureType((QuantityValue)element);
         } else if (element instanceof org.n52.sos.ogc.gml.CodeType) {
-            return createCodeType((org.n52.sos.ogc.gml.CodeType) element);
+            encodedObject = createCodeType((org.n52.sos.ogc.gml.CodeType) element);
         } else if (element instanceof AbstractFeature) {
-            return createFeaturePropertyType((AbstractFeature)element, additionalValues);
+            encodedObject = createFeaturePropertyType((AbstractFeature)element, additionalValues);
         } else if (element instanceof SosEnvelope) {
-            return createEnvelope((SosEnvelope)element);
+            encodedObject = createEnvelope((SosEnvelope)element);
         } else {
             throw new UnsupportedEncoderInputException(this, element);
         }
+        LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
+                XmlHelper.validateDocument(encodedObject));
+        return encodedObject;
     }
 
     private XmlObject createFeaturePropertyType(AbstractFeature feature, Map<HelperValues, String> additionalValues)
@@ -405,12 +412,17 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         return timeInstantType;
     }
 
-    private XmlObject createPosition(Geometry geom, String foiId) throws OwsExceptionReport {
-
+    private XmlObject createPosition(Geometry geom, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+        String foiId = additionalValues.get(HelperValues.GMLID);
         if (geom instanceof Point) {
             PointType xbPoint = PointType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             xbPoint.setId("point_" + foiId);
             createPointFromJtsGeometry((Point) geom, xbPoint);
+            if (additionalValues.containsKey(HelperValues.DOCUMENT)) {
+                PointDocument xbPointDoc = PointDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                xbPointDoc.setPoint(xbPoint);
+                return xbPointDoc;
+            }
             return xbPoint;
         }
 
@@ -419,6 +431,11 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
                     LineStringType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             xbLineString.setId("lineString_" + foiId);
             createLineStringFromJtsGeometry((LineString) geom, xbLineString);
+            if (additionalValues.containsKey(HelperValues.DOCUMENT)) {
+                LineStringDocument xbLineStringDoc = LineStringDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                xbLineStringDoc.setLineString(xbLineString);
+                return xbLineStringDoc;
+            }
             return xbLineString;
         }
 
@@ -426,6 +443,11 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
             PolygonType xbPolygon = PolygonType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             xbPolygon.setId("polygon_" + foiId);
             createPolygonFromJtsGeometry((Polygon) geom, xbPolygon);
+            if (additionalValues.containsKey(HelperValues.DOCUMENT)) {
+                PolygonDocument  xbPolygonDoc = PolygonDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                xbPolygonDoc.setPolygon(xbPolygon);
+                return xbPolygonDoc;
+            }
             return xbPolygon;
         } else {
             throw new UnsupportedEncoderInputException(this, geom);

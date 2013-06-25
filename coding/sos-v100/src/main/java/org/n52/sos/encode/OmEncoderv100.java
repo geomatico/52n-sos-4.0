@@ -190,16 +190,23 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
 
     @Override
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+        XmlObject encodedObject = null;
         if (element instanceof OmObservation) {
-            return createObservation((OmObservation) element, additionalValues);
+            encodedObject = createObservation((OmObservation) element, additionalValues);
         } else if (element instanceof GetObservationResponse) {
             GetObservationResponse response = (GetObservationResponse) element;
-            return createObservationCollection(response.getObservationCollection(), response.getResultModel());
+            encodedObject =
+                    createObservationCollection(response.getObservationCollection(), response.getResultModel());
         } else if (element instanceof GetObservationByIdResponse) {
             GetObservationByIdResponse response = (GetObservationByIdResponse) element;
-            return createObservationCollection(response.getObservationCollection(), response.getResultModel());
+            encodedObject =
+                    createObservationCollection(response.getObservationCollection(), response.getResultModel());
+        } else {
+            throw new UnsupportedEncoderInputException(this, element);
         }
-        throw new UnsupportedEncoderInputException(this, element);
+        LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
+                XmlHelper.validateDocument(encodedObject));
+        return encodedObject;
     }
 
     private XmlObject createObservation(OmObservation sosObservation, Map<HelperValues, String> additionalValues)
@@ -514,8 +521,7 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
      * 
      * @throws OwsExceptionReport
      */
-    private void addFeatureOfInterest(ObservationType observation, AbstractFeature feature)
-            throws OwsExceptionReport {
+    private void addFeatureOfInterest(ObservationType observation, AbstractFeature feature) throws OwsExceptionReport {
         Map<HelperValues, String> additionalValues =
                 new EnumMap<SosConstants.HelperValues, String>(HelperValues.class);
         Profile activeProfile = Configurator.getInstance().getProfileHandler().getActiveProfile();

@@ -102,7 +102,9 @@ public interface GMLConstants {
 
     String EN_ABSTRACT_TIME_GEOM_PRIM = "_TimeGeometricPrimitive";
 
-    String EN_ABSTRACT_RING = "_Ring";
+    String EN_ABSTRACT_RING_311 = "_Ring";
+    
+    String EN_ABSTRACT_RING_32 = "AbstractRing";
 
     String EN_LINEAR_RING = "LinearRing";
 
@@ -155,14 +157,14 @@ public interface GMLConstants {
     QName QN_ABSTRACT_FEATURE_COLLECTION = new QName(NS_GML, EN_ABSTRACT_FEATURE_COLLECTION,
             NS_GML_PREFIX);
 
-    QName QN_FEATURE_COLLECTION = new QName(GMLConstants.NS_GML,
+    QName QN_FEATURE_COLLECTION = new QName(NS_GML,
             OMConstants.EN_FEATURE_COLLECTION, NS_GML_PREFIX);
 
-    QName QN_ABSTRACT_RING = new QName(NS_GML, EN_ABSTRACT_RING, NS_GML_PREFIX);
+    QName QN_ABSTRACT_RING = new QName(NS_GML, EN_ABSTRACT_RING_311, NS_GML_PREFIX);
 
     QName QN_LINEAR_RING = new QName(NS_GML, EN_LINEAR_RING, NS_GML_PREFIX);
 
-    QName QN_ABSTRACT_RING_32 = new QName(NS_GML_32, EN_ABSTRACT_RING, NS_GML_PREFIX);
+    QName QN_ABSTRACT_RING_32 = new QName(NS_GML_32, EN_ABSTRACT_RING_32, NS_GML_PREFIX);
 
     QName QN_LINEAR_RING_32 = new QName(NS_GML_32, EN_LINEAR_RING, NS_GML_PREFIX);
 
@@ -171,11 +173,12 @@ public interface GMLConstants {
     QName QN_ABSTRACT_TIME_GEOM_PRIM =
             new QName(NS_GML, EN_ABSTRACT_TIME_GEOM_PRIM, NS_GML_PREFIX);
 	
-	QName QN_ABSTRACT_FEATURE_GML = new QName(GMLConstants.NS_GML, GMLConstants.EN_ABSTRACT_FEATURE, NS_GML_PREFIX);
+	QName QN_ABSTRACT_FEATURE_GML = new QName(NS_GML, EN_ABSTRACT_FEATURE, NS_GML_PREFIX);
 	
-	QName QN_ABSTRACT_FEATURE_GML_32 = new QName(GMLConstants.NS_GML_32, GMLConstants.EN_ABSTRACT_FEATURE_32, NS_GML_PREFIX);
+	QName QN_ABSTRACT_FEATURE_GML_32 = new QName(NS_GML_32, EN_ABSTRACT_FEATURE_32, NS_GML_PREFIX);
 	
-	QName QN_ABSTRACT_TIME_32 = new QName(GMLConstants.NS_GML_32, GMLConstants.EN_ABSTRACT_TIME_OBJECT_32, NS_GML_PREFIX);
+    QName QN_ABSTRACT_TIME_32 = new QName(NS_GML_32, EN_ABSTRACT_TIME_OBJECT_32, NS_GML_PREFIX);
+    
 
     /** string constant for ascending sorting order */
     String SORT_ORDER_ASC = SortingOrder.ASC.name();

@@ -72,7 +72,10 @@ import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.GmlHelper;
 import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract Observation & Measurement 2.0 encoder should be extended by all O&M
@@ -85,6 +88,8 @@ import org.n52.sos.util.XmlOptionsHelper;
  * 
  */
 public abstract class AbstractOmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOmEncoderv20.class);
 
     /**
      * Method to create the om:result element content
@@ -139,13 +144,17 @@ public abstract class AbstractOmEncoderv20 implements ObservationEncoder<XmlObje
     @Override
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport,
             UnsupportedEncoderInputException {
+        XmlObject encodedObject = null;
         if (element instanceof OmObservation) {
-            return createOmObservation((OmObservation) element, additionalValues);
+            encodedObject = createOmObservation((OmObservation) element, additionalValues);
         } else if (element instanceof NamedValue) {
-            return createNamedValue((NamedValue) element);
+            encodedObject = createNamedValue((NamedValue) element);
         } else {
             throw new UnsupportedEncoderInputException(this, element);
         }
+        LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
+                XmlHelper.validateDocument(encodedObject));
+        return encodedObject;
     }
 
     @Override

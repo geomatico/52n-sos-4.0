@@ -75,6 +75,7 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,14 +132,20 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
 
     @Override
     public XmlObject encode(final Object element, final Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+        XmlObject encodedObject = null;
         if (element instanceof org.n52.sos.ogc.filter.FilterCapabilities) {
-            return encodeFilterCapabilities((org.n52.sos.ogc.filter.FilterCapabilities) element);
+            encodedObject = encodeFilterCapabilities((org.n52.sos.ogc.filter.FilterCapabilities) element);
+            LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
+                    XmlHelper.validateDocument(encodedObject));
         } else if (element instanceof TemporalFilter) {
-            return encodeTemporalFilter((TemporalFilter) element);
+            encodedObject = encodeTemporalFilter((TemporalFilter) element);
         } else if (element instanceof SpatialFilter) {
-            return encodeSpatialFilter((SpatialFilter) element);
+            encodedObject = encodeSpatialFilter((SpatialFilter) element);
+        } else {
+            throw new UnsupportedEncoderInputException(this, element);
         }
-        throw new UnsupportedEncoderInputException(this, element);
+        return encodedObject;
+       
     }
 
     private XmlObject encodeTemporalFilter(final TemporalFilter temporalFilter) throws OwsExceptionReport {

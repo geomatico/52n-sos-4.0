@@ -62,6 +62,7 @@ import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,7 +133,10 @@ public class SamplingEncoderv100 implements Encoder<XmlObject, AbstractFeature> 
     @Override
     public XmlObject encode(AbstractFeature abstractFeature, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
-        return createFeature(abstractFeature);
+        XmlObject encodedObject = createFeature(abstractFeature);
+        LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
+                XmlHelper.validateDocument(encodedObject));
+        return encodedObject;
     }
 
     private XmlObject createFeature(AbstractFeature absFeature) throws OwsExceptionReport {

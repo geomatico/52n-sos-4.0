@@ -134,7 +134,10 @@ public class SamplingEncoderv20 implements Encoder<XmlObject, AbstractFeature> {
     @Override
     public XmlObject encode(AbstractFeature abstractFeature, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
-        return createFeature(abstractFeature);
+        XmlObject encodedObject = createFeature(abstractFeature);
+        LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
+                XmlHelper.validateDocument(encodedObject));
+        return encodedObject;
     }
 
     private XmlObject createFeature(AbstractFeature absFeature) throws OwsExceptionReport {

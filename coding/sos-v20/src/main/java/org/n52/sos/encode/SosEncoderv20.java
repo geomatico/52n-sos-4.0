@@ -180,12 +180,17 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
     @Override
     public XmlObject encode(final AbstractServiceCommunicationObject communicationObject,
             final Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+        XmlObject encodedObject = null;
         if (communicationObject instanceof AbstractServiceRequest) {
-            return encodeRequests((AbstractServiceRequest) communicationObject);
+            encodedObject = encodeRequests((AbstractServiceRequest) communicationObject);
         } else if (communicationObject instanceof AbstractServiceResponse) {
-            return encodeResponse((AbstractServiceResponse) communicationObject);
+            encodedObject = encodeResponse((AbstractServiceResponse) communicationObject);
+        } else {
+            throw new UnsupportedEncoderInputException(this, communicationObject);
         }
-        throw new UnsupportedEncoderInputException(this, communicationObject);
+        LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
+                XmlHelper.validateDocument(encodedObject));
+        return encodedObject;
     }
 
     private XmlObject encodeRequests(final AbstractServiceRequest request) throws OwsExceptionReport {
@@ -308,8 +313,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
                 xbGetFoiResponseDoc.addNewGetFeatureOfInterestResponse();
         final AbstractFeature sosAbstractFeature = response.getAbstractFeature();
         if (sosAbstractFeature instanceof FeatureCollection) {
-            final Map<String, AbstractFeature> sosFeatColMap =
-                    ((FeatureCollection) sosAbstractFeature).getMembers();
+            final Map<String, AbstractFeature> sosFeatColMap = ((FeatureCollection) sosAbstractFeature).getMembers();
             for (final String sosFeatID : sosFeatColMap.keySet()) {
                 final AbstractFeature feature = sosFeatColMap.get(sosFeatID);
                 addFeatureOfInterestGetFeatureOfInterestResponse(feature, xbGetFoiResponse);
@@ -320,6 +324,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
             }
         }
         // set schemLocation
+        XmlHelper.makeGmlIdsUnique(xbGetFoiResponseDoc.getDomNode());
         Set<SchemaLocation> schemaLocations = CollectionHelper.set();
         schemaLocations.add(Sos2Constants.SOS_GET_FEATURE_OF_INTEREST_SCHEMA_LOCATION);
         N52XmlHelper.addSchemaLocationsForTo(xbGetFoiResponseDoc, schemaLocations);

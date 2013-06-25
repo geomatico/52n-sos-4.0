@@ -87,6 +87,7 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,6 +134,10 @@ public class SweCommonDecoderV20 implements Decoder<Object, Object> {
 
     @Override
     public Object decode(Object element) throws OwsExceptionReport {
+//        if (element instanceof XmlObject) {
+//            // validate document
+//            XmlHelper.validateDocument((XmlObject)element);
+//        }
         if (element instanceof DataArrayPropertyType) {
             DataArrayPropertyType dataArrayPropertyType = (DataArrayPropertyType) element;
             return parseAbstractDataComponent(dataArrayPropertyType.getDataArray1());
@@ -471,6 +476,8 @@ public class SweCommonDecoderV20 implements Decoder<Object, Object> {
     private List<SweCoordinate<?>> parseCoordinates(Coordinate[] coordinateArray) throws OwsExceptionReport {
         List<SweCoordinate<?>> sosCoordinates = new ArrayList<SweCoordinate<?>>(coordinateArray.length);
         for (Coordinate xbCoordinate : coordinateArray) {
+            // validate document
+            XmlHelper.validateDocument(xbCoordinate);
             if (xbCoordinate.isSetQuantity()) {
                 sosCoordinates.add(new SweCoordinate(checkCoordinateName(xbCoordinate.getName()),
                         (SweAbstractSimpleType)parseAbstractDataComponent(xbCoordinate.getQuantity())));
@@ -500,6 +507,8 @@ public class SweCommonDecoderV20 implements Decoder<Object, Object> {
             throws OwsExceptionReport {
         List<SweField> sosFields = new ArrayList<SweField>(fieldArray.length);
         for (AnyScalarPropertyType xbField : fieldArray) {
+            // validate document
+            XmlHelper.validateDocument(xbField);
             // if (xbField.isSetBoolean()) {
             // sosFields.add(new SosSweField(xbField.getName(),
             // parseAbstractDataComponent(xbField.getBoolean())));

@@ -53,6 +53,7 @@ import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,15 +61,14 @@ import org.slf4j.LoggerFactory;
 public class SwesEncoderv20 implements Encoder<XmlObject, AbstractServiceResponse> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SwesEncoderv20.class);
-    private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper
-            .encoderKeysForElements(SWEConstants.NS_SWES_20,
-        DescribeSensorResponse.class,
-        InsertSensorResponse.class,
-        UpdateSensorResponse.class,
-        DeleteSensorResponse.class);
+
+    private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(SWEConstants.NS_SWES_20,
+            DescribeSensorResponse.class, InsertSensorResponse.class, UpdateSensorResponse.class,
+            DeleteSensorResponse.class);
 
     public SwesEncoderv20() {
-        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!",
+                StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
@@ -88,9 +88,9 @@ public class SwesEncoderv20 implements Encoder<XmlObject, AbstractServiceRespons
 
     @Override
     public void addNamespacePrefixToMap(final Map<String, String> nameSpacePrefixMap) {
-    	if (nameSpacePrefixMap != null) {
-    		nameSpacePrefixMap.put(SWEConstants.NS_SWES_20, SWEConstants.NS_SWES_PREFIX);
-    	}
+        if (nameSpacePrefixMap != null) {
+            nameSpacePrefixMap.put(SWEConstants.NS_SWES_20, SWEConstants.NS_SWES_PREFIX);
+        }
     }
 
     @Override
@@ -111,16 +111,21 @@ public class SwesEncoderv20 implements Encoder<XmlObject, AbstractServiceRespons
     @Override
     public XmlObject encode(final AbstractServiceResponse response, final Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
+        XmlObject encodedObject = null;
         if (response instanceof DescribeSensorResponse) {
-            return createDescribeSensorResponse((DescribeSensorResponse) response);
+            encodedObject = createDescribeSensorResponse((DescribeSensorResponse) response);
         } else if (response instanceof InsertSensorResponse) {
-            return createInsertSensorResponse((InsertSensorResponse) response);
+            encodedObject = createInsertSensorResponse((InsertSensorResponse) response);
         } else if (response instanceof UpdateSensorResponse) {
-            return createUpdateSensorResponse((UpdateSensorResponse) response);
+            encodedObject = createUpdateSensorResponse((UpdateSensorResponse) response);
         } else if (response instanceof DeleteSensorResponse) {
-            return createDeleteSensorResponse((DeleteSensorResponse) response);
+            encodedObject = createDeleteSensorResponse((DeleteSensorResponse) response);
+        } else {
+            throw new UnsupportedEncoderInputException(this, response);
         }
-        throw new UnsupportedEncoderInputException(this, response);
+        LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
+                XmlHelper.validateDocument(encodedObject));
+        return encodedObject;
     }
 
     private XmlObject createDescribeSensorResponse(final DescribeSensorResponse response) throws OwsExceptionReport {
@@ -128,7 +133,8 @@ public class SwesEncoderv20 implements Encoder<XmlObject, AbstractServiceRespons
                 DescribeSensorResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         final DescribeSensorResponseType describeSensorResponse = xbDescSensorRespDoc.addNewDescribeSensorResponse();
         describeSensorResponse.setProcedureDescriptionFormat(response.getOutputFormat());
-        final XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getOutputFormat(), response.getSensorDescription());
+        final XmlObject xmlObject =
+                CodingHelper.encodeObjectToXml(response.getOutputFormat(), response.getSensorDescription());
         describeSensorResponse.addNewDescription().addNewSensorDescription().addNewData().set(xmlObject);
         // set schema location
         final Set<SchemaLocation> schemaLocations = CollectionHelper.set();

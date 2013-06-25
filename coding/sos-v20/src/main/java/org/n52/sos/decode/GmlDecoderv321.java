@@ -312,8 +312,7 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
      * @throws OwsExceptionReport
      */
     private TimeInstant parseTimeInstant(TimeInstantType xbTimeIntant) throws OwsExceptionReport {
-        
-            TimeInstant ti = new TimeInstant();
+                    TimeInstant ti = new TimeInstant();
             ti.setGmlId(xbTimeIntant.getId());
             TimePositionType xbTimePositionType = xbTimeIntant.getTimePosition();
             String timeString = xbTimePositionType.getStringValue();
