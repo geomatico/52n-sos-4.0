@@ -136,7 +136,7 @@ public class MiscSettings implements SettingDefinitionProvider {
     		.setOrder(12)
     		.setKey(HTTP_STATUS_CODE_USE_IN_KVP_POX_BINDING)
     		.setDefaultValue(FALSE)
-    		.setTitle("HTTP Status Code Usage in KVP and POX Binding")
+    		.setTitle("Use HTTP Status Codes in KVP and POX Binding?")
     		.setDescription("Should the response returned by KVP and POX binding use the exception specific HTTP status code or always <tt>HTTP 200 - OK</tt>.");
     
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
