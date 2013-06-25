@@ -77,9 +77,9 @@ public class SosGetCapabilitiesOperatorV20 extends
         if (sosRequest.isSetAcceptFormats()) {
             zipCompr = checkAcceptFormats(sosRequest.getAcceptFormats());
         }
-        if (sosRequest.isSetSections()) {
-            SosHelper.checkSection(sosRequest.getSections());
-        }
+//        if (sosRequest.isSetSections()) {
+//            SosHelper.checkSection(sosRequest.getSections());
+//        }
 
         GetCapabilitiesResponse response = getDao().getCapabilities(sosRequest);
         String contentType = SosConstants.CONTENT_TYPE_XML;
