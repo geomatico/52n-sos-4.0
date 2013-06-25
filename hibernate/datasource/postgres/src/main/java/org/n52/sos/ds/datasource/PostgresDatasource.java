@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.mapping.Table;
-import org.hibernate.spatial.dialect.postgis.PostgisDialect;
+import org.hibernate.spatial.dialect.postgis.PostgisDialect52N;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.util.StringHelper;
@@ -77,6 +77,14 @@ public class PostgresDatasource extends AbstractHibernateFullDBDatasource {
 
     public static final String TAB_SPATIAL_REF_SYS = "spatial_ref_sys";
 
+	public PostgresDatasource() {
+		super(USERNAME_DEFAULT_VALUE, USERNAME_DESCRIPTION,
+				PASSWORD_DEFAULT_VALUE, PASSWORD_DESCRIPTION,
+				DATABASE_DEFAULT_VALUE, null, HOST_DEFAULT_VALUE,
+				HOST_DESCRIPTION, PORT_DEFAULT_VALUE, PORT_DESCRIPTION,
+				SCHEMA_DEFAULT_VALUE, SCHEMA_DESCRIPTION);
+	}
+    
     @Override
     public String getDialectName() {
         return DIALECT_NAME;
@@ -84,7 +92,7 @@ public class PostgresDatasource extends AbstractHibernateFullDBDatasource {
 
     @Override
     protected Dialect createDialect() {
-        return new PostgisDialect();
+        return new PostgisDialect52N();
     }
 
     @Override

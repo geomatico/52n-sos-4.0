@@ -78,6 +78,13 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         checkPassword(param, c);
         clearSettings(c);
         Datasource datasource = c.getDatasource();
+        
+        Properties properties = datasource.getDatasourceProperties(c
+                .getDatabaseSettings());
+        // save the used datasource class
+        properties.put(Datasource.class.getCanonicalName(), datasource
+                .getClass().getCanonicalName());
+        instantiateConfigurator(properties, c);
 
         try {
             if (c.isDropSchema()) {
@@ -97,12 +104,6 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         }
         saveServiceSettings(c);
         createAdministratorUser(c);
-        Properties properties =
-                datasource.getDatasourceProperties(c.getDatabaseSettings());
-        // save the used datasource class
-        properties.put(Datasource.class.getCanonicalName(),
-                       datasource.getClass().getCanonicalName());
-        instantiateConfigurator(properties, c);
         saveDatabaseProperties(properties, c);
         saveInstallationDate();
     }
