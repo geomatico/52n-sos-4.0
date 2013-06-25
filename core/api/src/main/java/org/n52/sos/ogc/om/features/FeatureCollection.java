@@ -49,7 +49,7 @@ public class FeatureCollection extends AbstractFeature {
      * @param members
      *            collection with feature members of this collection
      */
-    public FeatureCollection(Map<String, AbstractFeature> members) {
+    public FeatureCollection(final Map<String, AbstractFeature> members) {
         super(new CodeWithAuthority("gml:FeatureCollection"));
         this.members = members;
     }
@@ -69,12 +69,19 @@ public class FeatureCollection extends AbstractFeature {
      * @param members
      *            the members to set
      */
-    public void setMembers(Map<String, AbstractFeature> members) {
+    public void setMembers(final Map<String, AbstractFeature> members) {
         this.members.putAll(members);
     }
     
-    public void addMember(AbstractFeature member) {
+    public void addMember(final AbstractFeature member) {
         members.put(member.getIdentifier().getValue(), member);
+    }
+    
+    /**
+     * @see Map#remove(Object)
+     */
+    public AbstractFeature removeMember(final String featureIdentifier) {
+    	return members.remove(featureIdentifier);
     }
     
     public boolean isSetMembers() {
