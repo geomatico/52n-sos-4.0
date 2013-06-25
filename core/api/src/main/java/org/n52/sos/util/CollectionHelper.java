@@ -289,6 +289,31 @@ public final class CollectionHelper {
     }
 
     /**
+     * Check if collection is not null and not empty
+     * 
+     * 
+     * @param map
+     * 			Map to check
+     * 
+     * @return <tt>false</tt>, if map is <tt>null</tt> or empty, else <tt>true</tt>. 
+     */
+    public static <K,V> boolean isNotEmpty(final Map<K,V> map) {
+    	return map != null && !map.isEmpty();
+    }
+    
+    /**
+     * Check if map is not <tt>null</tt> and empty
+     * 
+     * @param map
+     * 			map to check
+     * 
+     * @return <tt>true</tt>, if map is not null and empty, else <tt>false</tt>
+     */
+    public static <K,V> boolean isEmpty(final Map<K,V> map) {
+    	return map != null && map.isEmpty();
+    }
+
+    /**
      * Reverses a map (switches key and value types).
      *
      * @param <K> the key type
@@ -311,9 +336,9 @@ public final class CollectionHelper {
      * @param collection Collection to examine
      * @return whether the collection is null, empty, or contains only nulls
      */
-    public static boolean nullEmptyOrContainsOnlyNulls(Collection<? extends Object> collection) {
+    public static boolean nullEmptyOrContainsOnlyNulls(final Collection<? extends Object> collection) {
         if (isNotEmpty(collection)) {
-            for (Object obj : collection) {
+            for (final Object obj : collection) {
                 if (obj != null) {
                     return false;
                 }
