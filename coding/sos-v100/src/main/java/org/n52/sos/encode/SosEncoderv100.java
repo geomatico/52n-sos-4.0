@@ -282,8 +282,8 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
         for (SosObservationOffering offering : offerings) {
 
             ObservationOfferingType xbObservationOffering = xbObservationOfferings.addNewObservationOffering();
-            // TDO check NAme or ID
-            xbObservationOffering.setId(offering.getOffering());
+            // TODO check NAme or ID
+            xbObservationOffering.setId(StringHelper.sanitizeNcName(offering.getOffering()));
 
             // only if fois are contained for the offering set the values of the
             // envelope

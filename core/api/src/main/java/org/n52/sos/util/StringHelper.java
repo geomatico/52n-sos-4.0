@@ -75,6 +75,16 @@ public final class StringHelper {
     }
 
     /**
+     * Sanitize a string for use in an NCName
+     * @param string
+     * @return
+     */
+    public static String sanitizeNcName(final String string) {
+        String sanitizedString = string.replaceAll("[ !\"#$%&'()*+,/:;<=>?@\\[\\]^`{|}~]","_");
+        return sanitizedString.replaceFirst("^[\\-\\.0-9]","_");
+    }
+
+    /**
      * Check if string is not null and not empty
      * 
      * @param string

@@ -525,7 +525,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
 
                 final ObservationOfferingType xbObsOff =
                         ObservationOfferingType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-                xbObsOff.setIdentifier(offering.getOffering());
+                xbObsOff.setIdentifier(StringHelper.sanitizeNcName(offering.getOffering()));
                 if (offering.getOfferingName() != null && !offering.getOfferingName().isEmpty()) {
                     xbObsOff.addNewName().setStringValue(offering.getOfferingName());
                 }
