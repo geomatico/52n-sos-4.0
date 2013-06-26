@@ -137,7 +137,7 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
     }
 
     @Override
-    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
+    public void addNamespacePrefixToMap(final Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(GMLConstants.NS_GML_32, GMLConstants.NS_GML_PREFIX);
     }
 
@@ -152,12 +152,12 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
     }
 
     @Override
-    public XmlObject encode(Object element) throws OwsExceptionReport {
+    public XmlObject encode(final Object element) throws OwsExceptionReport {
         return encode(element, new EnumMap<HelperValues, String>(HelperValues.class));
     }
 
     @Override
-    public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+    public XmlObject encode(final Object element, final Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         XmlObject encodedObject = null;
         if (element instanceof Time) {
             encodedObject = createTime((Time) element, additionalValues);
@@ -185,42 +185,42 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         return encodedObject;
     }
 
-    private XmlObject createFeaturePropertyType(AbstractFeature feature, Map<HelperValues, String> additionalValues)
+    private XmlObject createFeaturePropertyType(final AbstractFeature feature, final Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
         if (feature instanceof FeatureCollection) {
              return createFeatureCollection((FeatureCollection)feature, additionalValues);
         } else if (feature instanceof SamplingFeature) {
-             return createFeature((SamplingFeature)feature, additionalValues);
+             return createFeature(feature, additionalValues);
         } else {
             throw new UnsupportedEncoderInputException(this, feature);
         }
     }
 
-    private XmlObject createFeatureCollection(FeatureCollection element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
-        FeatureCollectionDocument featureCollectionDoc = FeatureCollectionDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        FeatureCollectionType featureCollection = featureCollectionDoc.addNewFeatureCollection();
+    private XmlObject createFeatureCollection(final FeatureCollection element, final Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+        final FeatureCollectionDocument featureCollectionDoc = FeatureCollectionDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        final FeatureCollectionType featureCollection = featureCollectionDoc.addNewFeatureCollection();
         featureCollection.setId(element.getGmlId());
         if (element.isSetMembers()) {
-            for (AbstractFeature abstractFeature : element.getMembers().values()) {
+            for (final AbstractFeature abstractFeature : element.getMembers().values()) {
                 featureCollection.addNewFeatureMember().set(createFeaturePropertyType(abstractFeature, new HashMap<HelperValues, String>(0)));
             }
         } 
         if (additionalValues.containsKey(HelperValues.DOCUMENT)) {
            return featureCollectionDoc;
         }
-        FeaturePropertyType featurePropertyType = FeaturePropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        final FeaturePropertyType featurePropertyType = FeaturePropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         featurePropertyType.addNewAbstractFeature().set(featureCollection);
         return XmlHelper.substituteElement(featurePropertyType.getAbstractFeature(), featurePropertyType);
 //        return featureCollection;
     }
 
-    private XmlObject createFeature(AbstractFeature feature, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
-        FeaturePropertyType featurePropertyType = FeaturePropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        if (!(feature instanceof SamplingFeature)) {
+    private XmlObject createFeature(final AbstractFeature feature, final Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+        final FeaturePropertyType featurePropertyType = FeaturePropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        if (isNotSamplingFeature(feature)) {
             featurePropertyType.setHref(feature.getIdentifier().getValue());
             return featurePropertyType;
         } else {
-            SamplingFeature samplingFeature = (SamplingFeature) feature;
+            final SamplingFeature samplingFeature = (SamplingFeature) feature;
             if (samplingFeature.isSetGmlID()) {
                 featurePropertyType.setHref("#" + samplingFeature.getGmlId());
                 return featurePropertyType;
@@ -251,17 +251,16 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
                     } else {
                         namespace = OMHelper.getNamespaceForFeatureType(samplingFeature.getFeatureType());
                     }
-                    XmlObject encodedXmlObject = CodingHelper.encodeObjectToXml(namespace, samplingFeature);
+                    final XmlObject encodedXmlObject = CodingHelper.encodeObjectToXml(namespace, samplingFeature);
     
                     if (encodedXmlObject != null) {
                         return encodedXmlObject;
                     } else {
                         if (samplingFeature.getXmlDescription() != null) {
                             try {
-                                // TODO how set gml:id in already existing
-                                // XmlDescription?
+                                // TODO how set gml:id in already existing XmlDescription? <-- XmlCursor
                                 return XmlObject.Factory.parse(samplingFeature.getXmlDescription());
-                            } catch (XmlException xmle) {
+                            } catch (final XmlException xmle) {
                                 throw new NoApplicableCodeException().causedBy(xmle)
                                         .withMessage("Error while encoding featurePropertyType!");
                             }
@@ -278,18 +277,23 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         }
     }
 
-    private XmlObject createEnvelope(SosEnvelope sosEnvelope) {
-        Envelope envelope = sosEnvelope.getEnvelope();
-        int srid = sosEnvelope.getSrid();
-        EnvelopeType envelopeType = EnvelopeType.Factory.newInstance();
-        MinMax<String> minmax = SosHelper.getMinMaxFromEnvelope(envelope);
+	private boolean isNotSamplingFeature(final AbstractFeature feature)
+	{
+		return !(feature instanceof SamplingFeature);
+	}
+
+    private XmlObject createEnvelope(final SosEnvelope sosEnvelope) {
+        final Envelope envelope = sosEnvelope.getEnvelope();
+        final int srid = sosEnvelope.getSrid();
+        final EnvelopeType envelopeType = EnvelopeType.Factory.newInstance();
+        final MinMax<String> minmax = SosHelper.getMinMaxFromEnvelope(envelope);
         envelopeType.addNewLowerCorner().setStringValue(minmax.getMinimum());
         envelopeType.addNewUpperCorner().setStringValue(minmax.getMaximum());
         envelopeType.setSrsName(getSrsName(srid));
         return envelopeType;
     }
 
-    private XmlObject createTime(Time time, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+    private XmlObject createTime(final Time time, final Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         if (time != null) {
             if (time instanceof TimeInstant) {
                 if (additionalValues.containsKey(HelperValues.DOCUMENT)) {
@@ -310,8 +314,8 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         return null;
     }
 
-    private XmlObject createTimePeriodDocument(TimePeriod time) throws OwsExceptionReport {
-        TimePeriodDocument timePeriodDoc =
+    private XmlObject createTimePeriodDocument(final TimePeriod time) throws OwsExceptionReport {
+        final TimePeriodDocument timePeriodDoc =
                 TimePeriodDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         createTimePeriodType(time, timePeriodDoc.addNewTimePeriod());
         return timePeriodDoc;
@@ -328,7 +332,7 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
      *
      * @throws OwsExceptionReport * if an error occurs.
      */
-    private TimePeriodType createTimePeriodType(TimePeriod timePeriod, TimePeriodType timePeriodType)
+    private TimePeriodType createTimePeriodType(final TimePeriod timePeriod, TimePeriodType timePeriodType)
             throws OwsExceptionReport {
         if (timePeriodType == null) {
             timePeriodType = TimePeriodType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
@@ -339,8 +343,8 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
             timePeriodType.setId("tp_" + JavaHelper.generateID(timePeriod.toString() + System.currentTimeMillis()));
         }
         // beginPosition
-        TimePositionType xbTimePositionBegin = TimePositionType.Factory.newInstance();
-        String beginString =  DateTimeHelper.formatDateTime2String(timePeriod.getStart(), timePeriod.getTimeFormat());
+        final TimePositionType xbTimePositionBegin = TimePositionType.Factory.newInstance();
+        final String beginString =  DateTimeHelper.formatDateTime2String(timePeriod.getStart(), timePeriod.getTimeFormat());
 
         // concat minutes for timeZone offset, because gml requires
         // xs:dateTime, which needs minutes in
@@ -349,8 +353,8 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         xbTimePositionBegin.setStringValue(beginString);
 
         // endPosition
-        TimePositionType xbTimePositionEnd = TimePositionType.Factory.newInstance();
-        String endString =  DateTimeHelper.formatDateTime2String(timePeriod.getEnd(), timePeriod.getTimeFormat());
+        final TimePositionType xbTimePositionEnd = TimePositionType.Factory.newInstance();
+        final String endString =  DateTimeHelper.formatDateTime2String(timePeriod.getEnd(), timePeriod.getTimeFormat());
 
         // concat minutes for timeZone offset, because gml requires
         // xs:dateTime, which needs minutes in
@@ -364,8 +368,8 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         return timePeriodType;
     }
 
-    private XmlObject createTimeInstantDocument(TimeInstant time) throws OwsExceptionReport {
-        TimeInstantDocument timeInstantDoc =
+    private XmlObject createTimeInstantDocument(final TimeInstant time) throws OwsExceptionReport {
+        final TimeInstantDocument timeInstantDoc =
                 TimeInstantDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         createTimeInstantType(time, timeInstantDoc.addNewTimeInstant());
         return timeInstantDoc;
@@ -383,7 +387,7 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
      *
      * @throws OwsExceptionReport * if an error occurs.
      */
-    private TimeInstantType createTimeInstantType(TimeInstant timeInstant, TimeInstantType timeInstantType)
+    private TimeInstantType createTimeInstantType(final TimeInstant timeInstant, TimeInstantType timeInstantType)
             throws OwsExceptionReport {
         // create time instant
         if (timeInstantType == null) {
@@ -394,7 +398,7 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         } else {
             timeInstantType.setId("ti_" + JavaHelper.generateID(timeInstantType.toString() + System.currentTimeMillis()));
         }
-        TimePositionType xbTimePosition = timeInstantType.addNewTimePosition();
+        final TimePositionType xbTimePosition = timeInstantType.addNewTimePosition();
 
         String timeString = OGCConstants.UNKNOWN;
         if(timeInstant.isSetValue()) {
@@ -415,7 +419,7 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
     private XmlObject createPosition(Geometry geom, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         String foiId = additionalValues.get(HelperValues.GMLID);
         if (geom instanceof Point) {
-            PointType xbPoint = PointType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+            final PointType xbPoint = PointType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             xbPoint.setId("point_" + foiId);
             createPointFromJtsGeometry((Point) geom, xbPoint);
             if (additionalValues.containsKey(HelperValues.DOCUMENT)) {
@@ -427,7 +431,7 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         }
 
         else if (geom instanceof LineString) {
-            LineStringType xbLineString =
+            final LineStringType xbLineString =
                     LineStringType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             xbLineString.setId("lineString_" + foiId);
             createLineStringFromJtsGeometry((LineString) geom, xbLineString);
@@ -440,7 +444,7 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         }
 
         else if (geom instanceof Polygon) {
-            PolygonType xbPolygon = PolygonType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+            final PolygonType xbPolygon = PolygonType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             xbPolygon.setId("polygon_" + foiId);
             createPolygonFromJtsGeometry((Polygon) geom, xbPolygon);
             if (additionalValues.containsKey(HelperValues.DOCUMENT)) {
@@ -462,8 +466,8 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
      * @param xbPoint
      *            XML Point
      */
-    private void createPointFromJtsGeometry(Point jtsPoint, PointType xbPoint) throws OwsExceptionReport {
-        DirectPositionType xbPos = xbPoint.addNewPos();
+    private void createPointFromJtsGeometry(final Point jtsPoint, final PointType xbPoint) throws OwsExceptionReport {
+        final DirectPositionType xbPos = xbPoint.addNewPos();
         xbPos.setSrsName(getSrsName(jtsPoint));
         xbPos.setStringValue(JTSHelper.getCoordinatesString(jtsPoint));
     }
@@ -476,11 +480,11 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
      * @param xbLst
      *            XML LinetSring
      */
-    private void createLineStringFromJtsGeometry(LineString jtsLineString, LineStringType xbLst) throws
+    private void createLineStringFromJtsGeometry(final LineString jtsLineString, final LineStringType xbLst) throws
             OwsExceptionReport {
         final String srsName = getSrsName(jtsLineString);
         xbLst.setSrsName(srsName);
-        DirectPositionListType xbPosList = xbLst.addNewPosList();
+        final DirectPositionListType xbPosList = xbLst.addNewPosList();
         xbPosList.setSrsName(srsName);
         xbPosList.setStringValue(JTSHelper.getCoordinatesString(jtsLineString));
 
@@ -494,13 +498,13 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
      * @param xbPolType
      *            XML Polygon
      */
-    private void createPolygonFromJtsGeometry(Polygon jtsPolygon, PolygonType xbPolType) throws OwsExceptionReport {
-        List<?> jtsPolygons = PolygonExtracter.getPolygons(jtsPolygon);
+    private void createPolygonFromJtsGeometry(final Polygon jtsPolygon, final PolygonType xbPolType) throws OwsExceptionReport {
+        final List<?> jtsPolygons = PolygonExtracter.getPolygons(jtsPolygon);
         final String srsName = getSrsName(jtsPolygon);
         
         for (int i = 0; i < jtsPolygons.size(); i++) {
 
-            Polygon pol = (Polygon) jtsPolygons.get(i);
+            final Polygon pol = (Polygon) jtsPolygons.get(i);
 
             AbstractRingPropertyType xbArpt = xbPolType.addNewExterior();
             AbstractRingType xbArt = xbArpt.addNewAbstractRing();
@@ -522,7 +526,7 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
             }
 
             // Interior ring
-            int numberOfInteriorRings = pol.getNumInteriorRing();
+            final int numberOfInteriorRings = pol.getNumInteriorRing();
             for (int ringNumber = 0; ringNumber < numberOfInteriorRings; ringNumber++) {
                 xbArpt = xbPolType.addNewInterior();
                 xbArt = xbArpt.addNewAbstractRing();
@@ -545,8 +549,8 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         }
     }
 
-    private XmlObject createReferenceTypeForCategroyValue(CategoryValue categoryValue) {
-        ReferenceType xbRef = ReferenceType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+    private XmlObject createReferenceTypeForCategroyValue(final CategoryValue categoryValue) {
+        final ReferenceType xbRef = ReferenceType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (categoryValue.isSetValue()) {
             if (categoryValue.getValue().startsWith("http://")) {
                 xbRef.setHref(categoryValue.getValue());
@@ -559,13 +563,13 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         return xbRef;
     }
 
-    private ReferenceType createReferencType(org.n52.sos.ogc.gml.ReferenceType sosReferenceType) {
+    private ReferenceType createReferencType(final org.n52.sos.ogc.gml.ReferenceType sosReferenceType) {
         if (!sosReferenceType.isSetHref()) {
-            String exceptionText = String.format("The required 'href' parameter is empty for encoding %s!", ReferenceType.class.getName());
+            final String exceptionText = String.format("The required 'href' parameter is empty for encoding %s!", ReferenceType.class.getName());
             LOGGER.error(exceptionText);
             throw new IllegalArgumentException(exceptionText);
         }
-        ReferenceType referenceType = ReferenceType.Factory.newInstance();
+        final ReferenceType referenceType = ReferenceType.Factory.newInstance();
         referenceType.setHref(sosReferenceType.getHref());
         if (sosReferenceType.isSetTitle()) {
             referenceType.setTitle(sosReferenceType.getTitle());
@@ -576,13 +580,13 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         return referenceType;
     }
 
-    private CodeWithAuthorityType createCodeWithAuthorityType(CodeWithAuthority sosCodeWithAuthority) {
+    private CodeWithAuthorityType createCodeWithAuthorityType(final CodeWithAuthority sosCodeWithAuthority) {
         if (!sosCodeWithAuthority.isSetValue()) {
-            String exceptionText = String.format("The required 'value' parameter is empty for encoding %s!", CodeWithAuthorityType.class.getName());
+            final String exceptionText = String.format("The required 'value' parameter is empty for encoding %s!", CodeWithAuthorityType.class.getName());
             LOGGER.error(exceptionText);
             throw new IllegalArgumentException(exceptionText);
         }
-        CodeWithAuthorityType codeWithAuthority = CodeWithAuthorityType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        final CodeWithAuthorityType codeWithAuthority = CodeWithAuthorityType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         codeWithAuthority.setStringValue(sosCodeWithAuthority.getValue());
         if (sosCodeWithAuthority.isSetCodeSpace()) {
             codeWithAuthority.setCodeSpace(sosCodeWithAuthority.getCodeSpace());
@@ -592,13 +596,13 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         return codeWithAuthority;
     }
 
-    private CodeType createCodeType(org.n52.sos.ogc.gml.CodeType sosCodeType) {
+    private CodeType createCodeType(final org.n52.sos.ogc.gml.CodeType sosCodeType) {
         if (!sosCodeType.isSetValue()) {
-            String exceptionText = String.format("The required 'value' parameter is empty for encoding %s!", CodeType.class.getName());
+            final String exceptionText = String.format("The required 'value' parameter is empty for encoding %s!", CodeType.class.getName());
             LOGGER.error(exceptionText);
             throw new IllegalArgumentException(exceptionText);
         }
-        CodeType codeType = CodeType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        final CodeType codeType = CodeType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         codeType.setStringValue(sosCodeType.getValue());
         if (sosCodeType.isSetCodeSpace()) {
             codeType.setCodeSpace(sosCodeType.getCodeSpace());
@@ -608,12 +612,12 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         return codeType;
     }
 
-    protected MeasureType createMeasureType(QuantityValue quantityValue) throws OwsExceptionReport {
+    protected MeasureType createMeasureType(final QuantityValue quantityValue) throws OwsExceptionReport {
         if (!quantityValue.isSetValue()) {
             throw new NoApplicableCodeException()
                     .withMessage("The required 'value' parameter is empty for encoding %s!", MeasureType.class.getName());
         }
-        MeasureType measureType =
+        final MeasureType measureType =
                 MeasureType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         measureType.setDoubleValue(quantityValue.getValue().doubleValue());
         if (quantityValue.isSetUnit()) {
@@ -625,11 +629,11 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         return measureType;
     }
 
-    protected String getSrsName(Geometry geom) {
+    protected String getSrsName(final Geometry geom) {
         return getSrsName(geom.getSRID());
     }
 
-    protected String getSrsName(int srid) {
+    protected String getSrsName(final int srid) {
         return ServiceConfiguration.getInstance().getSrsNamePrefixSosV2() + srid;
     }
 }
