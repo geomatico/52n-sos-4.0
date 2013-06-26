@@ -91,7 +91,10 @@ public class OgcDecoderv100 implements Decoder<Object, XmlObject> {
     @Override
     public Object decode(XmlObject xmlObject) throws OwsExceptionReport {
         // validate document
-        XmlHelper.validateDocument(xmlObject);
+        
+        // FIXME Validation currently fails against abstract types
+        // XmlHelper.validateDocument(xmlObject);
+
         if (xmlObject instanceof BinaryTemporalOpType) {
             return parseTemporalOperatorType((BinaryTemporalOpType) xmlObject);
         }
