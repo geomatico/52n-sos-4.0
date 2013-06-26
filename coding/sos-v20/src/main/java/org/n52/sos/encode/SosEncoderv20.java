@@ -116,6 +116,7 @@ import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
+import org.n52.sos.util.NcNameResolver;
 import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.W3CConstants;
@@ -525,7 +526,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
 
                 final ObservationOfferingType xbObsOff =
                         ObservationOfferingType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-                xbObsOff.setIdentifier(StringHelper.sanitizeNcName(offering.getOffering()));
+                xbObsOff.setIdentifier(NcNameResolver.fixNcName(offering.getOffering()));
                 if (offering.getOfferingName() != null && !offering.getOfferingName().isEmpty()) {
                     xbObsOff.addNewName().setStringValue(offering.getOfferingName());
                 }

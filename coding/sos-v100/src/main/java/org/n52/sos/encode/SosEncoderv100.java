@@ -77,6 +77,7 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
+import org.n52.sos.util.NcNameResolver;
 import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.XmlHelper;
@@ -283,7 +284,7 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
 
             ObservationOfferingType xbObservationOffering = xbObservationOfferings.addNewObservationOffering();
             // TODO check NAme or ID
-            xbObservationOffering.setId(StringHelper.sanitizeNcName(offering.getOffering()));
+            xbObservationOffering.setId(NcNameResolver.fixNcName(offering.getOffering()));
 
             // only if fois are contained for the offering set the values of the
             // envelope
