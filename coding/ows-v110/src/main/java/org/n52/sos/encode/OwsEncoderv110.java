@@ -246,20 +246,44 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
         } else {
             /* TODO check for required fields and fail on missing ones */
             final ServiceProvider serviceProvider = ServiceProvider.Factory.newInstance();
-            serviceProvider.setProviderName(sosServiceProvider.getName());
-            serviceProvider.addNewProviderSite().setHref(sosServiceProvider.getSite());
+            if (sosServiceProvider.getName() != null) {            
+                serviceProvider.setProviderName(sosServiceProvider.getName());
+            }
+            if (sosServiceProvider.getSite() != null) {
+                serviceProvider.addNewProviderSite().setHref(sosServiceProvider.getSite());
+            }
             final ResponsiblePartySubsetType responsibleParty = serviceProvider.addNewServiceContact();
-            responsibleParty.setIndividualName(sosServiceProvider.getIndividualName());
-            responsibleParty.setPositionName(sosServiceProvider.getPositionName());
+            if (sosServiceProvider.getIndividualName() != null) {            
+                responsibleParty.setIndividualName(sosServiceProvider.getIndividualName());
+            }
+            if (sosServiceProvider.getPositionName() != null) {
+                responsibleParty.setPositionName(sosServiceProvider.getPositionName());
+            }
+
             final ContactType contact = responsibleParty.addNewContactInfo();
-            contact.addNewPhone().addVoice(sosServiceProvider.getPhone());
+            if (sosServiceProvider.getPhone() != null) {
+                contact.addNewPhone().addVoice(sosServiceProvider.getPhone());
+            }
+
             final AddressType address = contact.addNewAddress();
-            address.addDeliveryPoint(sosServiceProvider.getDeliveryPoint());
-            address.addElectronicMailAddress(sosServiceProvider.getMailAddress());
-            address.setAdministrativeArea(sosServiceProvider.getAdministrativeArea());
-            address.setCity(sosServiceProvider.getCity());
-            address.setCountry(sosServiceProvider.getCountry());
-            address.setPostalCode(sosServiceProvider.getPostalCode());
+            if (sosServiceProvider.getDeliveryPoint() != null) {
+                address.addDeliveryPoint(sosServiceProvider.getDeliveryPoint());
+            }
+            if (sosServiceProvider.getMailAddress() != null) {
+                address.addElectronicMailAddress(sosServiceProvider.getMailAddress());
+            }
+            if (sosServiceProvider.getAdministrativeArea() != null) {
+                address.setAdministrativeArea(sosServiceProvider.getAdministrativeArea());
+            }
+            if (sosServiceProvider.getCity() != null) {
+                address.setCity(sosServiceProvider.getCity());
+            }
+            if (sosServiceProvider.getCountry() != null) {
+                address.setCountry(sosServiceProvider.getCountry());
+            }
+            if (sosServiceProvider.getPostalCode() != null) {
+                address.setPostalCode(sosServiceProvider.getPostalCode());
+            }
             return serviceProvider;
         }
 
