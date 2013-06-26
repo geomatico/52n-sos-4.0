@@ -117,7 +117,6 @@ public class SamplingDecoderv20 implements Decoder<AbstractFeature, XmlObject> {
         // validate XmlObject
         XmlHelper.validateDocument(element);
         if (element instanceof SFSpatialSamplingFeatureDocument) {
-            XmlHelper.validateDocument(element);
             return parseSpatialSamplingFeature(((SFSpatialSamplingFeatureDocument) element)
                     .getSFSpatialSamplingFeature());
         } else if (element instanceof SFSpatialSamplingFeatureType) {
