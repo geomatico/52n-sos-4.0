@@ -25,6 +25,10 @@ package org.n52.sos.ogc.gml.time;
 
 import java.io.Serializable;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.n52.sos.ogc.sos.SosConstants.IndeterminateTime;
+
 /**
  * Interface for time objects
  * 
@@ -104,5 +108,16 @@ public abstract class Time implements Comparable<Time>, Serializable {
 
     public enum TimeFormat {
         ISO8601, YMD, YM, Y, NOT_SET
+    }
+    
+    protected DateTime resolveDateTime(DateTime dateTime, String indeterminateValue) {
+        if (dateTime != null) {
+            return dateTime;
+        }
+        if (indeterminateValue != null && IndeterminateTime.valueOf(indeterminateValue)
+                .equals(IndeterminateTime.now)) {
+            return new DateTime(DateTimeZone.UTC);
+        }
+        return null;
     }
 }

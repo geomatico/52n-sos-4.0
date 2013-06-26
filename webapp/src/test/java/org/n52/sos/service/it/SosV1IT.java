@@ -272,7 +272,7 @@ public class SosV1IT extends SosITBase {
         QName qnTimeInstant = new QName(GMLConstants.NS_GML, GMLConstants.EN_TIME_INSTANT, GMLConstants.NS_GML_PREFIX);
         TimeInstantType xb_timeInstant =
                 (TimeInstantType) xb_tmEquals.addNewTimeObject().substitute(qnTimeInstant, TimeInstantType.type);
-        xb_timeInstant.addNewTimePosition().setStringValue(SosConstants.FirstLatest.latest.name());
+        xb_timeInstant.addNewTimePosition().setStringValue(SosConstants.IndeterminateTime.latest.name());
 
         // execute request
         HttpPost httppost = new HttpPost(getSOSURI());

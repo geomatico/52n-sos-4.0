@@ -183,7 +183,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
                     filter.setOperator(TimeOperator.TM_Equals);
                     filter.setValueReference("phenomenonTime");
                     final TimeInstant timeInstant = new TimeInstant();
-                    timeInstant.setIndeterminateValue(SosConstants.FirstLatest.latest.name());
+                    timeInstant.setIndeterminateValue(SosConstants.IndeterminateTime.latest.name());
                     filter.setTime(timeInstant);
                     filters.add(filter);
                     sosRequest.setTemporalFilters(filters);

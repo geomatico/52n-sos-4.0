@@ -95,6 +95,10 @@ public class GetObservationKvpDecoderv100 extends AbstractKvpDecoder {
 
                 // eventTime (optional)
                 else if (parameterName.equalsIgnoreCase(Sos1Constants.GetObservationParams.eventTime.name())) {
+                    if (!parameterValues.contains(",")) {
+                        //for v1, prepend om:phenomenonTime if not present
+                        parameterValues = "om:phenomenonTime," + parameterValues;
+                    }
                     try {
                         request.setTemporalFilters(parseTemporalFilter(KvpHelper.checkParameterMultipleValues(
                                 parameterValues, parameterName), parameterName));

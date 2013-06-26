@@ -193,20 +193,24 @@ public interface SosConstants {
         procedure;
     }
 
-    enum FirstLatest {
+    enum IndeterminateTime {
         first,
-        latest;
+        latest,
+        now;
 
         public static boolean contains(final String timeString) {
             return timeString.equalsIgnoreCase(first.name())
-                   || timeString.equalsIgnoreCase(latest.name());
+                   || timeString.equalsIgnoreCase(latest.name())
+                   || timeString.equalsIgnoreCase(now.name());
         }
 
-        public static FirstLatest getEnumForString(final String value) {
+        public static IndeterminateTime getEnumForString(final String value) {
             if (value.equalsIgnoreCase(first.name())) {
                 return first;
             } else if (value.equalsIgnoreCase(latest.name())) {
                 return latest;
+            } else if (value.equalsIgnoreCase(now.name())) {
+                return now;
             }
             return null;
         }
