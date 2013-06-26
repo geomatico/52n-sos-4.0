@@ -315,7 +315,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
         final String newId = samplingFeature.getIdentifier().getValue();
         FeatureOfInterest feature = getFeatureOfInterest(newId, samplingFeature.getGeometry(), session);
         if (feature == null) {
-            feature = new FeatureOfInterest();
+            feature = new TFeatureOfInterest();
             if (samplingFeature.isSetIdentifier()) {
                 feature.setIdentifier(newId);
                 if (samplingFeature.getIdentifier().isSetCodeSpace()) {
