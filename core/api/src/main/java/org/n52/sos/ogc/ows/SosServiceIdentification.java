@@ -37,6 +37,7 @@ public class SosServiceIdentification {
 	private String title;
 	private String abstrakt;
 	private String serviceType;
+	private String serviceTypeCodeSpace;
 	private String fees;
 	private String accessConstraints;
 
@@ -109,6 +110,14 @@ public class SosServiceIdentification {
 		this.serviceType = serviceType;
 	}
 
+    public String getServiceTypeCodeSpace() {
+        return serviceTypeCodeSpace;
+    }
+
+    public void setServiceTypeCodeSpace(String serviceTypeCodeSpace) {
+        this.serviceTypeCodeSpace = serviceTypeCodeSpace;
+    }
+	
 	public String getFees() {
 		return fees;
 	}

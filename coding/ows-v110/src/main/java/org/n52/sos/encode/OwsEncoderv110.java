@@ -33,6 +33,7 @@ import java.util.Set;
 
 import net.opengis.ows.x11.AddressType;
 import net.opengis.ows.x11.AllowedValuesDocument.AllowedValues;
+import net.opengis.ows.x11.CodeType;
 import net.opengis.ows.x11.ContactType;
 import net.opengis.ows.x11.DCPDocument;
 import net.opengis.ows.x11.DomainType;
@@ -194,7 +195,11 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
             serviceIdent.addAccessConstraints(sosServiceIdentification.getAccessConstraints());
             serviceIdent.setFees(sosServiceIdentification.getFees());
             serviceIdent.addNewAbstract().setStringValue(sosServiceIdentification.getAbstract());
-            serviceIdent.addNewServiceType().setStringValue(sosServiceIdentification.getServiceType());
+            CodeType xbServiceType = serviceIdent.addNewServiceType();
+            xbServiceType.setStringValue(sosServiceIdentification.getServiceType());
+            if (sosServiceIdentification.getServiceTypeCodeSpace() != null) {
+                xbServiceType.setCodeSpace(sosServiceIdentification.getServiceTypeCodeSpace());
+            }
             serviceIdent.addNewTitle().setStringValue(sosServiceIdentification.getTitle());
         }
         // set service type versions

@@ -144,6 +144,7 @@ INSERT INTO "settings" VALUES('serviceIdentification.fees');
 INSERT INTO "settings" VALUES('serviceIdentification.file');
 INSERT INTO "settings" VALUES('serviceIdentification.keywords');
 INSERT INTO "settings" VALUES('serviceIdentification.serviceType');
+INSERT INTO "settings" VALUES('serviceIdentification.serviceTypeCodeSpace');
 INSERT INTO "settings" VALUES('serviceIdentification.title');
 
 INSERT INTO "settings" VALUES('serviceProvider.address');
@@ -202,6 +203,7 @@ INSERT INTO "string_settings" VALUES('NONE','serviceIdentification.accessConstra
 INSERT INTO "string_settings" VALUES('NONE','serviceIdentification.fees');
 INSERT INTO "string_settings" VALUES('North Rhine-Westphalia','serviceProvider.state');
 INSERT INTO "string_settings" VALUES('OGC:SOS','serviceIdentification.serviceType');
+INSERT INTO "string_settings" VALUES(NULL,'serviceIdentification.serviceTypeCodeSpace');
 INSERT INTO "string_settings" VALUES('TBA','serviceProvider.individualName');
 INSERT INTO "string_settings" VALUES('TBA','serviceProvider.positionName');
 INSERT INTO "string_settings" VALUES('urn:ogc:def:crs:EPSG::','misc.srsNamePrefixSosV1');

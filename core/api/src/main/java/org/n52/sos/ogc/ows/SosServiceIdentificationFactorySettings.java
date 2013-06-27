@@ -42,6 +42,7 @@ import org.n52.sos.util.CollectionHelper;
  */
 public class SosServiceIdentificationFactorySettings implements SettingDefinitionProvider {
     public static final String SERVICE_TYPE = "serviceIdentification.serviceType";
+    public static final String SERVICE_TYPE_CODE_SPACE = "serviceIdentification.serviceTypeCodeSpace";
     public static final String ACCESS_CONSTRAINTS = "serviceIdentification.accessConstraints";
     public static final String FILE = "serviceIdentification.file";
     public static final String TITLE = "serviceIdentification.title";
@@ -93,9 +94,16 @@ public class SosServiceIdentificationFactorySettings implements SettingDefinitio
             .setTitle("Service Type")
             .setDescription("SOS Service Type.")
             .setDefaultValue("OGC:SOS");
+     public static final StringSettingDefinition SERVICE_TYPE_CODE_SPACE_DEFINITION = new StringSettingDefinition()
+             .setGroup(GROUP)
+             .setOrder(6)
+             .setKey(SERVICE_TYPE_CODE_SPACE)
+             .setTitle("Service Type Code Space")
+             .setDescription("SOS Service Type Code Space.")
+             .setOptional(true);     
     public static final FileSettingDefinition FILE_DEFINITION = new FileSettingDefinition()
             .setGroup(GROUP)
-            .setOrder(6)
+            .setOrder(7)
             .setKey(FILE)
             .setTitle("Service Identification File")
             .setOptional(true)
@@ -106,8 +114,8 @@ public class SosServiceIdentificationFactorySettings implements SettingDefinitio
                             + "(e.g. <code>WEB-INF/identification.xml</code>).");
     
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?, ?>>set(
-            TITLE_DEFINITION, ABSTRACT_DEFINITION, SERVICE_TYPE_DEFINITION, KEYWORDS_DEFINITION, FEES_DEFINITION,
-            ACCESS_CONSTRAINTS_DEFINITION, FILE_DEFINITION);
+            TITLE_DEFINITION, ABSTRACT_DEFINITION, SERVICE_TYPE_DEFINITION, SERVICE_TYPE_CODE_SPACE_DEFINITION,
+            KEYWORDS_DEFINITION, FEES_DEFINITION, ACCESS_CONSTRAINTS_DEFINITION, FILE_DEFINITION);
 
     @Override
     public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
