@@ -28,6 +28,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -585,5 +586,17 @@ public class SosHelper {
                         .withMessage("The section element is empty!");
             }
         }
+    }
+
+    public static Map<String, String> getNcNameResolvedOfferings(Collection<String> offerings) {
+        Map<String, String> resolvedOfferings = new HashMap<String, String>();
+        for (String offering : offerings) {
+            if (!NcNameResolver.isValidNCName(offering)) {
+                resolvedOfferings.put(NcNameResolver.fixNcName(offering), offering);
+            } else {
+                resolvedOfferings.put(offering, offering);
+            }
+        }
+        return resolvedOfferings;
     }
 }
