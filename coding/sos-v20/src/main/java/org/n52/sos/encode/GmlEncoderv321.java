@@ -230,6 +230,7 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
                     if (feature instanceof SamplingFeature && samplingFeature.isSetNames()) {
                         featurePropertyType.setTitle(samplingFeature.getFirstName().getValue());
                     } 
+                    return featurePropertyType;
                 }
                 if (!samplingFeature.isSetGeometry()) {
                     featurePropertyType.setHref(samplingFeature.getIdentifier().getValue());
