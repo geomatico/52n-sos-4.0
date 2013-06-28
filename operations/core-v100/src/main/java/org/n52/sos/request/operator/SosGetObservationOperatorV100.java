@@ -271,7 +271,8 @@ public class SosGetObservationOperatorV100 extends
         List<String> validOfferings = CollectionHelper.list();
         if (offeringIds != null) {
 
-            Map<String, String> offerings = SosHelper.getNcNameResolvedOfferings(Configurator.getInstance().getCache().getOfferings());
+            Set<String> offerings = Configurator.getInstance().getCache().getOfferings();
+            Map<String, String> ncOfferings = SosHelper.getNcNameResolvedOfferings(offerings);
             CompositeOwsException exceptions = new CompositeOwsException();
 
             if (offeringIds.size() != 1) {
@@ -282,10 +283,13 @@ public class SosGetObservationOperatorV100 extends
                 if (StringHelper.isNullOrEmpty(offeringId)) {
                     throw new MissingOfferingParameterException();
                 }
-                if (!offerings.containsKey(offeringId)) {
+                if (offerings.contains(offeringId)) {
+                    validOfferings.add(offeringId);
+                } else if (ncOfferings.containsKey(offeringId)) {
+                    validOfferings.add(ncOfferings.get(offeringId));                    
+                } else {
                     throw new InvalidOfferingParameterException(offeringId);
-                }
-                validOfferings.add(offerings.get(offeringId));
+                }                
             }
             exceptions.throwIfNotEmpty();
         }

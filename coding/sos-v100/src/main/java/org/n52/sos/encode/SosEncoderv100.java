@@ -295,8 +295,8 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
             // TODO: add intended application
             // xbObservationOffering.addIntendedApplication("");
 
-            // add offering name
-            xbObservationOffering.addNewName().setStringValue(offering.getOfferingName());
+            // set gml:name to offering's id (not ncname resolved)
+            xbObservationOffering.addNewName().setStringValue(offering.getOffering());
             //
             // // set up phenomena
             // Collection<String> phenomenons =
