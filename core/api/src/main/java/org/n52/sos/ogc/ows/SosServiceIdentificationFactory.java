@@ -50,6 +50,7 @@ public class SosServiceIdentificationFactory extends LazyThreadSafeProducer<SosS
     private String title;
     private String description;
     private String serviceType;
+    private String serviceTypeCodeSpace;
     private String fees;
     private String constraints;
 
@@ -106,6 +107,13 @@ public class SosServiceIdentificationFactory extends LazyThreadSafeProducer<SosS
         setRecreate();
     }
 
+    @Setting(SERVICE_TYPE_CODE_SPACE)
+    public void setServiceTypeCodeSpace(String serviceTypeCodeSpace) throws ConfigurationException {
+        Validation.notNullOrEmpty("Service Identification Service Type Code Space", serviceType);
+        this.serviceTypeCodeSpace = serviceTypeCodeSpace;
+        setRecreate();
+    }
+    
     @Setting(FEES)
     public void setFees(String fees) throws ConfigurationException {
         Validation.notNullOrEmpty("Service Identification Fees", fees);
@@ -134,6 +142,7 @@ public class SosServiceIdentificationFactory extends LazyThreadSafeProducer<SosS
             serviceIdentification.setAccessConstraints(this.constraints);
             serviceIdentification.setFees(this.fees);
             serviceIdentification.setServiceType(this.serviceType);
+            serviceIdentification.setServiceTypeCodeSpace(this.serviceTypeCodeSpace);
             serviceIdentification.setTitle(this.title);
             serviceIdentification.setVersions(ServiceOperatorRepository.getInstance()
                     .getSupportedVersions(SosConstants.SOS));

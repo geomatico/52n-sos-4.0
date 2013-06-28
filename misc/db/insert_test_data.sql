@@ -163,27 +163,27 @@ $$
 $$
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION insertFeatureOfInterest(text, numeric, numeric, text) RETURNS bigint AS
+CREATE OR REPLACE FUNCTION insertFeatureOfInterest(int, text, numeric, numeric, text) RETURNS bigint AS
 $$
 	INSERT INTO public.featureOfInterest(featureOfInterestId, hibernateDiscriminator,featureOfInterestTypeId, identifier, names, geom, descriptionXml) 
-	SELECT nextval('public.featureOfInterestId_seq'),'T', getSpatialSamplingFeatureType('Point'), $1, $4, ST_GeomFromText('POINT(' || $2 || ' ' || $3 || ')', 4326), 
+	SELECT nextval('public.featureOfInterestId_seq'),'T', getSpatialSamplingFeatureType('Point'), $2, $5, ST_GeomFromText('POINT(' || $3 || ' ' || $4 || ')', 4326), 
 '<sams:SFSpatialSamplingFeature 
 	xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns:sams="http://www.opengis.net/samplingSpatial/2.0" 
 	xmlns:sf="http://www.opengis.net/sampling/2.0" 
-	xmlns:gml="http://www.opengis.net/gml/3.2" gml:id="ssf_'::text || $1 || '">
-	<gml:identifier codeSpace="">'::text || $1 || '</gml:identifier>
-	<gml:name>'::text || $4 || '</gml:name>
+	xmlns:gml="http://www.opengis.net/gml/3.2" gml:id="ssf_test_'::text || $1 || '">
+	<gml:identifier codeSpace="">'::text || $2 || '</gml:identifier>
+	<gml:name>'::text || $5 || '</gml:name>
 	<sf:type xlink:href="http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint"/>
 	<sf:sampledFeature xlink:href="http://www.opengis.net/def/nil/OGC/0/unknown"/>
 	<sams:shape>
-		<gml:Point gml:id="pSsf_'::text || $1 || '">
-			<gml:pos srsName="http://www.opengis.net/def/crs/EPSG/0/4326">'::text|| $3 || ' '::text || $2 || '</gml:pos>
+		<gml:Point gml:id="pSsf_test_'::text || $1 || '">
+			<gml:pos srsName="http://www.opengis.net/def/crs/EPSG/0/4326">'::text|| $4 || ' '::text || $3 || '</gml:pos>
 		</gml:Point>
 	</sams:shape>
 </sams:SFSpatialSamplingFeature>'::text
-	WHERE $1 NOT IN (SELECT identifier FROM public.featureOfInterest);
-	SELECT featureOfInterestId FROM public.featureOfInterest WHERE identifier = $1;
+	WHERE $2 NOT IN (SELECT identifier FROM public.featureOfInterest);
+	SELECT featureOfInterestId FROM public.featureOfInterest WHERE identifier = $2;
 $$
 LANGUAGE 'sql';
 
@@ -411,7 +411,7 @@ $$
 					<swe:uom xlink:href="http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"/>
 				</swe:Time>
 			</swe:field>
-			<swe:field name="'::text || $2 || '">
+			<swe:field name="observableProperty_'::text || getObservableProperty($2) || '">
 				<swe:Quantity definition="'::text || $2 || '">
 					<swe:uom code="'::text || $5 || '"/>
 				</swe:Quantity>
@@ -472,21 +472,21 @@ SELECT insertAllowedFeatureOfInterestTypesForOffering('http://www.52north.org/te
 
 ---- FEATUREOFINTEREST
 -- con terra
-SELECT insertFeatureOfInterest('http://www.52north.org/test/featureOfInterest/1', 7.727958, 51.883906, 'con terra');
+SELECT insertFeatureOfInterest(1, 'http://www.52north.org/test/featureOfInterest/1', 7.727958, 51.883906, 'con terra');
 -- ESRI
-SELECT insertFeatureOfInterest('http://www.52north.org/test/featureOfInterest/2', -117.1957110000000, 34.056517, 'ESRI');
+SELECT insertFeatureOfInterest(2, 'http://www.52north.org/test/featureOfInterest/2', -117.1957110000000, 34.056517, 'ESRI');
 -- Kisters
-SELECT insertFeatureOfInterest('http://www.52north.org/test/featureOfInterest/3', 6.1320144042060925, 50.78570661296184, 'Kisters');
+SELECT insertFeatureOfInterest(3, 'http://www.52north.org/test/featureOfInterest/3', 6.1320144042060925, 50.78570661296184, 'Kisters');
 -- IfGI
-SELECT insertFeatureOfInterest('http://www.52north.org/test/featureOfInterest/4', 7.593655600000034, 51.9681661, 'IfGI');
+SELECT insertFeatureOfInterest(4, 'http://www.52north.org/test/featureOfInterest/4', 7.593655600000034, 51.9681661, 'IfGI');
 -- TU-D
-SELECT insertFeatureOfInterest('http://www.52north.org/test/featureOfInterest/5', 13.72375999999997, 51.02881, 'TU-Dresden');
+SELECT insertFeatureOfInterest(5, 'http://www.52north.org/test/featureOfInterest/5', 13.72375999999997, 51.02881, 'TU-Dresden');
 -- HBO
-SELECT insertFeatureOfInterest('http://www.52north.org/test/featureOfInterest/6', 7.270806, 51.447722, 'Hochschule Bochum');
+SELECT insertFeatureOfInterest(6, 'http://www.52north.org/test/featureOfInterest/6', 7.270806, 51.447722, 'Hochschule Bochum');
 -- ITC
-SELECT insertFeatureOfInterest('http://www.52north.org/test/featureOfInterest/7', 4.283393599999954, 52.0464393, 'ITC');
+SELECT insertFeatureOfInterest(7, 'http://www.52north.org/test/featureOfInterest/7', 4.283393599999954, 52.0464393, 'ITC');
 -- DLZ-IT
-SELECT insertFeatureOfInterest('http://www.52north.org/test/featureOfInterest/8', 10.94306000000006, 50.68606, 'DLZ-IT');
+SELECT insertFeatureOfInterest(8, 'http://www.52north.org/test/featureOfInterest/8', 10.94306000000006, 50.68606, 'DLZ-IT');
 
 ---- UNIT
 SELECT insertUnit('test_unit_1');
@@ -672,7 +672,7 @@ DROP FUNCTION getUnit(text);
 DROP FUNCTION insertBooleanObservation(bigint, char);
 DROP FUNCTION insertCategoryObservation(bigint, text);
 DROP FUNCTION insertCountObservation(bigint, int);
-DROP FUNCTION insertFeatureOfInterest(text, numeric, numeric, text);
+DROP FUNCTION insertFeatureOfInterest(int, text, numeric, numeric, text);
 DROP FUNCTION insertFeatureOfInterestType(text);
 DROP FUNCTION insertNumericObservation(bigint, numeric);
 DROP FUNCTION insertObservableProperty(text);

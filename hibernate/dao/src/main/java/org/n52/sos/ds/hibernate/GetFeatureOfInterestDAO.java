@@ -64,51 +64,79 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
         Session session = null;
         try {
             session = sessionHolder.getSession();
-            if (request.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
+            FeatureCollection featureCollection;
+            
+            if (isSos100(request)) {
                 // sos 1.0.0 either or
-                if ((request.getFeatureIdentifiers() != null && !request.getFeatureIdentifiers().isEmpty())
-                    && (request.getSpatialFilters() != null && !request.getSpatialFilters().isEmpty())) {
+                if (isMixedFeatureIdentifierAndSpatialFilters(request))
+                {
                     throw new NoApplicableCodeException()
-                            .withMessage("Only one out of featureofinterestid or location possible");
-                } else if ((request.getFeatureIdentifiers() != null && !request.getFeatureIdentifiers().isEmpty())
-                        || (request.getSpatialFilters() != null && !request.getSpatialFilters().isEmpty())) {
-                    // good
-                    final Set<String> foiIDs = new HashSet<String>(queryFeatureIdentifiersForParameter(request, session));
-                    // feature of interest
-                    final FeatureCollection featureCollection =
-                            new FeatureCollection(getConfigurator().getFeatureQueryHandler().getFeatures(
-                                    new ArrayList<String>(foiIDs), request.getSpatialFilters(), session,
-                                    request.getVersion(), -1));
-                    final GetFeatureOfInterestResponse response = new GetFeatureOfInterestResponse();
-                    response.setService(request.getService());
-                    response.setVersion(request.getVersion());
-                    response.setAbstractFeature(featureCollection);
-                    return response;
-                } else {
+                            .withMessage("Only one out of featureofinterestid or location possible.");
+                } 
+                else if (isFeatureIdentifierRequest(request) || isSpatialFilterRequest(request))
+                {
+                    featureCollection = getFeatures(request, session);
+                } 
+                else 
+                {
                     throw new CompositeOwsException(
                             new MissingParameterValueException(Sos1Constants.GetFeatureOfInterestParams.featureOfInterestID),
                             new MissingParameterValueException(Sos1Constants.GetFeatureOfInterestParams.location));
                 }
-            } else {
-                final Set<String> foiIDs = new HashSet<String>(queryFeatureIdentifiersForParameter(request, session));
-                // feature of interest
-                final FeatureCollection featureCollection =
-                        new FeatureCollection(getConfigurator().getFeatureQueryHandler().getFeatures(
-                                new ArrayList<String>(foiIDs), request.getSpatialFilters(), session,
-                                request.getVersion(), -1));
-                final GetFeatureOfInterestResponse response = new GetFeatureOfInterestResponse();
-                response.setService(request.getService());
-                response.setVersion(request.getVersion());
-                response.setAbstractFeature(featureCollection);
-                return response;
             }
-        } catch (final HibernateException he) {
-            throw new NoApplicableCodeException().causedBy(he)
+            else // SOS 2.0 
+            {
+                featureCollection = getFeatures(request, session);
+                featureCollection = processRelatedFeatures(request,featureCollection);
+            }
+            final GetFeatureOfInterestResponse response = new GetFeatureOfInterestResponse();
+            response.setService(request.getService());
+            response.setVersion(request.getVersion());
+            response.setAbstractFeature(featureCollection);
+            return response;
+        } 
+        catch (final HibernateException he)
+        {
+            throw new NoApplicableCodeException()
+            		.causedBy(he)
                     .withMessage("Error while querying feature of interest data!");
-        } finally {
+        } 
+        finally 
+        {
             sessionHolder.returnSession(session);
         }
     }
+
+	private boolean isSpatialFilterRequest(final GetFeatureOfInterestRequest request)
+	{
+		return request.getSpatialFilters() != null && !request.getSpatialFilters().isEmpty();
+	}
+
+	private boolean isFeatureIdentifierRequest(final GetFeatureOfInterestRequest request)
+	{
+		return request.getFeatureIdentifiers() != null && !request.getFeatureIdentifiers().isEmpty();
+	}
+
+	private boolean isMixedFeatureIdentifierAndSpatialFilters(final GetFeatureOfInterestRequest request)
+	{
+		return isFeatureIdentifierRequest(request)
+		    && isSpatialFilterRequest(request);
+	}
+
+	private boolean isSos100(final GetFeatureOfInterestRequest request)
+	{
+		return request.getVersion().equals(Sos1Constants.SERVICEVERSION);
+	}
+
+	private FeatureCollection getFeatures(final GetFeatureOfInterestRequest request,
+			final Session session) throws OwsExceptionReport
+	{
+		final Set<String> foiIDs = new HashSet<String>(queryFeatureIdentifiersForParameter(request, session));
+		// feature of interest
+		return new FeatureCollection(getConfigurator().getFeatureQueryHandler().getFeatures(
+		                new ArrayList<String>(foiIDs), request.getSpatialFilters(), session,
+		                request.getVersion(), -1));
+	}
 
     @SuppressWarnings("unchecked")
     private List<String> queryFeatureIdentifiersForParameter(final GetFeatureOfInterestRequest req, final Session session)
@@ -121,8 +149,7 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
 
         // relates to observations.
         if (req.isSetFeatureOfInterestIdentifiers()) {
-        	// FIXME clarify logic here! What do we want if the requested feature is only a relatedFeature of an procedure?
-        	final Collection<String> features = checkFeatureIdentifiersForRelatedFeatures(req.getFeatureIdentifiers());
+        	final Collection<String> features = getFeatureIdentifiers(req.getFeatureIdentifiers());
         	if (features != null && !features.isEmpty()) {
         		fc.add(Restrictions.in(FeatureOfInterest.IDENTIFIER,features));
         	}
@@ -137,7 +164,7 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
             c.createCriteria(Observation.PROCEDURE)
                     .add(Restrictions.in(Procedure.IDENTIFIER, req.getProcedures()));
         }
-        // temporal filters
+        // temporal filters (SOS 1.0.0)
         if (req.isSetTemporalFilters()) {
             c.add(TemporalRestrictions.filter(req.getTemporalFilters()));
         }

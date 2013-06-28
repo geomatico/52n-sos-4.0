@@ -44,7 +44,7 @@ import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
+import org.n52.sos.ogc.sos.SosConstants.IndeterminateTime;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.service.ServiceConstants;
@@ -145,7 +145,7 @@ public abstract class AbstractKvpDecoder implements Decoder<AbstractServiceReque
 
         if (times.length == 1) {
             TimeInstant ti = new TimeInstant();
-            if (FirstLatest.contains(times[0])) {
+            if (IndeterminateTime.contains(times[0])) {
                 ti.setIndeterminateValue(times[0]);
             } else {
                 DateTime instant = DateTimeHelper.parseIsoString2DateTime(times[0]);

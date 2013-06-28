@@ -89,6 +89,7 @@ import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.NcNameResolver;
 import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -157,15 +158,15 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
 
     @Override
     public XmlObject encode(final Object sosSweType, final Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
-
+        XmlObject encodedObject = null;
         if (sosSweType instanceof SweCoordinate) {
-            return createCoordinate((SweCoordinate) sosSweType);
+            encodedObject = createCoordinate((SweCoordinate) sosSweType);
 //        } else if (sosSweType instanceof SosSweAbstractSimpleType) {
 //            return createSimpleType((SosSweAbstractSimpleType) sosSweType);
         } else if (sosSweType instanceof SweAbstractEncoding) {
-            return createAbstractEncoding((SweAbstractEncoding) sosSweType);
+            encodedObject = createAbstractEncoding((SweAbstractEncoding) sosSweType);
         } else if (sosSweType instanceof SweAbstractDataComponent) {
-            return createAbstractDataComponent((SweAbstractDataComponent) sosSweType, additionalValues);
+            encodedObject = createAbstractDataComponent((SweAbstractDataComponent) sosSweType, additionalValues);
 //        } else if (sosSweType instanceof SosMultiObservationValues) {
 //            SosMultiObservationValues sosObservationValue = (SosMultiObservationValues) sosSweType;
 //            if (sosObservationValue.getValue() != null && sosObservationValue.getValue() instanceof SweDataArrayValue
@@ -196,11 +197,15 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
                 final DataArrayPropertyType dataArrayProperty = DataArrayPropertyType.Factory.newInstance(XmlOptionsHelper
                         .getInstance().getXmlOptions());
                 dataArrayProperty.setDataArray1(dataArrayType);
-                return dataArrayProperty;
+                encodedObject = dataArrayProperty;
             }
-            return dataArrayType;
+            encodedObject = dataArrayType;
+        } else {
+            throw new UnsupportedEncoderInputException(this, sosSweType);
         }
-        throw new UnsupportedEncoderInputException(this, sosSweType);
+        LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
+                XmlHelper.validateDocument(encodedObject));
+        return encodedObject;
     }
 
     private XmlObject createAbstractDataComponent(final SweAbstractDataComponent sosSweAbstractDataComponent,

@@ -57,7 +57,6 @@ import net.opengis.gml.x32.TimePositionType;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
-import org.joda.time.DateTime;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedDecoderInputException;
@@ -71,7 +70,7 @@ import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
+import org.n52.sos.ogc.sos.SosConstants.IndeterminateTime;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
@@ -311,25 +310,10 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
      *             if parsing the datestring into java.util.Date failed
      * @throws OwsExceptionReport
      */
-    private TimeInstant parseTimeInstant(TimeInstantType xbTimeIntant) throws OwsExceptionReport {
-        
-            TimeInstant ti = new TimeInstant();
-            ti.setGmlId(xbTimeIntant.getId());
-            TimePositionType xbTimePositionType = xbTimeIntant.getTimePosition();
-            String timeString = xbTimePositionType.getStringValue();
-            if (timeString != null && !timeString.isEmpty()) {
-                if ((FirstLatest.contains(timeString))) {
-                    ti.setIndeterminateValue(timeString);
-                } else {
-                    ti.setValue(DateTimeHelper.parseIsoString2DateTime(timeString));
-                    ti.setRequestedTimeLength(timeString.length());
-                }
-            }
-            if (xbTimePositionType.getIndeterminatePosition() != null) {
-                ti.setIndeterminateValue(xbTimePositionType.getIndeterminatePosition().toString());
-            }
-            return ti;
-       
+    private Object parseTimeInstant(TimeInstantType xbTimeIntant) throws OwsExceptionReport {
+        TimeInstant ti = parseTimePosition(xbTimeIntant.getTimePosition());
+        ti.setGmlId(xbTimeIntant.getId());
+        return ti;
     }
 
     /**
@@ -343,35 +327,50 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
      *
      * @throws OwsExceptionReport
      */
-    private TimePeriod parseTimePeriod(TimePeriodType xbTimePeriod) throws OwsExceptionReport {
+    private Object parseTimePeriod(TimePeriodType xbTimePeriod) throws OwsExceptionReport {
         // begin position
         TimePositionType xbBeginTPT = xbTimePeriod.getBeginPosition();
-        DateTime begin = null;
+        TimeInstant begin = null;
         if (xbBeginTPT != null) {
-            String beginString = xbBeginTPT.getStringValue();
-            begin = DateTimeHelper.parseIsoString2DateTime(beginString);
+            begin = parseTimePosition(xbBeginTPT);
         } else {
             throw new NoApplicableCodeException()
-                    .withMessage("gml:TimePeriod! must contain beginPos Element with valid ISO:8601 String!!");
+                    .withMessage("gml:TimePeriod must contain gml:beginPosition Element with valid ISO:8601 String!");
         }
 
         // end position
-        DateTime end = null;
         TimePositionType xbEndTPT = xbTimePeriod.getEndPosition();
+        TimeInstant end = null;
         if (xbEndTPT != null) {
-            String endString = xbEndTPT.getStringValue();
-            end =
-                    DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
-                            DateTimeHelper.parseIsoString2DateTime(endString), endString.length());
+            end = parseTimePosition(xbEndTPT);
         } else {
             throw new NoApplicableCodeException()
-                    .withMessage("gml:TimePeriod! must contain endPos Element with valid ISO:8601 String!!");
+                    .withMessage("gml:TimePeriod must contain gml:endPosition Element with valid ISO:8601 String!");
         }
         TimePeriod timePeriod = new TimePeriod(begin, end);
         timePeriod.setGmlId(xbTimePeriod.getId());
         return timePeriod;
     }
 
+    private TimeInstant parseTimePosition(TimePositionType xbTimePosition) throws OwsExceptionReport {
+        TimeInstant ti = new TimeInstant();
+        String timeString = xbTimePosition.getStringValue();
+        if (timeString != null && !timeString.isEmpty()) {
+            if ((IndeterminateTime.contains(timeString))) {
+                ti.setIndeterminateValue(timeString);
+            } else {
+                ti.setValue(DateTimeHelper.parseIsoString2DateTime(timeString));
+                ti.setRequestedTimeLength(timeString.length());
+            }
+        }
+        if (xbTimePosition.getIndeterminatePosition() != null) {
+            ti.setIndeterminateValue(xbTimePosition.getIndeterminatePosition().toString());
+        }
+
+        return ti;        
+    }
+    
+    
     private SingleObservationValue<String> parseReferenceType(ReferenceType referenceType) {
         SingleObservationValue<String> value = new SingleObservationValue<String>();
         if (referenceType.getHref() != null && !referenceType.getHref().isEmpty()) {

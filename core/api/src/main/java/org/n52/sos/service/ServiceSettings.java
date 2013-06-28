@@ -110,8 +110,8 @@ public class ServiceSettings implements SettingDefinitionProvider {
     		.setOrder(12)
     		.setKey(ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR)
     		.setDefaultValue(true)
-    		.setTitle("Encode full for child procedure SensorMl in parent DescribeSensor responses")
-    		.setDescription("Whether to encode full SensorML for each child procedures in a DescribeSensor response for a parent procedure.");    
+    		.setTitle("Encode full for child procedure SensorML in parent DescribeSensor responses")
+    		.setDescription("Whether to encode full SensorML for each child procedures in a DescribeSensor response for a parent procedure.");
 
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
             SERVICE_URL_DEFINITION,

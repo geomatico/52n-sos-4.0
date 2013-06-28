@@ -57,7 +57,7 @@ import org.n52.sos.ogc.om.OmObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
+import org.n52.sos.ogc.sos.SosConstants.IndeterminateTime;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.util.CollectionHelper;
@@ -130,9 +130,9 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         final Criterion filterCriterion = getTemporalFilterCriterion(request);
 
         if (request.hasTemporalFilters()) {
-            final List<FirstLatest> flFilters = request.getFirstLatestTemporalFilter();
+            final List<IndeterminateTime> flFilters = request.getFirstLatestTemporalFilter();
             if (!flFilters.isEmpty()) {
-                for (final FirstLatest fl : flFilters) {
+                for (final IndeterminateTime fl : flFilters) {
                     observations.addAll(createTemporalFilterLessCriteria(session, request, features)
                             .addOrder(getOrder(fl)).setMaxResults(1).list());
                 }
@@ -175,7 +175,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
             return null;
         }
         // temporal filters
-        final List<FirstLatest> flFilters = request.getFirstLatestTemporalFilter();
+        final List<IndeterminateTime> itFilters = request.getFirstLatestTemporalFilter();
         final Criterion filterCriterion = getTemporalFilterCriterion(request);
 
         final List<OmObservation> result = new LinkedList<OmObservation>();
@@ -183,9 +183,9 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         for (final ObservationConstellation oc : getObservationConstellations(session, request)) {
             final Set<Observation> observations = new HashSet<Observation>(0);
             if (request.hasTemporalFilters()) {
-                if (flFilters != null && !flFilters.isEmpty()) {
-                    for (final FirstLatest firstLatest : flFilters) {
-                        observations.addAll(createObservationCriteria(session, oc).addOrder(getOrder(firstLatest))
+                if (itFilters != null && !itFilters.isEmpty()) {
+                    for (final IndeterminateTime indetTimeFiler : itFilters) {
+                        observations.addAll(createObservationCriteria(session, oc).addOrder(getOrder(indetTimeFiler))
                                 .setMaxResults(1).list());
                     }
                 } else if (filterCriterion != null) {
@@ -305,10 +305,10 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         }
     }
 
-    protected Order getOrder(final FirstLatest firstLatest) {
-        if (firstLatest.equals(FirstLatest.first)) {
+    protected Order getOrder(final IndeterminateTime indetTime) {
+        if (indetTime.equals(IndeterminateTime.first)) {
             return Order.asc(Observation.PHENOMENON_TIME_START);
-        } else if (firstLatest.equals(FirstLatest.latest)) {
+        } else if (indetTime.equals(IndeterminateTime.latest)) {
             return Order.desc(Observation.PHENOMENON_TIME_END);
         }
         return null;

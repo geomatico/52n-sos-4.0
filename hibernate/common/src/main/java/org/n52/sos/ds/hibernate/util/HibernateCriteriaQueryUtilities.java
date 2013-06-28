@@ -63,7 +63,7 @@ import org.n52.sos.ds.hibernate.entities.Unit;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.features.AbstractFeature;
-import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
+import org.n52.sos.ogc.sos.SosConstants.IndeterminateTime;
 import org.n52.sos.util.CollectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -676,10 +676,10 @@ public class HibernateCriteriaQueryUtilities {
         return rtc.list();
     }
     @Deprecated
-    public static Order getOrderForEnum(FirstLatest firstLatest) {
-        if (firstLatest.equals(FirstLatest.first)) {
+    public static Order getOrderForEnum(IndeterminateTime firstLatest) {
+        if (firstLatest.equals(IndeterminateTime.first)) {
             return Order.asc(Observation.PHENOMENON_TIME_START);
-        } else if (firstLatest.equals(FirstLatest.latest)) {
+        } else if (firstLatest.equals(IndeterminateTime.latest)) {
             return Order.desc(Observation.PHENOMENON_TIME_END);
         }
         return null;

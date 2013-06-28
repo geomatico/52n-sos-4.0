@@ -1,5 +1,5 @@
 /**
-AbstractSosV2KvpTest * Copyright (C) 2013
+ * Copyright (C) 2013
  * by 52 North Initiative for Geospatial Open Source Software GmbH
  *
  * Contact: Andreas Wytzisk

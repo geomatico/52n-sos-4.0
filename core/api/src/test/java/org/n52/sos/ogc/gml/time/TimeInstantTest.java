@@ -23,10 +23,13 @@
  */
 package org.n52.sos.ogc.gml.time;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.n52.sos.ogc.sos.SosConstants.IndeterminateTime;
 
 public class TimeInstantTest {
 
@@ -52,10 +55,20 @@ public class TimeInstantTest {
     }
     
     @Test
-    public void shoulEqual() {
+    public void shouldEqual() {
         DateTime dateTime = new DateTime();
         TimeInstant timeInstant = new TimeInstant(dateTime);
         TimeInstant equalTimeInstant = new TimeInstant(dateTime, "latest");
         assertTrue("TimeInstants are NOT equal",timeInstant.equals(equalTimeInstant));
+    }
+    
+    @Test
+    public void testIndeterminateNow() {
+        TimeInstant timeInstant = new TimeInstant(null, IndeterminateTime.now.name());
+        DateTime beforeAccess = new DateTime();
+        DateTime nowValue = timeInstant.resolveValue();
+        assertNotNull("TimeInstant now value is null", nowValue);
+        assertTrue("TimeInstant now value is too early", nowValue.isAfter(beforeAccess) || nowValue.isEqual(beforeAccess));
+        assertTrue("TimeInstant now value is too late", nowValue.isBeforeNow() || nowValue.isEqualNow());
     }
 }

@@ -71,6 +71,15 @@ public class TimeInstant extends Time {
     }
 
     /**
+     * Get time value, resolving indeterminate value if value is null
+     * 
+     * @return Returns the resolved value.
+     */
+    public DateTime resolveValue() {
+        return resolveDateTime(value, getIndeterminateValue());
+    }
+
+    /**
      * Set time value
      * 
      * @param value
@@ -178,5 +187,4 @@ public class TimeInstant extends Time {
     {
         return !isSetValue() && !isSetIndeterminateValue();
     }
-
 }

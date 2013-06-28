@@ -66,6 +66,7 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,6 +117,8 @@ public class OmDecoderv20 implements Decoder<OmObservation, OMObservationType> {
 
     @Override
     public OmObservation decode(OMObservationType omObservation) throws OwsExceptionReport {
+        // validate document
+        XmlHelper.validateDocument(omObservation);
         Map<String, AbstractFeature> featureMap = new HashMap<String, AbstractFeature>();
         OmObservation sosObservation = new OmObservation();
         sosObservation.setIdentifier(getIdentifier(omObservation));

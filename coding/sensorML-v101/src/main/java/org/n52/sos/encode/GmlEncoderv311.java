@@ -86,6 +86,7 @@ import org.n52.sos.util.MinMax;
 import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,27 +149,31 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
 
     @Override
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+        XmlObject encodedObject = null;
         if (element instanceof Time) {
-            return createTime((Time) element, additionalValues);
+            encodedObject = createTime((Time) element, additionalValues);
         } else if (element instanceof Geometry) {
-            return createPosition((Geometry) element, additionalValues.get(HelperValues.GMLID));
+            encodedObject = createPosition((Geometry) element, additionalValues.get(HelperValues.GMLID));
         } else if (element instanceof CategoryValue) {
-            return createReferenceTypeForCategroyValue((CategoryValue) element);
+            encodedObject = createReferenceTypeForCategroyValue((CategoryValue) element);
         } else if (element instanceof org.n52.sos.ogc.gml.ReferenceType) {
-            return createReferencType((org.n52.sos.ogc.gml.ReferenceType) element);
+            encodedObject = createReferencType((org.n52.sos.ogc.gml.ReferenceType) element);
         } else if (element instanceof CodeWithAuthority) {
-            return createCodeWithAuthorityType((CodeWithAuthority) element);
+            encodedObject = createCodeWithAuthorityType((CodeWithAuthority) element);
         } else if (element instanceof QuantityValue) {
-            return createMeasureType((QuantityValue) element);
+            encodedObject = createMeasureType((QuantityValue) element);
         } else if (element instanceof org.n52.sos.ogc.gml.CodeType) {
-            return createCodeType((org.n52.sos.ogc.gml.CodeType) element);
+            encodedObject = createCodeType((org.n52.sos.ogc.gml.CodeType) element);
         } else if (element instanceof AbstractFeature) {
-            return createFeature((AbstractFeature) element);
+            encodedObject = createFeature((AbstractFeature) element);
         } else if (element instanceof SosEnvelope) {
-            return createEnvelope((SosEnvelope)element);
+            encodedObject = createEnvelope((SosEnvelope)element);
         } else {
             throw new UnsupportedEncoderInputException(this, element);
         }
+        LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
+                XmlHelper.validateDocument(encodedObject));
+        return encodedObject;
     }
 
     private XmlObject createTime(Time time, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {

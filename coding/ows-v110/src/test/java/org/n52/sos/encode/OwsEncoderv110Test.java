@@ -23,7 +23,9 @@
  */
 package org.n52.sos.encode;
 
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
 import java.util.AbstractMap;
@@ -31,13 +33,18 @@ import java.util.Map;
 
 import net.opengis.ows.x11.ExceptionDocument;
 import net.opengis.ows.x11.ExceptionReportDocument;
+import net.opengis.ows.x11.ServiceIdentificationDocument.ServiceIdentification;
 
+import org.apache.xmlbeans.XmlObject;
 import org.junit.Test;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
+import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 
 /**
@@ -77,5 +84,30 @@ public class OwsEncoderv110Test {
 		nace.setVersion(Sos2Constants.SERVICEVERSION);
 		return nace;
 	}
+	
+	@Test
+	public void should_encode_service_identification_without_service_type_codespace() throws OwsExceptionReport {
+	    String serviceTypeValue = "serviceType";
+	    SosServiceIdentification serviceId = new SosServiceIdentification();
+	    serviceId.setServiceType(serviceTypeValue);
+	    XmlObject xbEncoded = CodingHelper.encodeObjectToXml(OWSConstants.NS_OWS, serviceId);
+	    assertThat(xbEncoded, instanceOf(ServiceIdentification.class));
+	    ServiceIdentification xbServiceId = (ServiceIdentification) xbEncoded;
+	    assertThat(xbServiceId.getServiceType().getStringValue(), equalTo(serviceTypeValue));
+	    assertThat(xbServiceId.getServiceType().getCodeSpace(), nullValue());
+	}
 
+    @Test
+    public void should_encode_service_identification_with_service_type_codespace() throws OwsExceptionReport {
+        String serviceTypeValue = "serviceType";
+        String serviceTypeCodeSpaceValue = "codeSpace";
+        SosServiceIdentification serviceId = new SosServiceIdentification();
+        serviceId.setServiceType(serviceTypeValue);
+        serviceId.setServiceTypeCodeSpace(serviceTypeCodeSpaceValue);
+        XmlObject xbEncoded = CodingHelper.encodeObjectToXml(OWSConstants.NS_OWS, serviceId);
+        assertThat(xbEncoded, instanceOf(ServiceIdentification.class));
+        ServiceIdentification xbServiceId = (ServiceIdentification) xbEncoded;
+        assertThat(xbServiceId.getServiceType().getStringValue(), equalTo(serviceTypeValue));
+        assertThat(xbServiceId.getServiceType().getCodeSpace(), equalTo(serviceTypeCodeSpaceValue));
+    }	
 }

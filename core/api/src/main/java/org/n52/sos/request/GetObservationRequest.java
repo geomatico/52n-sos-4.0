@@ -34,7 +34,7 @@ import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
+import org.n52.sos.ogc.sos.SosConstants.IndeterminateTime;
 
 /**
  * SOS GetObservation request
@@ -468,7 +468,7 @@ public class GetObservationRequest extends AbstractServiceRequest {
         for (TemporalFilter temporalFilter : temporalFilters) {
             if (temporalFilter.getTime() instanceof TimeInstant) {
                 TimeInstant ti = (TimeInstant)temporalFilter.getTime();
-                if (ti.isSetIndeterminateValue() && FirstLatest.contains(ti.getIndeterminateValue())) {
+                if (ti.isSetIndeterminateValue() && IndeterminateTime.contains(ti.getIndeterminateValue())) {
                     return true;
                 }
             }
@@ -476,13 +476,13 @@ public class GetObservationRequest extends AbstractServiceRequest {
         return false;
     }
 
-    public List<FirstLatest> getFirstLatestTemporalFilter() {
-        List<FirstLatest> tf = new LinkedList<FirstLatest>();
+    public List<IndeterminateTime> getFirstLatestTemporalFilter() {
+        List<IndeterminateTime> tf = new LinkedList<IndeterminateTime>();
         for (TemporalFilter temporalFilter : temporalFilters) {
             if (temporalFilter.getTime() instanceof TimeInstant) {
                 TimeInstant ti = (TimeInstant) temporalFilter.getTime();
-                if (ti.isSetIndeterminateValue() && FirstLatest.contains(ti.getIndeterminateValue())) {
-                    tf.add(FirstLatest.valueOf(ti.getIndeterminateValue()));
+                if (ti.isSetIndeterminateValue() && IndeterminateTime.contains(ti.getIndeterminateValue())) {
+                    tf.add(IndeterminateTime.valueOf(ti.getIndeterminateValue()));
                 }
             }
         }
@@ -494,7 +494,7 @@ public class GetObservationRequest extends AbstractServiceRequest {
         for (TemporalFilter temporalFilter : temporalFilters) {
             if (temporalFilter.getTime() instanceof TimeInstant) {
                 TimeInstant ti = (TimeInstant) temporalFilter.getTime();
-                if (!ti.isSetIndeterminateValue() || !FirstLatest.contains(ti.getIndeterminateValue())) {
+                if (!ti.isSetIndeterminateValue() || !IndeterminateTime.contains(ti.getIndeterminateValue())) {
                     tf.add(temporalFilter);
                 }
             } else {

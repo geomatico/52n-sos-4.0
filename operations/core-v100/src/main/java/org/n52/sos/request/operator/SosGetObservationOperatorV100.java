@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -59,8 +60,10 @@ import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.SosHelper;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,7 +148,7 @@ public class SosGetObservationOperatorV100 extends
         checkQueryParametersIfAllEmpty(sosRequest);
 
         try {
-            checkOfferingId(sosRequest.getOfferings());
+            sosRequest.setOfferings(checkOfferingId(sosRequest.getOfferings()));
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -205,7 +208,8 @@ public class SosGetObservationOperatorV100 extends
                 if (!qNamesForResultModel.contains(sosRequest.getResultModel())) {
                     exceptions.add(new InvalidParameterValueException().at(
                             Sos1Constants.GetObservationParams.resultModel).withMessage(
-                            "The value '%s' is invalid for the requested offering!", OMHelper.getEncodedResultModelFor(sosRequest.getResultModel())));
+                            "The value '%s' is invalid for the requested offering!",
+                            OMHelper.getEncodedResultModelFor(sosRequest.getResultModel())));
                 }
             }
         }
@@ -263,10 +267,12 @@ public class SosGetObservationOperatorV100 extends
      *             * if the passed offeringId is not supported
      */
     // one / mandatory
-    private void checkOfferingId(List<String> offeringIds) throws OwsExceptionReport {
+    private List<String> checkOfferingId(List<String> offeringIds) throws OwsExceptionReport {
+        List<String> validOfferings = CollectionHelper.list();
         if (offeringIds != null) {
 
-            Collection<String> offerings = Configurator.getInstance().getCache().getOfferings();
+            Set<String> offerings = Configurator.getInstance().getCache().getOfferings();
+            Map<String, String> ncOfferings = SosHelper.getNcNameResolvedOfferings(offerings);
             CompositeOwsException exceptions = new CompositeOwsException();
 
             if (offeringIds.size() != 1) {
@@ -274,25 +280,20 @@ public class SosGetObservationOperatorV100 extends
             }
 
             for (String offeringId : offeringIds) {
-                if (offeringId == null || offeringId.isEmpty()) {
+                if (StringHelper.isNullOrEmpty(offeringId)) {
                     throw new MissingOfferingParameterException();
                 }
-                if (offeringId.contains(SosConstants.SEPARATOR_4_OFFERINGS)) {
-                    String[] offArray = offeringId.split(SosConstants.SEPARATOR_4_OFFERINGS);
-                    if (!offerings.contains(offArray[0])
-                            || !Configurator.getInstance().getCache().getProceduresForOffering(offArray[0])
-                                    .contains(offArray[1])) {
-                        throw new InvalidOfferingParameterException(offeringId);
-                    }
-
+                if (offerings.contains(offeringId)) {
+                    validOfferings.add(offeringId);
+                } else if (ncOfferings.containsKey(offeringId)) {
+                    validOfferings.add(ncOfferings.get(offeringId));                    
                 } else {
-                    if (!offerings.contains(offeringId)) {
-                        throw new InvalidOfferingParameterException(offeringId);
-                    }
-                }
+                    throw new InvalidOfferingParameterException(offeringId);
+                }                
             }
             exceptions.throwIfNotEmpty();
         }
+        return validOfferings;
     }
 
     // TODO check for SOS 1.0.0

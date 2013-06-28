@@ -100,6 +100,7 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.SchemaLocation;
 import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,10 +113,9 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweCommonEncoderv101.class);
 
     private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(SWEConstants.NS_SWE_101,
-            SweBoolean.class, SweCategory.class, SweCount.class, SweObservableProperty.class,
-            SweQuantity.class, SweQuantityRange.class, SweText.class, SweTime.class,
-            SweTimeRange.class, SweEnvelope.class, SweCoordinate.class, SweDataArray.class,
-            SweDataRecord.class, SweSimpleDataRecord.class, TimePeriod.class);
+            SweBoolean.class, SweCategory.class, SweCount.class, SweObservableProperty.class, SweQuantity.class,
+            SweQuantityRange.class, SweText.class, SweTime.class, SweTimeRange.class, SweEnvelope.class,
+            SweCoordinate.class, SweDataArray.class, SweDataRecord.class, SweSimpleDataRecord.class, TimePeriod.class);
 
     public SweCommonEncoderv101() {
         LOGGER.debug("Encoder for the following keys initialized successfully: {}!",
@@ -160,38 +160,43 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
     @Override
     public XmlObject encode(final Object element, final Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
+        XmlObject encodedObject = null;
         if (element instanceof SweBoolean) {
-            return createBoolean((SweBoolean) element);
+            encodedObject = createBoolean((SweBoolean) element);
         } else if (element instanceof SweCategory) {
-            return createCategory((SweCategory) element);
+            encodedObject = createCategory((SweCategory) element);
         } else if (element instanceof SweCount) {
-            return createCount((SweCount) element);
+            encodedObject = createCount((SweCount) element);
         } else if (element instanceof SweObservableProperty) {
-            return createObservableProperty((SweObservableProperty) element);
+            encodedObject = createObservableProperty((SweObservableProperty) element);
         } else if (element instanceof SweQuantity) {
-            return createQuantity((SweQuantity) element);
+            encodedObject = createQuantity((SweQuantity) element);
         } else if (element instanceof SweQuantityRange) {
-            return createQuantityRange((SweQuantityRange) element);
+            encodedObject = createQuantityRange((SweQuantityRange) element);
         } else if (element instanceof SweText) {
-            return createText((SweText) element);
+            encodedObject = createText((SweText) element);
         } else if (element instanceof SweTime) {
-            return createTime((SweTime) element);
+            encodedObject = createTime((SweTime) element);
         } else if (element instanceof SweTimeRange) {
-            return createTimeRange((SweTimeRange) element);
+            encodedObject = createTimeRange((SweTimeRange) element);
         } else if (element instanceof SweCoordinate) {
-            return createCoordinate((SweCoordinate<?>) element);
+            encodedObject = createCoordinate((SweCoordinate<?>) element);
         } else if (element instanceof SweDataArray) {
-            return createDataArray((SweDataArray) element);
+            encodedObject = createDataArray((SweDataArray) element);
         } else if (element instanceof SweDataRecord) {
-        	return createDataRecord((SweDataRecord) element);
+            encodedObject = createDataRecord((SweDataRecord) element);
         } else if (element instanceof SweEnvelope) {
-            return createEnvelope((SweEnvelope) element);
+            encodedObject = createEnvelope((SweEnvelope) element);
         } else if (element instanceof SweSimpleDataRecord) {
-            return createSimpleDataRecord((SweSimpleDataRecord) element);
+            encodedObject = createSimpleDataRecord((SweSimpleDataRecord) element);
         } else if (element instanceof TimePeriod) {
-            return createTimeGeometricPrimitivePropertyType((TimePeriod) element);
+            encodedObject = createTimeGeometricPrimitivePropertyType((TimePeriod) element);
+        } else {
+            throw new UnsupportedEncoderInputException(this, element);
         }
-        throw new UnsupportedEncoderInputException(this, element);
+        LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
+                XmlHelper.validateDocument(encodedObject));
+        return encodedObject;
     }
 
     private SimpleDataRecordType createSimpleDataRecord(final SweSimpleDataRecord simpleDataRecord)
@@ -439,7 +444,8 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
     }
 
     private EnvelopeType createEnvelope(final SweEnvelope sosSweEnvelope) {
-        final EnvelopeType envelopeType = EnvelopeType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        final EnvelopeType envelopeType =
+                EnvelopeType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         addAbstractDataComponentValues(envelopeType, sosSweEnvelope);
         if (sosSweEnvelope.isReferenceFrameSet()) {
             envelopeType.setReferenceFrame(sosSweEnvelope.getReferenceFrame());
@@ -530,7 +536,8 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
 
         final List<SweField> sosFields = sosDataRecord.getFields();
 
-        final DataRecordType xbDataRecord = DataRecordType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        final DataRecordType xbDataRecord =
+                DataRecordType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
 
         if (sosDataRecord.isSetFields()) {
             final DataComponentPropertyType[] xbFields = new DataComponentPropertyType[sosFields.size()];
@@ -561,8 +568,7 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
                 final DataComponentPropertyType xbElementType = xbDataArray.addNewElementType();
                 xbDataArray.getElementType().setName("Components");
 
-                final DataRecordType xbDataRecord =
-                        createDataRecord((SweDataRecord) sosDataArray.getElementType());
+                final DataRecordType xbDataRecord = createDataRecord((SweDataRecord) sosDataArray.getElementType());
                 xbElementType.set(xbDataRecord);
             }
 
@@ -685,7 +691,7 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
         timeCursor.dispose();
         return xbTimeGeometricPrimitiveProperty;
     }
-    
+
     private UomPropertyType createUom(String uom) {
         UomPropertyType xbUom = UomPropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (uom.startsWith("urn:") || uom.startsWith("http://")) {
@@ -694,5 +700,5 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             xbUom.setCode(uom);
         }
         return xbUom;
-    }    
+    }
 }

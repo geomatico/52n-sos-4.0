@@ -85,6 +85,13 @@ public class TimePeriod extends Time {
         this.end = end;
     }
 
+    public TimePeriod(DateTime start, String startIndet, DateTime end, String endIndet) {
+        this.start = start;
+        this.startIndet = startIndet;
+        this.end = end;
+        this.endIndet = endIndet;
+    }    
+    
     /**
      * standard constructor
      * 
@@ -112,6 +119,24 @@ public class TimePeriod extends Time {
         this.duration = ISOPeriodFormat.standard().parsePeriod(duration);
     }
 
+    /**
+     * Constructor using TimeInstants
+     * 
+     * @param startTime Start TimeInstant
+     * @param endTime End TimeInstant
+     * @throws ParseException
+     */
+    public TimePeriod(TimeInstant startTime, TimeInstant endTime) {
+        if (startTime != null) {
+            this.start = startTime.getValue();
+            this.startIndet = startTime.getIndeterminateValue();
+        }
+        if (endTime != null) {
+            this.end = endTime.getValue();
+            this.endIndet = endTime.getIndeterminateValue();
+        }
+    }    
+    
     /**
      * Get duration
      * 
@@ -141,6 +166,15 @@ public class TimePeriod extends Time {
     }
 
     /**
+     * Get start time, resolving indeterminate value if start is null
+     * 
+     * @return Returns the resolved start time.
+     */
+    public DateTime resolveStart() {
+        return resolveDateTime(start, startIndet);
+    }
+
+    /**
      * Set start time
      * 
      * @param start
@@ -159,6 +193,15 @@ public class TimePeriod extends Time {
         return end;
     }
 
+    /**
+     * Get end time, resolving indeterminate value if start is null
+     * 
+     * @return Returns the resolved end time.
+     */
+    public DateTime resolveEnd() {
+        return resolveDateTime(end, endIndet);
+    }
+    
     /**
      * Set end time
      * 

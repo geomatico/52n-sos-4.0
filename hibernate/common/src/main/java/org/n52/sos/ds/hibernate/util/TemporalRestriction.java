@@ -139,11 +139,11 @@ public abstract class TemporalRestriction {
      * @return the <tt>Criterion</tt> that describes this restriction
      */
     private Criterion filterWithPeriod(TimePeriod time, TimePrimitiveFieldDescriptor r) {
-        Date begin = time.getStart().toDate();
+        Date begin = time.resolveStart().toDate();
         //FIXME should also incorporate reduced precision like getRequestedTimeLength()
-        Date end = time.getEnd().toDate();
+        Date end = time.resolveEnd().toDate();
         if (begin.equals(end)) {
-            return filterWithInstant(new TimeInstant(time.getStart()), r);
+            return filterWithInstant(new TimeInstant(time.resolveStart()), r);
         }
         if (r.isPeriod()) {
             return getPropertyCheckingCriterion(filterPeriodWithPeriod(r.getBeginPosition(), r.getEndPosition(), begin, end),
@@ -171,7 +171,7 @@ public abstract class TemporalRestriction {
          * Also instants with reduced precision are semantically periods and have to be
          * handled like periods.
          */
-        Date begin = time.getValue().toDate();
+        Date begin = time.resolveValue().toDate();
         Date end = checkInstantWithReducedPrecision(time);
         if (end != null) {
             return filterWithPeriod(new TimePeriod(new DateTime(begin), new DateTime(end)), r);
