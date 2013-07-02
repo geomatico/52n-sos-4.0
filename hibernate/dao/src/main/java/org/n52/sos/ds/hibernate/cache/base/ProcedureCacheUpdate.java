@@ -28,13 +28,16 @@ import java.util.List;
 import org.n52.sos.ds.hibernate.cache.AbstractQueuingDatasourceCacheUpdate;
 import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
 import org.n52.sos.ds.hibernate.entities.Procedure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  * @author Shane StClair <shane@axiomalaska.com>
  */
-public class ProcedureCacheUpdate extends AbstractQueuingDatasourceCacheUpdate<Procedure> {    
+public class ProcedureCacheUpdate extends AbstractQueuingDatasourceCacheUpdate<Procedure> {   
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcedureCacheUpdate.class);    
     private static final String THREAD_GROUP_NAME = "procedure-cache-update";
     
     public ProcedureCacheUpdate(int threads) {
@@ -58,6 +61,9 @@ public class ProcedureCacheUpdate extends AbstractQueuingDatasourceCacheUpdate<P
             Runnable task = new ProcedureCacheUpdateTask(getCountDownLatch(), getSessionFactory(), getCache(), procedure, getErrorList());
             // put runnable in executor service
             getExecutor().submit(task);
+        } else {
+            getCountDownLatch().countDown();
+            LOGGER.debug("Procedure '{}' is deleted, latch.countDown().", procedure.getIdentifier());
         }
     }
 }

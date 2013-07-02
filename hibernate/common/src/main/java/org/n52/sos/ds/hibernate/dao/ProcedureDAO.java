@@ -23,8 +23,6 @@
  */
 package org.n52.sos.ds.hibernate.dao;
 
-import static org.n52.sos.util.CollectionHelper.*;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -42,6 +40,7 @@ import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat;
 import org.n52.sos.ds.hibernate.entities.TProcedure;
+import org.n52.sos.util.CollectionHelper;
 
 /**
  * Hibernate data access class for procedure
@@ -106,10 +105,12 @@ public class ProcedureDAO {
      */
     @SuppressWarnings("unchecked")
     public List<String> getProceduresForFeatureOfInterest(final Session session, final FeatureOfInterest feature) {
-        return session.createCriteria(Observation.class).add(Restrictions.eq(Observation.DELETED, false))
-                .createCriteria(Observation.FEATURE_OF_INTEREST)
-                .add(Restrictions.eq(FeatureOfInterest.IDENTIFIER, feature.getIdentifier()))
-                .setProjection(Projections.distinct(Projections.property(FeatureOfInterest.IDENTIFIER))).list();
+    	final Criteria c = session.createCriteria(Observation.class);
+    	c.add(Restrictions.eq(Observation.DELETED, false));
+    	c.createCriteria(Observation.FEATURE_OF_INTEREST).add(Restrictions.eq(FeatureOfInterest.IDENTIFIER, feature.getIdentifier()));
+    	c.createCriteria(Observation.PROCEDURE).setProjection(Projections.distinct(Projections.property(Procedure.IDENTIFIER)));
+        final List<String> list = c.list();
+		return list;
     }
 
     /**
@@ -244,8 +245,8 @@ public class ProcedureDAO {
             final TProcedure tProcedure = new TProcedure();
             tProcedure.setProcedureDescriptionFormat(procedureDecriptionFormat);
             tProcedure.setIdentifier(identifier);
-            if (isNotEmpty(parentProcedures)) {
-                tProcedure.setParents(asSet(getProceduresForIdentifiers(parentProcedures,
+            if (CollectionHelper.isNotEmpty(parentProcedures)) {
+                tProcedure.setParents(CollectionHelper.asSet(getProceduresForIdentifiers(parentProcedures,
                         session)));
             }
             procedure = tProcedure;
