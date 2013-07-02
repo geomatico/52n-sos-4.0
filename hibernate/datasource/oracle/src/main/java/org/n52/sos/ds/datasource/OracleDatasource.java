@@ -1,6 +1,7 @@
 package org.n52.sos.ds.datasource;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -16,14 +17,23 @@ import org.hibernate.mapping.Table;
 import org.hibernate.spatial.dialect.oracle.OracleSpatial10gDialect;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.n52.sos.ds.Datasource;
+import org.n52.sos.ds.hibernate.util.HibernateConstants;
+import org.n52.sos.exception.ConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OracleDatasource extends AbstractHibernateFullDBDatasource {
+	private static final Logger LOG = LoggerFactory
+			.getLogger(OracleDatasource.class);
+
 	private static final String DIALECT_NAME = "Oracle Spatial";
 
 	private static final String ORACLE_DRIVER_CLASS = "oracle.jdbc.OracleDriver";
 
-	private static final Pattern JDBC_URL_PATTERN = Pattern
+	private static final Pattern JDBC_THIN_URL_PATTERN = Pattern
 			.compile("^jdbc:oracle:thin://([^:]+):([0-9]+)/(.*)$");
+	private static final Pattern JDBC_OCI_URL_PATTERN = Pattern
+			.compile("^jdbc:oracle:oci:@([^:]+):([0-9]+)/(.*)$");
 
 	public static final String USERNAME_DESCRIPTION = "Your database server user name. "
 			+ "The default value for Oracle Spatial is \"oracle\".";
@@ -38,6 +48,12 @@ public class OracleDatasource extends AbstractHibernateFullDBDatasource {
 			+ "Oracle Spatial server. The default value for Oracle is 1521.";
 	public static final int PORT_DEFAULT_VALUE = 1521;
 	public static final String SCHEMA_DEFAULT_VALUE = "oracle";
+
+	private enum Mode {
+		THIN, OCI
+	}
+
+	private Mode mode = Mode.OCI;
 
 	public OracleDatasource() {
 		super(USERNAME_DEFAULT_VALUE, USERNAME_DESCRIPTION,
@@ -150,7 +166,9 @@ public class OracleDatasource extends AbstractHibernateFullDBDatasource {
 
 	@Override
 	protected void validatePrerequisites(Connection con,
-			DatabaseMetadata metadata, Map<String, Object> settings) {
+			DatabaseMetadata metadata, Map<String, Object> settings)
+			throws ConfigurationException {
+		checkClasspath();
 	}
 
 	@Override
@@ -159,23 +177,91 @@ public class OracleDatasource extends AbstractHibernateFullDBDatasource {
 	}
 
 	@Override
+	protected Connection openConnection(Map<String, Object> settings)
+			throws SQLException {
+		String pass = (String) settings
+				.get(HibernateConstants.CONNECTION_PASSWORD);
+		String user = (String) settings
+				.get(HibernateConstants.CONNECTION_USERNAME);
+		try {
+			Class.forName(getDriverClass());
+		} catch (ClassNotFoundException ex) {
+			throw new SQLException(ex);
+		}
+
+		// Try OCI if it never failed previously
+		if (mode == Mode.OCI) {
+			try {
+				return DriverManager.getConnection(toOciUrl(settings), user,
+						pass);
+			} catch (UnsatisfiedLinkError e) {
+				LOG.debug("Failed to use OCI driver. Falling back to thin.", e);
+				mode = Mode.THIN;
+			} catch (SQLException e) {
+				LOG.debug("Failed to use OCI driver. Falling back to thin.", e);
+				mode = Mode.THIN;
+			}
+		}
+
+		return DriverManager.getConnection(toThinUrl(settings), user, pass);
+	}
+
+	@Override
 	protected String toURL(Map<String, Object> settings) {
-		String url = String.format("jdbc:oracle:thin://%s:%d/%s",
+		if (mode == Mode.OCI) {
+			return toOciUrl(settings);
+		} else {
+			return toThinUrl(settings);
+		}
+	}
+
+	private String toThinUrl(Map<String, Object> settings) {
+		return String.format("jdbc:oracle:thin://%s:%d/%s",
 				settings.get(HOST_KEY), settings.get(PORT_KEY),
 				settings.get(DATABASE_KEY));
-		return url;
+	}
+
+	private String toOciUrl(Map<String, Object> settings) {
+		return String.format("jdbc:oracle:oci:@%s:%d/%s",
+				settings.get(HOST_KEY), settings.get(PORT_KEY),
+				settings.get(DATABASE_KEY));
 	}
 
 	@Override
 	protected String[] parseURL(String url) {
-		Matcher matcher = JDBC_URL_PATTERN.matcher(url);
-		matcher.find();
-		return new String[] { matcher.group(1), matcher.group(2),
-				matcher.group(3) };
+		// Try OCI
+		Matcher matcher = JDBC_OCI_URL_PATTERN.matcher(url);
+		if (matcher.find() && matcher.groupCount() == 3) {
+			return new String[] { matcher.group(1), matcher.group(2),
+					matcher.group(3) };
+		} else {
+			// If OCI fails, use THIN
+			matcher = JDBC_THIN_URL_PATTERN.matcher(url);
+			matcher.find();
+			return new String[] { matcher.group(1), matcher.group(2),
+					matcher.group(3) };
+		}
 	}
 
 	@Override
 	protected String getDriverClass() {
 		return ORACLE_DRIVER_CLASS;
+	}
+
+	@Override
+	public void validateConnection(Map<String, Object> settings) {
+		checkClasspath();
+		super.validateConnection(settings);
+	}
+
+	private void checkClasspath() throws ConfigurationException {
+		try {
+			Class.forName(ORACLE_DRIVER_CLASS);
+		} catch (ClassNotFoundException e) {
+			throw new ConfigurationException(
+					"Oracle jar file (ojdbc6.jar) must be "
+							+ "included in the server classpath. "
+							+ "Visit http://www.google.es for help.", e);
+		}
 	}
 }

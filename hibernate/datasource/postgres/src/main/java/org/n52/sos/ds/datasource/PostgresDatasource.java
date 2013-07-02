@@ -24,6 +24,7 @@
 package org.n52.sos.ds.datasource;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
@@ -38,6 +39,7 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.mapping.Table;
 import org.hibernate.spatial.dialect.postgis.PostgisDialect52N;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
+import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.util.StringHelper;
 
@@ -221,4 +223,20 @@ public class PostgresDatasource extends AbstractHibernateFullDBDatasource {
             }
         }
     }
+    
+    @Override
+	protected Connection openConnection(Map<String, Object> settings)
+			throws SQLException {
+		try {
+			String jdbc = toURL(settings);
+			Class.forName(getDriverClass());
+			String pass = (String) settings
+					.get(HibernateConstants.CONNECTION_PASSWORD);
+			String user = (String) settings
+					.get(HibernateConstants.CONNECTION_USERNAME);
+			return DriverManager.getConnection(jdbc, user, pass);
+		} catch (ClassNotFoundException ex) {
+			throw new SQLException(ex);
+		}
+	}
 }

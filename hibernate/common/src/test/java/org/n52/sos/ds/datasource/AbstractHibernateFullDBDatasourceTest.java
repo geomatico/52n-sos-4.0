@@ -1,6 +1,7 @@
 package org.n52.sos.ds.datasource;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -147,6 +148,12 @@ public class AbstractHibernateFullDBDatasourceTest extends TestCase {
 		@Override
 		protected void validatePrerequisites(Connection con,
 				DatabaseMetadata metadata, Map<String, Object> settings) {
+		}
+
+		@Override
+		protected Connection openConnection(Map<String, Object> settings)
+				throws SQLException {
+			return null;
 		}
 	}
 }

@@ -1,8 +1,5 @@
 package org.n52.sos.ds.datasource;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -159,22 +156,6 @@ public abstract class AbstractHibernateFullDBDatasource extends
 				: Integer.valueOf(port));
 		settings.put(createDatabaseDefinition().getKey(), db);
 		return settings;
-	}
-
-	@Override
-	protected Connection openConnection(Map<String, Object> settings)
-			throws SQLException {
-		try {
-			String jdbc = toURL(settings);
-			Class.forName(getDriverClass());
-			String pass = (String) settings
-					.get(HibernateConstants.CONNECTION_PASSWORD);
-			String user = (String) settings
-					.get(HibernateConstants.CONNECTION_USERNAME);
-			return DriverManager.getConnection(jdbc, user, pass);
-		} catch (ClassNotFoundException ex) {
-			throw new SQLException(ex);
-		}
 	}
 
 	private String getDialectClass() {
