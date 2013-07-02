@@ -34,6 +34,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.GeneralQueryDAO;
+import org.n52.sos.exception.ows.concrete.NoImplementationFoundException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CollectionHelper;
@@ -42,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -120,6 +122,13 @@ public class AdminDatasourceController extends AbstractDatasourceController {
         }
     }
 
+	@ResponseBody
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	@ExceptionHandler(UnsupportedOperationException.class)
+	public String onError(UnsupportedOperationException e) {
+		return "The operation is not supported.";
+	}
+	
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE_REMOVE_TEST_DATA, method = RequestMethod.POST)
     public void deleteTestData() throws OwsExceptionReport,

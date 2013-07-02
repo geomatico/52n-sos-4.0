@@ -140,7 +140,11 @@
                     "url": "<c:url value="/admin/datasource/testdata/remove" />",
                     "type": "POST"
                 }).fail(function(error) {
-                    showError("Request failed: " + error.status + " " + error.statusText);
+                    if (error.responseText) {
+                        showError(error.responseText);
+                    } else {
+                        showError("Request failed: " + error.status + " " + error.statusText);
+                    }
                     $button.removeAttr("disabled");
                 }).done(function() {
                     showSuccess("The test data was removed.");
