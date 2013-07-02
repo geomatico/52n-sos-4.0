@@ -260,8 +260,7 @@ public class OracleDatasource extends AbstractHibernateFullDBDatasource {
 		} catch (ClassNotFoundException e) {
 			throw new ConfigurationException(
 					"Oracle jar file (ojdbc6.jar) must be "
-							+ "included in the server classpath. "
-							+ "Visit http://www.google.es for help.", e);
+							+ "included in the server classpath. ", e);
 		}
 	}
 }
